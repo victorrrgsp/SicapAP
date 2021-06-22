@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout}">
+<head>
+    <meta charset="utf-8">
+</head>
+<body>
+<section layout:fragment="corpo">
+    <h2 class="bg-light" style="margin-left:1%;">Unidade Gestora</h2>
+    <nav class="navbar navbar-light bg-light">
+        <form action="/buscar-municipio.php" method="post" class="form-inline">
+            <span> Digite o nome do município para filtrar: </span>
+            <input class="form-control mr-sm-2" type="search" name="nome" aria-label="Search">
+            <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Pesquisar</button>
+        </form>
+    </nav>
+    <table class="table">
+        <thead class="thead-light">
+        <tr>
+            <th scope="col">Nome</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><a href="#"> Abreulândia - CÂMARA MUNICIPAL DE ABREULÂNDIA</td>
+        </tr>
+        <tr>
+            <td><a href="#"> Aliança do Tocantins - CÂMARA MUNICIPAL DE ALIANÇA DO TOCANTINS</td>
+        </tr>
+        <tr>
+            <td><a href="#"> Alvorada - CÂMARA MUNICIPAL DE ALVORADA</td>
+        </tbody>
+    </table>
+    <nav aria-label="Page navigation example">
+        <ul class="pagination">
+            <li class="page-item"><a class="page-link" href="#">Anterior</a></li>
+            <li class="page-item"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item"><a class="page-link" href="#">Proximo</a></li>
+        </ul>
+    </nav>
+</section>
+</body>
+</html>
