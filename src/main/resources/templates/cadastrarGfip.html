@@ -1,93 +1,344 @@
 <!DOCTYPE html>
-<html layout:decorate="~{layout}">
-<head>
+<html lang="pt-br">
+  <head>
+    <!-- Meta tags Obrigatórias -->
     <meta charset="utf-8">
-</head>
-<body>
-<section layout:fragment="corpo">
-    <h5>Lista de arquivos GFIP</h5>
-    <nav>
-        <div class="nav nav-tabs" id="nav-tab" role="tablist">
-            <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab"
-               aria-controls="nav-home" aria-selected="true">Filtros / Resultados</a>
-            <a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab"
-               aria-controls="nav-profile" aria-selected="false">Dados GFIP</a>
-        </div>
-    </nav>
-    <div class="tab-content" id="nav-tabContent">
-        <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
-            <p></p>
-            <!-- Button trigger modal -->
-            <button type="button" class="btn btn-secondary"> Imprimir <i class="fas fa-print"></i>
-            </button>
-            <br></br>
-            <form class="form-inline">
-                <span>Ano: </span>
-                <input placeholder="digite o ano" class="form-control mr-sm-2" type="search" name="nome"
-                       aria-label="Search"></table>
-                <span>Mes: </span>
-                <input placeholder="digite o mes" class="form-control mr-sm-2" type="search" name="nome"
-                       aria-label="Search"></table>
-                <button type="button" class="btn btn-primary">Pesquisar <i class="fas fa-search"></i></button>
-            </form>
-            <br></br>
-            <table class="table table-striped">
-                <thead>
-                <tr>
-                    <th scope="col">Ano</th>
-                    <th scope="col">Mes</th>
-                    <th scope="col">Data de envio</th>
-                    <th scope="col">Arquivo GFIP</th>
-                    <th scope="col">Boleto GFIP</th>
-                    <th scope="col">Comprovante de pagamento</th>
-                    <th scope="col"></th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>2</td>
-                    <td>3</td>
-                    <td>4</td>
-                    <td>5</td>
-                    <td>6</td>
-                    <td><a href="#"> retificar </a></td>
-                </tr>
-                <tr>
-                    <td>1</td>
-                    <td>2</td>
-                    <td>3</td>
-                    <td>4</td>
-                    <td>5</td>
-                    <td>6</td>
-                    <td><a href="#"> retificar </a></td>
-                </tr>
-                <tr>
-                    <td>1</td>
-                    <td>2</td>
-                    <td>3</td>
-                    <td>4</td>
-                    <td>5</td>
-                    <td>6</td>
-                    <td><a href="#"> retificar </a></td>
-                </tr>
-                </tbody>
-            </table>
-            <nav aria-label="Page navigation example">
-                <ul class="pagination">
-                    <li class="page-item"><a class="page-link" href="#">Anterior</a></li>
-                    <li class="page-item"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                    <li class="page-item"><a class="page-link" href="#">Proximo</a></li>
-                </ul>
-            </nav>
-        </div>
-        <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
-            <p></p>
-            teste
-        </div>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+    <script src="https://kit.fontawesome.com/18603f7a9f.js" crossorigin="anonymous"></script>
+
+
+    <title>SICAP</title>
+  </head>
+  <body>
+
+    <div style="background: url(&quot;https://dev2.tce.to.gov.br/resources/imagens/bg-topo.jpg&quot;) repeat-x; height: 128px;">
+
+      <img src="https://dev2.tce.to.gov.br/resources/imagens/logo-topo.jpg" align="left" >
+
+      <b style="font-size:24px; font-weight::bold; position: absolute; z-index: 1;top: 30px; color:#fff;">
+      Tribunal de Contas do Tocantins
+      </b>
+
+      <b style="font-size:18px; font-weight::bold; position: absolute; z-index: 1; top: 65px; color:#fff;">
+      Sistema Integrado de Controle e Auditoria Pública de Atos de Pessoal
+      </b>
+
+      <img style="border-width:0;" src="https://dev2.tce.to.gov.br/resources/imagens/direita-topo.jpg" height="109" align="right">
     </div>
-</section>
-</body>
+
+    <div>
+
+
+<div class="container-fluid">      
+
+      
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Alterna navegação">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNavDropdown">
+    <ul class="navbar-nav">
+
+   <li class="nav-item active">
+        <a class="nav-link" href="avisos.php"><i class="fas fa-exclamation-triangle"></i> Avisos</a>
+      </li>
+
+      <li class="nav-item active">
+        <a class="nav-link" href="unidadeGestora.php"><i class="fas fa-map-marker-alt"></i> Unidade Gestora</a>
+      </li>
+
+
+      <li class="nav-item active dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <i class="fas fa-edit"></i> Concurso publico
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+          <a class="dropdown-item" href="#">Edital de abertura</a>
+          <a class="dropdown-item" href="#">Vaga do concurso</a>
+          <a class="dropdown-item" href="#">Homologacao do concurso</a>
+          <a class="dropdown-item" href="#">Aprovado do concurso</a>
+        </div>
+      </li>
+
+            <li class="nav-item active dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <i class="fas fa-pen"></i> Registro </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+          <a class="dropdown-item" href="#">Decisao</a>
+          <a class="dropdown-item" href="#">Processo</a>
+          <a class="dropdown-item" href="#">Livro</a>
+          <a class="dropdown-item" href="#">Gerar etiqueta</a>
+        </div>
+      </li>
+
+            <li class="nav-item active dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <i class="fas fa-paper-plane"></i> Envio eletronico de documentos
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+          <a class="dropdown-item" href="#">Concessao</a>
+          <a class="dropdown-item" href="#">Concurso publico</a>
+          <a class="dropdown-item" href="#">Admissao</a>
+          <a class="dropdown-item" href="#">Assinar processo</a>
+        </div>
+      </li>
+
+
+      <li class="nav-item active">
+
+         <!-- Button trigger modal -->
+         <a data-toggle="modal" data-target="#exampleModalCenter2" class="nav-link" href=""> <i class="fas fa-key"></i> Permissoes</a>
+
+         <!-- Modal -->
+         <div class="modal fade" id="exampleModalCenter2" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+           <div class="modal-dialog modal-dialog-centered" role="document">
+             <div class="modal-content">
+               <div class="modal-header">
+                 <h5 class="modal-title" id="exampleModalLongTitle">Associação de Usuário à Perfis</h5>
+
+               </div>
+
+               <div class="modal-body">
+                                 
+               <table class="table">
+                 <thead class="thead-light">
+                   <tr>
+                     <th scope="col">Perfis</th>
+                   </tr>
+                 </thead>
+                 <tbody>
+                   <tr>
+                     <td> <a href="#">Administrador</td>
+                   </tr>
+                   <tr>
+                     <td> <a href="#">Registro</td>
+                   </tr>
+                   <tr>
+                 </tbody>
+               </table>
+
+               <table class="table">
+                 <thead class="thead-light">
+                   <tr>
+                     <th scope="col">Usuarios</th>
+                   </tr>
+                 </thead>
+               </table>
+
+   
+               <form action="/buscar-nome.php" method="post" class="form-inline">
+                  <input placeholder="nome" class="form-control mr-sm-2" type="search" name="nome" aria-label="Search"></table>
+                  <button class="btn btn-outline-primary my-2 my-sm-0" type="submit"> <i class="fas fa-search"></i> </button>
+                  <button style="margin-left:1%;" class="btn btn-outline-primary my-2 my-sm-0" type="submit"> <i class="fas fa-plus"></i> </button>
+               </form>
+      
+
+               <table class="table">
+                 <thead class="thead-light">
+                 </thead>
+                 <tbody>
+                   <tr>        
+                     <td> <a href="#">Admin</td>
+                   </tr>
+                   <tr>
+                     <td> <a href="#">Jose</td>
+                   </tr>
+                   <tr>
+                     <td> <a href="#">Maria</td>
+                 </tbody>
+               </table>
+
+               </div>
+
+               <div class="modal-footer">
+                 <button type="button" class="btn btn-primary" data-dismiss="modal">Fechar</button>
+               </div>
+             </div>
+           </div>
+         </div>
+      </li>
+
+
+      <li class="nav-item active">
+        <a class="nav-link" href="sair.php"> <i class="fas fa-sign-out-alt"></i> Sair </a>
+      </li>
+
+
+
+    </ul>
+
+   </div>
+
+   <div>
+
+       <ul class="navbar-nav ms-auto">
+
+      <li class="nav-item active">
+
+         <!-- Button trigger modal -->
+         <a data-toggle="modal" data-target="#exampleModalCenter" class="nav-link" href=""> <i class="fas fa-user-circle"></i> Admin</a>
+
+         <!-- Modal -->
+         <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+           <div class="modal-dialog modal-dialog-centered" role="document">
+             <div class="modal-content">
+               <div class="modal-header">
+                 <h5 class="modal-title" id="exampleModalLongTitle">Dados do usuario</h5>
+
+               </div>
+
+               <div class="modal-body">
+                                 
+                 <div>Nome: Admin</div>
+                 <div>Matricula: 123</div>
+                 <div>Ultimo acesso: 01/01/2020</div>
+               </div>
+
+               <div class="modal-footer">
+                 <button type="button" class="btn btn-primary" data-dismiss="modal">Fechar</button>
+               </div>
+             </div>
+           </div>
+         </div>
+         </li>
+
+
+       </ul>
+
+   </div>
+
+
+
+</nav>
+
+</div>
+
+      <div class="card">
+        <div class="card-header text-white" style="background-color: #03487b;">
+          Lista de arquivos GFIP
+        </div>
+      </div>
+
+<nav>
+  <div class="nav nav-tabs" id="nav-tab" role="tablist">
+    <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true">Filtros / Resultados</a>
+    <a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false">Dados GFIP</a>
+  </div>
+</nav>
+<div class="tab-content" id="nav-tabContent">
+  <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+
+   <p></p>
+
+   <!-- Button trigger modal -->
+   <button type="button" class="btn btn-secondary"> Imprimir  <i class="fas fa-print"></i>
+   </button>
+
+   <br></br>
+
+     
+    <form class="form-inline">
+    <span>Ano: </span>
+    <input placeholder="digite o ano" class="form-control mr-sm-2" type="search" name="nome" aria-label="Search"></table>
+    <span>Mes: </span>
+    <input placeholder="digite o mes" class="form-control mr-sm-2" type="search" name="nome" aria-label="Search"></table>
+    <button type="button" class="btn btn-primary">Pesquisar <i class="fas fa-search"></i></button>
+    </form>
+
+      
+
+      <br></br>
+
+      <table class="table table-striped">
+  <thead>
+
+    <tr>
+               <th scope="col">Ano</th>
+               <th scope="col">Mes</th>
+               <th scope="col">Data de envio</th>
+               <th scope="col">Arquivo GFIP</th>
+               <th scope="col">Boleto GFIP</th>
+               <th scope="col">Comprovante de pagamento</th>
+               <th scope="col"></th>
+    </tr>
+
+  </thead>
+  
+  <tbody>
+
+    <tr>
+      <td>1</td>
+      <td>2</td>
+      <td>3</td>
+      <td>4</td>
+      <td>5</td>
+      <td>6</td>
+      <td> <a href="#"> retificar </h> </td>
+    </tr>
+
+    <tr>
+      <td>1</td>
+      <td>2</td>
+      <td>3</td>
+      <td>4</td>
+      <td>5</td>
+      <td>6</td>
+      <td> <a href="#"> retificar </h> </td>
+    </tr>
+
+    <tr>
+      <td>1</td>
+      <td>2</td>
+      <td>3</td>
+      <td>4</td>
+      <td>5</td>
+      <td>6</td>
+      <td> <a href="#"> retificar </h> </td>
+    </tr>
+
+  </tbody>
+</table>
+
+
+    <nav aria-label="Page navigation example">
+  <ul class="pagination">
+    <li class="page-item"><a class="page-link" href="#">Anterior</a></li>
+    <li class="page-item"><a class="page-link" href="#">1</a></li>
+    <li class="page-item"><a class="page-link" href="#">2</a></li>
+    <li class="page-item"><a class="page-link" href="#">3</a></li>
+    <li class="page-item"><a class="page-link" href="#">Proximo</a></li>
+  </ul>
+</nav>  
+
+   </div>
+
+  <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
+
+   <p></p>
+   <!-- Button trigger modal -->
+
+teste   
+
+  </div>
+
+</div>
+
+ 
+
+
+    <!-- JavaScript (Opcional) -->
+    <!-- jQuery primeiro, depois Popper.js, depois Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
+</div>
+
+
+  </body>
 </html>
