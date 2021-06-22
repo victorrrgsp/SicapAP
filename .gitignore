@@ -31,3 +31,23 @@ build/
 
 ### VS Code ###
 .vscode/
+
+/****Arquivos****/
+*.project
+*.launch
+*.iml
+*.classpath
+*.class
+*.iml
+src/META-INF/config.properties
+
+/****Pastas****/
+.externalToolBuilders
+build
+bin
+mainteste
+/log/
+/temp/
+/xml/
+/target/
+ProjetoTeste/
