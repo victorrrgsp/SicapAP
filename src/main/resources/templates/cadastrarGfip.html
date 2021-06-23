@@ -5,89 +5,137 @@
 </head>
 <body>
 <section layout:fragment="corpo">
+    
     <h5>Lista de arquivos GFIP</h5>
-    <nav>
-        <div class="nav nav-tabs" id="nav-tab" role="tablist">
-            <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab"
-               aria-controls="nav-home" aria-selected="true">Filtros / Resultados</a>
-            <a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab"
-               aria-controls="nav-profile" aria-selected="false">Dados GFIP</a>
-        </div>
-    </nav>
-    <div class="tab-content" id="nav-tabContent">
-        <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
-            <p></p>
-            <!-- Button trigger modal -->
-            <button type="button" class="btn btn-secondary"> Imprimir <i class="fas fa-print"></i>
-            </button>
-            <br></br>
-            <form class="form-inline">
-                <span>Ano: </span>
-                <input placeholder="digite o ano" class="form-control mr-sm-2" type="search" name="nome"
-                       aria-label="Search"></table>
-                <span>Mes: </span>
-                <input placeholder="digite o mes" class="form-control mr-sm-2" type="search" name="nome"
-                       aria-label="Search"></table>
-                <button type="button" class="btn btn-primary">Pesquisar <i class="fas fa-search"></i></button>
-            </form>
-            <br></br>
-            <table class="table table-striped">
-                <thead>
-                <tr>
-                    <th scope="col">Ano</th>
-                    <th scope="col">Mes</th>
-                    <th scope="col">Data de envio</th>
-                    <th scope="col">Arquivo GFIP</th>
-                    <th scope="col">Boleto GFIP</th>
-                    <th scope="col">Comprovante de pagamento</th>
-                    <th scope="col"></th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>2</td>
-                    <td>3</td>
-                    <td>4</td>
-                    <td>5</td>
-                    <td>6</td>
-                    <td><a href="#"> retificar </a></td>
-                </tr>
-                <tr>
-                    <td>1</td>
-                    <td>2</td>
-                    <td>3</td>
-                    <td>4</td>
-                    <td>5</td>
-                    <td>6</td>
-                    <td><a href="#"> retificar </a></td>
-                </tr>
-                <tr>
-                    <td>1</td>
-                    <td>2</td>
-                    <td>3</td>
-                    <td>4</td>
-                    <td>5</td>
-                    <td>6</td>
-                    <td><a href="#"> retificar </a></td>
-                </tr>
-                </tbody>
-            </table>
-            <nav aria-label="Page navigation example">
-                <ul class="pagination">
-                    <li class="page-item"><a class="page-link" href="#">Anterior</a></li>
-                    <li class="page-item"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                    <li class="page-item"><a class="page-link" href="#">Proximo</a></li>
-                </ul>
-            </nav>
-        </div>
-        <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
-            <p></p>
-            teste
-        </div>
+
+<nav>
+  <div class="nav nav-tabs" id="nav-tab" role="tablist">
+    <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true">Filtros / Resultados</a>
+    <a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false">Teste</a>
+  </div>
+</nav>
+<div class="tab-content" id="nav-tabContent">
+  <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+
+   <p></p>
+
+   <!-- Button trigger modal -->
+   <button type="button" class="btn btn-secondary"> Imprimir  <i class="fas fa-print"></i>
+   </button>
+
+   <br></br>
+
+     
+    <form class="form-inline">
+    <span>Ano: </span>
+    <input placeholder="digite o ano" class="form-control mr-sm-2" type="search" name="nome" aria-label="Search"></table>
+    <span>Mes: </span>
+    <input placeholder="digite o mes" class="form-control mr-sm-2" type="search" name="nome" aria-label="Search"></table>
+    <button type="button" class="btn btn-primary">Pesquisar <i class="fas fa-search"></i></button>
+    </form>
+
+      
+
+      <br></br>
+
+      <table class="table table-striped">
+  <thead>
+
+    <tr>
+               <th scope="col">Ano</th>
+               <th scope="col">Mes</th>
+               <th scope="col">Data de envio</th>
+               <th scope="col">Arquivo GFIP</th>
+               <th scope="col">Boleto GFIP</th>
+               <th scope="col">Comprovante de pagamento</th>
+               <th scope="col">Ações</th>
+    </tr>
+
+  </thead>
+  
+  <tbody>
+
+    <tr>
+      <td>1</td>
+      <td>2</td>
+      <td>3</td>
+      <td><a href="#"> <i class="fas fa-file-pdf"></i> </a></td>
+      <td><a href="#"> <i class="fas fa-file-pdf"></i> </a></td>
+      <td><a href="#"> <i class="fas fa-file-pdf"></i> </a></td>
+ 	  <td>
+      	<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter4"> retificar </button> 
+  	  </td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModalCenter4" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Retificar arquivos GFIP</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        
+		<form action="#">
+		  <label for="myfile">Insira o arquivo GFIP:</label>
+		  <input type="file" id="myfile1" name="myfile1"><br><br>
+
+		  <label for="myfile">Insira o boleto GFIP:</label>
+		  <input type="file" id="myfile2" name="myfile2"><br><br>
+
+		  <label for="myfile">Insira o comprovante de pagamento:</label>
+		  <input type="file" id="myfile3" name="myfile3"><br><br>
+		  <input type="submit">
+		</form>				
+
+      </div>
+
     </div>
+  </div>
+</div>
+
+
+    <nav aria-label="Page navigation example">
+  <ul class="pagination">
+    <li class="page-item"><a class="page-link" href="#">Anterior</a></li>
+    <li class="page-item"><a class="page-link" href="#">1</a></li>
+    <li class="page-item"><a class="page-link" href="#">2</a></li>
+    <li class="page-item"><a class="page-link" href="#">3</a></li>
+    <li class="page-item"><a class="page-link" href="#">Proximo</a></li>
+  </ul>
+</nav>  
+
+   </div>
+
+  <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
+
+   <p></p>
+   <!-- Button trigger modal -->
+
+teste   
+
+  </div>
+
+</div>
+
+ 
+
+
+    <!-- JavaScript (Opcional) -->
+    <!-- jQuery primeiro, depois Popper.js, depois Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
+</div>
+
 </section>
 </body>
 </html>

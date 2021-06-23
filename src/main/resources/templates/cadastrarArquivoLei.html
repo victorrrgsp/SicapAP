@@ -5,91 +5,396 @@
 </head>
 <body>
 <section layout:fragment="corpo">
-    <h5>Lista de arquivos GFIP</h5>
-    <nav>
-        <div class="nav nav-tabs" id="nav-tab" role="tablist">
-            <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab"
-               aria-controls="nav-home" aria-selected="true">Filtros / Resultados</a>
-            <a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab"
-               aria-controls="nav-profile" aria-selected="false">Teste</a>
+  
+  <h5>Lista de lei</h5>
+
+  <!-- Modal -->
+  <div class="modal fade bd-example-modal-lg" id="exampleModalCenter5" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Gerenciador de Lei</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
         </div>
-    </nav>
-    <div class="tab-content" id="nav-tabContent">
-        <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
-            <p></p>
-            <!-- Button trigger modal -->
-            <button type="button" class="btn btn-secondary"> Imprimir <i class="fas fa-print"></i>
-            </button>
-            <br></br>
-            <form class="form-inline">
-                <span>Ano: </span>
-                <input placeholder="digite o ano" class="form-control mr-sm-2" type="search" name="nome"
-                       aria-label="Search"></table>
-                <span>Mes: </span>
-                <input placeholder="digite o mes" class="form-control mr-sm-2" type="search" name="nome"
-                       aria-label="Search"></table>
-                <button type="button" class="btn btn-primary">Pesquisar <i class="fas fa-search"></i></button>
-            </form>
-            <br></br>
-            <table class="table table-striped">
-                <thead>
-                <tr>
-                    <th scope="col">Ano</th>
-                    <th scope="col">Mes</th>
-                    <th scope="col">Data de envio</th>
-                    <th scope="col">Arquivo GFIP</th>
-                    <th scope="col">Boleto GFIP</th>
-                    <th scope="col">Comprovante de pagamento</th>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>Mark</td>
-                    <td>Otto</td>
-                    <td>@mdo</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>Jacob</td>
-                    <td>Thornton</td>
-                    <td>@fat</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>Larry</td>
-                    <td>the Bird</td>
-                    <td>@twitter</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                </tbody>
-            </table>
-            <nav aria-label="Page navigation example">
-                <ul class="pagination">
-                    <li class="page-item"><a class="page-link" href="#">Anterior</a></li>
-                    <li class="page-item"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                    <li class="page-item"><a class="page-link" href="#">Proximo</a></li>
-                </ul>
-            </nav>
+        <div class="modal-body">
+          
+          <form>
+  
+            <div class="form-row">
+               <div class="col">
+                  <span>Vinculo:</span>
+                <select class="form-control" id="exampleFormControlSelect1">
+                  <option>1</option>
+                  <option>2</option>
+                  <option>3</option>
+                  <option>4</option>
+                  <option>5</option>
+                </select>
+               </div>
+  
+               <div class="col">
+                  <span>Numero da lei:</span>
+                  <input type="text" class="form-control">
+               </div>
+  
+            </div>
+  
+            <div class="form-row">
+               <div class="col">
+                  <span>Data da lei:</span>
+                  <input type="text" class="form-control">
+               </div>
+  
+               <div class="col">
+                  <span>Data da publicacao:</span>
+                  <input type="text" class="form-control">
+               </div>
+               
+               <div class="col">
+                <span>Veiculo da publicacao:</span>
+                <input type="text" class="form-control">
+             </div>
+               
+            </div>
+  
+          <div class="form-row">
+  
+            <div class="col">
+              <span>Observação:</span>
+              <input type="text" class="form-control sm">
+           </div>
+               
+            </div>   
+  
+         </form>
+  
+         <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+          <button type="button" class="btn btn-primary">Salvar</button>
+       </div>       
+  
         </div>
-        <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
-            <p></p>
-            teste
-        </div>
+  
+      </div>
     </div>
+  </div>
+  
+  <nav>
+    <div class="nav nav-tabs" id="nav-tab" role="tablist">
+      <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true">Lei</a>
+      <a class="nav-item nav-link" id="nav-contact-tab" data-toggle="tab" href="#nav-contact" role="tab" aria-controls="nav-contact" aria-selected="false">Quadro de cargos</a>
     </div>
+  </nav>
+  
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModalCenter10" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Atenção</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+  
+        <span>Deseja realmente excluir a lei?</span>
+  
+        </div>
+  
+        <div class="modal-footer">
+          <button type="button" class="btn btn-warning" data-dismiss="modal">Sim</button>
+          <button type="button" class="btn btn-primary">Não</button>
+       </div>  
+  
+      </div>
+    </div>
+  </div>
+  
+  <div class="tab-content" id="nav-tabContent">
+    <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+  
+     <p></p>
+  
+     <!-- Button trigger modal -->
+     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter5">
+          Adicionar novo <i class="fas fa-plus"></i>
+     </button>
+  
+     <br></br>
+  
+     <form class="form-inline">
+  
+      <span>Vinculo: </span>
+      <select class="form-select mr-sm-2" aria-label="Default select example">
+        <option selected>Selecione uma opção</option>
+        <option value="1">A</option>
+        <option value="2">B</option>
+        <option value="3">C</option>
+      </select>
+  
+      <span>Numero de lei: </span>
+      <input placeholder="digite o numero da lei" class="form-control mr-sm-2" type="search" name="nome" aria-label="Search">
+      <button type="button" class="btn btn-primary">Pesquisar <i class="fas fa-search"></i></button>
+      </form>
+  
+      <br></br>
+  
+  <table class="table table-striped">
+    <thead>
+  
+      <tr>
+                 <th scope="col">Vinculo</th>
+                 <th scope="col">Num lei</th>
+                 <th scope="col">Dt lei</th>
+                 <th scope="col">Veic pub</th>
+                 <th scope="col">Dt pub</th>
+                 <th scope="col">Acoes</th>
+    </thead>
+    
+    <tbody>
+  
+      <tr>
+        <td>Mark</td>
+        <td>Otto</td>
+        <td>@mdo</td>
+        <td>aaaaa</td>
+        <td>1</td>
+        <td>
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter5"> <i class="fas fa-pen"></i>
+        </button> 
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter10"> <i class="fas fa-trash-alt"></i> </button> 
+      </td>
+      </tr>
+  
+  
+    </tbody>
+  </table>      
+  
+  
+     </div>
+  
+  <!-- Modal -->
+  <div class="modal fade bd-example-modal-lg" id="exampleModalCenter6" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Gerenciador do quadro de lei</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          
+          <form>
+  
+            <div class="form-row">
+  
+  
+               <div class="col">
+                  <span>Lei numero: 123</span>
+               </div>
+  
+               <div class="col">
+                <span>Regime:</span>
+              <select class="form-control" id="exampleFormControlSelect1">
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
+              </select>
+             </div>
+  
+            </div>
+  
+            <div class="form-row">
+  
+              <div class="col">
+                <span>Cargo:</span>
+              <select class="form-control" id="exampleFormControlSelect1">
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
+              </select>
+             </div>
+  
+               <div class="col">
+                  <span>Quantidade de vagas:</span>
+                  <input type="text" class="form-control">
+               </div>
+  
+               
+            </div>
+  
+          <div class="form-row">
+  
+            <div class="col">
+              <span>Vencimento:</span>
+              <input type="text" class="form-control sm">
+           </div>
+  
+           <div class="col">
+            <span>Nivel de escolaridade:</span>
+          <select class="form-control" id="exampleFormControlSelect1">
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+            <option>4</option>
+            <option>5</option>
+          </select>
+         </div>
+               
+            </div>   
+  
+            <div class="form-row">
+  
+             <div class="col">
+              <span>Jornada semanal:</span>
+            <select class="form-control" id="exampleFormControlSelect1">
+              <option>1</option>
+              <option>2</option>
+              <option>3</option>
+              <option>4</option>
+              <option>5</option>
+            </select>
+           </div>
+  
+           <div class="col">
+            <span>Descrição da jornada semanal:</span>
+            <input type="text" class="form-control sm">
+         </div>
+  
+         <div class="col">
+          <span>Natureza do cargo:</span>
+        <select class="form-control" id="exampleFormControlSelect1">
+          <option>1</option>
+          <option>2</option>
+          <option>3</option>
+          <option>4</option>
+          <option>5</option>
+        </select>
+       </div>       
+  
+                 
+              </div>            
+  
+         </form>
+  
+         <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+          <button type="button" class="btn btn-primary">Salvar</button>
+       </div>       
+  
+        </div>
+  
+      </div>
+    </div>
+  </div>   
+  
+     <!-- card  quadro de cargos--> 
+     
+    <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">
+     
+  
+     <p></p>
+     <p></p>
+  
+     <!-- Button trigger modal -->
+     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter6">
+          Adicionar novo <i class="fas fa-plus"></i>
+     </button>
+  
+     <br></br>
+  
+     <form class="form-inline">
+  
+      <span>Codigo: </span>
+      <input placeholder="digite o cod do cargo" class="form-control mr-sm-10" type="search" name="nome" aria-label="Search">
+      <button type="button" class="btn btn-primary"><i class="fas fa-search"></i></button>
+  
+      <span>Numero de lei: </span>
+      <input placeholder="digite o numero da lei" class="form-control mr-sm-2" type="search" name="nome" aria-label="Search">
+      <button type="button" class="btn btn-primary"><i class="fas fa-search"></i></button>
+  
+      <span>Nome do cargo: </span>
+      <input placeholder="digite o nome do cargo" class="form-control mr-sm-2" type="search" name="nome" aria-label="Search">
+      <button type="button" class="btn btn-primary"><i class="fas fa-search"></i></button>
+  
+      </form>
+  
+      <br></br>
+  
+  <table class="table table-striped">
+    <thead>
+  
+      <tr>
+                 <th scope="col">Lei</th>
+                 <th scope="col">Codigo</th>
+                 <th scope="col">Vinculo</th>
+                 <th scope="col">Cargo</th>
+                 <th scope="col">Quantidade</th>
+                 <th scope="col">Vencimento</th>
+                 <th scope="col">Acoes</th>
+    </thead>
+    
+    <tbody>
+  
+      <tr>
+        <td>Mark</td>
+        <td>Otto</td>
+        <td>@mdo</td>
+        <td>aaaaa</td>
+        <td>1</td>
+        <td>1</td>
+        <td>
+          <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter6"> <i class="fas fa-pen"></i>
+          </button> 
+          <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter8"> <i class="fas fa-trash-alt"></i> </button> 
+        </td>
+      </tr>
+  
+  
+    </tbody>
+  </table>    
+  
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModalCenter8" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Atenção</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+  
+        <span>Deseja realmente excluir o quadro de lei?</span>
+  
+        </div>
+  
+        <div class="modal-footer">
+          <button type="button" class="btn btn-warning" data-dismiss="modal">Sim</button>
+          <button type="button" class="btn btn-primary">Não</button>
+       </div>  
+  
+      </div>
+    </div>
+  </div>
+      
+  
+  
+    </div>
+  
+     <!-- card  quadro de cargos--> 
+  
+  </div>
+
 </section>
 </body>
 </html>
