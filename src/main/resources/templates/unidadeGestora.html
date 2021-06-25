@@ -26,14 +26,10 @@
         </tr>
         </thead>
         <tbody>
-        <tr>
-            <td><a href="#"> Abreulândia - CÂMARA MUNICIPAL DE ABREULÂNDIA </a></td>
+        <tr th:each="u : ${unidades}">
+            <td th:text="${u.nome}"><a href="#"> Abreulândia - CÂMARA MUNICIPAL DE ABREULÂNDIA </a></td>
         </tr>
-        <tr>
-            <td><a href="#"> Aliança do Tocantins - CÂMARA MUNICIPAL DE ALIANÇA DO TOCANTINS </a></td>
-        </tr>
-        <tr>
-            <td><a href="#"> Alvorada - CÂMARA MUNICIPAL DE ALVORADA </a></td>
+
         </tbody>
     </table>
     <nav aria-label="Page navigation example">
