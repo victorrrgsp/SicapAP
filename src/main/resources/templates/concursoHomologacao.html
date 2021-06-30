@@ -55,44 +55,20 @@
         <thead>
         <tr>
             <th scope="col">Concurso (edital)</th>
-            <th scope="col">Tipo do ato</th>
+            <th scope="col">CNPJ da UG</th>
             <th scope="col">Numero do ato</th>
-            <th scope="col">Data do ato</th>
+            <th scope="col">Data da Homologação</th>
             <th scope="col">Veiculo de publicacao</th>
-            <th scope="col">Status</th>
-            <th scope="col">Documentos</th>
-            <th scope="col">Recibo</th>
+            <th scope="col">data Da Publicação</th>
         </thead>
         <tbody>
-        <tr>
-            <td>Mark</td>
-            <td>Otto</td>
-            <td>@mdo</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>Jacob</td>
-            <td>Thornton</td>
-            <td>@fat</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>Larry</td>
-            <td>the Bird</td>
-            <td>@twitter</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
+        <tr th:each="h : ${homologacoes}">
+            <td th:text="${h.Edital.numeroEdital}">Mark</td>
+            <td th:text="${h.cnpj}">Otto</td>
+            <td th:text="${h.Ato.numeroAto}">@mdo</td>
+            <td th:text="${#dates.format(h.dataHomologacao, 'dd/MM/yyyy')}"></td>
+            <td th:text="${h.veiculoPublicacao}"></td>
+            <td th:text="${#dates.format(h.dataPublicacao, 'dd/MM/yyyy')}"></td>
         </tr>
         </tbody>
     </table>

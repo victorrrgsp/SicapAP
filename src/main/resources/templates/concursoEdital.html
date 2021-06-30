@@ -41,7 +41,7 @@
             <th scope="col">Numero do edital</th>
             <th scope="col">Veiculo de publicacao</th>
             <th scope="col">Data de publicacao</th>
-            <th scope="col">Data de validade</th>
+            <th scope="col">Prazo de validade</th>
             <th scope="col">Organizadora</th>
             <th scope="col">Modalidade de contratacao</th>
             <th scope="col">Valor da contratacao</th>
@@ -51,10 +51,10 @@
         <tbody>
         <tr th:each="e : ${editais}">
             <td th:text="${e.numeroEdital}">Mark</td>
-            <td>Otto</td>
-            <td>@mdo</td>
-            <td></td>
-            <td></td>
+            <td th:text="${e.veiculoPublicacao}">Otto</td>
+            <td th:text="${#dates.format(e.dataPublicacao, 'dd/MM/yyyy')}">@mdo</td>
+            <td th:text="${e.prazoValidade}"></td>
+            <td th:text="${e.cnpjOrganizador}"></td>
             <td></td>
             <td></td>
             <td></td>

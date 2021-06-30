@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html layout:decorate="~{layout}">
 <head>
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
 </head>
 <body>
 <section layout:fragment="corpo">
@@ -43,43 +43,25 @@
     <table class="table table-striped">
         <thead>
         <tr>
-            <th scope="col">Concurso</th>
-            <th scope="col">Lei</th>
+            <th scope="col">Concurso (Edital)</th>
+            <th scope="col">CNPJ da UG</th>
+            <th scope="col">Unidade Administrativa</th>
             <th scope="col">Cargo</th>
-            <th scope="col">Especialidade</th>
+            <th scope="col">Código da Vaga</th>
+            <th scope="col">Tipo de Concorrência</th>
             <th scope="col">Quantidade</th>
-            <th scope="col">Acoes</th>
+            <th scope="col">Especialidade da Vaga</th>
         </thead>
         <tbody>
-        <tr>
-            <td>Mark</td>
-            <td>Otto</td>
-            <td>@mdo</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>Jacob</td>
-            <td>Thornton</td>
-            <td>@fat</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>Larry</td>
-            <td>the Bird</td>
-            <td>@twitter</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
+        <tr th:each="v : ${vagas}">
+            <td th:text="${v.Edital.numeroEdital}">Mark</td>
+            <td th:text="${v.cnpj}">Otto</td>
+            <td th:text="${v.UnidadeAdministrativa.nome}">@mdo</td>
+            <td th:text="${v.Cargo.nomeCargo}"></td>
+            <td th:text="${v.codigoVaga}"></td>
+            <td th:text="${v.tipoConcorrencia}"></td>
+            <td th:text="${v.quantidade}"></td>
+            <td th:text="${v.especialidadeVaga}"></td>
         </tr>
         </tbody>
     </table>

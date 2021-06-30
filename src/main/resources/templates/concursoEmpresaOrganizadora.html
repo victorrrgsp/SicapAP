@@ -8,7 +8,7 @@
 
     <div class="card">
         <div class="card-header text-white" style="background-color: #03487b;">
-            Lista de especialidade das vagas
+            Lista de Empresas Organizadoras
         </div>
     </div>
 
@@ -17,7 +17,7 @@
         Adicionar novo <i class="fas fa-search"></i>
     </button>
     <br></br>
-    <h4>Pesquisa de especialidade</h4>
+    <h4>Pesquisa de Empresas Organizadoras</h4>
     <div>
         <form action="/buscar-nome.php" method="post" class="form-inline">
             <span>Codigo: </span>
@@ -36,26 +36,24 @@
     <table class="table table-striped">
         <thead>
         <tr>
-            <th scope="col">Codigo</th>
+            <th scope="col">CNPJ</th>
             <th scope="col">Nome</th>
-            <th scope="col">Acoes</th>
+            <th scope="col">Valor</th>
+            <th scope="col">Número Administrativo</th>
+            <th scope="col">Ano do Processo Administrativo</th>
+            <th scope="col">Número Licitatório</th>
+            <th scope="col">Ano da Licitação</th>
         </tr>
         </thead>
         <tbody>
-        <tr>
-            <td>Mark</td>
-            <td>Otto</td>
-            <td>@mdo</td>
-        </tr>
-        <tr>
-            <td>Jacob</td>
-            <td>Thornton</td>
-            <td>@fat</td>
-        </tr>
-        <tr>
-            <td>Larry</td>
-            <td>the Bird</td>
-            <td>@twitter</td>
+        <tr th:each="e : ${empresas}">
+            <td th:text="${e.cnpjEmpresaOrganizadora}">Mark</td>
+            <td th:text="${e.nome}">Otto</td>
+            <td th:text="${e.valor}">@mdo</td>
+            <td th:text="${e.numeroAdministrativo}">@mdo</td>
+            <td th:text="${e.anoAdministrativo}">@mdo</td>
+            <td th:text="${e.numeroLicitatorio}">@mdo</td>
+            <td th:text="${e.anoLicitatorio}">@mdo</td>
         </tr>
         </tbody>
     </table>
@@ -66,7 +64,7 @@
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLongTitle">Gerenciador da especialidade da vaga</h5>
+                    <h5 class="modal-title" id="exampleModalLongTitle">Gerenciador da Empresa Organizadora</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
