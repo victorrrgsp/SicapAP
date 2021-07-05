@@ -1,6 +1,6 @@
 package com.example.sicapweb.web.controller;
 
-import com.example.sicapweb.service.UnidadeGestoraService;
+import com.example.sicapweb.repository.UnidadeGestoraRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class UnidadeGestoraController {
 
     @Autowired
-    private UnidadeGestoraService unidadeGestoraService;
+    private UnidadeGestoraRepository unidadeGestoraRepository;
 
     @GetMapping("/")
     public String listarunidadeGestora(ModelMap model) {
-        model.addAttribute("unidades", unidadeGestoraService.buscarTodos());
+        model.addAttribute("unidades", unidadeGestoraRepository.findAll());
         return "unidadeGestora";
     }
 

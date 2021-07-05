@@ -38,7 +38,13 @@
         <thead>
 
         <tr>
-            <th scope="col">Numero do edital</th>
+            <th scope="col">
+                <a class="" th:href="@{/concursoEdital/(page=${pageEdital.pagina}, dir=desc)}" tabindex="-1"><i
+                        class="fas fa-arrow-down"></i></a>
+                Numero do edital
+                <a class="" th:href="@{/concursoEdital/(page=${pageEdital.pagina}, dir=asc)}" tabindex="-1"><i
+                        class="fas fa-arrow-up"></i></a>
+            </th>
             <th scope="col">Veiculo de publicacao</th>
             <th scope="col">Data de publicacao</th>
             <th scope="col">Prazo de validade</th>
@@ -49,7 +55,7 @@
         </tr>
         </thead>
         <tbody>
-        <tr th:each="e : ${editais}">
+        <tr th:each="e : ${pageEdital.registros}">
             <td th:text="${e.numeroEdital}">Mark</td>
             <td th:text="${e.veiculoPublicacao}">Otto</td>
             <td th:text="${#dates.format(e.dataPublicacao, 'dd/MM/yyyy')}">@mdo</td>
@@ -139,11 +145,38 @@
 
     <nav aria-label="Page navigation example">
         <ul class="pagination">
-            <li class="page-item"><a class="page-link" href="#">Anterior</a></li>
-            <li class="page-item"><a class="page-link" href="#">1</a></li>
-            <li class="page-item"><a class="page-link" href="#">2</a></li>
-            <li class="page-item"><a class="page-link" href="#">3</a></li>
-            <li class="page-item"><a class="page-link" href="#">Proximo</a></li>
+            <li class="page-item">
+                <a class="page-link" th:href="@{/concursoEdital/(page=${1}, dir=${pageEdital.direcao})}"
+                   tabindex="-1"><i class="fas fa-step-backward"></i>
+                </a>
+            </li>
+
+            <li th:class="${pageEdital.pagina == 1} ? 'page-item disabled' : 'page-item'">
+                <a class="page-link"
+                   th:href="@{/concursoEdital/(page=${pageEdital.pagina - 1}, dir=${pageEdital.direcao})}"
+                   tabindex="-1">
+                    <i class="fas fa-caret-left"></i>
+                </a>
+            </li>
+            <li class="page-item">
+                <span class="page-link" th:text="|${pageEdital.pagina} de ${pageEdital.totalPaginas}|"></span>
+            </li>
+            <li th:class="${pageEdital.pagina == pageEdital.totalPaginas} ? 'page-item disabled' : 'page-item'">
+                <a class="page-link"
+                   th:href="@{/concursoEdital/(page=${pageEdital.pagina + 1}, dir=${pageEdital.direcao})}"
+                   title="Próxima Página">
+                    <i class="fas fa-caret-right"></i>
+                </a>
+            </li>
+
+            <li class="page-item">
+                <a class="page-link"
+                   th:href="@{/concursoEdital/(page=${pageEdital.totalPaginas}, dir=${pageEdital.direcao})}"
+                   tabindex="-1"
+                   title="Última Página">
+                    <i class="fas fa-step-forward"></i>
+                </a>
+            </li>
         </ul>
     </nav>
 </section>
