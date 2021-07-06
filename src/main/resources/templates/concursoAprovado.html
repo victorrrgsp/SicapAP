@@ -19,20 +19,78 @@
     <br></br>
     <h4>Pesquisa de concurso aprovado</h4>
     <div>
-        <form action="/buscar-nome.php" method="post" class="form-inline">
+        <form class="form-inline">
+
             <span>CPF: </span>
-            <input placeholder="digite o CPF" class="form-control mr-sm-2" type="search" name="nome"
-                   aria-label="Search"></table>
-            <button class="btn btn-outline-primary my-2 my-sm-0" type="submit"><i class="fas fa-search"></i></button>
-        </form>
-        <form action="/buscar-nome.php" method="post" class="form-inline">
+            <input placeholder="digite o CPF" class="form-control mr-sm-2" type="search" name="nome" aria-label="Search"></table>
+            <button type="button" class="btn btn-primary"><i class="fas fa-search"></i></button>
+
             <span>Nome: </span>
-            <input style="width:15%;" placeholder="digite o nome" class="form-control mr-sm-2 " type="search"
-                   name="nome" aria-label="Search"></table>
-            <button class="btn btn-outline-primary my-2 my-sm-0" type="submit"><i class="fas fa-search"></i></button>
+            <input placeholder="digite o nome" class="form-control mr-sm-2" type="search" name="nome" aria-label="Search"></table>
+            <button type="button" class="btn btn-primary"><i class="fas fa-search"></i></button>
+            
         </form>
     </div>
     <br></br>
+
+<!-- Modal dos detalhes do concurso-->
+<div class="modal fade" id="exampleModal40" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Detalhes do concurso</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <span>Concurso: 26894022000136</span>
+        <br>Vaga: GIORDANO B</br>
+        <span>Cpf: 00023851201</span>
+        <br>Nome: THIAGO EMANUELL VAZ RESPLANDES</br>
+        <span>Classificacao: 3</span>
+        <br>Numero de inscricao: 1401014970</br>
+        <span>Quadrimestre: 1</span>
+        <br>Localidade: 1721000</br>
+        <span>Exercicio: 2020</span>
+        <br>Fonte: 2</br>
+        <span>Usuario de criacao: GIORDANO B</span>
+        <br>Data da criacao: 28/02/2020</br>
+        <span>Usuario de alteracao: IMPORTACAO</span>
+        <br>Data da alteracao: 03/03/2020</br>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Fechar</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modal dos detalhes do concurso-->
+
+
+<!-- Modal da lixeira-->
+<div class="modal fade" id="exampleModal50" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">ATENCAO</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        Deseja realmente excluir?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-warning" data-dismiss="modal">Sim</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Nao</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modal da lixeira-->
+
+
     <table class="table table-striped">
         <thead>
         <tr>
@@ -43,6 +101,7 @@
             <th scope="col">Número de Inscrição</th>
             <th scope="col">Classificacao</th>
             <th scope="col">Tipo de Concorrência</th>
+            <th scope="col">Acoes</th>
         </thead>
         <tbody>
         <tr th:each="a : ${aprovados}">
@@ -53,6 +112,13 @@
             <td th:text="${a.numeroInscricao}"></td>
             <td th:text="${a.classificacao}"></td>
             <td th:text="${a.tipoConcorrencia}"></td>
+
+            <td>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter3"><i class="fas fa-pencil-alt"></i></button>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal40"><i class="fas fa-search-plus"></i></button>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal50"><i class="fas fa-trash-alt"></i></button>
+            </td>
+            
         </tr>
         </tbody>
     </table>
