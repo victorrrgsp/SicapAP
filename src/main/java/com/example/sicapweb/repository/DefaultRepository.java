@@ -1,4 +1,4 @@
-package com.example.sicapweb.dao;
+package com.example.sicapweb.repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
 
-public abstract class DefaultDao<T, PK extends Serializable> {
+public abstract class DefaultRepository<T, PK extends Serializable> {
 
     @SuppressWarnings("unchecked")
     private final Class<T> entityClass = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];

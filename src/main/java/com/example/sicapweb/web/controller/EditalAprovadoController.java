@@ -1,6 +1,6 @@
 package com.example.sicapweb.web.controller;
 
-import com.example.sicapweb.service.EditalAprovadoService;
+import com.example.sicapweb.repository.EditalAprovadoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class EditalAprovadoController {
 
     @Autowired
-    private EditalAprovadoService editalAprovadoService;
+    private EditalAprovadoRepository editalAprovadoRepository;
 
     @GetMapping("/")
     public String listaEditalAprovado(ModelMap model) {
-        model.addAttribute("aprovados", editalAprovadoService.buscarTodos());
+        model.addAttribute("aprovados", editalAprovadoRepository.findAll());
         return "concursoAprovado";
     }
 }
