@@ -1,236 +1,239 @@
 <!DOCTYPE html>
 <html layout:decorate="~{layout}">
+
 <head>
     <meta charset="UTF-8">
 </head>
+
 <body>
-<section layout:fragment="corpo">
+    <section layout:fragment="corpo">
 
-    <div class="card">
-        <div class="card-header text-white" style="background-color: #03487b;">
-            Lista de vagas do concurso
+        <div class="card">
+            <div class="card-header text-white" style="background-color: #03487b;">
+                Lista de vagas do concurso
+            </div>
         </div>
-    </div>
 
-    <!-- Button trigger modal -->
-    <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#exampleModalCenter3">
-        Adicionar novo <i class="fas fa-search"></i>
-    </button>
-    <br></br>
-    <h4>Pesquisa de vaga do concurso</h4>
-    <div>
-      <form class="form-inline">
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#exampleModalCenter3">
+            Adicionar novo <i class="fas fa-search"></i>
+        </button>
+        <br></br>
+        <h4>Pesquisa de vaga do concurso</h4>
+        <div>
+            <form class="form-inline">
 
-         <span>Lei: </span>
-         <input placeholder="digite o CPF" class="form-control mr-sm-2" type="search" name="nome"
-            aria-label="Search"></table>
-         <button type="button" class="btn btn-primary"><i class="fas fa-search"></i></button>
+                <span>Lei: </span>
+                <input placeholder="digite o CPF" class="form-control mr-sm-2" type="search" name="nome"
+                    aria-label="Search"></table>
+                <button type="button" class="btn btn-primary"><i class="fas fa-search"></i></button>
 
-         <span>Cargo: </span>
-         <input placeholder="digite o CPF" class="form-control mr-sm-2" type="search" name="nome"
-            aria-label="Search"></table>
-         <button type="button" class="btn btn-primary"><i class="fas fa-search"></i></button>
+                <span>Cargo: </span>
+                <input placeholder="digite o CPF" class="form-control mr-sm-2" type="search" name="nome"
+                    aria-label="Search"></table>
+                <button type="button" class="btn btn-primary"><i class="fas fa-search"></i></button>
 
-         <span>Especialidade: </span>
-         <input placeholder="digite o nome" class="form-control mr-sm-2" type="search" name="nome"
-            aria-label="Search"></table>
-         <button type="button" class="btn btn-primary"><i class="fas fa-search"></i></button>
+                <span>Especialidade: </span>
+                <input placeholder="digite o nome" class="form-control mr-sm-2" type="search" name="nome"
+                    aria-label="Search"></table>
+                <button type="button" class="btn btn-primary"><i class="fas fa-search"></i></button>
 
-      </form>
-    </div>
-    <br></br>
+            </form>
+        </div>
+        <br></br>
 
-   <!-- Modal dos detalhes do concurso-->
-   <div class="modal fade" id="exampleModal40" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-      aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered" role="document">
-         <div class="modal-content">
-            <div class="modal-header">
-               <h5 class="modal-title" id="exampleModalLabel">Detalhes do concurso</h5>
-               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-               </button>
-            </div>
+        <!-- Modal dos detalhes do concurso-->
+        <div class="modal fade" id="exampleModal40" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Detalhes do concurso</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
 
-            <div class="modal-body">
-                  <span>Concurso: 01803618000152</span>
-                  <br>Lei: 01803618000152</br>
-                  <span>Leiquadro: 01803618000152</span>
-                  <br>Especialidade: 0021</br>
-                  <span>Quantidade: 1</span>
-                  <br>Quadrimestre: 1</br>
-                  <span>Exercicio: 2019</span>
-                  <br>Fonte: 2</br>
-                  <span>Usuariocriacao: IMPORTACAO</span>
-                  <br>Datacriacao: 08/02/2019</br>
-                  <span>Usuarioalteracao: admin</span>
-                  <br>Dataalteracao: 01/01/2020</br>
-            </div>
+                    <div class="modal-body">
+                        <span>Concurso: 01803618000152</span>
+                        <br>Lei: 01803618000152</br>
+                        <span>Leiquadro: 01803618000152</span>
+                        <br>Especialidade: 0021</br>
+                        <span>Quantidade: 1</span>
+                        <br>Quadrimestre: 1</br>
+                        <span>Exercicio: 2019</span>
+                        <br>Fonte: 2</br>
+                        <span>Usuariocriacao: IMPORTACAO</span>
+                        <br>Datacriacao: 08/02/2019</br>
+                        <span>Usuarioalteracao: admin</span>
+                        <br>Dataalteracao: 01/01/2020</br>
+                    </div>
 
-            <div class="modal-footer">
-               <button type="button" class="btn btn-primary" data-dismiss="modal">Fechar</button>
-            </div>
-         </div>
-      </div>
-   </div>
-   <!-- Modal dos detalhes do concurso-->
-
-
-   <!-- Modal da lixeira-->
-   <div class="modal fade" id="exampleModal50" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-      aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered" role="document">
-         <div class="modal-content">
-            <div class="modal-header">
-               <h5 class="modal-title" id="exampleModalLabel">ATENCAO</h5>
-               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-               </button>
-            </div>
-            <div class="modal-body">
-               Deseja realmente excluir?
-            </div>
-            <div class="modal-footer">
-               <button type="button" class="btn btn-warning" data-dismiss="modal">Sim</button>
-               <button type="button" class="btn btn-primary" data-dismiss="modal">Nao</button>
-            </div>
-         </div>
-      </div>
-   </div>
-   <!-- Modal da lixeira-->    
-
-    <table class="table table-striped">
-        <thead>
-        <tr>
-            <th scope="col">Concurso</th>
-            <th scope="col">CNPJ da UG</th>
-            <th scope="col">Unidade Administrativa</th>
-            <th scope="col">Cargo</th>
-            <th scope="col">Código da Vaga</th>
-            <th scope="col">Tipo de Concorrência</th>
-            <th scope="col">Quantidade</th>
-            <th scope="col">Especialidade da Vaga</th>
-            <th scope="col">Lei</th>
-            <th scope="col">Acoes</th>
-        </thead>
-        <tbody>
-        <tr th:each="v : ${vagas}">
-            <td th:text="${v.Edital.numeroEdital}">Mark</td>
-            <td th:text="${v.cnpj}">Otto</td>
-            <td th:text="${v.UnidadeAdministrativa.nome}">@mdo</td>
-            <td th:text="${v.Cargo.nomeCargo}"></td>
-            <td th:text="${v.codigoVaga}"></td>
-            <td th:text="${v.tipoConcorrencia}"></td>
-            <td th:text="${v.quantidade}"></td>
-            <td th:text="${v.especialidadeVaga}"></td>
-            <td></td>
-
-            <td>
-               <button type="button" class="btn btn-primary" data-toggle="modal"
-                  data-target="#exampleModalCenter3"><i class="fas fa-pencil-alt"></i></button>
-               <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal40"><i
-                     class="fas fa-search-plus"></i></button>
-               <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal50"><i
-                     class="fas fa-trash-alt"></i></button>
-            </td>
-            
-        </tr>
-        </tbody>
-    </table>
-
-    <!-- Modal -->
-    <div class="modal fade bd-example-modal-lg" id="exampleModalCenter3" tabindex="-1" role="dialog"
-         aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLongTitle">Gerenciador da vaga do concurso</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form>
-                        <div class="form-row">
-                            <div class="col">
-                                <span>Concurso:</span>
-                                <select class="form-control" id="exampleFormControlSelect1">
-                                    <option>1</option>
-                                    <option>2</option>
-                                    <option>3</option>
-                                    <option>4</option>
-                                    <option>5</option>
-                                </select>
-                            </div>
-                            <div class="col">
-                                <span>Lei:</span>
-                                <select class="form-control" id="exampleFormControlSelect1">
-                                    <option>1</option>
-                                    <option>2</option>
-                                    <option>3</option>
-                                    <option>4</option>
-                                    <option>5</option>
-                                </select>
-                            </div>
-
-                            <div class="col">
-                                <span>Cargo:</span>
-                                <select class="form-control" id="exampleFormControlSelect1">
-                                    <option>1</option>
-                                    <option>2</option>
-                                    <option>3</option>
-                                    <option>4</option>
-                                    <option>5</option>
-                                </select>
-                            </div>
-                            <div class="col">
-                                <span>Especialidade:</span>
-                                <select class="form-control" id="exampleFormControlSelect1">
-                                    <option>1</option>
-                                    <option>2</option>
-                                    <option>3</option>
-                                    <option>4</option>
-                                    <option>5</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="col">
-                                <span>Quantidade:</span>
-                                <input type="text" class="form-control">
-                            </div>
-                            <div class="col">
-                                <span>Municipio:</span>
-                                <select class="form-control" id="exampleFormControlSelect1">
-                                    <option>1</option>
-                                    <option>2</option>
-                                    <option>3</option>
-                                    <option>4</option>
-                                    <option>5</option>
-                                </select>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
-                    <button type="button" class="btn btn-primary">Salvar</button>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Fechar</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+        <!-- Modal dos detalhes do concurso-->
 
-    <nav aria-label="Page navigation example">
-        <ul class="pagination">
-            <li class="page-item"><a class="page-link" href="#">Anterior</a></li>
-            <li class="page-item"><a class="page-link" href="#">1</a></li>
-            <li class="page-item"><a class="page-link" href="#">2</a></li>
-            <li class="page-item"><a class="page-link" href="#">3</a></li>
-            <li class="page-item"><a class="page-link" href="#">Proximo</a></li>
-        </ul>
-    </nav>
 
-</section>
+        <!-- Modal da lixeira-->
+        <div class="modal fade" id="exampleModal50" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">ATENCAO</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        Deseja realmente excluir?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-warning" data-dismiss="modal">Sim</button>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Nao</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Modal da lixeira-->
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Concurso</th>
+                    <th scope="col">CNPJ da UG</th>
+                    <th scope="col">Unidade Administrativa</th>
+                    <th scope="col">Cargo</th>
+                    <th scope="col">Código da Vaga</th>
+                    <th scope="col">Tipo de Concorrência</th>
+                    <th scope="col">Quantidade</th>
+                    <th scope="col">Especialidade da Vaga</th>
+                    <th scope="col">Lei</th>
+                    <th scope="col">Acoes</th>
+            </thead>
+            <tbody>
+                <tr th:each="v : ${vagas}">
+                    <td th:text="${v.Edital.numeroEdital}">Mark</td>
+                    <td th:text="${v.cnpj}">Otto</td>
+                    <td th:text="${v.UnidadeAdministrativa.nome}">@mdo</td>
+                    <td th:text="${v.Cargo.nomeCargo}"></td>
+                    <td th:text="${v.codigoVaga}"></td>
+                    <td th:text="${v.tipoConcorrencia}"></td>
+                    <td th:text="${v.quantidade}"></td>
+                    <td th:text="${v.especialidadeVaga}"></td>
+                    <td></td>
+
+                    <td>
+                        <button type="button" class="btn btn-primary" data-toggle="modal"
+                            data-target="#exampleModalCenter3"><i class="fas fa-pencil-alt"></i></button>
+                        <button type="button" class="btn btn-primary" data-toggle="modal"
+                            data-target="#exampleModal40"><i class="fas fa-search-plus"></i></button>
+                        <button type="button" class="btn btn-primary" data-toggle="modal"
+                            data-target="#exampleModal50"><i class="fas fa-trash-alt"></i></button>
+                    </td>
+
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Modal -->
+        <div class="modal fade bd-example-modal-lg" id="exampleModalCenter3" tabindex="-1" role="dialog"
+            aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">Gerenciador da vaga do concurso</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="form-row">
+                                <div class="col">
+                                    <span>Concurso:</span>
+                                    <select class="form-control" id="exampleFormControlSelect1">
+                                        <option>1</option>
+                                        <option>2</option>
+                                        <option>3</option>
+                                        <option>4</option>
+                                        <option>5</option>
+                                    </select>
+                                </div>
+                                <div class="col">
+                                    <span>Lei:</span>
+                                    <select class="form-control" id="exampleFormControlSelect1">
+                                        <option>1</option>
+                                        <option>2</option>
+                                        <option>3</option>
+                                        <option>4</option>
+                                        <option>5</option>
+                                    </select>
+                                </div>
+
+                                <div class="col">
+                                    <span>Cargo:</span>
+                                    <select class="form-control" id="exampleFormControlSelect1">
+                                        <option>1</option>
+                                        <option>2</option>
+                                        <option>3</option>
+                                        <option>4</option>
+                                        <option>5</option>
+                                    </select>
+                                </div>
+                                <div class="col">
+                                    <span>Especialidade:</span>
+                                    <select class="form-control" id="exampleFormControlSelect1">
+                                        <option>1</option>
+                                        <option>2</option>
+                                        <option>3</option>
+                                        <option>4</option>
+                                        <option>5</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="col">
+                                    <span>Quantidade:</span>
+                                    <input type="text" class="form-control">
+                                </div>
+                                <div class="col">
+                                    <span>Municipio:</span>
+                                    <select class="form-control" id="exampleFormControlSelect1">
+                                        <option>1</option>
+                                        <option>2</option>
+                                        <option>3</option>
+                                        <option>4</option>
+                                        <option>5</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                        <button type="button" class="btn btn-primary">Salvar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <nav aria-label="Page navigation example">
+            <ul class="pagination">
+                <li class="page-item"><a class="page-link" href="#">Anterior</a></li>
+                <li class="page-item"><a class="page-link" href="#">1</a></li>
+                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                <li class="page-item"><a class="page-link" href="#">Proximo</a></li>
+            </ul>
+        </nav>
+
+    </section>
 </body>
+
 </html>
