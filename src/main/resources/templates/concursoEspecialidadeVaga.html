@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout}">
+
+<head>
+	<meta charset="utf-8">
+</head>
+
+<body>
+	<section layout:fragment="corpo">
+
+		<div class="card">
+			<div class="card-header text-white" style="background-color: #03487b;">
+				Lista de especialidade das vagas
+			</div>
+		</div>
+
+		<!-- Button trigger modal -->
+		<button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#exampleModalCenter3">
+			Adicionar novo <i class="fas fa-search"></i>
+		</button>
+		<br></br>
+		<h4>Pesquisa de especialidade</h4>
+		<div>
+			<form class="form-inline">
+
+				<span>Codigo: </span>
+				<input placeholder="digite o codigo" class="form-control mr-sm-2" type="search" name="nome"
+					aria-label="Search"></table>
+				<button type="button" class="btn btn-primary"><i class="fas fa-search"></i></button>
+
+				<span>Nome: </span>
+				<input placeholder="digite o nome" class="form-control mr-sm-2" type="search" name="nome"
+					aria-label="Search"></table>
+				<button type="button" class="btn btn-primary"><i class="fas fa-search"></i></button>
+
+			</form>
+
+		</div>
+		<br></br>
+
+		<!-- Modal dos detalhes do concurso-->
+		<div class="modal fade" id="exampleModal40" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+			aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel">Detalhes do concurso</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<span>Codigo: 0034</span>
+						<br>Nome: TECNICO EM LABORATORIO</br>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-primary" data-dismiss="modal">Fechar</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- Modal dos detalhes do concurso-->
+
+
+		<!-- Modal da lixeira-->
+		<div class="modal fade" id="exampleModal50" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+			aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel">ATENCAO</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						Deseja realmente excluir?
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-warning" data-dismiss="modal">Sim</button>
+						<button type="button" class="btn btn-primary" data-dismiss="modal">Nao</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- Modal da lixeira-->
+
+		<table class="table table-striped">
+			<thead>
+
+				<tr>
+					<th scope="col">Codigo</th>
+					<th scope="col">Nome</th>
+					<th scope="col">Acoes</th>
+				</tr>
+
+			</thead>
+
+			<tbody>
+
+				<tr>
+					<td>Mark</td>
+					<td>Otto</td>
+
+					<td>
+						<button type="button" class="btn btn-primary" data-toggle="modal"
+							data-target="#exampleModalCenter3"><i class="fas fa-pencil-alt"></i></button>
+						<button type="button" class="btn btn-primary" data-toggle="modal"
+							data-target="#exampleModal40"><i class="fas fa-search-plus"></i></button>
+						<button type="button" class="btn btn-primary" data-toggle="modal"
+							data-target="#exampleModal50"><i class="fas fa-trash-alt"></i></button>
+					</td>
+
+				</tr>
+
+			</tbody>
+		</table>
+
+		<!-- Modal -->
+		<div class="modal fade" id="exampleModalCenter3" tabindex="-1" role="dialog"
+			aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLongTitle">Gerenciador da especialidade da vaga</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<form>
+							<div class="form-row">
+								<div class="col">
+									<span>Codigo:</span>
+									<input type="text" class="form-control">
+								</div>
+								<div class="col">
+									<span>Nome:</span>
+									<input type="text" class="form-control">
+								</div>
+							</div>
+						</form>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+						<button type="button" class="btn btn-primary">Salvar</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<nav aria-label="Page navigation example">
+			<ul class="pagination">
+				<li class="page-item"><a class="page-link" href="#">Anterior</a></li>
+				<li class="page-item"><a class="page-link" href="#">1</a></li>
+				<li class="page-item"><a class="page-link" href="#">2</a></li>
+				<li class="page-item"><a class="page-link" href="#">3</a></li>
+				<li class="page-item"><a class="page-link" href="#">Proximo</a></li>
+			</ul>
+		</nav>
+	</section>
+</body>
+
+</html>
