@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout}">
+<head>
+    <meta charset="utf-8">
+</head>
+<body>
+<section layout:fragment="corpo">
+    <div style="text-align: center;">
+
+        <div class="card">
+            <div class="card-header text-white" style="background-color: #03487b;">
+                Edital detalhes:
+            </div>
+        </div>
+
+<!-- Button trigger modal -->
+
+  <a href="concursoEdital.html" class="btn btn-secondary">Voltar</a>
+
+  <button type="button" class="btn btn-primary mr-sm-2" data-toggle="modal" data-target="#exampleModalCenter3">
+    Adicionar vaga</i>
+
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter70">
+      Adicionar aprovado</i>
+    </button>
+    <br></br>
+
+
+    <div class="alert alert-secondary" role="alert">
+      <span>Processo: 15492004</span>
+      <br>Procconcdt:</br>
+      <span>Numeroedital: 000012003</span>
+      <br>Veículo de publicação: null</br>
+      <span>Data de publicação: null</span>
+      <br>Data de início das inscrições:</br>
+      <span>Data de fim das inscrições:</span>
+      <br>Validade: anos</br>
+      <span>Organizadora: null</span>
+      <br>Modalidade de contratação:</br>
+      <span>Valor da contratação: 0</span>
+      <br>Data de criação do registro: 10/08/2017</br>
+    </div>
+
+    <br></br>
+
+    <h4>Listagem de vagas</h4>
+
+    <table class="table table-striped">
+      <thead>
+
+        <tr>
+          <th scope="col">Concurso</th>
+          <th scope="col">Lei</th>
+          <th scope="col">Lei quadro</th>
+          <th scope="col">Especialidade</th>
+          <th scope="col">Quantidade</th>
+          <th scope="col">Acoes</th>
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        <tr>
+          <td>Mark</td>
+          <td>Otto</td>
+          <td>@mdo</td>
+          <td></td>
+          <td></td>
+
+          <td>
+            <button type="button" class="btn btn-primary" data-toggle="modal"
+              data-target="#exampleModalCenter3"><i class="fas fa-pencil-alt"></i></button>
+
+            <a href="concursoVaga.html" class="btn btn-primary"><i class="fas fa-search-plus"></i></a>
+
+            <button type="button" class="btn btn-primary" data-toggle="modal"
+              data-target="#exampleModal50"><i class="fas fa-trash-alt"></i></button>
+          </td>
+
+        </tr>
+
+      </tbody>
+    </table>
+
+    <!-- Modal da lixeira-->
+    <div class="modal fade" id="exampleModal50" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">ATENCAO</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            Deseja realmente excluir?
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-warning" data-dismiss="modal">Sim</button>
+            <button type="button" class="btn btn-primary" data-dismiss="modal">Nao</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Modal da lixeira-->
+
+    <!-- Modal adicionar aprovado-->
+    <div class="modal fade bd-example-modal-lg" id="exampleModalCenter70" tabindex="-1" role="dialog"
+      aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLongTitle">Gerenciador de concurso</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form>
+
+              <div class="form-row">
+                <div class="col">
+                  <span>Concurso:</span>
+                  <input type="text" class="form-control">
+                </div>
+                <div class="col">
+                  <span>Vaga:</span>
+                  <input type="text" class="form-control">
+                </div>
+                <div class="col">
+                  <span>CPF:</span>
+                  <input type="text" class="form-control">
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="col">
+                  <br>Nome:</br>
+                  <input type="text" class="form-control">
+                </div>
+                <div class="col">
+                  <br>Classificacao:</br>
+                  <input type="text" class="form-control">
+                </div>
+
+                <div class="col">
+                  <br>Numero incricao:</br>
+                  <input type="text" class="form-control">
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="col">
+                  <br>Localidade:</br>
+                  <input type="text" class="form-control">
+                </div>
+                <div class="col">
+                  <br>Tipo concorrencia:</br>
+                  <input type="text" class="form-control">
+                </div>
+
+                <div class="col">
+                  <br>Codigo da especialidade:</br>
+                  <input type="text" class="form-control">
+                </div>
+              </div>
+
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+            <button type="button" class="btn btn-primary">Salvar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Modal adicionar aprovado-->
+
+    <!-- Modal adicionar vaga-->
+    <div class="modal fade bd-example-modal-lg" id="exampleModalCenter3" tabindex="-1" role="dialog"
+      aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLongTitle">Gerenciador de concurso</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form>
+
+              <div class="form-row">
+                <div class="col">
+                  <span>Concurso:</span>
+                  <input type="text" class="form-control">
+                </div>
+                <div class="col">
+                  <span>Lei:</span>
+                  <input type="text" class="form-control">
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="col">
+                  <br>Cargo:</br>
+                  <input type="text" class="form-control">
+                </div>
+                <div class="col">
+                  <br>Especialidade:</br>
+                  <input type="text" class="form-control">
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="col">
+                  <br>Quantidade:</br>
+                  <input type="text" class="form-control">
+                </div>
+                <div class="col">
+                  <br>Localidade:</br>
+                  <input type="text" class="form-control">
+                </div>
+              </div>
+
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+            <button type="button" class="btn btn-primary">Salvar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Modal adicionar vaga-->
+
+    <nav aria-label="Page navigation example">
+      <ul class="pagination">
+        <li class="page-item"><a class="page-link" href="#">Anterior</a></li>
+        <li class="page-item"><a class="page-link" href="#">1</a></li>
+        <li class="page-item"><a class="page-link" href="#">2</a></li>
+        <li class="page-item"><a class="page-link" href="#">3</a></li>
+        <li class="page-item"><a class="page-link" href="#">Proximo</a></li>
+      </ul>
+    </nav>
+
+    <br></br>
+
+    <h4>Listagem de aprovados</h4>
+
+    <table class="table table-striped">
+      <thead>
+
+        <tr>
+          <th scope="col">Concurso</th>
+          <th scope="col">Vaga</th>
+          <th scope="col">CPF</th>
+          <th scope="col">Nome</th>
+          <th scope="col">Classificacao</th>
+          <th scope="col">Acoes</th>
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        <tr>
+          <td>Mark</td>
+          <td>Otto</td>
+          <td>@mdo</td>
+          <td></td>
+          <td></td>
+
+          <td>
+            <button type="button" class="btn btn-primary" data-toggle="modal"
+              data-target="#exampleModalCenter70"><i class="fas fa-pencil-alt"></i></button>
+
+            <a href="concursoAprovado.html" class="btn btn-primary"><i class="fas fa-search-plus"></i></a>
+
+            <button type="button" class="btn btn-primary" data-toggle="modal"
+              data-target="#exampleModal50"><i class="fas fa-trash-alt"></i></button>
+          </td>
+
+        </tr>
+
+      </tbody>
+    </table>
+
+    <nav aria-label="Page navigation example">
+      <ul class="pagination">
+        <li class="page-item"><a class="page-link" href="#">Anterior</a></li>
+        <li class="page-item"><a class="page-link" href="#">1</a></li>
+        <li class="page-item"><a class="page-link" href="#">2</a></li>
+        <li class="page-item"><a class="page-link" href="#">3</a></li>
+        <li class="page-item"><a class="page-link" href="#">Proximo</a></li>
+      </ul>
+    </nav>
+    
+</section>
+</body>
+</html>
