@@ -1,5 +1,7 @@
 package com.example.sicapweb.repository;
 
+import com.example.sicapweb.util.PaginacaoUtil;
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
@@ -52,5 +54,23 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
             query.setParameter(i + 1, params[i]);
         }
         return query.getResultList();
+    }
+
+    public PaginacaoUtil<T> buscaPaginada(int pagina, String direcao, String campo) {
+        int tamanho = 10;
+        int inicio = (pagina -1) * tamanho;
+        List<T> list = getEntityManager()
+                .createNativeQuery("select * from " + entityClass.getSimpleName() + " order by " + campo + " " + direcao, entityClass)
+                .setFirstResult(inicio)
+                .setMaxResults(tamanho)
+                .getResultList();
+
+        long totalRegistros = count();
+        long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
+        return new PaginacaoUtil<T>(tamanho, pagina, totalPaginas, direcao, list);
+    }
+
+    public long count() {
+        return getEntityManager().createQuery("select count(*) from " + entityClass.getSimpleName(), Long.class).getSingleResult();
     }
 }

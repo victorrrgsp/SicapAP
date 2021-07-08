@@ -12,7 +12,7 @@
         </div>
     </div>
 
-    <form>
+    <form class="form-inline">
         <div class="form-row">
             <label for="inputEmail4">CPF</label>
             <div class="form-group mr-sm-2">
@@ -66,35 +66,14 @@
             <th scope="col">Recibo</th>
         </thead>
         <tbody>
-        <tr>
-            <td>Mark</td>
-            <td>Otto</td>
-            <td>@mdo</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>Jacob</td>
-            <td>Thornton</td>
-            <td>@fat</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>Larry</td>
-            <td>the Bird</td>
-            <td>@twitter</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
+        <tr th:each="p : ${pensoes}">
+            <td th:text="${p.Admissao.Servidor.cpfServidor}">Mark</td>
+            <td th:text="${p.Admissao.Servidor.nome}">Otto</td>
+            <td th:text="${p.Admissao.Cargo.nomeCargo}">@mdo</td>
+            <td th:text="${p.Ato.numeroAto}"></td>
+            <td>---</td>
+            <td>---</td>
+            <td>---</td>
         </tr>
         </tbody>
     </table>
