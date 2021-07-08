@@ -18,7 +18,47 @@
     a:hover {
         color: blue !important;
     }
-    </style>  
+
+    .dropdown-submenu {
+      position: relative;
+    }
+
+    .dropdown-submenu a::after {
+      transform: rotate(-90deg);
+      position: absolute;
+      right: 6px;
+      top: .8em;
+    }
+
+    .dropdown-submenu .dropdown-menu {
+      top: 0;
+      left: 100%;
+      margin-left: .1rem;
+      margin-right: .1rem;
+    }
+    </style>
+
+    <script>
+
+    $(document).ready(function(){
+      $('.dropdown-menu a.dropdown-toggle').on('click', function() {
+        if (!$(this).next().hasClass('show')) {
+          $(this).parents('.dropdown-menu').first().find('.show').removeClass('show');
+        }
+
+        const $subMenu = $(this).next('.dropdown-menu');
+        $subMenu.toggleClass('show');
+
+
+        $(this).parents('li.nav-item.dropdown.show').on('hidden.bs.dropdown', function() {
+          $('.dropdown-submenu .show').removeClass('show');
+        });
+
+        return false;
+      });
+    });
+
+    </script>       
     
 </head>
 <body>
