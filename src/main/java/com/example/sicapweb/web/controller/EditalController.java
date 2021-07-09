@@ -17,14 +17,14 @@ import java.util.Optional;
 public class EditalController {
 
     @Autowired
-    private EditalRepository editalDao;
+    private EditalRepository editalRepository;
 
     @GetMapping("/")
-    public String listaEdital(ModelMap model, @RequestParam("page")Optional<Integer> page, @RequestParam("dir")Optional<String> dir) {
+    public String lista(ModelMap model, @RequestParam("page")Optional<Integer> page, @RequestParam("dir")Optional<String> dir) {
         int paginaAtual = page.orElse(1);
         String ordem = dir.orElse("asc");
 
-        PaginacaoUtil<Edital> pageEdital = editalDao.buscaPaginada(paginaAtual, ordem);
+        PaginacaoUtil<Edital> pageEdital = editalRepository.buscaPaginada(paginaAtual, ordem, "numeroEdital");
 
         model.addAttribute("pageEdital", pageEdital);
         return "concursoEdital";

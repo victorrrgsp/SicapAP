@@ -1,5 +1,6 @@
 package com.example.sicapweb.web.controller;
 
+import br.gov.to.tce.model.ap.pessoal.Aposentadoria;
 import com.example.sicapweb.repository.AposentadoriaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -8,15 +9,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/documentoConcessaoAposentadoria")
-public class ConcessaoAposentadoriaController {
+@RequestMapping("/documentoConcessaoReforma")
+public class ConcessaoReformaController {
 
     @Autowired
     private AposentadoriaRepository aposentadoriaRepository;
 
     @GetMapping("/")
     public String lista(ModelMap model) {
-        model.addAttribute("aposentadorias", aposentadoriaRepository.findAll());
-        return "documentoConcessaoAposentadoria";
+        model.addAttribute("reformas", aposentadoriaRepository.buscarAposentadoriaTipoReserva(Aposentadoria.TipoAposentadoria.Reforma.getValor()));
+        return "documentoConcessaoReforma";
     }
 }

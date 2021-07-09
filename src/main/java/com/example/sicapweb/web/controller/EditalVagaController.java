@@ -15,7 +15,7 @@ public class EditalVagaController {
     private EditalVagaRepository editalVagaRepository;
 
     @GetMapping("/")
-    public String listaEditalVaga(ModelMap model) {
+    public String lista(ModelMap model) {
         model.addAttribute("vagas", editalVagaRepository.findAll());
         return "concursoVaga";
     }

@@ -70,35 +70,15 @@
             <th scope="col">Recibo</th>
         </thead>
         <tbody>
-        <tr>
-            <td>Mark</td>
-            <td>Otto</td>
-            <td>@mdo</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>Jacob</td>
-            <td>Thornton</td>
-            <td>@fat</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>Larry</td>
-            <td>the Bird</td>
-            <td>@twitter</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
+        <tr th:each="a : ${aproveitamentos}">
+            <td th:text="${a.Admissao.Servidor.cpfServidor}">Mark</td>
+            <td th:text="${a.Admissao.Servidor.nome}">Otto</td>
+            <td th:text="${a.Admissao.Cargo.nomeCargo}">@mdo</td>
+            <td>---</td>
+            <td th:text="${a.Ato.numeroAto}"></td>
+            <td>---</td>
+            <td>---</td>
+            <td>---</td>
         </tr>
         </tbody>
     </table>

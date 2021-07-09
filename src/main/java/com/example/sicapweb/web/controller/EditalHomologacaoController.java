@@ -15,7 +15,7 @@ public class EditalHomologacaoController {
     private EditalHomologacaoRepository editalHomologacaoRepository;
 
     @GetMapping("/")
-    public String listaEditalHomologacao(ModelMap model) {
+    public String lista(ModelMap model) {
         model.addAttribute("homologacoes", editalHomologacaoRepository.findAll());
         return "concursoHomologacao";
     }

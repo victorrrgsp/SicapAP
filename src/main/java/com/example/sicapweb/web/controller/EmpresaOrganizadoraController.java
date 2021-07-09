@@ -15,7 +15,7 @@ public class EmpresaOrganizadoraController {
     private EmpresaOrganizadoraRepository empresaOrganizadoraRepository;
 
     @GetMapping("/")
-    public String listaEmpresaOrganizadora(ModelMap model) {
+    public String lista(ModelMap model) {
         model.addAttribute("empresas", empresaOrganizadoraRepository.findAll());
         return "concursoEmpresaOrganizadora";
     }

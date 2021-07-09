@@ -15,7 +15,7 @@ public class UnidadeGestoraController {
     private UnidadeGestoraRepository unidadeGestoraRepository;
 
     @GetMapping("/")
-    public String listarunidadeGestora(ModelMap model) {
+    public String lista(ModelMap model) {
         model.addAttribute("unidades", unidadeGestoraRepository.findAll());
         return "unidadeGestora";
     }
