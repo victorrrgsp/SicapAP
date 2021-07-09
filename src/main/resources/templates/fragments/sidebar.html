@@ -1,217 +1,302 @@
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
-    <meta charset="UTF-8">
+	<meta charset="UTF-8">
 </head>
+
 <body>
-<nav class="navbar navbar-expand-lg navbar-light bg-light" th:fragment="sidebar">
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown"
-            aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Alterna navegação">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNavDropdown">
-        <ul class="navbar-nav">
-            <li class="nav-item active">
-                <a class="nav-link" href="/avisos/"><i class="fas fa-exclamation-triangle"></i> Avisos</a>
-            </li>
-            <li class="nav-item active">
-                <a class="nav-link" href="/unidadeGestora/"><i class="fas fa-map-marker-alt"></i> Unidade
-                    Gestora</a>
-            </li>
-            <li class="nav-item active dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button"
-                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <i class="fas fa-edit"></i> Concurso publico
-                </a>
-                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                    <a class="dropdown-item" href="/concursoEdital/">Edital de abertura</a>
-                    <a class="dropdown-item" href="/concursoEmpresaOrganizadora/">Empresa Organizadora</a>
-                    <a class="dropdown-item" href="/concursoVaga/">Vaga do concurso</a>
-                    <a class="dropdown-item" href="/concursoHomologacao/">Homologacao do concurso</a>
-                    <a class="dropdown-item" href="/concursoAprovado/">Aprovado do concurso</a>
-                </div>
-            </li>
-            <li class="nav-item active dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button"
-                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <i class="fas fa-pen"></i> Registro </a>
-                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                    <a class="dropdown-item" href="/registroDecisao/">Decisao</a>
-                    <a class="dropdown-item" href="/registroProcesso/">Processo</a>
-                    <a class="dropdown-item" href="/registroLivro/">Livro</a>
-                    <a class="dropdown-item" href="/registroGerarEtiqueta/">Gerar etiqueta</a>
-                </div>
-            </li>
-            <li class="nav-item active dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button"
-                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <i class="fas fa-paper-plane"></i> Envio eletronico de documentos
-                </a>
-                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                    <a class="dropdown-item" href="#">Concessao</a>
-                    <a class="dropdown-item" href="#">Concurso publico</a>
-                    <a class="dropdown-item" href="/documentoAdmissao/">Admissao</a>
-                    <a class="dropdown-item" href="#">Assinar processo</a>
-                </div>
-            </li>
-            <li class="nav-item active dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button"
-                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <i class="fas fa-file-upload"></i> Cadastrar arquivos
-                </a>
-                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                    <a class="dropdown-item" href="/cadastrarGfip/">GFIP</a>
-                    <a class="dropdown-item" href="/cadastrarArquivoLei/">Arquivos de lei</a>
-                </div>
-            </li>
-            <li class="nav-item active">
-                <!-- Button trigger modal -->
-                <a data-toggle="modal" data-target="#exampleModalCenter2" class="nav-link" href=""> <i
-                        class="fas fa-key"></i> Permissoes</a>
-                <!-- Modal -->
-                <div class="modal fade" id="exampleModalCenter2" tabindex="-1" role="dialog"
-                     aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="exampleModalLongTitle">Associação de Usuário à
-                                    Perfis</h5>
-                            </div>
-                            <div class="modal-body">
-                                <table class="table">
-                                    <thead class="thead-light">
-                                    <tr>
-                                        <th scope="col">Perfis</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr>
-                                        <td><a href="#">Administrador</a></td>
-                                    </tr>
-                                    <tr>
-                                        <td><a href="#">Registro</a></td>
-                                    </tr>
-                                    <tr>
-                                    </tbody>
-                                </table>
-                                <table class="table">
-                                    <thead class="thead-light">
-                                    <tr>
-                                        <th scope="col">Usuarios</th>
-                                    </tr>
-                                    </thead>
-                                </table>
-                                <form action="/buscar-nome.php" method="post" class="form-inline">
-                                    <input placeholder="nome" class="form-control mr-sm-2" type="search"
-                                           name="nome" aria-label="Search"></table>
-                                    <button class="btn btn-outline-primary my-2 my-sm-0" type="submit"><i
-                                            class="fas fa-search"></i></button>
-                                    <button style="margin-left:1%;"
-                                            class="btn btn-outline-primary my-2 my-sm-0" type="submit"><i
-                                            class="fas fa-plus"></i></button>
-                                </form>
-                                <table class="table">
-                                    <thead class="thead-light">
-                                    </thead>
-                                    <tbody>
-                                    <tr>
-                                        <td><a href="#">Admin</a></td>
-                                        <td>
-                                            <button type="button" class="btn btn-primary" data-toggle="modal"
-                                                    data-target="#exampleModalCenter11"><i class="fas fa-trash-alt"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td><a href="#">Jose</a></td>
-                                        <td>
-                                            <button data-dismiss="modal" type="button" class="btn btn-primary"
-                                                    data-toggle="modal" data-target="#exampleModalCenter11"><i
-                                                    class="fas fa-trash-alt"></i></button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td><a href="#">Maria</a></td>
-                                        <td>
-                                            <button data-dismiss="modal" type="button" class="btn btn-primary"
-                                                    data-toggle="modal" data-target="#exampleModalCenter11"><i
-                                                    class="fas fa-trash-alt"></i></button>
-                                        </td>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-primary"
-                                        data-dismiss="modal">Fechar
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </li>
-            <li class="nav-item active">
-                <a class="nav-link" href="/logout/"> <i class="fas fa-sign-out-alt"></i> Sair </a>
-            </li>
-        </ul>
-    </div>
-    <div>
-        <ul class="navbar-nav ms-auto">
-            <li class="nav-item active">
-                <!-- Button trigger modal -->
-                <a data-toggle="modal" data-target="#exampleModalCenter" class="nav-link" href=""> <i
-                        class="fas fa-user-circle"></i> Admin</a>
-                <!-- Modal -->
-                <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog"
-                     aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="exampleModalLongTitle">Dados do usuario</h5>
-                            </div>
-                            <div class="modal-body">
-                                <div>Nome: Admin</div>
-                                <div>Matricula: 123</div>
-                                <div>Ultimo acesso: 01/01/2020</div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-primary"
-                                        data-dismiss="modal">Fechar
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </li>
-        </ul>
-    </div>
-</nav>
 
-<!-- Modal -->
-<div class="modal fade" id="exampleModalCenter11" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
-     aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLongTitle">Atenção</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
+	<nav class="navbar navbar-expand-lg navbar-light bg-light">
+		<div class="collapse navbar-collapse" id="navbar">
+			<ul class="navbar-nav">
 
-                <span>Deseja realmente remover o usuario desse sistema?</span>
+				<!-- aviso -->
+				<li class="nav-item active">
+					<a class="nav-link" href="/avisos/"> <i class="fas fa-exclamation-triangle"></i> Avisos</a> </a>
+				</li>
+				<!-- aviso -->
 
-            </div>
+				<!-- unidade gestora-->
+				<li class="nav-item active">
+					<a class="nav-link" href="/unidadeGestora/"><i class="fas fa-map-marker-alt"></i> Unidade
+						Gestora</a>
+				</li>
+				<!-- unidade gestora-->
 
-            <div class="modal-footer">
-                <button type="button" class="btn btn-warning">Sim</button>
-                <button type="button" class="btn btn-primary" data-dismiss="modal">Não</button>
+				<!-- concurso publico -->
+				<li class="nav-item dropdown active">
+					<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownLink" data-toggle="dropdown"
+						aria-haspopup="true" aria-expanded="false">
+						<i class="fas fa-edit"></i> Concurso publico
+					</a>
+					<ul class="dropdown-menu" aria-labelledby="navbarDropdownLink">
 
-            </div>
+						<li><a class="dropdown-item" href="/concursoEdital/">Edital de abertura</a></li>
 
-        </div>
-    </div>
-</div>
+						<li class="dropdown-submenu">
+							<a class="dropdown-item dropdown-toggle" href="#">Vaga do concurso</a>
+							<ul class="dropdown-menu">
+								<li><a class="dropdown-item" href="/concursoEspecialidadeVaga/">Especialidade da
+										vaga</a></li>
+								<li><a class="dropdown-item" href="/concursoVaga/">Vaga</a></li>
+							</ul>
+						</li>
+
+						<li><a class="dropdown-item" href="/concursoHomologacao/">Homologacao do concurso</a></li>
+
+						<li><a class="dropdown-item" href="/concursoAprovado/">Aprovado do concurso</a></li>
+
+					</ul>
+				</li>
+				<!-- concurso publico -->
+
+				<!-- registro -->
+				<li class="nav-item dropdown active">
+					<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownLink" data-toggle="dropdown"
+						aria-haspopup="true" aria-expanded="false">
+						<i class="fas fa-pen"></i> Registro
+					</a>
+					<ul class="dropdown-menu" aria-labelledby="navbarDropdownLink">
+						<li><a class="dropdown-item" href="/registroDecisao/">Decisao</a></li>
+						<li><a class="dropdown-item" href="/registroProcesso/">Processo</a></li>
+						<li><a class="dropdown-item" href="/registroLivro/">Livro</a></li>
+						<li><a class="dropdown-item" href="/registroGerarEtiqueta/">Gerar etiqueta</a></li>
+					</ul>
+				</li>
+				<!-- registro -->
+
+				<!-- envio eletronico de documentos -->
+				<li class="nav-item dropdown active">
+					<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownLink" data-toggle="dropdown"
+						aria-haspopup="true" aria-expanded="false">
+						<i class="fas fa-paper-plane"></i> Envio eletronico de documentos
+					</a>
+					<ul class="dropdown-menu" aria-labelledby="navbarDropdownLink">
+
+						<li class="dropdown-submenu">
+							<a class="dropdown-item dropdown-toggle" href="#">Concessoes</a>
+							<ul class="dropdown-menu">
+								<li><a class="dropdown-item" href="/documentoConcessaoAposentadoria/">Aposentadoria</a>
+								</li>
+								<li><a class="dropdown-item"
+										href="/documentoConcessaoAproveitamento/">Aproveitamento</a></li>
+								<li><a class="dropdown-item" href="/documentoConcessaoPensao/">Pensão</a></li>
+								<li><a class="dropdown-item" href="/documentoConcessaoReserva/">Reserva</a></li>
+								<li><a class="dropdown-item" href="/documentoConcessaoReforma/">Reforma</a></li>
+								<li><a class="dropdown-item" href="/documentoConcessaoReintegracao/">Reintegração</a>
+								</li>
+								<li><a class="dropdown-item" href="/documentoConcessaoReconducao/">Recondução</a></li>
+								<li><a class="dropdown-item" href="/documentoConcessaoReadaptacao/">Readaptação</a></li>
+								<li><a class="dropdown-item" href="/documentoConcessaoRevisaoAposentadoria/">Revisão de
+										Aposentadoria</a></li>
+								<li><a class="dropdown-item" href="/documentoConcessaoRevisaoPensao/">Revisão de
+										Pensão</a></li>
+								<li><a class="dropdown-item" href="/documentoConcessaoRevisaoReserva/">Revisão de
+										Reserva</a></li>
+								<li><a class="dropdown-item" href="/documentoConcessaoRevisaoReforma/">Revisão de
+										Reforma</a></li>
+								<li><a class="dropdown-item"
+										href="/documentoConcessaoReversaoAposentadoriaReserva/">Reversão de
+										Aposentadoria/Reserva</a></li>
+							</ul>
+						</li>
+
+						<li class="dropdown-submenu">
+							<a class="dropdown-item dropdown-toggle" href="#">Concurso publico</a>
+							<ul class="dropdown-menu">
+								<li><a class="dropdown-item" href="/documentoConcursoEdital/">Edital de concurso</a>
+								</li>
+								<li><a class="dropdown-item" href="/documentoConcursoHomologacao/">Homologacao do
+										concurso</a></li>
+							</ul>
+						</li>
+
+						<li><a class="dropdown-item" href="/documentoAdmissao/">Admissao</a></li>
+
+						<li class="dropdown-submenu">
+							<a class="dropdown-item dropdown-toggle" href="#">Assinar processo</a>
+							<ul class="dropdown-menu">
+								<li><a class="dropdown-item" href="/documentoAssinarConcessoes/">Concessoes</a></li>
+								<li><a class="dropdown-item" href="/documentoAssinarConcursoPublico/">Concurso
+										publico</a></li>
+								<li><a class="dropdown-item" href="/documentoAssinarAdmissao/">Admissao</a></li>
+							</ul>
+						</li>
+
+					</ul>
+				</li>
+				<!-- envio eletronico de documentos -->
+
+				<!-- permissoes -->
+				<a data-toggle="modal" data-target="#exampleModalCenter2" class="nav-link active" href="#"> <i
+						class="fas fa-key"></i> Permissoes</a>
+				<!-- permissoes -->
+
+				<!-- permissoes modal -->
+				<div class="modal fade" id="exampleModalCenter2" tabindex="-1" role="dialog"
+					aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+					<div class="modal-dialog modal-dialog-centered" role="document">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title" id="exampleModalLongTitle">Associação de Usuário à Perfis</h5>
+
+							</div>
+
+							<div class="modal-body">
+
+								<table class="table">
+									<thead class="thead-light">
+										<tr>
+											<th scope="col">Perfis</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<td> <a href="#">Administrador</td>
+										</tr>
+										<tr>
+											<td> <a href="#">Registro</td>
+										</tr>
+										<tr>
+									</tbody>
+								</table>
+
+								<table class="table">
+									<thead class="thead-light">
+										<tr>
+											<th scope="col">Usuarios</th>
+											<th scope="col"></th>
+										</tr>
+									</thead>
+								</table>
+
+
+								<form action="/buscar-nome.php" method="post" class="form-inline">
+									<input placeholder="nome" class="form-control mr-sm-2" type="search" name="nome"
+										aria-label="Search"></table>
+									<button class="btn btn-outline-primary my-2 my-sm-0" type="submit"> <i
+											class="fas fa-search"></i> </button>
+									<button style="margin-left:1%;" class="btn btn-outline-primary my-2 my-sm-0"
+										type="submit"> <i class="fas fa-plus"></i> </button>
+								</form>
+
+
+
+
+								<table class="table">
+									<thead class="thead-light">
+									</thead>
+									<tbody>
+										<tr>
+											<td> <a href="#">Admin</td>
+											<td>
+												<button type="button" class="btn btn-primary" data-toggle="modal"
+													data-target="#exampleModalCenter10"> <i
+														class="fas fa-trash-alt"></i> </button>
+											</td>
+										</tr>
+										<tr>
+											<td> <a href="#">Jose</td>
+											<td>
+												<button data-dismiss="modal" type="button" class="btn btn-primary"
+													data-toggle="modal" data-target="#exampleModalCenter10"> <i
+														class="fas fa-trash-alt"></i> </button>
+											</td>
+										</tr>
+										<tr>
+											<td> <a href="#">Maria</td>
+											<td>
+												<button data-dismiss="modal" type="button" class="btn btn-primary"
+													data-toggle="modal" data-target="#exampleModalCenter10"> <i
+														class="fas fa-trash-alt"></i> </button>
+											</td>
+									</tbody>
+								</table>
+
+							</div>
+
+							<div class="modal-footer">
+								<button type="button" class="btn btn-primary" data-dismiss="modal">Fechar</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- permissoes modal -->
+
+				<!-- permissoes modal exclusao -->
+				<div class="modal fade" id="exampleModalCenter11" tabindex="-1" role="dialog"
+					aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+					<div class="modal-dialog modal-dialog-centered" role="document">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title" id="exampleModalLongTitle">Atenção</h5>
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+							<div class="modal-body">
+
+								<span>Deseja realmente remover o usuario desse sistema?</span>
+
+							</div>
+
+							<div class="modal-footer">
+								<button type="button" class="btn btn-warning">Sim</button>
+								<button type="button" class="btn btn-primary" data-dismiss="modal">Não</button>
+
+							</div>
+
+						</div>
+					</div>
+				</div>
+				<!-- permissoes modal exclusao -->
+
+				<!-- sair -->
+				<li class="nav-item active">
+					<a class="nav-link" href="/logout/"><i class="fas fa-sign-out-alt"></i> Sair</a>
+				</li>
+				<!-- sair -->
+
+			</ul>
+		</div>
+
+		<!-- perfil -->
+		<ul class="navbar-nav ms-auto">
+			<li class="nav-item active">
+				<a data-toggle="modal" data-target="#exampleModalCenter" class="nav-link active" href="#"> <i
+						class="fas fa-user-circle"></i> Admin</a>
+			</li>
+		</ul>
+		<!-- perfil -->
+
+		<!-- perfil modal -->
+		<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog"
+			aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLongTitle">Dados do usuario</h5>
+
+					</div>
+
+					<div class="modal-body">
+
+						<div>Nome: Admin</div>
+						<div>Matricula: 123</div>
+						<div>Ultimo acesso: 01/01/2020</div>
+					</div>
+
+					<div class="modal-footer">
+						<button type="button" class="btn btn-primary" data-dismiss="modal">Fechar</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- perfil modal-->
+
+	</nav>
 
 </body>
+
 </html>
