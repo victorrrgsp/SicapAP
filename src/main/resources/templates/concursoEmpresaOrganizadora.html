@@ -8,7 +8,7 @@
 
     <div class="card">
         <div class="card-header text-white" style="background-color: #03487b;">
-            Lista de Empresas Organizadoras
+            Empresa Organizadora
         </div>
     </div>
 
@@ -16,7 +16,7 @@
     <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#exampleModalCenter3">
         Adicionar novo <i class="fas fa-search"></i>
     </button>
-    <br></br>
+    <br/><br/>
     <h4>Pesquisa de Empresas Organizadoras</h4>
     <div>
         <form action="/buscar-nome.php" method="post" class="form-inline">
@@ -32,7 +32,7 @@
             <button class="btn btn-outline-primary my-2 my-sm-0" type="submit"><i class="fas fa-search"></i></button>
         </form>
     </div>
-    <br></br>
+    <br/><br/>
     <table class="table table-striped">
         <thead>
         <tr>
@@ -59,9 +59,9 @@
     </table>
 
     <!-- Modal -->
-    <div class="modal fade" id="exampleModalCenter3" tabindex="-1" role="dialog"
+    <div class="modal fade bd-example-modal-lg" id="exampleModalCenter3" tabindex="-1" role="dialog"
          aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLongTitle">Gerenciador da Empresa Organizadora</h5>
@@ -70,27 +70,77 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form>
+                    <form th:action="@{salvar}" th:object="${empresaOrganizadora}" method="POST">
                         <div class="form-row">
                             <div class="col">
-                                <span>Codigo:</span>
-                                <input type="text" class="form-control">
+                                <label for="cnpj">CNPJ:</label>
+                                <input type="text" class="form-control form-control-sm" id="cnpj"
+                                       th:field="*{cnpjEmpresaOrganizadora}">
                             </div>
                             <div class="col">
-                                <span>Nome:</span>
-                                <input type="text" class="form-control">
+                                <label for="nome">Nome da Empresa:</label>
+                                <input type="text" class="form-control form-control-sm" id="nome" th:field="*{nome}">
                             </div>
+                            <div class="col">
+                                <label for="valor">Valor da Contratação:</label>
+                                <input type="text" class="form-control form-control-sm" id="valor" th:field="*{valor}">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="col">
+                                <label for="modalidade">Modalidade da Licitação:</label>
+                                <select class="form-control form-control-sm" id="modalidade"
+                                        th:field="*{modalidadeLicitacao}">
+                                    <option th:value="${null}">Selecione</option>
+                                    <option th:each="m : ${T(br.gov.to.tce.model.ap.concurso.EmpresaOrganizadora.ModalidadeLicitacao).values()}"
+                                            th:value="${m}" th:text="${m.label}">1 - Pregão
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col">
+                                <label for="numeroAdministrativo">Nº do Processo Administrativo:</label>
+                                <input type="text" class="form-control form-control-sm" id="numeroAdministrativo"
+                                       th:field="*{numeroAdministrativo}">
+                            </div>
+                            <div class="col">
+                                <label for="anoAdministrativo">Ano do Processo Administrativo:</label>
+                                <input type="text" class="form-control form-control-sm" id="anoAdministrativo"
+                                       th:field="*{anoAdministrativo}">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="col">
+                                <label for="numeroLicitatorio">Nº do Processo Licitatório:</label>
+                                <input type="text" class="form-control form-control-sm" id="numeroLicitatorio"
+                                       th:field="*{numeroLicitatorio}">
+                            </div>
+                            <div class="col">
+                                <label for="anoLicitatorio">Ano do Processo Licitatório:</label>
+                                <input type="text" class="form-control form-control-sm" id="anoLicitatorio"
+                                       th:field="*{anoLicitatorio}">
+                            </div>
+                            <div class="col">
+                                <label for="situacaoContratacao">Situação da Contratação:</label>
+                                <select class="form-control form-control-sm" id="situacaoContratacao"
+                                        th:field="*{situacaoContratacao}">
+                                    <option th:value="${null}">Selecione</option>
+                                    <option th:each="m : ${T(br.gov.to.tce.model.ap.concurso.EmpresaOrganizadora.SituacaoContratacao).values()}"
+                                            th:value="${m}" th:text="${m.label}">1 - Pregão
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                            <input type="hidden" id="id" name="id" value=""/>
+                            <button type="submit" class="btn btn-primary">Salvar</button>
                         </div>
                     </form>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
-                    <button type="button" class="btn btn-primary">Salvar</button>
-                </div>
+
             </div>
         </div>
     </div>
-
     <nav aria-label="Page navigation example">
         <ul class="pagination">
             <li class="page-item"><a class="page-link" href="#">Anterior</a></li>
@@ -100,7 +150,6 @@
             <li class="page-item"><a class="page-link" href="#">Proximo</a></li>
         </ul>
     </nav>
-
 </section>
 </body>
 </html>

@@ -16,44 +16,45 @@
     <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#exampleModalCenter3">
         Adicionar novo <i class="fas fa-search"></i>
     </button>
-    <br></br>
+    <br/><br/>
     <h4>Pesquisa de concursos</h4>
     <div>
         <form action="/buscar-nome.php" method="post" class="form-inline">
 
-          <span>Numero do edital: </span>
-          <input class="form-control mr-sm-2" type="search" name="nome" aria-label="Search"></table>
-          <button type="button" class="btn btn-primary"><i class="fas fa-search"></i></button>
+            <span>Numero do edital: </span>
+            <input class="form-control mr-sm-2" type="search" name="nome" aria-label="Search"></table>
+            <button type="button" class="btn btn-primary"><i class="fas fa-search"></i></button>
 
-          <span>Modalidade: </span>
-          <input class="form-control mr-sm-2" type="search" name="nome" aria-label="Search"></table>
-          <button type="button" class="btn btn-primary"><i class="fas fa-search"></i></button>
-          
+            <span>Modalidade: </span>
+            <input class="form-control mr-sm-2" type="search" name="nome" aria-label="Search"></table>
+            <button type="button" class="btn btn-primary"><i class="fas fa-search"></i></button>
+
         </form>
     </div>
     <br></br>
 
     <!-- Modal da lixeira-->
-<div class="modal fade" id="exampleModal50" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">ATENCAO</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        Deseja realmente excluir?
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-warning" data-dismiss="modal">Sim</button>
-        <button type="button" class="btn btn-primary" data-dismiss="modal">Nao</button>
-      </div>
+    <div class="modal fade" id="exampleModal50" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">ATENCAO</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Deseja realmente excluir?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-warning" data-dismiss="modal">Sim</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Nao</button>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
-<!-- Modal da lixeira-->      
+    <!-- Modal da lixeira-->
 
 
     <table class="table table-striped">
@@ -70,8 +71,8 @@
             <th scope="col">Veiculo de publicacao</th>
             <th scope="col">Data de publicacao</th>
             <th scope="col">Prazo de validade</th>
-            <th scope="col">Organizadora</th>
-            <th scope="col">Modalidade de contratacao</th>
+            <th scope="col">Empresa Organizadora</th>
+            <th scope="col">Tipo de Edital</th>
             <th scope="col">Valor da contratacao</th>
             <th scope="col">Acoes</th>
         </tr>
@@ -82,19 +83,16 @@
             <td th:text="${e.veiculoPublicacao}">Otto</td>
             <td th:text="${#dates.format(e.dataPublicacao, 'dd/MM/yyyy')}">@mdo</td>
             <td th:text="${e.prazoValidade}"></td>
-            <td th:text="${e.cnpjOrganizador}"></td>
-            
+            <td th:text="${e.EmpresaOrganizadora.nome}"></td>
+            <td th:text="${e.tipoEdital}">---</td>
+            <td th:text="${e.EmpresaOrganizadora.valor}">---</td>
             <td>
-                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter3"><i class="fas fa-pencil-alt"></i></button>
-
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter3"><i
+                        class="fas fa-pencil-alt"></i></button>
                 <a href="concursoEditalDetalhes.html" class="btn btn-primary"><i class="fas fa-search-plus"></i></a>
-
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal50"><i class="fas fa-trash-alt"></i></button>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal50"><i
+                        class="fas fa-trash-alt"></i></button>
             </td>
-
-            <td></td>
-            <td></td>
-            <td></td>
         </tr>
         </tbody>
     </table>
@@ -111,65 +109,72 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form>
+                    <form th:action="@{salvar}" th:object="${edital}" method="POST">
                         <div class="form-row">
-                            <div class="col">
-                                <span>Numero do edital:</span>
-                                <input type="text" class="form-control">
+                            <div class="col-3">
+                                <label for="numeroEdital">Numero do edital:</label>
+                                <input type="text" class="form-control form-control-sm" id="numeroEdital"
+                                       th:field="*{numeroEdital}">
+                            </div>
+                            <div class="col-4">
+                                <label for="tipoEdital">Tipo de Edital:</label>
+                                <select class="form-control form-control-sm" id="tipoEdital"
+                                        th:field="*{tipoEdital}">
+                                    <option th:value="${null}">Selecione</option>
+                                    <option th:each="t : ${T(br.gov.to.tce.model.ap.concurso.Edital.TipoEdital).values()}"
+                                            th:value="${t}" th:text="${t.label}">1 - Pregão
+                                    </option>
+                                </select>
                             </div>
                             <div class="col">
-                                <span>Modalidade da contratacao:</span>
-                                <input type="text" class="form-control">
-                            </div>
-                            <div class="col">
-                                <span>Veiculo de publicacao:</span>
-                                <input type="text" class="form-control">
+                                <label for="veiculoPublicacao">Veiculo de Publicação:</label>
+                                <input type="text" class="form-control form-control-sm" id="veiculoPublicacao"
+                                       th:field="*{veiculoPublicacao}">
                             </div>
                         </div>
+                        <br/>
                         <div class="form-row">
                             <div class="col">
-                                <br>Data de publicacao:</br>
-                                <input type="text" class="form-control">
+                                <label for="dataPublicacao">Data da Publicação:</label>
+                                <input type="date" class="form-control form-control-sm" id="dataPublicacao"
+                                       th:field="*{dataPublicacao}">
                             </div>
                             <div class="col">
-                                <span>Inicio do periodo de incricoes do concurso:</span>
-                                <input type="text" class="form-control">
+                                <label for="inicioIncricoes">Início das Incrições do Concurso:</label>
+                                <input type="date" class="form-control form-control-sm" id="inicioIncricoes"
+                                       th:field="*{dataInicioInscricoes}">
                             </div>
                             <div class="col">
-                                <span>Fim do periodo de incricoes do concurso:</span>
-                                <input type="text" class="form-control">
+                                <label for="fimIncricoes">Fim das Incrições do Concurso:</label>
+                                <input type="date" class="form-control form-control-sm" id="fimIncricoes"
+                                       th:field="*{dataFimInscricoes}">
                             </div>
                         </div>
+                        <br/>
                         <div class="form-row">
-                            <div class="col">
-                                <span>Validade em anos:</span>
-                                <input type="text" class="form-control">
+                            <div class="col-3">
+                                <label for="validade">Validade em anos:</label>
+                                <input type="text" class="form-control form-control-sm" id="validade"
+                                       th:field="*{prazoValidade}">
                             </div>
                             <div class="col">
-                                <span>Organizadora:</span>
-                                <input type="text" class="form-control">
-                            </div>
-                            <div class="col">
-                                <span>Valor da contratacao:</span>
-                                <input type="text" class="form-control">
+                                <label for="organizadora">Empresa Organizadora:</label>
+                                <select class="form-control form-control-sm" id="organizadora"
+                                        th:field="*{empresaOrganizadora}">
+                                    <option th:value="${null}">Selecione</option>
+                                    <option th:each="e : ${empresas}" th:value="${e.id}"
+                                            th:text="|${e.nome} - ${e.cnpjEmpresaOrganizadora}|">2 - Processo Seletivo
+                                    </option>
+                                </select>
                             </div>
                         </div>
-                        <div class="form-row">
-                            <div class="col">
-                                <span>Nº do processo licitatorio:</span>
-                                <input type="text" class="form-control">
-                            </div>
-                            <div class="col">
-                                <span>Ano do processo licitatorio:</span>
-                                <input type="text" class="form-control">
-                            </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                            <button type="submit" class="btn btn-primary">Salvar</button>
                         </div>
                     </form>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
-                    <button type="button" class="btn btn-primary">Salvar</button>
-                </div>
+
             </div>
         </div>
     </div>

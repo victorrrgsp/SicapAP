@@ -6,182 +6,159 @@
 </head>
 
 <body>
-    <section layout:fragment="corpo">
+<section layout:fragment="corpo">
 
-        <div class="card">
-            <div class="card-header text-white" style="background-color: #03487b;">
-                Concursos em homologacao
-            </div>
+    <div class="card">
+        <div class="card-header text-white" style="background-color: #03487b;">
+            Concursos em homologacao
         </div>
+    </div>
 
-        <!-- Modal dos detalhes do concurso-->
-        <div class="modal fade" id="exampleModal40" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Detalhes do concurso</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <span>Tpoatocod: DECRETO</span>
-                        <br>Número do ato: 0003022018</br>
-                        <span>Dataato: 25/01/2018</span>
-                        <br>Veiculopublicacao: DOE TO 5039</br>
-                        <span>Datapublicacao: 25/01/2018</span>
-                        <br>Numero de inscricao: 1401014970</br>
-                        <span>OBS:</span>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" data-dismiss="modal">Fechar</button>
-                    </div>
+    <!-- Modal dos detalhes do concurso-->
+    <div class="modal fade" id="exampleModal40" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Detalhes do concurso</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <span>Tpoatocod: DECRETO</span>
+                    <br>Número do ato: 0003022018</br>
+                    <span>Dataato: 25/01/2018</span>
+                    <br>Veiculopublicacao: DOE TO 5039</br>
+                    <span>Datapublicacao: 25/01/2018</span>
+                    <br>Numero de inscricao: 1401014970</br>
+                    <span>OBS:</span>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Fechar</button>
                 </div>
             </div>
         </div>
-        <!-- Modal dos detalhes do concurso-->
+    </div>
+    <!-- Modal dos detalhes do concurso-->
 
-
-        <!-- Modal da lixeira-->
-        <div class="modal fade" id="exampleModal50" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">ATENCAO</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        Deseja realmente excluir?
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-warning" data-dismiss="modal">Sim</button>
-                        <button type="button" class="btn btn-primary" data-dismiss="modal">Nao</button>
-                    </div>
+    <!-- Modal da lixeira-->
+    <div class="modal fade" id="exampleModal50" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">ATENCAO</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Deseja realmente excluir?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-warning" data-dismiss="modal">Sim</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Nao</button>
                 </div>
             </div>
         </div>
-        <!-- Modal da lixeira-->
+    </div>
+    <!-- Modal da lixeira-->
 
-        <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#exampleModalCenter3">
-            Adicionar novo <i class="fas fa-search"></i>
-        </button>
+    <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#exampleModalCenter3">
+        Adicionar novo <i class="fas fa-search"></i>
+    </button>
 
-        <br></br>
+    <br/><br/>
 
-        <!-- Modal -->
-        <div class="modal fade bd-example-modal-lg" id="exampleModalCenter3" tabindex="-1" role="dialog"
-            aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-            <div class="modal-dialog modal-lg" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLongTitle">Gerenciador de concurso aprovado</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <form>
-
-                            <div class="form-row">
-                                <div class="col">
-                                    <span>Concurso:</span>
-                                    <select class="form-control" id="exampleFormControlSelect1">
-                                        <option>1</option>
-                                        <option>2</option>
-                                        <option>3</option>
-                                        <option>4</option>
-                                        <option>5</option>
-                                    </select>
-                                </div>
-                                <div class="col">
-                                    <span>Tipo do ato de homologacao:</span>
-                                    <select class="form-control" id="exampleFormControlSelect1">
-                                        <option>1</option>
-                                        <option>2</option>
-                                        <option>3</option>
-                                        <option>4</option>
-                                        <option>5</option>
-                                    </select>
-                                </div>
-
-                                <div class="col">
-                                    <span>Numero do ato:</span>
-                                    <input type="text" class="form-control">
-                                </div>
-
+    <!-- Modal -->
+    <div class="modal fade bd-example-modal-lg" id="exampleModalCenter3" tabindex="-1" role="dialog"
+         aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Gerenciador de concurso aprovado</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form th:action="@{salvar}" th:object="${editalHomologacao}" method="POST">
+                        <div class="form-row">
+                            <div class="col">
+                                <label for="numeroEdital">Edital:</label>
+                                <select class="form-control form-control-sm" id="numeroEdital" th:field="*{edital}">
+                                    <option th:value="${null}">Selecione</option>
+                                    <option th:each="e : ${editais}" th:value="${e.id}"
+                                            th:text="${e.numeroEdital}">2
+                                    </option>
+                                </select>
                             </div>
-
-                            <div class="form-row">
-
-
-                                <div class="col">
-                                    <span>Data do ato:</span>
-                                    <input type="text" class="form-control">
-                                </div>
-
-
-                                <div class="col">
-                                    <span>Veiculo de publicacao:</span>
-                                    <input type="text" class="form-control">
-                                </div>
-
-                                <div class="col">
-                                    <span>Data de publicacao:</span>
-                                    <input type="text" class="form-control">
-                                </div>
-
+                            <div class="col">
+                                <label for="numeroAto">Número do Ato:</label>
+                                <select class="form-control form-control-sm" id="numeroAto" th:field="*{ato}">
+                                    <option th:value="${null}">Selecione</option>
+                                    <option th:each="a : ${atos}" th:value="${a.id}"
+                                            th:text="${a.numeroAto}">2
+                                    </option>
+                                </select>
                             </div>
-
-                        </form>
-                    </div>
-
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
-                        <button type="button" class="btn btn-primary">Salvar</button>
-                    </div>
-
+                        </div>
+                        <div class="form-row">
+                            <div class="col">
+                                <label for="dataHomologacao">Data da Homologação:</label>
+                                <input type="date" class="form-control form-control-sm" id="dataHomologacao"
+                                       th:field="*{dataHomologacao}">
+                            </div>
+                            <div class="col">
+                                <label for="veiculoPublicacao">Veículo de Publicação:</label>
+                                <input type="text" class="form-control form-control-sm" id="veiculoPublicacao"
+                                       th:field="*{veiculoPublicacao}">
+                            </div>
+                            <div class="col">
+                                <label for="dataPublicacao">Data de Publicação:</label>
+                                <input type="date" class="form-control form-control-sm" id="dataPublicacao"
+                                       th:field="*{dataPublicacao}">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                            <button type="submit" class="btn btn-primary">Salvar</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
-
-        <p></p>
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th scope="col">Concurso (edital)</th>
-                    <th scope="col">CNPJ da UG</th>
-                    <th scope="col">Numero do ato</th>
-                    <th scope="col">Data da Homologação</th>
-                    <th scope="col">Veiculo de publicacao</th>
-                    <th scope="col">data Da Publicação</th>
-                    <th scope="col">Acoes</th>
-            </thead>
-            <tbody>
-                <tr th:each="h : ${homologacoes}">
-                    <td th:text="${h.Edital.numeroEdital}">Mark</td>
-                    <td th:text="${h.cnpj}">Otto</td>
-                    <td th:text="${h.Ato.numeroAto}">@mdo</td>
-                    <td th:text="${#dates.format(h.dataHomologacao, 'dd/MM/yyyy')}"></td>
+    </div>
+    <p></p>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th scope="col">Edital</th>
+            <th scope="col">Número do Ato</th>
+            <th scope="col">Data da Homologação</th>
+            <th scope="col">Veículo de Publicação</th>
+            <th scope="col">Data da Publicação</th>
+            <th scope="col">Ações</th>
+        </thead>
+        <tbody>
+        <tr th:each="h : ${homologacoes}">
+            <td th:text="${h.Edital.numeroEdital}">Mark</td>
+            <td th:text="${h.Ato.numeroAto}">@mdo</td>
+            <td th:text="${#dates.format(h.dataHomologacao, 'dd/MM/yyyy')}"></td>
             <td th:text="${h.veiculoPublicacao}"></td>
             <td th:text="${#dates.format(h.dataPublicacao, 'dd/MM/yyyy')}"></td>
-
-            <td>
-              <button type="button" class="btn btn-primary" data-toggle="modal"
-                data-target="#exampleModalCenter3"><i class="fas fa-pencil-alt"></i></button>
-              <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal40"><i
-                  class="fas fa-search-plus"></i></button>
-              <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal50"><i
-                  class="fas fa-trash-alt"></i></button>
+            <td class="btn-group-sm">
+                <button type="button" class="btn btn-primary" data-toggle="modal"
+                        data-target="#exampleModalCenter3"><i class="fas fa-pencil-alt"></i></button>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal40"><i
+                        class="fas fa-search-plus"></i></button>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal50"><i
+                        class="fas fa-trash-alt"></i></button>
             </td>
-
         </tr>
         </tbody>
     </table>
-
     <nav aria-label="Page navigation example">
         <ul class="pagination">
             <li class="page-item"><a class="page-link" href="#">Anterior</a></li>
@@ -191,7 +168,6 @@
             <li class="page-item"><a class="page-link" href="#">Proximo</a></li>
         </ul>
     </nav>
-
 </section>
 </body>
 </html>
