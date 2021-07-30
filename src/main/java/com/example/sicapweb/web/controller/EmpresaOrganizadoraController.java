@@ -3,30 +3,59 @@ package com.example.sicapweb.web.controller;
 import br.gov.to.tce.model.ap.concurso.EmpresaOrganizadora;
 import com.example.sicapweb.repository.EmpresaOrganizadoraRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.math.BigInteger;
+import java.net.URI;
+import java.util.List;
 
 @RestController
-@RequestMapping("/concursoEmpresaOrganizadora")
+@RequestMapping({"/concursoEmpresaOrganizadora"})
 public class EmpresaOrganizadoraController {
 
     @Autowired
     private EmpresaOrganizadoraRepository empresaOrganizadoraRepository;
 
-    @GetMapping("/")
-    public String lista(ModelMap model, EmpresaOrganizadora empresaOrganizadora) {
-        model.addAttribute("empresas", empresaOrganizadoraRepository.findAll());
-        return "concursoEmpresaOrganizadora";
+    @CrossOrigin
+    @GetMapping
+    public ResponseEntity<List<EmpresaOrganizadora>> findAll() {
+        List<EmpresaOrganizadora> list = empresaOrganizadoraRepository.findAll();
+        return ResponseEntity.ok().body(list);
     }
 
+    @CrossOrigin
+    @GetMapping(path = {"/{id}"})
+    public ResponseEntity<?> findById(@PathVariable BigInteger id) {
+        EmpresaOrganizadora list = empresaOrganizadoraRepository.findById(id);
+        return ResponseEntity.ok().body(list);
+    }
+
+    @CrossOrigin
     @Transactional
-    @PostMapping("salvar")
-    public String salvar(EmpresaOrganizadora empresaOrganizadora) {
+    @PostMapping
+    public ResponseEntity<EmpresaOrganizadora> create(@RequestBody EmpresaOrganizadora empresaOrganizadora) {
         empresaOrganizadoraRepository.save(empresaOrganizadora);
-        return "redirect:/concursoEmpresaOrganizadora/";
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(empresaOrganizadora.getId()).toUri();
+        return ResponseEntity.created(uri).body(empresaOrganizadora);
+    }
+
+    @CrossOrigin
+    @Transactional
+    @RequestMapping(value = {"/{id}"}, method = RequestMethod.PUT)
+    public ResponseEntity<EmpresaOrganizadora> update(@RequestBody EmpresaOrganizadora empresaOrganizadora, @PathVariable BigInteger id){
+        empresaOrganizadora.setId(id);
+        empresaOrganizadoraRepository.update(empresaOrganizadora);
+        return ResponseEntity.noContent().build();
+    }
+
+    @CrossOrigin
+    @Transactional
+    @DeleteMapping
+    public ResponseEntity<?> delete(@PathVariable BigInteger id) {
+        empresaOrganizadoraRepository.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }
