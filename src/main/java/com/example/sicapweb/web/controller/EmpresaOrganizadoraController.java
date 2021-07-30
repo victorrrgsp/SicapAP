@@ -53,7 +53,7 @@ public class EmpresaOrganizadoraController {
 
     @CrossOrigin
     @Transactional
-    @DeleteMapping
+    @DeleteMapping(value = {"/{id}"})
     public ResponseEntity<?> delete(@PathVariable BigInteger id) {
         empresaOrganizadoraRepository.delete(id);
         return ResponseEntity.noContent().build();
