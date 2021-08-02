@@ -1,5 +1,6 @@
 package com.example.sicapweb.repository;
 
+import br.gov.to.tce.model.InfoRemessa;
 import com.example.sicapweb.util.PaginacaoUtil;
 
 import javax.persistence.EntityManager;
@@ -72,5 +73,10 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
 
     public long count() {
         return getEntityManager().createQuery("select count(*) from " + entityClass.getSimpleName(), Long.class).getSingleResult();
+    }
+
+    public InfoRemessa buscarPrimeiraRemessa() {
+        List<InfoRemessa> list = entityManager.createNativeQuery("select * from infoRemessa where remessa = 1 and exercicio = 2021", InfoRemessa.class).getResultList();
+        return list.get(0);
     }
 }

@@ -37,6 +37,7 @@ public class EmpresaOrganizadoraController {
     @Transactional
     @PostMapping
     public ResponseEntity<EmpresaOrganizadora> create(@RequestBody EmpresaOrganizadora empresaOrganizadora) {
+        empresaOrganizadora.setChave(empresaOrganizadoraRepository.buscarPrimeiraRemessa());
         empresaOrganizadoraRepository.save(empresaOrganizadora);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(empresaOrganizadora.getId()).toUri();
         return ResponseEntity.created(uri).body(empresaOrganizadora);
