@@ -48,6 +48,7 @@ public class EmpresaOrganizadoraController {
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.PUT)
     public ResponseEntity<EmpresaOrganizadora> update(@RequestBody EmpresaOrganizadora empresaOrganizadora, @PathVariable BigInteger id){
         empresaOrganizadora.setId(id);
+        empresaOrganizadora.setChave(empresaOrganizadoraRepository.buscarPrimeiraRemessa());
         empresaOrganizadoraRepository.update(empresaOrganizadora);
         return ResponseEntity.noContent().build();
     }
