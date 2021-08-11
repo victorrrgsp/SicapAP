@@ -1,6 +1,7 @@
 package com.example.sicapweb.repository;
 
 import br.gov.to.tce.model.InfoRemessa;
+import br.gov.to.tce.model.ap.concurso.Edital;
 import com.example.sicapweb.util.PaginacaoUtil;
 
 import javax.persistence.EntityManager;
@@ -8,6 +9,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
+import java.math.BigInteger;
 import java.util.List;
 
 public abstract class DefaultRepository<T, PK extends Serializable> {
@@ -32,7 +34,7 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
         entityManager.merge(entity);
     }
 
-    public void delete(PK id) {
+    public void delete(BigInteger id) {
 
         entityManager.remove(entityManager.getReference(entityClass, id));
     }

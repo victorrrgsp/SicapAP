@@ -1,7 +1,9 @@
 package com.example.sicapweb.web.controller;
 
+import br.gov.to.tce.application.ApplicationException;
 import br.gov.to.tce.model.ap.concurso.Edital;
 import br.gov.to.tce.model.ap.concurso.EmpresaOrganizadora;
+import br.gov.to.tce.validation.ValidationException;
 import com.example.sicapweb.repository.EditalRepository;
 import com.example.sicapweb.repository.EmpresaOrganizadoraRepository;
 import com.example.sicapweb.util.PaginacaoUtil;
@@ -46,6 +48,7 @@ public class EditalController {
     @PostMapping
     public ResponseEntity<Edital> create(@RequestBody Edital edital) {
         edital.setInfoRemessa(editalRepository.buscarPrimeiraRemessa());
+        edital.setEmpresaOrganizadora(empresaOrganizadoraRepository.buscaEmpresaPorCnpj(edital.getCnpjEmpresaOrganizadora()));
         editalRepository.save(edital);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(edital.getId()).toUri();
         return ResponseEntity.created(uri).body(edital);
@@ -54,40 +57,20 @@ public class EditalController {
     @CrossOrigin
     @Transactional
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.PUT)
-    public ResponseEntity<Edital> update(@RequestBody Edital edital, @PathVariable BigInteger id){
+    public ResponseEntity<Edital> update(@RequestBody Edital edital, @PathVariable BigInteger id) {
+        edital.setInfoRemessa(editalRepository.buscarPrimeiraRemessa());
         edital.setId(id);
+        edital.setEmpresaOrganizadora(empresaOrganizadoraRepository.buscaEmpresaPorCnpj(edital.getCnpjEmpresaOrganizadora()));
         editalRepository.update(edital);
         return ResponseEntity.noContent().build();
     }
 
     @CrossOrigin
     @Transactional
-    @DeleteMapping
+    @DeleteMapping(value = {"/{id}"})
     public ResponseEntity<?> delete(@PathVariable BigInteger id) {
         editalRepository.delete(id);
         return ResponseEntity.noContent().build();
     }
 
-//    @GetMapping("/")
-//    public String lista(ModelMap model, @RequestParam("page")Optional<Integer> page, @RequestParam("dir")Optional<String> dir, Edital edital) {
-//        int paginaAtual = page.orElse(1);
-//        String ordem = dir.orElse("asc");
-//
-//        PaginacaoUtil<Edital> pageEdital = editalRepository.buscaPaginada(paginaAtual, ordem, "numeroEdital");
-//
-//        model.addAttribute("pageEdital", pageEdital);
-//        return "concursoEdital";
-//    }
-//
-//    @Transactional
-//    @PostMapping("salvar")
-//    public String salvar(Edital edital) {
-//        editalRepository.save(edital);
-//        return "redirect:/concursoEdital/";
-//    }
-//
-//    @ModelAttribute("empresas")
-//    public List<EmpresaOrganizadora> empresaOrganizadoraList() {
-//        return empresaOrganizadoraRepository.findAll();
-//    }
 }
