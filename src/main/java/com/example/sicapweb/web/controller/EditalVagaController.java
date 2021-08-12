@@ -1,18 +1,15 @@
 package com.example.sicapweb.web.controller;
 
-import br.gov.to.tce.model.ap.concurso.Edital;
 import br.gov.to.tce.model.ap.concurso.EditalVaga;
-import br.gov.to.tce.model.ap.relacional.Cargo;
-import br.gov.to.tce.model.ap.relacional.UnidadeAdministrativa;
-import com.example.sicapweb.repository.CargoRepository;
-import com.example.sicapweb.repository.EditalRepository;
 import com.example.sicapweb.repository.EditalVagaRepository;
-import com.example.sicapweb.repository.UnidadeAdministrativaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.math.BigInteger;
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -22,40 +19,45 @@ public class EditalVagaController {
     @Autowired
     private EditalVagaRepository editalVagaRepository;
 
-    @Autowired
-    private EditalRepository editalRepository;
-
-    @Autowired
-    private UnidadeAdministrativaRepository unidadeAdministrativaRepository;
-
-    @Autowired
-    private CargoRepository cargoRepository;
-
-    @GetMapping("/")
-    public String lista(ModelMap model, EditalVaga editalVaga) {
-        model.addAttribute("vagas", editalVagaRepository.findAll());
-        return "concursoVaga";
+    @CrossOrigin
+    @GetMapping
+    public ResponseEntity<List<EditalVaga>> findAll() {
+        List<EditalVaga> list = editalVagaRepository.findAll();
+        return ResponseEntity.ok().body(list);
     }
 
+    @CrossOrigin
+    @GetMapping(path = {"/{id}"})
+    public ResponseEntity<?> findById(@PathVariable BigInteger id) {
+        EditalVaga list = editalVagaRepository.findById(id);
+        return ResponseEntity.ok().body(list);
+    }
+
+    @CrossOrigin
     @Transactional
-    @PostMapping("salvar")
-    public String salvar(EditalVaga editalVaga) {
+    @PostMapping
+    public ResponseEntity<EditalVaga> create(@RequestBody EditalVaga editalVaga) {
+        editalVaga.setChave(editalVagaRepository.buscarPrimeiraRemessa());
         editalVagaRepository.save(editalVaga);
-        return "redirect:/concursoVaga/";
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(editalVaga.getId()).toUri();
+        return ResponseEntity.created(uri).body(editalVaga);
     }
 
-    @ModelAttribute("editais")
-    public List<Edital> editalList() {
-        return editalRepository.findAll();
+    @CrossOrigin
+    @Transactional
+    @RequestMapping(value = {"/{id}"}, method = RequestMethod.PUT)
+    public ResponseEntity<EditalVaga> update(@RequestBody EditalVaga editalVaga, @PathVariable BigInteger id){
+        editalVaga.setId(id);
+        editalVaga.setChave(editalVagaRepository.buscarPrimeiraRemessa());
+        editalVagaRepository.update(editalVaga);
+        return ResponseEntity.noContent().build();
     }
 
-    @ModelAttribute("unidades")
-    public List<UnidadeAdministrativa> unidadeAdministrativaList() {
-        return unidadeAdministrativaRepository.findAll();
-    }
-
-    @ModelAttribute("cargos")
-    public List<Cargo> cargoList() {
-        return cargoRepository.findAll();
+    @CrossOrigin
+    @Transactional
+    @DeleteMapping(value = {"/{id}"})
+    public ResponseEntity<?> delete(@PathVariable BigInteger id) {
+        editalVagaRepository.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }
