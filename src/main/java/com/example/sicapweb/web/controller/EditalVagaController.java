@@ -1,7 +1,10 @@
 package com.example.sicapweb.web.controller;
 
 import br.gov.to.tce.model.ap.concurso.EditalVaga;
+import com.example.sicapweb.repository.CargoRepository;
+import com.example.sicapweb.repository.EditalRepository;
 import com.example.sicapweb.repository.EditalVagaRepository;
+import com.example.sicapweb.repository.UnidadeAdministrativaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +21,15 @@ public class EditalVagaController {
 
     @Autowired
     private EditalVagaRepository editalVagaRepository;
+
+    @Autowired
+    private EditalRepository editalRepository;
+
+    @Autowired
+    private UnidadeAdministrativaRepository unidadeAdministrativaRepository;
+
+    @Autowired
+    private CargoRepository cargoRepository;
 
     @CrossOrigin
     @GetMapping
@@ -38,6 +50,9 @@ public class EditalVagaController {
     @PostMapping
     public ResponseEntity<EditalVaga> create(@RequestBody EditalVaga editalVaga) {
         editalVaga.setChave(editalVagaRepository.buscarPrimeiraRemessa());
+        editalVaga.setEdital(editalRepository.buscarEditalPorNumero(editalVaga.getNumeroEdital()));
+        editalVaga.setUnidadeAdministrativa(unidadeAdministrativaRepository.buscarUnidadePorcodigo(editalVaga.codigoUnidadeAdministrativa));
+        editalVaga.setCargo(cargoRepository.buscarCargoPorcodigo(editalVaga.codigoCargo));
         editalVagaRepository.save(editalVaga);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(editalVaga.getId()).toUri();
         return ResponseEntity.created(uri).body(editalVaga);
@@ -49,6 +64,9 @@ public class EditalVagaController {
     public ResponseEntity<EditalVaga> update(@RequestBody EditalVaga editalVaga, @PathVariable BigInteger id){
         editalVaga.setId(id);
         editalVaga.setChave(editalVagaRepository.buscarPrimeiraRemessa());
+        editalVaga.setEdital(editalRepository.buscarEditalPorNumero(editalVaga.getNumeroEdital()));
+        editalVaga.setUnidadeAdministrativa(unidadeAdministrativaRepository.buscarUnidadePorcodigo(editalVaga.codigoUnidadeAdministrativa));
+        editalVaga.setCargo(cargoRepository.buscarCargoPorcodigo(editalVaga.codigoCargo));
         editalVagaRepository.update(editalVaga);
         return ResponseEntity.noContent().build();
     }
