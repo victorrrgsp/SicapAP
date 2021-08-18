@@ -1,23 +1,17 @@
 package com.example.sicapweb.web.controller;
 
-import br.gov.to.tce.application.ApplicationException;
 import br.gov.to.tce.model.ap.concurso.Edital;
-import br.gov.to.tce.model.ap.concurso.EmpresaOrganizadora;
-import br.gov.to.tce.validation.ValidationException;
 import com.example.sicapweb.repository.EditalRepository;
 import com.example.sicapweb.repository.EmpresaOrganizadoraRepository;
-import com.example.sicapweb.util.PaginacaoUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.math.BigInteger;
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/concursoEdital")
@@ -48,7 +42,6 @@ public class EditalController {
     @PostMapping
     public ResponseEntity<Edital> create(@RequestBody Edital edital) {
         edital.setInfoRemessa(editalRepository.buscarPrimeiraRemessa());
-        edital.setEmpresaOrganizadora(empresaOrganizadoraRepository.buscaEmpresaPorCnpj(edital.getCnpjEmpresaOrganizadora()));
         editalRepository.save(edital);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(edital.getId()).toUri();
         return ResponseEntity.created(uri).body(edital);
