@@ -46,6 +46,13 @@ public class EditalVagaController {
     }
 
     @CrossOrigin
+    @GetMapping("/buscar/{id}")
+    public ResponseEntity<List<EditalVaga>> findVagasByIdEdital(@PathVariable Integer id) {
+        List<EditalVaga> list = editalVagaRepository.buscarVagasPorEdital(id);
+        return ResponseEntity.ok().body(list);
+    }
+
+    @CrossOrigin
     @Transactional
     @PostMapping
     public ResponseEntity<EditalVaga> create(@RequestBody EditalVaga editalVaga) {
