@@ -31,6 +31,13 @@ public class EditalController {
     }
 
     @CrossOrigin
+    @GetMapping(path = {"/editaisNaoHomologados"})
+    public ResponseEntity<List<Edital>> findEditalNaoHomologado() {
+        List<Edital> list = editalRepository.buscarEditaisNaoHomologados();
+        return ResponseEntity.ok().body(list);
+    }
+
+    @CrossOrigin
     @GetMapping(path = {"/{id}"})
     public ResponseEntity<?> findById(@PathVariable BigInteger id) {
         Edital list = editalRepository.findById(id);

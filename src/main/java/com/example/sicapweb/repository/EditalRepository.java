@@ -15,4 +15,10 @@ public class EditalRepository extends DefaultRepository<Edital, BigInteger> {
         return list.get(0);
     }
 
+    public List<Edital> buscarEditaisNaoHomologados() {
+        List<Edital> list = getEntityManager().createNativeQuery("select * from Edital ed where " +
+                "not exists (select * from EditalHomologacao eh where ed.id = eh.idEdital)", Edital.class).getResultList();
+        return list;
+    }
+
 }
