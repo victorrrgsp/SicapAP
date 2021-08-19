@@ -36,22 +36,13 @@ public class EditalHomologacaoController {
         return "concursoHomologacao";
     }
 
-    @ModelAttribute("editais")
-    public List<Edital> editalList() {
-        return editalRepository.findAll();
-    }
-
-    @ModelAttribute("atos")
-    public List<Ato> atoList() {
-        return atoRepository.findAll();
-    }
-
     @CrossOrigin
     @GetMapping
     public ResponseEntity<List<EditalHomologacao>> findAll() {
         List<EditalHomologacao> list = editalHomologacaoRepository.findAll();
         return ResponseEntity.ok().body(list);
     }
+
 
     @CrossOrigin
     @GetMapping(path = {"/{id}"})
