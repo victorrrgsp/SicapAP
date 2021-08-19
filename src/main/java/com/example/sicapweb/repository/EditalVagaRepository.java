@@ -9,10 +9,16 @@ import java.util.List;
 @Repository
 public class EditalVagaRepository extends DefaultRepository<EditalVaga, BigInteger> {
 
-    public List<EditalVaga> buscarVagas(Integer idEdital) {
+    public List<EditalVaga> buscarVagasPorEdital(Integer idEdital) {
         return getEntityManager().createNativeQuery(
                 "select * from EditalVaga where idEdital = "
                         + idEdital, EditalVaga.class)
                 .getResultList();
+    }
+
+    public EditalVaga buscarVagasPorCodigo(String codigo) {
+        List<EditalVaga> list = getEntityManager().createNativeQuery("select * from EditalVaga ed" +
+                " where codigoVaga = '" + codigo + "'    ", EditalVaga.class).getResultList();
+        return list.get(0);
     }
 }
