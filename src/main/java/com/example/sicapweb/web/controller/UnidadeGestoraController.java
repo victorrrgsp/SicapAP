@@ -4,10 +4,8 @@ import br.gov.to.tce.model.UnidadeGestora;
 import com.example.sicapweb.repository.UnidadeGestoraRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 
 import java.util.List;
 
@@ -22,6 +20,12 @@ public class UnidadeGestoraController {
     @GetMapping
     public ResponseEntity<List<UnidadeGestora>> findAll() {
         List<UnidadeGestora> list = unidadeGestoraRepository.findAll();
+        return ResponseEntity.ok().body(list);
+    }
+    @CrossOrigin
+    @GetMapping(path = {"/{Cnpj}"})
+    public ResponseEntity<?> findById(@PathVariable String Cnpj) {
+        UnidadeGestora list = unidadeGestoraRepository.buscaUnidadeGestoraPorCnpj(Cnpj);
         return ResponseEntity.ok().body(list);
     }
 }
