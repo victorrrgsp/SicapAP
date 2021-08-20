@@ -1,7 +1,6 @@
 package com.example.sicapweb.repository;
 
 import br.gov.to.tce.model.InfoRemessa;
-import br.gov.to.tce.model.ap.concurso.Edital;
 import com.example.sicapweb.util.PaginacaoUtil;
 
 import javax.persistence.EntityManager;
@@ -39,7 +38,7 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
         entityManager.remove(entityManager.getReference(entityClass, id));
     }
 
-    public T findById(PK id) {
+    public T findById(BigInteger id) {
 
         return entityManager.find(entityClass, id);
     }
