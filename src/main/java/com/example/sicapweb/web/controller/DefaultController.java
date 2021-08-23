@@ -22,7 +22,7 @@ import java.util.List;
 @Controller
 @RequestMapping
 public abstract class DefaultController<T> {
-    public String clazz;
+    public String clazz = "com.example.sicapweb.repository.";
 
     @ExceptionHandler(value = ConstraintViolationException.class)
     public ResponseEntity handleConstraintViolationException(ConstraintViolationException ex, WebRequest request) {

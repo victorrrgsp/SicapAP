@@ -4,31 +4,29 @@ import br.gov.to.tce.model.ap.pessoal.Aposentadoria;
 import com.example.sicapweb.repository.AposentadoriaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.math.BigInteger;
+import javax.annotation.PostConstruct;
 import java.util.List;
 
 @RestController
 @RequestMapping("/documentoConcessaoRevisaoReserva")
-public class ConcessaoRevisaoReservaController {
+public class ConcessaoRevisaoReservaController  extends DefaultController<Aposentadoria> {
 
     @Autowired
     private AposentadoriaRepository aposentadoriaRepository;
-
-
-    @CrossOrigin
-    @GetMapping
-    public ResponseEntity<List<Aposentadoria>> findAposentadoriaRevisoesReserva() {
-        List<Aposentadoria> list = aposentadoriaRepository.buscarAposentadoriaRevisaoReserva();
-        return ResponseEntity.ok().body(list);
+    @PostConstruct
+    public void initialize() {
+        this.clazz  = "com.example.sicapweb.repository.AposentadoriaRepository";
     }
 
     @CrossOrigin
-    @GetMapping(path = {"/{id}"})
-    public ResponseEntity<?> findById(@PathVariable BigInteger id) {
-        Aposentadoria list = aposentadoriaRepository.findById(id);
+    @GetMapping("/findAposentadoriaRevisoesReserva")
+    public ResponseEntity<List<Aposentadoria>> findAposentadoriaRevisoesReserva() {
+        List<Aposentadoria> list = aposentadoriaRepository.buscarAposentadoriaRevisaoReserva();
         return ResponseEntity.ok().body(list);
     }
 }

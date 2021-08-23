@@ -21,22 +21,8 @@ public class EmpresaOrganizadoraController extends DefaultController<EmpresaOrga
 
     @PostConstruct
     public void initialize() {
-        this.clazz  = "com.example.sicapweb.repository.EmpresaOrganizadoraRepository";
+        this.clazz  += "EmpresaOrganizadoraRepository";
     }
-
-//    @CrossOrigin
-//    @GetMapping
-//    public ResponseEntity<List<EmpresaOrganizadora>> findAll() {
-//        List<EmpresaOrganizadora> list = empresaOrganizadoraRepository.findAll();
-//        return ResponseEntity.ok().body(list);
-//    }
-
-//    @CrossOrigin
-//    @GetMapping(path = {"/{id}"})
-//    public ResponseEntity<?> findById(@PathVariable BigInteger id) {
-//        EmpresaOrganizadora list = empresaOrganizadoraRepository.findById(id);
-//        return ResponseEntity.ok().body(list);
-//    }
 
     @CrossOrigin
     @Transactional

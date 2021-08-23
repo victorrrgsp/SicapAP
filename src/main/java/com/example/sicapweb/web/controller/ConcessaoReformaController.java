@@ -4,31 +4,25 @@ import br.gov.to.tce.model.ap.pessoal.Aposentadoria;
 import com.example.sicapweb.repository.AposentadoriaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.math.BigInteger;
 import java.util.List;
 
 @RestController
 @RequestMapping("/documentoConcessaoReforma")
-public class ConcessaoReformaController {
+public class ConcessaoReformaController  extends DefaultController<Aposentadoria>  {
 
     @Autowired
     private AposentadoriaRepository aposentadoriaRepository;
 
 
     @CrossOrigin
-    @GetMapping
+    @GetMapping("/findAposentadoriaReserva")
     public ResponseEntity<List<Aposentadoria>> findAposentadoriaReserva() {
         List<Aposentadoria> list = aposentadoriaRepository.buscarAposentadoriaTipoReserva(7);
-        return ResponseEntity.ok().body(list);
-    }
-
-    @CrossOrigin
-    @GetMapping(path = {"/{id}"})
-    public ResponseEntity<?> findById(@PathVariable BigInteger id) {
-        Aposentadoria list = aposentadoriaRepository.findById(id);
         return ResponseEntity.ok().body(list);
     }
 }
