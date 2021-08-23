@@ -2,6 +2,7 @@ package com.example.sicapweb.repository;
 
 import br.gov.to.tce.model.InfoRemessa;
 import com.example.sicapweb.util.PaginacaoUtil;
+import org.hibernate.cfg.Configuration;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.EntityManager;
