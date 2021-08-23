@@ -17,7 +17,7 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, St
 
     public List<Aposentadoria> buscarAposentadoriaRevisao() {
         return getEntityManager().createNativeQuery(
-                "select * from Aposentadoria where revisao = 1", Aposentadoria.class)
+                "select * from Aposentadoria where revisao = 0", Aposentadoria.class)
                 .getResultList();
     }
 

@@ -10,7 +10,7 @@ import java.util.List;
 @Repository
 public class PensaoRepository extends DefaultRepository<Pensao, BigInteger>{
 
-    public List<Aposentadoria> buscarPensaoRevisao() {
+    public List<Pensao> buscarPensaoRevisao() {
         return getEntityManager().createNativeQuery(
                 "select * from Pensao where revisao = 1", Pensao.class)
                 .getResultList();
