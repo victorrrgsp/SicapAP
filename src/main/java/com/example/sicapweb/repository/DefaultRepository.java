@@ -2,6 +2,7 @@ package com.example.sicapweb.repository;
 
 import br.gov.to.tce.model.InfoRemessa;
 import com.example.sicapweb.util.PaginacaoUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -17,41 +18,50 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
     private final Class<T> entityClass = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
 
     @PersistenceContext
+    @Autowired
     private EntityManager entityManager;
 
     protected EntityManager getEntityManager() {
+        if(entityManager == null) {
+            entityManager = new Configuration().configure().buildSessionFactory().openSession()
+                    .getEntityManagerFactory().createEntityManager();
+        }
         return entityManager;
     }
 
     public void save(T entity) {
-
-        entityManager.persist(entity);
+        getEntityManager().persist(entity);
     }
 
     public void update(T entity) {
 
-        entityManager.merge(entity);
+        try {
+            getEntityManager().merge(entity);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public void delete(BigInteger id) {
-
-        entityManager.remove(entityManager.getReference(entityClass, id));
+        entityManager = getEntityManager();
+        entityManager.getTransaction().begin();
+        entityManager.remove(entityManager.find(entityClass, id));
+        entityManager.getTransaction().commit();
     }
 
-    public T findById(BigInteger id) {
-
-        return entityManager.find(entityClass, id);
+    public T findById(PK id) {
+        return getEntityManager().find(entityClass, id);
     }
 
     public List<T> findAll() {
-
-        return entityManager
+        return getEntityManager()
                 .createQuery("from " + entityClass.getSimpleName(), entityClass)
                 .getResultList();
     }
 
     protected List<T> createQuery(String jpql, Object... params) {
-        TypedQuery<T> query = entityManager.createQuery(jpql, entityClass);
+        TypedQuery<T> query = getEntityManager().createQuery(jpql, entityClass);
         for (int i = 0; i < params.length; i++) {
             query.setParameter(i + 1, params[i]);
         }
@@ -77,7 +87,7 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
     }
 
     public InfoRemessa buscarPrimeiraRemessa() {
-        List<InfoRemessa> list = entityManager.createNativeQuery("select * from infoRemessa " +
+        List<InfoRemessa> list = getEntityManager().createNativeQuery("select * from infoRemessa " +
                 "where remessa = 1 and exercicio = 2021", InfoRemessa.class).getResultList();
         return list.get(0);
     }

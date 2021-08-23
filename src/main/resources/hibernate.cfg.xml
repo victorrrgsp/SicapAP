@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+    <session-factory>
+        <property name="hibernate.connection.driver_class">net.sourceforge.jtds.jdbc.Driver</property>
+        <property name="hibernate.connection.password">naoseiasenha</property>
+        <property name="hibernate.connection.url">jdbc:jtds:sqlserver://bdsql.tce-to.tce.to.gov.br:1433/SicapAp21</property>
+        <property name="hibernate.connection.username">user</property>
+        <property name="hibernate.dialect">org.hibernate.dialect.SQLServerDialect</property>
+        <property name="hibernate.show_sql">true</property>
+        <property name="hibernate.format_sql">false</property>
+        <property name="hbm2ddl.auto">none</property>
+
+        <mapping class="br.gov.to.tce.model.ap.estatico.CargoNome" />
+        <mapping class="br.gov.to.tce.model.ap.estatico.FolhaItemESocial" />
+        <mapping class="br.gov.to.tce.model.estatico.Municipio" />
+
+        <mapping class="br.gov.to.tce.model.Mensagem" />
+        <mapping class="br.gov.to.tce.model.DefaultEntity" />
+        <mapping class="br.gov.to.tce.model.InfoRemessa" />
+        <mapping class="br.gov.to.tce.model.UnidadeGestora" />
+        <mapping class="br.gov.to.tce.model.InformacaoAtualizacao" />
+
+
+        <mapping class="br.gov.to.tce.model.adm.AdmFilaRecebimento" />
+        <mapping class="br.gov.to.tce.model.adm.AdmAutenticacao" />
+        <mapping class="br.gov.to.tce.model.adm.AdmArquivoRelacional" />
+        <mapping class="br.gov.to.tce.model.adm.Aviso" />
+        <mapping class="br.gov.to.tce.model.adm.AdmRegra" />
+        <mapping class="br.gov.to.tce.model.adm.AdmRegraExcecao" />
+
+
+        <mapping class="br.gov.to.tce.model.ap.concurso.EmpresaOrganizadora" />
+        <mapping class="br.gov.to.tce.model.ap.concurso.Edital" />
+        <mapping class="br.gov.to.tce.model.ap.concurso.EditalHomologacao" />
+        <mapping class="br.gov.to.tce.model.ap.concurso.EditalVaga" />
+        <mapping class="br.gov.to.tce.model.ap.concurso.EditalAprovado" />
+
+        <mapping class="br.gov.to.tce.model.ap.folha.DemonstrativoPrevidenciario" />
+        <mapping class="br.gov.to.tce.model.ap.folha.FolhaPagamento" />
+        <mapping class="br.gov.to.tce.model.ap.folha.RecolhimentoPrevidenciario" />
+
+        <mapping class="br.gov.to.tce.model.ap.pessoal.Servidor" />
+        <mapping class="br.gov.to.tce.model.ap.pessoal.Admissao" />
+        <mapping class="br.gov.to.tce.model.ap.pessoal.Desligamento" />
+        <mapping class="br.gov.to.tce.model.ap.pessoal.Aposentadoria" />
+        <mapping class="br.gov.to.tce.model.ap.pessoal.DesignacaoFuncao" />
+        <mapping class="br.gov.to.tce.model.ap.pessoal.Pensao" />
+        <mapping class="br.gov.to.tce.model.ap.pessoal.Pensionista" />
+        <mapping class="br.gov.to.tce.model.ap.pessoal.Readaptacao" />
+        <mapping class="br.gov.to.tce.model.ap.pessoal.Reintegracao" />
+        <mapping class="br.gov.to.tce.model.ap.pessoal.Aproveitamento" />
+        <mapping class="br.gov.to.tce.model.ap.pessoal.Cessao" />
+        <mapping class="br.gov.to.tce.model.ap.pessoal.Disponibilidade" />
+        <mapping class="br.gov.to.tce.model.ap.pessoal.Licenca" />
+        <mapping class="br.gov.to.tce.model.ap.pessoal.Reconducao" />
+
+        <mapping class="br.gov.to.tce.model.ap.relacional.Ato" />
+        <mapping class="br.gov.to.tce.model.ap.relacional.Lei" />
+        <mapping class="br.gov.to.tce.model.ap.relacional.Cargo" />
+        <mapping class="br.gov.to.tce.model.ap.relacional.UnidadeAdministrativa" />
+        <mapping class="br.gov.to.tce.model.ap.relacional.Lotacao" />
+        <mapping class="br.gov.to.tce.model.ap.relacional.FolhaItem" />
+    </session-factory>
+</hibernate-configuration>
