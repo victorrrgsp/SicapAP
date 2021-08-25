@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import javax.annotation.PostConstruct;
 import java.math.BigInteger;
 import java.net.URI;
 
@@ -18,11 +17,6 @@ public class EmpresaOrganizadoraController extends DefaultController<EmpresaOrga
 
     @Autowired
     private EmpresaOrganizadoraRepository empresaOrganizadoraRepository;
-
-    @PostConstruct
-    public void initialize() {
-        this.clazz  += "EmpresaOrganizadoraRepository";
-    }
 
     @CrossOrigin
     @Transactional

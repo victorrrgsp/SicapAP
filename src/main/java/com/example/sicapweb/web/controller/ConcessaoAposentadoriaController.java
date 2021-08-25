@@ -24,5 +24,4 @@ public class ConcessaoAposentadoriaController extends DefaultController<Aposenta
         List<Aposentadoria> list = aposentadoriaRepository.findAll();
         return ResponseEntity.ok().body(list);
     }
-
 }

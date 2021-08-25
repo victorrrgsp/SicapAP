@@ -13,6 +13,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.io.Serializable;
+import java.lang.reflect.ParameterizedType;
 import java.math.BigInteger;
 import java.net.URI;
 import java.util.ArrayList;
@@ -22,7 +23,16 @@ import java.util.List;
 @Controller
 @RequestMapping
 public abstract class DefaultController<T> {
-    public String clazz = "com.example.sicapweb.repository.";
+    public String clazz;
+
+    {
+        try {
+            clazz = "com.example.sicapweb.repository."+
+                    Class.forName( ((ParameterizedType)this.getClass().getGenericSuperclass()).getActualTypeArguments()[0].getTypeName()).getSimpleName()+"Repository";
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
 
     @ExceptionHandler(value = ConstraintViolationException.class)
     public ResponseEntity handleConstraintViolationException(ConstraintViolationException ex, WebRequest request) {
