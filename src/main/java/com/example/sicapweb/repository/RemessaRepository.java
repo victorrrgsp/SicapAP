@@ -11,6 +11,11 @@ public class RemessaRepository extends DefaultRepository<Integer, Integer> {
 
     @PersistenceContext
     EntityManager entityManager;
+
+    public RemessaRepository(EntityManager em) {
+        super(em);
+    }
+
     public List<Integer> findAllRemessasByExercicio(Integer exercicio) {
         return entityManager.createNativeQuery("select distinct numeroRemessa as remessa from Cadun..PeriodoRemessa  "+" where idSistema=29 AND exercicio="+exercicio+" ").getResultList();
     }

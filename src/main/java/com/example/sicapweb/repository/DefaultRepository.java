@@ -2,7 +2,6 @@ package com.example.sicapweb.repository;
 
 import br.gov.to.tce.model.InfoRemessa;
 import com.example.sicapweb.util.PaginacaoUtil;
-import org.hibernate.cfg.Configuration;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.EntityManager;
@@ -20,13 +19,19 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
 
     @PersistenceContext
     @Autowired
-    private EntityManager entityManager;
+    public EntityManager entityManager;
 
-    protected EntityManager getEntityManager() {
-        if(entityManager == null) {
-            entityManager = new Configuration().configure().buildSessionFactory().openSession()
-                    .getEntityManagerFactory().createEntityManager();
-        }
+    public DefaultRepository(EntityManager em){
+        entityManager = em;
+    }
+    public DefaultRepository(){
+    }
+
+    public EntityManager getEntityManager() {
+//        if(entityManager == null) {
+//            entityManager = new Configuration().configure().buildSessionFactory().openSession()
+//                    .getEntityManagerFactory().createEntityManager();
+//        }
         return entityManager;
     }
 
@@ -45,6 +50,13 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
     }
 
     public void delete(BigInteger id) {
+        entityManager = getEntityManager();
+        entityManager.getTransaction().begin();
+        entityManager.remove(entityManager.find(entityClass, id));
+        entityManager.getTransaction().commit();
+    }
+
+    public void delete(String id) {
         entityManager = getEntityManager();
         entityManager.getTransaction().begin();
         entityManager.remove(entityManager.find(entityClass, id));

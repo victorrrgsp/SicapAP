@@ -11,6 +11,11 @@ import java.util.List;
 public class UnidadeGestoraRepository extends DefaultRepository<UnidadeGestora, String> {
     @PersistenceContext
     EntityManager entityManager;
+
+    public UnidadeGestoraRepository(EntityManager em) {
+        super(em);
+    }
+
     public UnidadeGestora buscaUnidadeGestoraPorCnpj(String Cnpj) {
 
         List<UnidadeGestora> list = entityManager.createNativeQuery("select * from UnidadeGestora " +

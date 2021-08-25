@@ -3,11 +3,16 @@ package com.example.sicapweb.repository;
 import br.gov.to.tce.model.ap.concurso.EditalVaga;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.EntityManager;
 import java.math.BigInteger;
 import java.util.List;
 
 @Repository
 public class EditalVagaRepository extends DefaultRepository<EditalVaga, BigInteger> {
+
+    public EditalVagaRepository(EntityManager em) {
+        super(em);
+    }
 
     public List<EditalVaga> buscarVagasPorEdital(Integer idEdital) {
         return getEntityManager().createNativeQuery(

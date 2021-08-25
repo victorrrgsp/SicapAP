@@ -1,11 +1,14 @@
 package com.example.sicapweb.web.controller;
 
+import br.gov.to.tce.model.UnidadeGestora;
 import br.gov.to.tce.model.ap.concurso.EmpresaOrganizadora;
 import com.example.sicapweb.repository.EmpresaOrganizadoraRepository;
+import com.example.sicapweb.repository.UnidadeGestoraRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.math.BigInteger;
@@ -17,6 +20,9 @@ public class EmpresaOrganizadoraController extends DefaultController<EmpresaOrga
 
     @Autowired
     private EmpresaOrganizadoraRepository empresaOrganizadoraRepository;
+    @Autowired
+    private UnidadeGestoraRepository unidadeGestoraRepository;
+
 
     @CrossOrigin
     @Transactional
@@ -41,12 +47,16 @@ public class EmpresaOrganizadoraController extends DefaultController<EmpresaOrga
         return ResponseEntity.noContent().build();
     }
 
-//    @CrossOrigin
-//    @Transactional
-//    @DeleteMapping(value = {"/{id}"})
-//    public ResponseEntity<?> delete(@PathVariable BigInteger id) {
-//        empresaOrganizadoraRepository.delete(id);
-//        return ResponseEntity.noContent().build();
-//    }
+    @CrossOrigin
+    @Transactional
+    @PostMapping("/upload")
+    public ResponseEntity<?> addFile(@RequestParam("file") MultipartFile file) {
+
+        unidadeGestoraRepository.save(
+            new UnidadeGestora("String ", "String nome", 1, 'C', 1)
+        );
+        return ResponseEntity.ok().body(super.setCastorFile(file, "EmpresaOrganizadora"));
+    }
 
 }
+

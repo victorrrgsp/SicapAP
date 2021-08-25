@@ -3,10 +3,15 @@ package com.example.sicapweb.repository;
 import br.gov.to.tce.model.ap.pessoal.Aposentadoria;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.EntityManager;
 import java.util.List;
 
 @Repository
 public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, String> {
+
+    public AposentadoriaRepository(EntityManager em) {
+        super(em);
+    }
 
     public List<Aposentadoria> buscarAposentadoriaTipoReserva(Integer tipoAposentadoria) {
         return getEntityManager().createNativeQuery(
