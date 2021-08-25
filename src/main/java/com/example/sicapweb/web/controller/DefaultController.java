@@ -1,7 +1,13 @@
 package com.example.sicapweb.web.controller;
 
+import br.gov.to.tce.castor.application.ApplicationException;
+import br.gov.to.tce.castor.arquivo.CastorController;
+import br.gov.to.tce.castor.arquivo.ObjetoCastor;
+import br.gov.to.tce.model.CastorFile;
 import br.gov.to.tce.util.JayReflection;
+import com.example.sicapweb.repository.CastorFileRepository;
 import com.example.sicapweb.repository.UnidadeGestoraRepository;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -12,11 +18,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.persistence.EntityManager;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.math.BigInteger;
