@@ -28,4 +28,13 @@ public class UnidadeGestoraController {
         UnidadeGestora list = unidadeGestoraRepository.buscaUnidadeGestoraPorCnpj(Cnpj);
         return ResponseEntity.ok().body(list);
     }
+    @CrossOrigin
+    @GetMapping(path = {"/vigencia/{Cnpj}/{Exercicio}/{Remessa}"})
+    public ResponseEntity<List<Integer>>  buscaVigenciaUnidadeGestoraPorCnpj(@PathVariable String Cnpj, @PathVariable Integer Exercicio, @PathVariable Integer Remessa) {
+        List<Integer> resposta = unidadeGestoraRepository.buscaVigenciaUnidadeGestoraPorCnpj(Cnpj, Exercicio, Remessa);
+        return ResponseEntity.ok().body(resposta);
+    }
+
+
+
 }

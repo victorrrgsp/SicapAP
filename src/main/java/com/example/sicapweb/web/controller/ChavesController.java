@@ -51,12 +51,11 @@ public class ChavesController {
             digest.reset();
             digest.update(value.getBytes("utf8"));
             sha1 = String.format("%040x", new BigInteger(1, digest.digest()));
-            //System.out.println(sha1);
             autenticacao.setIdSistema(29);
             autenticacao.setData(strToDate);
 
             autenticacao.setChave(sha1);
-            chavesRepository.save(autenticacao);
+           // chavesRepository.save(autenticacao);
         } catch (Exception e) {
             e.printStackTrace();
         }
