@@ -7,6 +7,7 @@ import br.gov.to.tce.model.CastorFile;
 import br.gov.to.tce.util.JayReflection;
 import com.example.sicapweb.repository.CastorFileRepository;
 import com.example.sicapweb.repository.UnidadeGestoraRepository;
+import com.example.sicapweb.util.FileDownload;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -137,6 +138,32 @@ public abstract class DefaultController<T> {
         return ResponseEntity.noContent().build();
     }
 
+    @CrossOrigin
+    @GetMapping(value = {"/downloadCastor/{hash}"})
+    public ResponseEntity<FileDownload> getCastorFile(@PathVariable String hash){
+        CastorController castor = new CastorController();
+        ObjetoCastor objeto = new ObjetoCastor(hash);
+        FileDownload fileDownload = new FileDownload();
+        if(hash != null){
+            try {
+                objeto = castor.carregar(objeto);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            fileDownload.name = objeto.getNomeArquivo();
+            fileDownload.bytes = objeto.getBytes();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachement; filename=\"" + objeto.getNomeArquivo() + "\"");
+
+            return ResponseEntity.ok().body(fileDownload);
+//            return ResponseEntity.ok()
+//                    .headers(headers)
+//                    .body(objeto.getBytes());
+        }
+        return null;
+    }
+
     public String setCastorFile(MultipartFile file, String origem) {
         String idCastor = "";
         File fileTemp = new File(path+file.hashCode()+"."+
@@ -153,7 +180,7 @@ public abstract class DefaultController<T> {
             objeto = castor.gravarArquivo(objeto);
             idCastor = objeto.getUUID();
 
-            new CastorFileRepository(repository.getEntityManager()).save(new CastorFile(idCastor));
+            new CastorFileRepository(repository.getEntityManager()).save(new CastorFile(idCastor, origem));
             fileTemp.delete();
         } catch (Exception e) {
             e.printStackTrace();

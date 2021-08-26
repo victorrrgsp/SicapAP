@@ -1,6 +1,5 @@
 package com.example.sicapweb.web.controller;
 
-import br.gov.to.tce.model.UnidadeGestora;
 import br.gov.to.tce.model.ap.concurso.EmpresaOrganizadora;
 import com.example.sicapweb.repository.EmpresaOrganizadoraRepository;
 import com.example.sicapweb.repository.UnidadeGestoraRepository;
@@ -52,9 +51,6 @@ public class EmpresaOrganizadoraController extends DefaultController<EmpresaOrga
     @PostMapping("/upload")
     public ResponseEntity<?> addFile(@RequestParam("file") MultipartFile file) {
 
-        unidadeGestoraRepository.save(
-            new UnidadeGestora("String ", "String nome", 1, 'C', 1)
-        );
         return ResponseEntity.ok().body(super.setCastorFile(file, "EmpresaOrganizadora"));
     }
 
