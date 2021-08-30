@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.math.BigInteger;
@@ -16,7 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/lei")
-public class LeiController {
+public class LeiController extends DefaultController<Lei> {
 
     @Autowired
     private LeiRepository leiRepository; 
@@ -75,5 +76,14 @@ public class LeiController {
     public ResponseEntity<?> delete(@PathVariable BigInteger id) {
         leiRepository.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+
+    @CrossOrigin
+    @Transactional
+    @PostMapping("/upload")
+    public ResponseEntity<?> addFile(@RequestParam("file") MultipartFile file) {
+
+        return ResponseEntity.ok().body(super.setCastorFile(file, "Lei"));
     }
 }
