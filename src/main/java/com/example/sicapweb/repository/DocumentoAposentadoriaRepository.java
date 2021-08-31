@@ -5,10 +5,18 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import java.math.BigInteger;
+import java.util.List;
 
 @Repository
 public class DocumentoAposentadoriaRepository extends DefaultRepository<DocumentoAposentadoria, BigInteger> {
     public DocumentoAposentadoriaRepository(EntityManager em) {
         super(em);
+    }
+
+    public List<DocumentoAposentadoria> buscarDocumentoAposentadoria(String coluna, BigInteger idAposentadoria) {
+        return getEntityManager().createNativeQuery(
+                "select * from DocumentoAposentadoria where inciso = '"
+                        + coluna + "' and idAposentadoria = " + idAposentadoria, DocumentoAposentadoria.class)
+                .getResultList();
     }
 }

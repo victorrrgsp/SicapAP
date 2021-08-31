@@ -3,7 +3,6 @@ package com.example.sicapweb.web.controller;
 import br.gov.to.tce.model.ap.concessoes.DocumentoAposentadoria;
 import br.gov.to.tce.model.ap.pessoal.Aposentadoria;
 import com.example.sicapweb.repository.AposentadoriaRepository;
-import com.example.sicapweb.repository.CastorFileRepository;
 import com.example.sicapweb.repository.DocumentoAposentadoriaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -23,9 +22,6 @@ public class ConcessaoAposentadoriaController extends DefaultController<Aposenta
 
     @Autowired
     private DocumentoAposentadoriaRepository documentoAposentadoriaRepository;
-
-    @Autowired
-    private CastorFileRepository castorFileRepository;
 
     @CrossOrigin
     @GetMapping
@@ -49,11 +45,9 @@ public class ConcessaoAposentadoriaController extends DefaultController<Aposenta
     }
 
     @CrossOrigin
-    @Transactional
-    @RequestMapping(value = {"/{id}"}, method = RequestMethod.PUT)
-    public ResponseEntity<DocumentoAposentadoria> update(@RequestBody DocumentoAposentadoria documentoAposentadoria, @PathVariable BigInteger id) {
-        documentoAposentadoria.setId(id);
-        documentoAposentadoriaRepository.update(documentoAposentadoria);
-        return ResponseEntity.noContent().build();
+    @GetMapping(path = {"anexos/{inciso}/{id}"})
+    public ResponseEntity<?> findByDocumento(@PathVariable String inciso, @PathVariable BigInteger id) {
+        DocumentoAposentadoria list = documentoAposentadoriaRepository.buscarDocumentoAposentadoria(inciso, id).get(0);
+        return ResponseEntity.ok().body(list);
     }
 }
