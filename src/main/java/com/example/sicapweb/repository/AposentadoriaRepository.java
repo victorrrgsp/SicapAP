@@ -4,10 +4,11 @@ import br.gov.to.tce.model.ap.pessoal.Aposentadoria;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import java.math.BigInteger;
 import java.util.List;
 
 @Repository
-public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, String> {
+public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, BigInteger> {
 
     public AposentadoriaRepository(EntityManager em) {
         super(em);
