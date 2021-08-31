@@ -81,9 +81,13 @@ public class LeiController extends DefaultController<Lei> {
 
     @CrossOrigin
     @Transactional
-    @PostMapping("/upload")
-    public ResponseEntity<?> addFile(@RequestParam("file") MultipartFile file) {
-
-        return ResponseEntity.ok().body(super.setCastorFile(file, "Lei"));
+    @PostMapping("/upload/{id}")
+    public ResponseEntity<?> addFile(@RequestParam("file") MultipartFile file, @PathVariable BigInteger id) {
+        Lei lei = new Lei();
+        lei = leiRepository.findById(id);
+        String idCastor = super.setCastorFile(file, "Lei");
+        lei.setIdCastorFile(idCastor);
+        leiRepository.save(lei);
+        return ResponseEntity.ok().body(idCastor);
     }
 }
