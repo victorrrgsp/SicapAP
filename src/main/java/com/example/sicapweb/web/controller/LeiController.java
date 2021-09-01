@@ -1,5 +1,7 @@
 package com.example.sicapweb.web.controller;
 
+import br.gov.to.tce.model.CastorFile;
+import br.gov.to.tce.model.ap.concessoes.DocumentoAposentadoria;
 import br.gov.to.tce.model.ap.relacional.Ato;
 import br.gov.to.tce.model.ap.relacional.Lei;
 import com.example.sicapweb.repository.AtoRepository;
@@ -85,9 +87,16 @@ public class LeiController extends DefaultController<Lei> {
     public ResponseEntity<?> addFile(@RequestParam("file") MultipartFile file, @PathVariable BigInteger id) {
         Lei lei = new Lei();
         lei = leiRepository.findById(id);
-        String idCastor = super.setCastorFile(file, "Lei");
-        lei.setIdCastorFile(idCastor);
-        leiRepository.save(lei);
-        return ResponseEntity.ok().body(idCastor);
+        CastorFile castorFile = super.getCastorFile(file, "Lei");
+        lei.setCastorFile(castorFile);
+        leiRepository.update(lei);
+        return ResponseEntity.ok().body(castorFile.getId());
+    }
+
+    @CrossOrigin
+    @GetMapping(path = {"anexos/{id}"})
+    public ResponseEntity<?> findByDocumento(@PathVariable BigInteger id) {
+        Lei list = leiRepository.buscarDocumentoLei(id).get(0);
+        return ResponseEntity.ok().body(list);
     }
 }

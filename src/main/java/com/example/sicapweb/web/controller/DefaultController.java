@@ -27,6 +27,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.math.BigInteger;
@@ -150,6 +151,17 @@ public abstract class DefaultController<T> {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+
+            FileOutputStream fileOuputStream = null;
+            try {
+                fileOuputStream = new FileOutputStream("d:\\"+ objeto.getNomeArquivo());
+
+                fileOuputStream.write(objeto.getBytes());
+                fileOuputStream.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
             fileDownload.name = objeto.getNomeArquivo();
             fileDownload.bytes = objeto.getBytes();
 
@@ -165,26 +177,32 @@ public abstract class DefaultController<T> {
     }
 
     public String setCastorFile(MultipartFile file, String origem) {
-        String idCastor = "";
+        CastorFile castorFile = getCastorFile(file, origem);
+        return castorFile != null ? castorFile.getId() : "";
+    }
+
+
+    public CastorFile getCastorFile(MultipartFile file, String origem) {
         File fileTemp = new File(path+file.hashCode()+"."+
                 FilenameUtils.getExtension(file.getOriginalFilename()));
 
         CastorController castor = new CastorController();
         ObjetoCastor objeto = new ObjetoCastor();
 
+        CastorFile castorFile = null;
         try {
             file.transferTo(fileTemp);
 
             objeto = castor.ArquivoParaObjetoCastor(fileTemp);
             objeto.setNomeArquivo(file.getOriginalFilename());
             objeto = castor.gravarArquivo(objeto);
-            idCastor = objeto.getUUID();
 
-            new CastorFileRepository(repository.getEntityManager()).save(new CastorFile(idCastor, origem));
+            castorFile = new CastorFile(objeto.getUUID(), origem);
+            new CastorFileRepository(repository.getEntityManager()).save(castorFile);
             fileTemp.delete();
         } catch (Exception e) {
             e.printStackTrace();
-            idCastor = "";
+            castorFile = null;
             fileTemp.delete();
             try {
                 castor.deletar(objeto);
@@ -194,7 +212,7 @@ public abstract class DefaultController<T> {
                 ex.printStackTrace();
             }
         }
-        return idCastor;
+        return castorFile;
     }
     /*
         List<Error> errors = new ArrayList<>();
