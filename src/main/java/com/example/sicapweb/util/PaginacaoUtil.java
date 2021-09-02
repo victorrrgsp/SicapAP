@@ -14,15 +14,15 @@ public class PaginacaoUtil<T> {
 
     private long totalPaginas;
 
-    private String direcao;
+    private long totalRegistros;
 
     private List<T> registros;
 
-    public PaginacaoUtil(int tamanho, int pagina, long totalPaginas, String direcao, List<T> registros) {
+    public PaginacaoUtil(int tamanho, int pagina, long totalPaginas, long totalRegistros, List<T> registros) {
         this.tamanho = tamanho;
         this.pagina = pagina;
         this.totalPaginas = totalPaginas;
-        this.direcao = direcao;
         this.registros = registros;
+        this.totalRegistros = totalRegistros;
     }
 }

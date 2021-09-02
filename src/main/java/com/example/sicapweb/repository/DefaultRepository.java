@@ -3,6 +3,8 @@ package com.example.sicapweb.repository;
 import br.gov.to.tce.model.InfoRemessa;
 import com.example.sicapweb.util.PaginacaoUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -81,18 +83,32 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
         return query.getResultList();
     }
 
-    public PaginacaoUtil<T> buscaPaginada(int pagina, String direcao, String campo) {
-        int tamanho = 10;
-        int inicio = (pagina -1) * tamanho;
+    //public PaginacaoUtil<T> buscaPaginada(int pagina, int tamanho, String direcao, String campo) {
+    public PaginacaoUtil<T> buscaPaginada(Pageable pageable) {
+
+        int pagina = Integer.valueOf(pageable.getPageNumber());
+        int tamanho = Integer.valueOf(pageable.getPageSize());
+
+        //evita a pagina iniciar com a posicao 0
+       //  Integer posicao = (pagina < 1) ? 1 : pagina;
+
+        //retirar os : do Sort pageable
+        String campo = String.valueOf(pageable.getSort()).replace(":","");
+
+        System.out.println(pagina);
+
+
         List<T> list = getEntityManager()
-                .createNativeQuery("select * from " + entityClass.getSimpleName() + " order by " + campo + " " + direcao, entityClass)
-                .setFirstResult(inicio)
+                .createNativeQuery("select * from " + entityClass.getSimpleName()+" ORDER BY "+campo , entityClass)
+                .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();
 
         long totalRegistros = count();
         long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
-        return new PaginacaoUtil<T>(tamanho, pagina, totalPaginas, direcao, list);
+        return new PaginacaoUtil<T>(tamanho, pagina, totalPaginas, totalRegistros, list);
+
+
     }
 
     public long count() {
