@@ -14,16 +14,22 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
         super(em);
     }
 
-    public List<Aposentadoria> buscarAposentadoriaTipoReserva(Integer tipoAposentadoria) {
+    public List<Aposentadoria> buscarAposentadorias() {
         return getEntityManager().createNativeQuery(
-                "select * from Aposentadoria where tipoAposentadoria = "
+                "select * from Aposentadoria where reversao = 0 and revisao = 0 and tipoAposentadoria not in (6,7)", Aposentadoria.class)
+                .getResultList();
+    }
+
+    public List<Aposentadoria> buscarAposentadoriaPorTipo(Integer tipoAposentadoria) {
+        return getEntityManager().createNativeQuery(
+                "select * from Aposentadoria where reversao = 0 and revisao = 0 and tipoAposentadoria = "
                         + tipoAposentadoria, Aposentadoria.class)
                 .getResultList();
     }
 
     public List<Aposentadoria> buscarAposentadoriaRevisao() {
         return getEntityManager().createNativeQuery(
-                "select * from Aposentadoria where revisao = 0", Aposentadoria.class)
+                "select * from Aposentadoria where revisao = 1 and tipoAposentadoria not in (6,7)", Aposentadoria.class)
                 .getResultList();
     }
 
@@ -43,7 +49,7 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
 
     public List<Aposentadoria> buscarReversaoAposentadoriaReserva() {
         return getEntityManager().createNativeQuery(
-                "select * from Aposentadoria where reversao = 1", Aposentadoria.class)
+                "select * from Aposentadoria where reversao = 1 and tipoAposentadoria != 7", Aposentadoria.class)
                 .getResultList();
     }
 }

@@ -25,9 +25,10 @@ public class ConcessaoReservaController  extends DefaultController<Aposentadoria
 
 
     @CrossOrigin
-    @GetMapping("/findAposentadoriaReserva")
-    public ResponseEntity<List<Aposentadoria>> findAposentadoriaReserva() {
-        List<Aposentadoria> list = aposentadoriaRepository.buscarAposentadoriaTipoReserva(6);
+    @GetMapping
+    @Override
+    public ResponseEntity<List<Aposentadoria>> findAll() {
+        List<Aposentadoria> list = aposentadoriaRepository.buscarAposentadoriaPorTipo(6);
         return ResponseEntity.ok().body(list);
     }
 

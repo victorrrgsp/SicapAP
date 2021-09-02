@@ -23,6 +23,8 @@ public class ConcessaoRevisaoAposentadoriaController  extends DefaultController<
     @Autowired
     private DocumentoAposentadoriaRepository documentoAposentadoriaRepository;
 
+    @CrossOrigin
+    @GetMapping
     @Override
     public ResponseEntity<List<Aposentadoria>> findAll() {
         List<Aposentadoria> list = aposentadoriaRepository.buscarAposentadoriaRevisao();
