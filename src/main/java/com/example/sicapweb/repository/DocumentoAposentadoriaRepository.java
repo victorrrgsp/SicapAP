@@ -40,4 +40,25 @@ public class DocumentoAposentadoriaRepository extends DefaultRepository<Document
                         + coluna + "' and idAposentadoria = " + idAposentadoria, DocumentoAposentadoria.class)
                 .getResultList();
     }
+
+    public List<DocumentoAposentadoria> buscarDocumentoRevisaoReserva(String coluna, BigInteger idAposentadoria) {
+        return getEntityManager().createNativeQuery(
+                "select * from DocumentoAposentadoria where revisao = 'S' and reserva = 'S' and inciso = '"
+                        + coluna + "' and idAposentadoria = " + idAposentadoria, DocumentoAposentadoria.class)
+                .getResultList();
+    }
+
+    public List<DocumentoAposentadoria> buscarDocumentoRevisaoReforma(String coluna, BigInteger idAposentadoria) {
+        return getEntityManager().createNativeQuery(
+                "select * from DocumentoAposentadoria where revisao = 'S' and reforma = 'S' and inciso = '"
+                        + coluna + "' and idAposentadoria = " + idAposentadoria, DocumentoAposentadoria.class)
+                .getResultList();
+    }
+
+    public List<DocumentoAposentadoria> buscarDocumentoAposentadoriaReversao(String coluna, BigInteger idAposentadoria) {
+        return getEntityManager().createNativeQuery(
+                "select * from DocumentoAposentadoria where reversao = 'S' and inciso = '"
+                        + coluna + "' and idAposentadoria = " + idAposentadoria, DocumentoAposentadoria.class)
+                .getResultList();
+    }
 }

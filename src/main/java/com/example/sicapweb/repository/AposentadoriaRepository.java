@@ -43,8 +43,7 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
 
     public List<Aposentadoria> buscarReversaoAposentadoriaReserva() {
         return getEntityManager().createNativeQuery(
-                "select * from Aposentadoria where reversao = 1 and tipoAposentadoria = "
-                        + Aposentadoria.TipoAposentadoria.Reserva.getValor(), Aposentadoria.class)
+                "select * from Aposentadoria where reversao = 1", Aposentadoria.class)
                 .getResultList();
     }
 }

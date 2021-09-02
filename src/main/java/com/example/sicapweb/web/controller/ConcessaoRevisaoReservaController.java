@@ -1,15 +1,16 @@
 package com.example.sicapweb.web.controller;
 
+import br.gov.to.tce.model.ap.concessoes.DocumentoAposentadoria;
 import br.gov.to.tce.model.ap.pessoal.Aposentadoria;
 import com.example.sicapweb.repository.AposentadoriaRepository;
+import com.example.sicapweb.repository.DocumentoAposentadoriaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.PostConstruct;
+import java.math.BigInteger;
 import java.util.List;
 
 @RestController
@@ -18,15 +19,38 @@ public class ConcessaoRevisaoReservaController  extends DefaultController<Aposen
 
     @Autowired
     private AposentadoriaRepository aposentadoriaRepository;
-    @PostConstruct
-    public void initialize() {
-        this.clazz  = "com.example.sicapweb.repository.AposentadoriaRepository";
+
+    @Autowired
+    private DocumentoAposentadoriaRepository documentoAposentadoriaRepository;
+
+    @CrossOrigin
+    @GetMapping
+    @Override
+    public ResponseEntity<List<Aposentadoria>> findAll() {
+        List<Aposentadoria> list = aposentadoriaRepository.buscarAposentadoriaRevisaoReserva();
+        return ResponseEntity.ok().body(list);
     }
 
     @CrossOrigin
-    @GetMapping("/findAposentadoriaRevisoesReserva")
-    public ResponseEntity<List<Aposentadoria>> findAposentadoriaRevisoesReserva() {
-        List<Aposentadoria> list = aposentadoriaRepository.buscarAposentadoriaRevisaoReserva();
+    @Transactional
+    @PostMapping("/upload/{inciso}/{id}")
+    public ResponseEntity<?> addFile(@RequestParam("file") MultipartFile file, @PathVariable String inciso, @PathVariable BigInteger id) {
+        DocumentoAposentadoria documentoAposentadoria = new DocumentoAposentadoria();
+        documentoAposentadoria.setAposentadoria(aposentadoriaRepository.findById(id));
+        documentoAposentadoria.setInciso(inciso);
+        String idCastor = super.setCastorFile(file, "AposentadoriaRevisaoReserva");
+        documentoAposentadoria.setIdCastorFile(idCastor);
+        documentoAposentadoria.setStatus(DocumentoAposentadoria.Status.Informado.getValor());
+        documentoAposentadoria.setRevisao("S");
+        documentoAposentadoria.setReserva("S");
+        documentoAposentadoriaRepository.save(documentoAposentadoria);
+        return ResponseEntity.ok().body(idCastor);
+    }
+
+    @CrossOrigin
+    @GetMapping(path = {"anexos/{inciso}/{id}"})
+    public ResponseEntity<?> findByDocumento(@PathVariable String inciso, @PathVariable BigInteger id) {
+        DocumentoAposentadoria list = documentoAposentadoriaRepository.buscarDocumentoRevisaoReserva(inciso, id).get(0);
         return ResponseEntity.ok().body(list);
     }
 }

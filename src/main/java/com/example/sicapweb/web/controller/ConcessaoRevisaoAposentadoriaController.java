@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigInteger;
+import java.util.List;
 
 @RestController
 @RequestMapping("/documentoConcessaoRevisaoAposentadoria")
@@ -21,6 +22,12 @@ public class ConcessaoRevisaoAposentadoriaController  extends DefaultController<
 
     @Autowired
     private DocumentoAposentadoriaRepository documentoAposentadoriaRepository;
+
+    @Override
+    public ResponseEntity<List<Aposentadoria>> findAll() {
+        List<Aposentadoria> list = aposentadoriaRepository.buscarAposentadoriaRevisao();
+        return ResponseEntity.ok().body(list);
+    }
 
     @CrossOrigin
     @Transactional
