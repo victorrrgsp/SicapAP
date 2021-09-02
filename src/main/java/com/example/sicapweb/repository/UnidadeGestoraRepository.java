@@ -21,6 +21,7 @@ public class UnidadeGestoraRepository extends DefaultRepository<UnidadeGestora, 
                 " where id = '" + Cnpj + "'    ", UnidadeGestora.class).getResultList();
         return list.get(0);
     }
+
     public List<Integer> buscaVigenciaUnidadeGestoraPorCnpj(String Cnpj, Integer Exercicio, Integer Remessa) {
 
         return entityManager.createNativeQuery("select 1 as resposta where EXISTS("+

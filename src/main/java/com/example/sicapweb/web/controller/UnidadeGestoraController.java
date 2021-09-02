@@ -22,12 +22,14 @@ public class UnidadeGestoraController {
         List<UnidadeGestora> list = unidadeGestoraRepository.findAll();
         return ResponseEntity.ok().body(list);
     }
+
     @CrossOrigin
     @GetMapping(path = {"/{Cnpj}"})
     public ResponseEntity<?> findById(@PathVariable String Cnpj) {
         UnidadeGestora list = unidadeGestoraRepository.buscaUnidadeGestoraPorCnpj(Cnpj);
         return ResponseEntity.ok().body(list);
     }
+
     @CrossOrigin
     @GetMapping(path = {"/vigencia/{Cnpj}/{Exercicio}/{Remessa}"})
     public ResponseEntity<List<Integer>>  buscaVigenciaUnidadeGestoraPorCnpj(@PathVariable String Cnpj, @PathVariable Integer Exercicio, @PathVariable Integer Remessa) {
