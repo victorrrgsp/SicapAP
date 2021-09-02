@@ -7,6 +7,7 @@ import javax.persistence.EntityManager;
 import java.math.BigInteger;
 import java.util.List;
 
+
 @Repository
 public class AdmAutenticacaoRepository extends DefaultRepository<AdmAutenticacao, BigInteger> {
 
