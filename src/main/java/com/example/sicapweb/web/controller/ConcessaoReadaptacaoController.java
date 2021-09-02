@@ -44,7 +44,7 @@ public class ConcessaoReadaptacaoController extends DefaultController<Readaptaca
         DocumentoReadaptacao documentoReadaptacao = new DocumentoReadaptacao();
         documentoReadaptacao.setReadaptacao(readaptacaoRepository.findById(id));
         documentoReadaptacao.setInciso(inciso);
-        String idCastor = super.setCastorFile(file, "Pensao");
+        String idCastor = super.setCastorFile(file, "Readaptacao");
         documentoReadaptacao.setIdCastorFile(idCastor);
         documentoReadaptacao.setStatus(DocumentoReadaptacao.Status.Informado.getValor());
         documentoReadaptacaoRepository.save(documentoReadaptacao);
