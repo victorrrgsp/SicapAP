@@ -7,16 +7,18 @@ import br.gov.to.tce.model.CastorFile;
 import br.gov.to.tce.util.JayReflection;
 import com.example.sicapweb.repository.CastorFileRepository;
 import com.example.sicapweb.repository.UnidadeGestoraRepository;
-import com.example.sicapweb.util.FileDownload;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.MimeType;
+import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,7 +29,6 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.math.BigInteger;
@@ -54,8 +55,7 @@ public abstract class DefaultController<T> {
     @Autowired
     private UnidadeGestoraRepository repository;
 
-    @Value("${upload.path}")
-    public String path;
+    public String path = System.getProperty("user.home")+ File.separator+"spring"+File.separator;
 
     @ExceptionHandler(value = ConstraintViolationException.class)
     public ResponseEntity handleConstraintViolationException(ConstraintViolationException ex, WebRequest request) {
@@ -88,6 +88,7 @@ public abstract class DefaultController<T> {
     @CrossOrigin
     @GetMapping(path = {"/{id}"})
     public ResponseEntity<?> findById(@PathVariable BigInteger id) {
+
         T obj = null;
         try {
             obj = (T) JayReflection.executeMethod(clazz,
@@ -100,7 +101,6 @@ public abstract class DefaultController<T> {
         }
         return ResponseEntity.ok().body(obj);
     }
-
 
     @CrossOrigin
     @Transactional
@@ -139,39 +139,81 @@ public abstract class DefaultController<T> {
         return ResponseEntity.noContent().build();
     }
 
+
     @CrossOrigin
-    @GetMapping(value = {"/downloadCastor/{hash}"})
-    public ResponseEntity<FileDownload> getCastorFile(@PathVariable String hash){
+    @PostMapping(value = {"/getFileName"})
+    public ResponseEntity<?> getCastorFileName(@RequestBody CastorFile castorFile){
+        new File(path).mkdirs();
+        CastorController castor = new CastorController();
+        ObjetoCastor objeto = new ObjetoCastor(castorFile.id);
+        if(castorFile.id != null){
+            try {
+                objeto = castor.carregar(objeto);
+                if(objeto.getBytes().length <= 0)   return null;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return ResponseEntity.ok().body(objeto.getNomeArquivo());
+        }
+        return null;
+    }
+
+    @CrossOrigin
+    @PostMapping(value = {"/downloadCastor"})
+    public ResponseEntity<?> getCastorFile(@RequestBody CastorFile castorFile) {
+        if(castorFile.id == null) return ResponseEntity.ok().body(null);
+
+        new File(path).mkdirs();
+
+        CastorController castor = new CastorController();
+        ObjetoCastor objeto = new ObjetoCastor(castorFile.id);
+        try {
+            objeto = castor.carregar(objeto);
+            if (objeto.getBytes().length <= 0) return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("filename", objeto.getNomeArquivo());
+
+        MimeType contentType = null;
+        try {
+            contentType = MimeTypeUtils.parseMimeType(new File(objeto.getNomeArquivo()).toURL().openConnection().getContentType());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return ResponseEntity.ok().contentType(MediaType.asMediaType(contentType)).
+                headers(headers).
+                body(new ByteArrayResource(objeto.getBytes()));
+    }
+
+
+    @CrossOrigin
+    @GetMapping(value = {"/file"})
+//    public ResponseEntity<?> getCastorFile(@PathVariable BigInteger hash){
+    public ResponseEntity<?> getCastorFile( ){
+        String hash = "006a96a25fd86176eaf78382bba2a496";
+        new File(path).mkdirs();
         CastorController castor = new CastorController();
         ObjetoCastor objeto = new ObjetoCastor(hash);
-        FileDownload fileDownload = new FileDownload();
         if(hash != null){
             try {
                 objeto = castor.carregar(objeto);
+
+                if(objeto.getBytes().length <= 0)   return null;
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
-            FileOutputStream fileOuputStream = null;
-            try {
-                fileOuputStream = new FileOutputStream("d:\\"+ objeto.getNomeArquivo());
-
-                fileOuputStream.write(objeto.getBytes());
-                fileOuputStream.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            fileDownload.name = objeto.getNomeArquivo();
-            fileDownload.bytes = objeto.getBytes();
 
             HttpHeaders headers = new HttpHeaders();
-            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachement; filename=\"" + objeto.getNomeArquivo() + "\"");
+            headers.add("filename", objeto.getNomeArquivo());
 
-            return ResponseEntity.ok().body(fileDownload);
-//            return ResponseEntity.ok()
-//                    .headers(headers)
-//                    .body(objeto.getBytes());
+            return ResponseEntity.ok().
+                    header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=\"" + objeto.getNomeArquivo() + "\"").
+                    body(new ByteArrayResource(objeto.getBytes()));
         }
         return null;
     }
@@ -183,6 +225,8 @@ public abstract class DefaultController<T> {
 
 
     public CastorFile getCastorFile(MultipartFile file, String origem) {
+        new File(path).mkdirs();
+        String idCastor = "";
         File fileTemp = new File(path+file.hashCode()+"."+
                 FilenameUtils.getExtension(file.getOriginalFilename()));
 
