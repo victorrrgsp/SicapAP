@@ -26,17 +26,18 @@ public class ConcessaoPensaoController extends DefaultController<Pensao>{
 
     @CrossOrigin
     @GetMapping()
+    @Override
     public ResponseEntity<List<Pensao>> findAll() {
-        List<Pensao> list = pensaoRepository.findAll();
+        List<Pensao> list = pensaoRepository.buscarPensao();
         return ResponseEntity.ok().body(list);
     }
 
-    @CrossOrigin
-    @GetMapping(path = {"/{id}"})
-    public ResponseEntity<?> findById(@PathVariable BigInteger id) {
-        Pensao list = pensaoRepository.findById(id);
-        return ResponseEntity.ok().body(list);
-    }
+//    @CrossOrigin
+//    @GetMapping(path = {"/{id}"})
+//    public ResponseEntity<?> findById(@PathVariable BigInteger id) {
+//        Pensao list = pensaoRepository.findById(id);
+//        return ResponseEntity.ok().body(list);
+//    }
 
     @CrossOrigin
     @Transactional

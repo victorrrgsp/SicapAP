@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -13,10 +14,20 @@ public class DocumentoPensaoRepository extends DefaultRepository<DocumentoPensao
         super(em);
     }
 
+    ArrayList<String> incisos = new ArrayList();
+
     public List<DocumentoPensao> buscarDocumentoPensao(String coluna, BigInteger idPensao) {
+
         return getEntityManager().createNativeQuery(
-                "select * from DocumentoPensao where inciso = '"
+                "select * from DocumentoPensao where revisao = 'N' and inciso = '"
                         + coluna + "' and idPensao = " + idPensao, DocumentoPensao.class)
+                .getResultList();
+    }
+
+    public List<DocumentoPensao> buscarDocumentoPensaoRevisao(String coluna, BigInteger idPensao) {
+        return getEntityManager().createNativeQuery(
+                        "select * from DocumentoPensao where revisao = 'S' and inciso = '"
+                                + coluna + "' and idPensao = " + idPensao, DocumentoPensao.class)
                 .getResultList();
     }
 }

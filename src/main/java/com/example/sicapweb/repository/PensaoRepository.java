@@ -14,6 +14,12 @@ public class PensaoRepository extends DefaultRepository<Pensao, BigInteger>{
         super(em);
     }
 
+    public List<Pensao> buscarPensao() {
+        return getEntityManager().createNativeQuery(
+                        "select * from Pensao where revisao = 0", Pensao.class)
+                .getResultList();
+    }
+
     public List<Pensao> buscarPensaoRevisao() {
         return getEntityManager().createNativeQuery(
                 "select * from Pensao where revisao = 1", Pensao.class)

@@ -4,10 +4,10 @@ import br.gov.to.tce.model.InfoRemessa;
 import com.example.sicapweb.util.PaginacaoUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
@@ -73,6 +73,13 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
         return getEntityManager()
                 .createQuery("from " + entityClass.getSimpleName(), entityClass)
                 .getResultList();
+    }
+
+
+    public Integer findAllInciso(String entidade, String pk ,BigInteger id, String inciso ) {
+        return (Integer) getEntityManager().createNativeQuery("select count(*) from "+ entidade +
+                        " where "+ pk +" = "+ id +" and inciso = '"+ inciso +"'").getSingleResult();
+
     }
 
     protected List<T> createQuery(String jpql, Object... params) {
