@@ -76,7 +76,7 @@ public class ConcessaoRevisaoPensaoController extends DefaultController<Pensao>{
         list.add(new Inciso("VI", "Ato de concessão da revisão de proventos",
                 "Ato de concessão da revisão de proventos constando o documento revisado, o nome do servidor e a fundamentação legal, acompanhado da respectiva publicação", "", "Sim"));
         list.add(new Inciso("", "Outros",
-                "Outros", "", "Sim"));
+                "Outros", "", "Não"));
 
         for (int i = 0; i < list.size(); i++){
             Integer existeArquivo = documentoPensaoRepository.findAllInciso("documentoPensao","idPensao",id, list.get(i).getInciso());

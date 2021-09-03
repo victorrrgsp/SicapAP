@@ -2,6 +2,7 @@ package com.example.sicapweb.web.controller;
 
 import br.gov.to.tce.model.ap.concessoes.DocumentoReconducao;
 import br.gov.to.tce.model.ap.pessoal.Reconducao;
+import com.example.sicapweb.model.Inciso;
 import com.example.sicapweb.repository.DocumentoReconducaoRepository;
 import com.example.sicapweb.repository.ReconducaoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -49,6 +51,34 @@ public class ConcessaoReconducaoController extends DefaultController<Reconducao>
         documentoReconducao.setStatus(DocumentoReconducao.Status.Informado.getValor());
         documentoReconducaoRepository.save(documentoReconducao);
         return ResponseEntity.ok().body(idCastor);
+    }
+
+    @CrossOrigin
+    @GetMapping(path = {"getInciso/{id}"})
+    public ResponseEntity<?> findInciso(@PathVariable BigInteger id) {
+        List<Inciso> list = new ArrayList<>();
+        list.add(new Inciso("I - Seção V", "Ofício subscrito pela autoridade competente",
+                "Ofício subscrito pela autoridade competente dirigido ao Presidente do TCE/TO dando ciência do fato", "", "Sim"));
+        list.add(new Inciso("II - Seção V", "Ato da concessão acompanhado da respectiva publicação",
+                "Ato da concessão acompanhado da respectiva publicação", "", "Sim"));
+        list.add(new Inciso("V - Seção V", "Declaração do órgão competente da existência de vaga no cargo em que se der a reintegração",
+                "Declaração do órgão competente da existência de vaga no cargo em que se der a reintegração", "", "Sim"));
+        list.add(new Inciso("VI - Seção V", "Parecer jurídico atestando a legalidade do ato",
+                "Parecer jurídico atestando a legalidade do ato", "", "Sim"));
+        list.add(new Inciso("IX - Seção V", "Cópia dos atos que declararam os resultados da avaliação de desempenho",
+                "Cópia dos atos que declararam os resultados da avaliação de desempenho, nos casos de recondução por inabilitação em estágio probatório", "", "Não"));
+        list.add(new Inciso("", "Outros",
+                "Outros", "", "Não"));
+
+        for (int i = 0; i < list.size(); i++){
+            Integer existeArquivo = documentoReconducaoRepository.findAllInciso("documentoReconducao","idReconducao",id, list.get(i).getInciso());
+            if (existeArquivo > 0){
+                list.get(i).setStatus("Informado");
+            }else{
+                list.get(i).setStatus("Não informado");
+            }
+        }
+        return ResponseEntity.ok().body(list);
     }
 
     @CrossOrigin
