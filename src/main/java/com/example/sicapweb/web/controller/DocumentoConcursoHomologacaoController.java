@@ -3,6 +3,7 @@ package com.example.sicapweb.web.controller;
 
 import br.gov.to.tce.model.ap.concurso.EditalHomologacao;
 import br.gov.to.tce.model.ap.concurso.documento.DocumentoEditalHomologacao;
+import com.example.sicapweb.model.Inciso;
 import com.example.sicapweb.repository.DocumentoEditalHomologacaoRepository;
 import com.example.sicapweb.repository.EditalHomologacaoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -50,6 +52,37 @@ public class DocumentoConcursoHomologacaoController extends DefaultController<Ed
         documentoEditalHomologacao.setStatus(DocumentoEditalHomologacao.Status.Informado.getValor());
         documentoEditalHomologacaoRepository.save(documentoEditalHomologacao);
         return ResponseEntity.ok().body(idCastor);
+    }
+
+    @CrossOrigin
+    @GetMapping(path = {"getInciso/{id}"})
+    public ResponseEntity<?> findInciso(@PathVariable BigInteger id) {
+        List<Inciso> list = new ArrayList<>();
+        list.add(new Inciso("XI", "Demais editais do concurso público, quando houver",
+                "Demais editais do concurso público, quando houver", "", "Não"));
+        list.add(new Inciso("XII ", "Relação de candidatos inscritos para o concurso público",
+                "Relação de candidatos inscritos para o concurso público", "", "Sim"));
+        list.add(new Inciso("XIII", "Lista de presença dos candidatos",
+                "Lista de presença dos candidatos", "", "Sim"));
+        list.add(new Inciso("XIV", "Ata ou relatório final dos trabalhos realizados na promoção do concurso público",
+                "Ata ou relatório final dos trabalhos realizados na promoção do concurso público", "", "Sim"));
+        list.add(new Inciso("XV", "Ato de homologação do resultado do concurso público e lista de aprovados",
+                "Ato de homologação do resultado do concurso público e lista de aprovados", "", "Sim"));
+        list.add(new Inciso("XVI", "Demais documentos exigidos em legislação específica de concurso público",
+                "Demais documentos exigidos em legislação específica de concurso público", "", "Sim"));
+        list.add(new Inciso("", "Outros",
+                "Outros", "", "Não"));
+
+        for (int i = 0; i < list.size(); i++){
+            Integer existeArquivo = documentoEditalHomologacaoRepository.findAllInciso("documentoEditalHomologacao","idEditalHomologacao",id, list.get(i).getInciso());
+            if (existeArquivo > 0){
+                list.get(i).setStatus("Informado");
+            }else{
+                list.get(i).setStatus("Não informado");
+            }
+        }
+
+        return ResponseEntity.ok().body(list);
     }
 
     @CrossOrigin
