@@ -47,6 +47,14 @@ public class ConcessaoAposentadoriaController extends DefaultController<Aposenta
         return ResponseEntity.ok().body(idCastor);
     }
 
+
+    @CrossOrigin
+    @GetMapping(path = {"getSituacao/{id}"})
+    public ResponseEntity<?> findSituacao(@PathVariable BigInteger id) {
+        String situacao = documentoAposentadoriaRepository.findSituacao("documentoAposentadoria",12,"idAposentadoria",id);
+        return ResponseEntity.ok().body(situacao);
+    }
+
     @CrossOrigin
     @GetMapping(path = {"getInciso/{id}"})
     public ResponseEntity<?> findInciso(@PathVariable BigInteger id) {

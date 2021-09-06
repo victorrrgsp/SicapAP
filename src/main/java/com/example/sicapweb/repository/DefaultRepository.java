@@ -1,6 +1,7 @@
 package com.example.sicapweb.repository;
 
 import br.gov.to.tce.model.InfoRemessa;
+import br.gov.to.tce.model.ap.concessoes.DocumentoAposentadoria;
 import com.example.sicapweb.util.PaginacaoUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -79,6 +80,15 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
     public Integer findAllInciso(String entidade, String pk ,BigInteger id, String inciso ) {
         return (Integer) getEntityManager().createNativeQuery("select count(*) from "+ entidade +
                         " where "+ pk +" = "+ id +" and inciso = '"+ inciso +"'").getSingleResult();
+
+    }
+
+    public String findSituacao(String entidade, Integer quantidadeArtigos, String pk ,BigInteger id) {
+        return (String) getEntityManager().createNativeQuery("select case \n" +
+                "when count(*) = "+quantidadeArtigos+" then 'Concluido'\n" +
+                "when count(*) between 1 and "+quantidadeArtigos+" then 'Incompleto'\n" +
+                "else  'Pendente' end Situacao from "+ entidade +
+                " where "+ pk +" = "+ id ).getSingleResult();
 
     }
 

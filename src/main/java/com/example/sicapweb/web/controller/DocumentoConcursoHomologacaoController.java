@@ -1,6 +1,7 @@
 package com.example.sicapweb.web.controller;
 
 
+import br.gov.to.tce.model.CastorFile;
 import br.gov.to.tce.model.ap.concurso.EditalHomologacao;
 import br.gov.to.tce.model.ap.concurso.documento.DocumentoEditalHomologacao;
 import com.example.sicapweb.model.Inciso;
