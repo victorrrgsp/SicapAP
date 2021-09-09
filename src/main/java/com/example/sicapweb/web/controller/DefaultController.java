@@ -112,7 +112,7 @@ public abstract class DefaultController<T> {
                     Arrays.asList(EntityManager.class),
                     Arrays.asList(repository.getEntityManager()),
                     "save",
-                    Arrays.asList(object.getClass()), object);
+                    Arrays.asList(Object.class), object);
         } catch (Exception e) {
             e.printStackTrace();
         }
