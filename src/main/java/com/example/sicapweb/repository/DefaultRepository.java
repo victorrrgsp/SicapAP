@@ -8,12 +8,14 @@ import org.springframework.data.domain.Pageable;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
+
 import javax.persistence.TypedQuery;
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.math.BigInteger;
 import java.util.List;
+
+import java.lang.*;
 
 public abstract class DefaultRepository<T, PK extends Serializable> {
 
@@ -101,31 +103,42 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
     }
 
     //public PaginacaoUtil<T> buscaPaginada(int pagina, int tamanho, String direcao, String campo) {
-    public PaginacaoUtil<T> buscaPaginada(Pageable pageable) {
+    public PaginacaoUtil<T> buscaPaginada(Pageable pageable, String searchParams, Integer tipoParams) {
 
         int pagina = Integer.valueOf(pageable.getPageNumber());
         int tamanho = Integer.valueOf(pageable.getPageSize());
+        String search= "";
 
-        //evita a pagina iniciar com a posicao 0
-       //  Integer posicao = (pagina < 1) ? 1 : pagina;
+       //monta pesquisa search
+        if(searchParams.length() > 3){
 
-        //retirar os : do Sort pageable
-        String campo = String.valueOf(pageable.getSort()).replace(":","");
+            if(tipoParams==0){ //entra para tratar a string
 
-        System.out.println(pagina);
+                String arrayOfStrings[]  = searchParams.split("=");
+               // System.out.println(arrayOfStrings[0]);
+                search = " WHERE " +arrayOfStrings[0] + "='"+arrayOfStrings[1]+"'  ";
+
+            }
+
+            else{
+                search = " WHERE " + searchParams + "   ";
+            }
+
+        }
+            //retirar os : do Sort pageable
+            String campo = String.valueOf(pageable.getSort()).replace(":", "");
+
+            List<T> list = getEntityManager()
+                    .createNativeQuery("select * from " + entityClass.getSimpleName() + " "+search+" ORDER BY " + campo, entityClass)
+                    .setFirstResult(pagina)
+                    .setMaxResults(tamanho)
+                    .getResultList();
+
+            long totalRegistros = count();
+            long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
 
 
-        List<T> list = getEntityManager()
-                .createNativeQuery("select * from " + entityClass.getSimpleName()+" ORDER BY "+campo , entityClass)
-                .setFirstResult(pagina)
-                .setMaxResults(tamanho)
-                .getResultList();
-
-        long totalRegistros = count();
-        long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
         return new PaginacaoUtil<T>(tamanho, pagina, totalPaginas, totalRegistros, list);
-
-
     }
 
     public long count() {

@@ -1,7 +1,6 @@
 package com.example.sicapweb.web.controller;
 import br.gov.to.tce.model.adm.AdmAutenticacao;
 import com.example.sicapweb.repository.AdmAutenticacaoRepository;
-import com.example.sicapweb.repository.DefaultRepository;
 import com.example.sicapweb.util.PaginacaoUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -12,11 +11,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.math.BigInteger;
 import java.net.URI;
 import java.security.MessageDigest;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 
 @RestController
 @RequestMapping(value="/chaves")
@@ -26,11 +23,9 @@ public class ChavesController {
     private AdmAutenticacaoRepository admAutenticacaoRepository;
 
     @CrossOrigin
-    //@GetMapping(path="/pagination/{Pagina}/{Tamanho}/{Direcao}/{Campo}")
-    //public ResponseEntity<PaginacaoUtil<AdmAutenticacao>> listChaves(@PathVariable Integer Pagina, @PathVariable Integer Tamanho,  @PathVariable String Direcao ,@PathVariable String Campo) {
-    @GetMapping(path="/pagination")
-    public ResponseEntity<PaginacaoUtil<AdmAutenticacao>> listChaves(Pageable pageable) {
-        PaginacaoUtil<AdmAutenticacao> paginacaoUtil = admAutenticacaoRepository.buscaPaginada(pageable);
+     @GetMapping(path="/{searchParams}/{tipoParams}/pagination")
+    public ResponseEntity<PaginacaoUtil<AdmAutenticacao>> listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
+        PaginacaoUtil<AdmAutenticacao> paginacaoUtil = admAutenticacaoRepository.buscaPaginada(pageable,searchParams,tipoParams);
         return ResponseEntity.ok().body(paginacaoUtil);
     }
 
