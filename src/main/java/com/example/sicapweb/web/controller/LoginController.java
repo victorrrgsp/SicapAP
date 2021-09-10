@@ -1,5 +1,6 @@
 package com.example.sicapweb.web.controller;
 
+import br.gov.to.tce.validation.ValidationException;
 import com.example.sicapweb.security.Config;
 import com.example.sicapweb.service.Login;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -31,10 +32,14 @@ public class LoginController {
 
     @CrossOrigin
     @PostMapping(path = {"/session"})
-    public ResponseEntity<?> find(@org.springframework.web.bind.annotation.RequestBody String user) {
+    public ResponseEntity<?> find(@org.springframework.web.bind.annotation.RequestBody String user) throws ValidationException {
         ServletRequestAttributes attr = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
-        System.out.println(config.jedis.get(user));
-        return ResponseEntity.ok().body(config.jedis.get(user));
+        //System.out.println(config.jedis.get(user));
+
+        if(true)
+            throw new ValidationException("jhjhhjhjjhhjhj");
+
+        return ResponseEntity.ok().body(null);
     }
 
     @CrossOrigin
@@ -85,7 +90,35 @@ public class LoginController {
 
     @CrossOrigin
     @GetMapping(path = {"/certicado{user}"})
-    public static String autenticar(String ipUsuario, String desafio, String cifrado) throws IOException {
+    public static String autenticar(String ipUsuario, String desafio, String cifrado) {
+
+        try {
+            OkHttpClient client = new OkHttpClient().newBuilder().build();
+
+            MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
+            String postdata = "ipUsuario=" + ipUsuario + "&desafio=" + desafio + "&cifrado=" + cifrado;
+            RequestBody body = RequestBody.create(mediaType, postdata);
+            Request request = new Request.Builder().url("http://172.30.0.35:8080/AssinaturaDigitalV3/AutenticacaoLogin")
+                    .method("POST", body).addHeader("Content-Type", "application/x-www-form-urlencoded").build();
+            Response response = client.newCall(request).execute();
+
+            String resposta = response.body().string();
+            System.out.println("autenticar(): " + resposta);
+
+            JsonNode respostaJson = new ObjectMapper().readTree(resposta);
+            String cpf = respostaJson.get("validacaoAssinatura").get("dados").get("cpf").asText();
+            //System.out.println(cpf);
+
+            return cpf;
+
+        } catch (Exception e) {
+            // System.out.println("[falha]: " + e.toString());
+        }
+
+        return null;
+
+    }
+    public static String autenticar1(String ipUsuario, String desafio, String cifrado) throws IOException {
 
         try {
             OkHttpClient client = new OkHttpClient().newBuilder().build();
@@ -111,6 +144,29 @@ public class LoginController {
 
         return null;
 
+    }
+
+    public static String obterToken() {
+        try {
+            OkHttpClient client = new OkHttpClient().newBuilder()
+                    .build();
+            MediaType mediaType = MediaType.parse("text/plain");
+            RequestBody body = RequestBody.create(mediaType, "");
+            Request request = new Request.Builder()
+                    .url("https://app.tce.to.gov.br/assinador/api/AssinadorWeb/obterToken")
+                    .method("POST", body)
+                    .addHeader("Accept", "application/json")
+                    .build();
+            Response response = client.newCall(request).execute();
+            String resposta = response.body().string();
+
+            return resposta;
+
+        } catch (Exception e) {
+            // System.out.println("[falha]: " + e.toString());
+        }
+
+        return null;
     }
 
 

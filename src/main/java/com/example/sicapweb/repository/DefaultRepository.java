@@ -5,6 +5,8 @@ import br.gov.to.tce.model.ap.concessoes.DocumentoAposentadoria;
 import com.example.sicapweb.util.PaginacaoUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -13,6 +15,7 @@ import javax.persistence.TypedQuery;
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.math.BigInteger;
+import java.sql.SQLException;
 import java.util.List;
 
 import java.lang.*;
@@ -40,20 +43,24 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
         return entityManager;
     }
 
+    @Transactional(rollbackFor = { SQLException.class },  propagation = Propagation.NESTED )
     public void save(T entity) {
         getEntityManager().persist(entity);
     }
 
+    //@Transactional(rollbackFor = { SQLException.class },  propagation = Propagation.NESTED )
     public void update(T entity) {
 
         try {
             getEntityManager().merge(entity);
+            //getEntityManager().getTransaction().commit();
         }
         catch (Exception e){
             e.printStackTrace();
         }
     }
 
+    //@Transactional(rollbackFor = { SQLException.class },  propagation = Propagation.NESTED )
     public void delete(BigInteger id) {
         entityManager = getEntityManager();
         entityManager.getTransaction().begin();
@@ -61,17 +68,21 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
         entityManager.getTransaction().commit();
     }
 
+    //@Transactional(rollbackFor = { SQLException.class },  propagation = Propagation.NESTED )
     public void delete(String id) {
         entityManager = getEntityManager();
         entityManager.getTransaction().begin();
         entityManager.remove(entityManager.find(entityClass, id));
         entityManager.getTransaction().commit();
+
     }
 
+    //@Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public T findById(PK id) {
         return getEntityManager().find(entityClass, id);
     }
 
+    //@Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public List<T> findAll() {
         return getEntityManager()
                 .createQuery("from " + entityClass.getSimpleName(), entityClass)
@@ -101,6 +112,7 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
     }
 
     //public PaginacaoUtil<T> buscaPaginada(int pagina, int tamanho, String direcao, String campo) {
+    //@Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public PaginacaoUtil<T> buscaPaginada(Pageable pageable, String searchParams, Integer tipoParams) {
 
         int pagina = Integer.valueOf(pageable.getPageNumber());
@@ -109,29 +121,29 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
 
         System.out.println("pagina:"+pagina+"tamanho"+tamanho);
 
-       //monta pesquisa search
+        //monta pesquisa search
         if(searchParams.length() > 3){
 
-                if(tipoParams==0){ //entra para tratar a string
-                    String arrayOfStrings[]  = searchParams.split("=");
-                    search = " WHERE " +arrayOfStrings[0] + " LIKE  '%"+arrayOfStrings[1]+"%'  ";
-                }
-                else{
-                    search = " WHERE " + searchParams + "   ";
-                }
+            if(tipoParams==0){ //entra para tratar a string
+                String arrayOfStrings[]  = searchParams.split("=");
+                search = " WHERE " +arrayOfStrings[0] + " LIKE  '%"+arrayOfStrings[1]+"%'  ";
             }
+            else{
+                search = " WHERE " + searchParams + "   ";
+            }
+        }
 
-            //retirar os : do Sort pageable
-            String campo = String.valueOf(pageable.getSort()).replace(":", "");
+        //retirar os : do Sort pageable
+        String campo = String.valueOf(pageable.getSort()).replace(":", "");
 
-            List<T> list = getEntityManager()
-                    .createNativeQuery("select * from " + entityClass.getSimpleName() + " "+search+" ORDER BY " + campo, entityClass)
-                    .setFirstResult(pagina)
-                    .setMaxResults(tamanho)
-                    .getResultList();
+        List<T> list = getEntityManager()
+                .createNativeQuery("select * from " + entityClass.getSimpleName() + " "+search+" ORDER BY " + campo, entityClass)
+                .setFirstResult(pagina)
+                .setMaxResults(tamanho)
+                .getResultList();
 
-            long totalRegistros = count();
-            long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
+        long totalRegistros = count();
+        long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
 
         return new PaginacaoUtil<T>(tamanho, pagina, totalPaginas, totalRegistros, list);
     }

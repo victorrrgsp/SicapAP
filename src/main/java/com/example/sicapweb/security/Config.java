@@ -4,6 +4,9 @@ import com.google.gson.Gson;
 import org.springframework.stereotype.Component;
 import redis.clients.jedis.Jedis;
 
+import java.util.Calendar;
+import java.util.TimeZone;
+
 @Component
 public class Config {
 
@@ -89,9 +92,27 @@ public class Config {
         com.example.sicapweb.security.User user = new com.example.sicapweb.security.User();
         Config config = new Config();
 
+        Calendar systemDate = Calendar.getInstance();
+        Calendar saoPauloDate = Calendar.getInstance(TimeZone.getTimeZone("America/Sao_Paulo"));
+        Calendar brazilEastDate = Calendar.getInstance(TimeZone.getTimeZone("Brazil/East"));
+
+        System.out.println("Sem Timezone: " + Config.getFormatedDate(systemDate));
+        System.out.println("America/São_Paulo: " + Config.getFormatedDate(saoPauloDate));
+        System.out.println("Brazil/East: " + Config.getFormatedDate(brazilEastDate));
+
         config.jedis = new Jedis(config.ip, 6379);
         config.jedis.set(user.userName, json(user));
         config.jedis.set(user.userName, json(user));
         System.out.println(config.jedis.get(user.userName));
+    }
+
+    private static String getFormatedDate(Calendar date) {
+        StringBuffer formattedDate = new StringBuffer();
+        formattedDate.append(date.get(Calendar.DAY_OF_MONTH)).append("/");
+        formattedDate.append(date.get(Calendar.MONTH) + 1).append("/");
+        formattedDate.append(date.get(Calendar.YEAR)).append(" ");
+        formattedDate.append(date.get(Calendar.HOUR_OF_DAY)).append(":");
+        formattedDate.append(date.get(Calendar.MINUTE));
+        return formattedDate.toString();
     }
 }

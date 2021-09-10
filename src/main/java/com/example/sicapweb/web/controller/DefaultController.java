@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@Transactional
 @Controller
 @RequestMapping
 public abstract class DefaultController<T> {

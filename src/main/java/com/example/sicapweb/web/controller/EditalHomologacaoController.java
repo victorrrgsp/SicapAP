@@ -1,13 +1,12 @@
 package com.example.sicapweb.web.controller;
 
-import br.gov.to.tce.model.ap.concurso.Edital;
 import br.gov.to.tce.model.ap.concurso.EditalHomologacao;
-import br.gov.to.tce.model.ap.relacional.Ato;
 import com.example.sicapweb.repository.AtoRepository;
 import com.example.sicapweb.repository.EditalHomologacaoRepository;
 import com.example.sicapweb.repository.EditalRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +15,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.math.BigInteger;
 import java.net.URI;
 import java.util.List;
-
+@Service
+@Transactional
 @RestController
 @RequestMapping("/concursoHomologacao")
 public class EditalHomologacaoController {

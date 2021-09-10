@@ -9,11 +9,18 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfi
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import redis.clients.jedis.Jedis;
 
+import javax.annotation.PostConstruct;
 import java.sql.Date;
+import java.util.TimeZone;
 
 @SpringBootApplication(exclude = {SecurityAutoConfiguration.class })
 @EntityScan(basePackages = {"br.gov.to.tce.*"})
 public class SicapwebApplication {
+
+    @PostConstruct
+    public void init(){
+        TimeZone.setDefault(TimeZone.getTimeZone("America/Brasilia"));
+    }
 
     public static void main(String[] args) {
         User user = new User();

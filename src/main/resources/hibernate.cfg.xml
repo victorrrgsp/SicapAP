@@ -15,7 +15,7 @@
 
         <mapping class="br.gov.to.tce.model.ap.estatico.CargoNome" />
         <mapping class="br.gov.to.tce.model.ap.estatico.FolhaItemESocial" />
-        <mapping class="br.gov.to.tce.model.estatico.Municipio" />
+        <mapping class="br.gov.to.tce.model.ap.estatico.Municipio" />
 
         <mapping class="br.gov.to.tce.model.Mensagem" />
         <mapping class="br.gov.to.tce.model.CastorFile" />
