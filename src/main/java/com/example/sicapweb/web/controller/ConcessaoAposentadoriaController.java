@@ -1,5 +1,8 @@
 package com.example.sicapweb.web.controller;
 
+import br.gov.to.tce.castor.arquivo.CastorController;
+import br.gov.to.tce.castor.arquivo.ObjetoCastor;
+import br.gov.to.tce.model.CastorFile;
 import br.gov.to.tce.model.ap.concessoes.DocumentoAposentadoria;
 import br.gov.to.tce.model.ap.pessoal.Aposentadoria;
 import com.example.sicapweb.model.Inciso;
@@ -11,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,6 +58,22 @@ public class ConcessaoAposentadoriaController extends DefaultController<Aposenta
     public ResponseEntity<?> findSituacao(@PathVariable BigInteger id) {
         String situacao = documentoAposentadoriaRepository.findSituacao("documentoAposentadoria",12,"idAposentadoria",id);
         return ResponseEntity.ok().body(situacao);
+    }
+
+    @CrossOrigin
+    @DeleteMapping(path = {"getSituacao/{id}"})
+    public ResponseEntity<?> deleteInciso(@PathVariable BigInteger id) {
+        CastorController c = new CastorController();
+        c.isMutable = false;
+
+        try {
+            c.deletar(new ObjetoCastor("45c368d4a15550700a00ba11dd0c9855"));
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+        }
+        return ResponseEntity.noContent().build();
     }
 
     @CrossOrigin
