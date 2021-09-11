@@ -20,6 +20,13 @@ public class DocumentoAposentadoriaRepository extends DefaultRepository<Document
                 .getResultList();
     }
 
+    public Integer findSituacao(String entidade, String pk ,BigInteger id, String incisos, String reserva, String reforma, String reversao, String revisao) {
+        return (Integer) getEntityManager().createNativeQuery("select count(*) \n" +
+                " Situacao from "+ entidade +
+                " where "+ pk +" = "+ id +" and inciso in ("+ incisos + ") and reserva = '"+ reserva +"' and reforma = '"+ reforma +"' and reversao = '"+ reversao +"' and revisao = '"+ revisao+"'" ).getSingleResult();
+
+    }
+
     public List<DocumentoAposentadoria> buscarDocumentoAposentadoriaReserva(String coluna, BigInteger idAposentadoria) {
         return getEntityManager().createNativeQuery(
                 "select * from DocumentoAposentadoria where reserva = 'S' and inciso = '"

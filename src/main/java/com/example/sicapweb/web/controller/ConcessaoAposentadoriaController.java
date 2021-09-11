@@ -1,5 +1,6 @@
 package com.example.sicapweb.web.controller;
 
+import br.gov.to.tce.annotation.JayValNotNull;
 import br.gov.to.tce.castor.arquivo.CastorController;
 import br.gov.to.tce.castor.arquivo.ObjetoCastor;
 import br.gov.to.tce.model.CastorFile;
@@ -14,10 +15,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.Transient;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @RestController
@@ -29,6 +32,30 @@ public class ConcessaoAposentadoriaController extends DefaultController<Aposenta
 
     @Autowired
     private DocumentoAposentadoriaRepository documentoAposentadoriaRepository;
+
+    HashMap<String, Object> aposentadoria = new HashMap<String, Object>();
+
+    public class AposentadoriaDocumento{
+        private Aposentadoria aposentadoria;
+
+        private String situacao;
+
+        public Aposentadoria getAposentadoria() {
+            return aposentadoria;
+        }
+
+        public void setAposentadoria(Aposentadoria aposentadoria) {
+            this.aposentadoria = aposentadoria;
+        }
+
+        public String getSituacao() {
+            return situacao;
+        }
+
+        public void setSituacao(String situacao) {
+            this.situacao = situacao;
+        }
+    }
 
     @CrossOrigin
     @GetMapping
@@ -52,28 +79,35 @@ public class ConcessaoAposentadoriaController extends DefaultController<Aposenta
         return ResponseEntity.ok().body(idCastor);
     }
 
+    @CrossOrigin
+    @GetMapping(path = {"getDocumentos"})
+    public ResponseEntity<?> findAllDocumentos() {
+        List<Aposentadoria> list = aposentadoriaRepository.buscarAposentadorias();
+        AposentadoriaDocumento situacao = new AposentadoriaDocumento();
+        for(Integer i= 0; i < list.size(); i++){
+            Integer quantidadeDocumentos = documentoAposentadoriaRepository.findSituacao("documentoAposentadoria","idAposentadoria", list.get(i).getId(), "'I', 'II', 'III', 'IV', 'V', 'VI', 'VI', 'VIII', 'XII', 'XIII'", "N", "N", "N", "N");
+            if(quantidadeDocumentos == 0) {
+                situacao.setAposentadoria(list.get(i));
+                situacao.setSituacao("Pendente");
+            } else if(quantidadeDocumentos == 10){
+                situacao.setAposentadoria(list.get(i));
+                situacao.setSituacao("Concluído");
+            } else{
+                situacao.setAposentadoria(list.get(i));
+                situacao.setSituacao("Aguardando verificação");
+            }
+            aposentadoria.put("Aposentadoria", situacao);
+        }
+
+        return ResponseEntity.ok().body(aposentadoria);
+    }
+
 
     @CrossOrigin
     @GetMapping(path = {"getSituacao/{id}"})
     public ResponseEntity<?> findSituacao(@PathVariable BigInteger id) {
-        String situacao = documentoAposentadoriaRepository.findSituacao("documentoAposentadoria",12,"idAposentadoria",id);
+        Integer situacao = documentoAposentadoriaRepository.findSituacao("documentoAposentadoria","idAposentadoria",id, "'I', 'II', 'III', 'IV', 'V', 'VI', 'VI', 'VIII', 'XII', 'XIII'", "N", "N", "N", "N");
         return ResponseEntity.ok().body(situacao);
-    }
-
-    @CrossOrigin
-    @DeleteMapping(path = {"getSituacao/{id}"})
-    public ResponseEntity<?> deleteInciso(@PathVariable BigInteger id) {
-        CastorController c = new CastorController();
-        c.isMutable = false;
-
-        try {
-            c.deletar(new ObjetoCastor("45c368d4a15550700a00ba11dd0c9855"));
-
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            e.printStackTrace();
-        }
-        return ResponseEntity.noContent().build();
     }
 
     @CrossOrigin
@@ -120,6 +154,23 @@ public class ConcessaoAposentadoriaController extends DefaultController<Aposenta
 
         return ResponseEntity.ok().body(list);
     }
+
+
+    //    @CrossOrigin
+//    @DeleteMapping(path = {"getSituacao/{id}"})
+//    public ResponseEntity<?> deleteInciso(@PathVariable BigInteger id) {
+//        CastorController c = new CastorController();
+//        c.isMutable = false;
+//
+//        try {
+//            c.deletar(new ObjetoCastor("45c368d4a15550700a00ba11dd0c9855"));
+//
+//        } catch (Exception e) {
+//            System.out.println(e.getMessage());
+//            e.printStackTrace();
+//        }
+//        return ResponseEntity.noContent().build();
+//    }
 
     @CrossOrigin
     @GetMapping(path = {"anexos/{inciso}/{id}"})

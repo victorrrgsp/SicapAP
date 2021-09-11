@@ -85,12 +85,10 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
 
     }
 
-    public String findSituacao(String entidade, Integer quantidadeArtigos, String pk ,BigInteger id) {
-        return (String) getEntityManager().createNativeQuery("select case \n" +
-                "when count(*) = "+quantidadeArtigos+" then 'Concluido'\n" +
-                "when count(*) between 1 and "+quantidadeArtigos+" then 'Incompleto'\n" +
-                "else  'Pendente' end Situacao from "+ entidade +
-                " where "+ pk +" = "+ id ).getSingleResult();
+    public Integer findSituacao(String entidade, String pk ,BigInteger id, String incisos) {
+        return (Integer) getEntityManager().createNativeQuery("select count(*) \n" +
+                " Situacao from "+ entidade +
+                " where "+ pk +" = "+ id +" and inciso in ("+ incisos + ")" ).getSingleResult();
 
     }
 
