@@ -109,21 +109,20 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
         int tamanho = Integer.valueOf(pageable.getPageSize());
         String search= "";
 
+        System.out.println("pagina:"+pagina+"tamanho"+tamanho);
+
        //monta pesquisa search
         if(searchParams.length() > 3){
 
-            if(tipoParams==0){ //entra para tratar a string
-
-                String arrayOfStrings[]  = searchParams.split("=");
-                search = " WHERE " +arrayOfStrings[0] + " LIKE  '"+arrayOfStrings[1]+"%'  ";
-
+                if(tipoParams==0){ //entra para tratar a string
+                    String arrayOfStrings[]  = searchParams.split("=");
+                    search = " WHERE " +arrayOfStrings[0] + " LIKE  '%"+arrayOfStrings[1]+"%'  ";
+                }
+                else{
+                    search = " WHERE " + searchParams + "   ";
+                }
             }
 
-            else{
-                search = " WHERE " + searchParams + "   ";
-            }
-
-        }
             //retirar os : do Sort pageable
             String campo = String.valueOf(pageable.getSort()).replace(":", "");
 
@@ -135,7 +134,6 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
 
             long totalRegistros = count();
             long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
-
 
         return new PaginacaoUtil<T>(tamanho, pagina, totalPaginas, totalRegistros, list);
     }
