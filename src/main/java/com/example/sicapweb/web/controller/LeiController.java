@@ -1,12 +1,13 @@
 package com.example.sicapweb.web.controller;
 
 import br.gov.to.tce.model.CastorFile;
-import br.gov.to.tce.model.ap.concessoes.DocumentoAposentadoria;
 import br.gov.to.tce.model.ap.relacional.Ato;
 import br.gov.to.tce.model.ap.relacional.Lei;
 import com.example.sicapweb.repository.AtoRepository;
 import com.example.sicapweb.repository.LeiRepository;
+import com.example.sicapweb.util.PaginacaoUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +31,14 @@ public class LeiController extends DefaultController<Lei> {
     public List<Ato> editalList() {
         return atoRepository.findAll();
     }
+
+    @CrossOrigin
+    @GetMapping(path="/{searchParams}/{tipoParams}/pagination")
+    public ResponseEntity<PaginacaoUtil<Lei>> listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
+        PaginacaoUtil<Lei> paginacaoUtil = leiRepository.buscaPaginada(pageable,searchParams,tipoParams);
+        return ResponseEntity.ok().body(paginacaoUtil);
+    }
+
 
     @ModelAttribute("atos")
     public List<Ato> atoList() {

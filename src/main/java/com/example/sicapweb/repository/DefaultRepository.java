@@ -115,8 +115,7 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
             if(tipoParams==0){ //entra para tratar a string
 
                 String arrayOfStrings[]  = searchParams.split("=");
-               // System.out.println(arrayOfStrings[0]);
-                search = " WHERE " +arrayOfStrings[0] + "='"+arrayOfStrings[1]+"'  ";
+                search = " WHERE " +arrayOfStrings[0] + " LIKE  '"+arrayOfStrings[1]+"%'  ";
 
             }
 
