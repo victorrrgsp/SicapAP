@@ -2,8 +2,9 @@ package com.example.sicapweb.web.controller;
 
 import br.gov.to.tce.model.ap.concurso.EmpresaOrganizadora;
 import com.example.sicapweb.repository.EmpresaOrganizadoraRepository;
-import com.example.sicapweb.repository.UnidadeGestoraRepository;
+import com.example.sicapweb.util.PaginacaoUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -19,9 +20,13 @@ public class EmpresaOrganizadoraController extends DefaultController<EmpresaOrga
 
     @Autowired
     private EmpresaOrganizadoraRepository empresaOrganizadoraRepository;
-    @Autowired
-    private UnidadeGestoraRepository unidadeGestoraRepository;
 
+    @CrossOrigin
+    @GetMapping(path="/{searchParams}/{tipoParams}/pagination")
+    public ResponseEntity<PaginacaoUtil<EmpresaOrganizadora>> listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
+        PaginacaoUtil<EmpresaOrganizadora> paginacaoUtil = empresaOrganizadoraRepository.buscaPaginada(pageable,searchParams,tipoParams);
+        return ResponseEntity.ok().body(paginacaoUtil);
+    }
 
     @CrossOrigin
     @Transactional
@@ -42,7 +47,6 @@ public class EmpresaOrganizadoraController extends DefaultController<EmpresaOrga
         empresaOrganizadora.setCnpjEmpresaOrganizadora(empresaOrganizadora.getCnpjEmpresaOrganizadora().replace(".", "").replace("-", "").replace("/", ""));
         empresaOrganizadora.setChave(empresaOrganizadoraRepository.buscarPrimeiraRemessa());
         empresaOrganizadoraRepository.update(empresaOrganizadora);
-
         return ResponseEntity.noContent().build();
     }
 
@@ -50,9 +54,7 @@ public class EmpresaOrganizadoraController extends DefaultController<EmpresaOrga
     @Transactional
     @PostMapping("/upload")
     public ResponseEntity<?> addFile(@RequestParam("file") MultipartFile file) {
-
         return ResponseEntity.ok().body(super.setCastorFile(file, "EmpresaOrganizadora"));
     }
-
 }
 

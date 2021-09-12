@@ -1,7 +1,6 @@
 package com.example.sicapweb.web.controller;
 
 import br.gov.to.tce.model.CastorFile;
-import br.gov.to.tce.model.ap.relacional.Ato;
 import br.gov.to.tce.model.ap.relacional.Lei;
 import com.example.sicapweb.repository.AtoRepository;
 import com.example.sicapweb.repository.LeiRepository;
@@ -27,22 +26,11 @@ public class LeiController extends DefaultController<Lei> {
     @Autowired
     private AtoRepository atoRepository;
 
-    @ModelAttribute("atos")
-    public List<Ato> editalList() {
-        return atoRepository.findAll();
-    }
-
     @CrossOrigin
     @GetMapping(path="/{searchParams}/{tipoParams}/pagination")
     public ResponseEntity<PaginacaoUtil<Lei>> listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
         PaginacaoUtil<Lei> paginacaoUtil = leiRepository.buscaPaginada(pageable,searchParams,tipoParams);
         return ResponseEntity.ok().body(paginacaoUtil);
-    }
-
-
-    @ModelAttribute("atos")
-    public List<Ato> atoList() {
-        return atoRepository.findAll();
     }
 
     @CrossOrigin

@@ -1,7 +1,7 @@
 package com.example.sicapweb.repository;
 
 import br.gov.to.tce.model.InfoRemessa;
-import br.gov.to.tce.model.ap.concessoes.DocumentoAposentadoria;
+import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -10,15 +10,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-
 import javax.persistence.TypedQuery;
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.math.BigInteger;
 import java.sql.SQLException;
 import java.util.List;
-
-import java.lang.*;
 
 public abstract class DefaultRepository<T, PK extends Serializable> {
 
@@ -85,7 +82,9 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
     //@Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public List<T> findAll() {
         return getEntityManager()
-                .createQuery("from " + entityClass.getSimpleName(), entityClass)
+                .createQuery("select a from " + entityClass.getSimpleName() +
+                        " a, InfoRemessa info where a.infoRemessa.chave = info.chave and info.idUnidadeGestora = '"
+                        + User.getUser().getUnidadeGestora().getId() + "'", entityClass)
                 .getResultList();
     }
 
@@ -137,7 +136,8 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
         String campo = String.valueOf(pageable.getSort()).replace(":", "");
 
         List<T> list = getEntityManager()
-                .createNativeQuery("select * from " + entityClass.getSimpleName() + " "+search+" ORDER BY " + campo, entityClass)
+                .createNativeQuery("select a.* from " + entityClass.getSimpleName() + " a " +
+                        " join InfoRemessa info on info.chave = a.chave and info.idUnidadeGestora = '" + User.getUser().getUnidadeGestora().getId() + "' " +search+" ORDER BY " + campo, entityClass)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();

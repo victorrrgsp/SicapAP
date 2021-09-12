@@ -76,6 +76,14 @@ public class User {
         this.dateEnd = dateEnd;
     }
 
+    public UnidadeGestora getUnidadeGestora() {
+        return unidadeGestora;
+    }
+
+    public void setUnidadeGestora(UnidadeGestora unidadeGestora) {
+        this.unidadeGestora = unidadeGestora;
+    }
+
     public enum Cargo implements DefaultEnum<Cargo>, Serializable {
         Gestor(4, "Gestor"),
         Contador(5, "Contador"),
