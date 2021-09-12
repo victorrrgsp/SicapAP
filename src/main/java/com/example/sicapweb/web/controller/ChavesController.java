@@ -25,6 +25,7 @@ public class ChavesController {
     @CrossOrigin
      @GetMapping(path="/{searchParams}/{tipoParams}/pagination")
     public ResponseEntity<PaginacaoUtil<AdmAutenticacao>> listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
+
         PaginacaoUtil<AdmAutenticacao> paginacaoUtil = admAutenticacaoRepository.buscaPaginadaUnidadeGestora(pageable,searchParams,tipoParams);
         return ResponseEntity.ok().body(paginacaoUtil);
     }
@@ -34,7 +35,6 @@ public class ChavesController {
     @Transactional
     @PostMapping("/salvar")
     public ResponseEntity<AdmAutenticacao> create(@RequestBody  AdmAutenticacao autenticacao) throws ParseException {
-
 
         Date data = new Date();
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -52,9 +52,7 @@ public class ChavesController {
             autenticacao.setIdSistema(29);
             autenticacao.setData(strToDate);
             autenticacao.setChave(sha1);
-
             admAutenticacaoRepository.save(autenticacao);
-
 
         } catch (Exception e) {
             e.printStackTrace();

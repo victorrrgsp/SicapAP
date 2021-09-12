@@ -66,6 +66,7 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
 
     //@Transactional(rollbackFor = { SQLException.class },  propagation = Propagation.NESTED )
     public void delete(String id) {
+
         entityManager = getEntityManager();
         entityManager.getTransaction().begin();
         entityManager.remove(entityManager.find(entityClass, id));
@@ -86,7 +87,6 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
                         + User.getUser().getUnidadeGestora().getId() + "'", entityClass)
                 .getResultList();
     }
-
 
     public Integer findAllInciso(String entidade, String pk ,BigInteger id, String inciso ) {
         return (Integer) getEntityManager().createNativeQuery("select count(*) from "+ entidade +
@@ -117,31 +117,27 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
         String search= "";
 
         //monta pesquisa search
-        if(searchParams.length() > 3){
+        if(searchParams.length() > 3){/// entra
 
             if(tipoParams==0){ //entra para tratar a string
                 String arrayOfStrings[]  = searchParams.split("=");
-                search = " WHERE " +arrayOfStrings[0] + " LIKE  '%"+arrayOfStrings[1]+"%'  ";
+                search = "" +arrayOfStrings[0] + " LIKE  '%"+arrayOfStrings[1]+"%' AND "  ;
             }
-            else{
-                search = " WHERE " + searchParams + "   ";
+            else{//entra caso for um Integer
+                search = "" + searchParams + " AND   " ;
             }
         }
-
-
 
         //retirar os : do Sort pageable
         String campo = String.valueOf(pageable.getSort()).replace(":", "");
 
         List<T> list = getEntityManager()
-                .createNativeQuery("select * from " + entityClass.getSimpleName() +
-                        " idUnidadeGestora = '"
-                        + User.getUser().getUnidadeGestora().getId() + "' " +search+" ORDER BY " + campo, entityClass)
+                .createNativeQuery("select * from " + entityClass.getSimpleName() + " WHERE " +search+"  idUnidadeGestora= '"+ User.getUser().getUnidadeGestora().getId() + "'  ORDER BY " + campo, entityClass)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();
 
-        long totalRegistros = count();
+        long totalRegistros = countUnidadeGestora();
         long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
 
         return new PaginacaoUtil<T>(tamanho, pagina, totalPaginas, totalRegistros, list);
@@ -195,6 +191,11 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
     public long count() {
         return getEntityManager().createQuery("select count(*) from " + entityClass.getSimpleName(), Long.class).getSingleResult();
     }
+
+    public long countUnidadeGestora() {
+        return getEntityManager().createQuery("select count(*) from " + entityClass.getSimpleName()+" WHERE idUnidadeGestora= '"+ User.getUser().getUnidadeGestora().getId() + "'", Long.class).getSingleResult();
+    }
+
 
     public InfoRemessa buscarPrimeiraRemessa() {
         List<InfoRemessa> list = getEntityManager().createNativeQuery("select * from infoRemessa " +
