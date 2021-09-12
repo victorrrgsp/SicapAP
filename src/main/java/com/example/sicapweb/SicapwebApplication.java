@@ -10,7 +10,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import redis.clients.jedis.Jedis;
 
 import javax.annotation.PostConstruct;
-import java.sql.Date;
 import java.util.TimeZone;
 
 @SpringBootApplication(exclude = {SecurityAutoConfiguration.class })
@@ -24,15 +23,18 @@ public class SicapwebApplication {
 
     public static void main(String[] args) {
         User user = new User();
-        user.setDateEnd(Date.valueOf("2021-1-1"));
+        //user.getDateEnd().cdate.addHours(3)
+        User.getUser();
         Config config = new Config();
-
         config.jedis = new Jedis(config.ip, 6379);
-        config.jedis.set(user.userName, Config.json(user));
         config.jedis.set(user.userName, Config.json(user));
         System.out.println(config.jedis.get(user.userName));
 
         SpringApplication.run(SicapwebApplication.class, args);
+
+
+
+
         UsernamePasswordAuthenticationToken authReq
                 = new UsernamePasswordAuthenticationToken("user", "pass");
 
