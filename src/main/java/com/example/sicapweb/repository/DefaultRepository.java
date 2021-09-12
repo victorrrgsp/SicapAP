@@ -117,8 +117,6 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
         int tamanho = Integer.valueOf(pageable.getPageSize());
         String search= "";
 
-        System.out.println("pagina:"+pagina+"tamanho"+tamanho);
-
         //monta pesquisa search
         if(searchParams.length() > 3){
 
