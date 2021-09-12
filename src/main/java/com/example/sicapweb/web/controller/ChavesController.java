@@ -29,18 +29,14 @@ public class ChavesController {
         return ResponseEntity.ok().body(paginacaoUtil);
     }
 
-//    @CrossOrigin
-//    @GetMapping
-//    public ResponseEntity<List<AdmAutenticacao>> findAll() {
-//        List<AdmAutenticacao> list = admAutenticacaoRepository.findAll();
-//        return ResponseEntity.ok().body(list);
-//    }
-
     // @ApiOperation(value="Salva uma Chave de Autorizacao para envio do Sicap AP")
     @CrossOrigin
     @Transactional
     @PostMapping("/salvar")
     public ResponseEntity<AdmAutenticacao> create(@RequestBody  AdmAutenticacao autenticacao) throws ParseException {
+
+
+        System.out.println(autenticacao);
 
         Date data = new Date();
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -72,10 +68,8 @@ public class ChavesController {
     @CrossOrigin
     @GetMapping(path = {"/status/{Cnpj}/{Exercicio}/{Remessa}"})
     public Boolean findStatusChave(@PathVariable String Cnpj, @PathVariable Integer Exercicio, @PathVariable Integer Remessa) {
-       // UnidadeGestora list = unidadeGestoraRepository.buscaUnidadeGestoraPorCnpj(Cnpj);
-        Boolean status = admAutenticacaoRepository.getStatusChave(Cnpj, Exercicio, Remessa);
-        System.out.println("aAAKUUUUUUUUUUUU"+status);
 
+        Boolean status = admAutenticacaoRepository.getStatusChave(Cnpj, Exercicio, Remessa);
         return status;
     }
 
