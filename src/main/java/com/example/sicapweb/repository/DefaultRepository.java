@@ -5,7 +5,6 @@ import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
@@ -40,7 +39,7 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
         return entityManager;
     }
 
-    @Transactional(rollbackFor = { SQLException.class },  propagation = Propagation.NESTED )
+    @Transactional(rollbackFor = { SQLException.class })
     public void save(T entity) {
         getEntityManager().persist(entity);
     }
@@ -137,7 +136,8 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
 
         List<T> list = getEntityManager()
                 .createNativeQuery("select a.* from " + entityClass.getSimpleName() + " a " +
-                        " join InfoRemessa info on info.chave = a.chave and info.idUnidadeGestora = '" + User.getUser().getUnidadeGestora().getId() + "' " +search+" ORDER BY " + campo, entityClass)
+                        " join InfoRemessa info on info.chave = a.chave and info.idUnidadeGestora = '"
+                        + User.getUser().getUnidadeGestora().getId() + "' " +search+" ORDER BY " + campo, entityClass)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();

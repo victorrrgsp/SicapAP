@@ -47,7 +47,6 @@ public class LeiController extends DefaultController<Lei> {
     }
 
     @CrossOrigin
-    @Transactional
     @PostMapping
     public ResponseEntity<Lei> create(@RequestBody Lei lei) {
         lei.setChave(leiRepository.buscarPrimeiraRemessa());
