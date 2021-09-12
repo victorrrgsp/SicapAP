@@ -25,7 +25,7 @@ public class ChavesController {
     @CrossOrigin
      @GetMapping(path="/{searchParams}/{tipoParams}/pagination")
     public ResponseEntity<PaginacaoUtil<AdmAutenticacao>> listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
-        PaginacaoUtil<AdmAutenticacao> paginacaoUtil = admAutenticacaoRepository.buscaPaginada(pageable,searchParams,tipoParams);
+        PaginacaoUtil<AdmAutenticacao> paginacaoUtil = admAutenticacaoRepository.buscaPaginadaUnidadeGestora(pageable,searchParams,tipoParams);
         return ResponseEntity.ok().body(paginacaoUtil);
     }
 
@@ -35,8 +35,6 @@ public class ChavesController {
     @PostMapping("/salvar")
     public ResponseEntity<AdmAutenticacao> create(@RequestBody  AdmAutenticacao autenticacao) throws ParseException {
 
-
-        System.out.println(autenticacao);
 
         Date data = new Date();
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -55,7 +53,9 @@ public class ChavesController {
             autenticacao.setData(strToDate);
             autenticacao.setChave(sha1);
 
-           // chavesRepository.save(autenticacao);
+            admAutenticacaoRepository.save(autenticacao);
+
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -68,7 +68,6 @@ public class ChavesController {
     @CrossOrigin
     @GetMapping(path = {"/status/{Cnpj}/{Exercicio}/{Remessa}"})
     public Boolean findStatusChave(@PathVariable String Cnpj, @PathVariable Integer Exercicio, @PathVariable Integer Remessa) {
-
         Boolean status = admAutenticacaoRepository.getStatusChave(Cnpj, Exercicio, Remessa);
         return status;
     }

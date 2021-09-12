@@ -27,7 +27,4 @@ public class AdmAutenticacaoRepository extends DefaultRepository<AdmAutenticacao
                "where idunidadegestora= '"+Cnpj+"' " +
                "AND exercicio="+Exercicio+" " + " AND remessa="+Remessa+" " ).getSingleResult();
     }
-
-
-
 }

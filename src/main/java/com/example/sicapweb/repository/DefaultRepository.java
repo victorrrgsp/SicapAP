@@ -109,6 +109,52 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
         return query.getResultList();
     }
 
+
+    public PaginacaoUtil<T> buscaPaginadaUnidadeGestora(Pageable pageable, String searchParams, Integer tipoParams) {
+
+        int pagina = Integer.valueOf(pageable.getPageNumber());
+        int tamanho = Integer.valueOf(pageable.getPageSize());
+        String search= "";
+
+        //monta pesquisa search
+        if(searchParams.length() > 3){
+
+            if(tipoParams==0){ //entra para tratar a string
+                String arrayOfStrings[]  = searchParams.split("=");
+                search = " WHERE " +arrayOfStrings[0] + " LIKE  '%"+arrayOfStrings[1]+"%'  ";
+            }
+            else{
+                search = " WHERE " + searchParams + "   ";
+            }
+        }
+
+
+
+        //retirar os : do Sort pageable
+        String campo = String.valueOf(pageable.getSort()).replace(":", "");
+
+        List<T> list = getEntityManager()
+                .createNativeQuery("select * from " + entityClass.getSimpleName() +
+                        " idUnidadeGestora = '"
+                        + User.getUser().getUnidadeGestora().getId() + "' " +search+" ORDER BY " + campo, entityClass)
+                .setFirstResult(pagina)
+                .setMaxResults(tamanho)
+                .getResultList();
+
+        long totalRegistros = count();
+        long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
+
+        return new PaginacaoUtil<T>(tamanho, pagina, totalPaginas, totalRegistros, list);
+    }
+
+
+
+
+
+
+
+
+
     //public PaginacaoUtil<T> buscaPaginada(int pagina, int tamanho, String direcao, String campo) {
     //@Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public PaginacaoUtil<T> buscaPaginada(Pageable pageable, String searchParams, Integer tipoParams) {
