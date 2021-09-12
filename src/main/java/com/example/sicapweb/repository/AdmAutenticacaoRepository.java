@@ -23,10 +23,9 @@ public class AdmAutenticacaoRepository extends DefaultRepository<AdmAutenticacao
 
     public Boolean getStatusChave(String Cnpj, Integer Exercicio, Integer Remessa){
 
-       return (Boolean) entityManager.createNativeQuery("select status from AdmAutenticacao  " +
+       return (Boolean) entityManager.createNativeQuery("select CAST(CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END AS BIT) from SICAPAP21.dbo.AdmAutenticacao  " +
                "where idunidadegestora= '"+Cnpj+"' " +
-               "AND exercicio="+Exercicio+"" +
-               "AND remessa="+Remessa+" " ).getSingleResult();
+               "AND exercicio="+Exercicio+" " + " AND remessa="+Remessa+" " ).getSingleResult();
     }
 
 
