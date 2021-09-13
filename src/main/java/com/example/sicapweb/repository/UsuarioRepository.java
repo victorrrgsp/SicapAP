@@ -15,8 +15,11 @@ public class UsuarioRepository extends DefaultRepository<Cargo, BigInteger> {
     }
 
     public List<Object> getUser(String codigo) {
-        List<Cargo> list = getEntityManager().createNativeQuery("select * from Cargo ed" +
-                " where codigoCargo = " + codigo, Cargo.class).getResultList();
-        return null;
+        return getEntityManager().createNativeQuery("  \n" +
+                "select cpf, unidadeGestora, nomeEntidade, codpoder, Cargo \n" +
+                "from AutenticacaoAssinatura..usuario a \n" +
+                "\tjoin AutenticacaoAssinatura..UsuarioAplicacao b on a.CPF = b.Usuario\n" +
+                "\tjoin UnidadeGestoraCadun c on UnidadeGestora = cnpj\n" +
+                "where cpf=  '01499673140' and Aplicacao = 29").getResultList();
     }
 }

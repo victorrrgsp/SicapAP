@@ -2,26 +2,63 @@ package com.example.sicapweb.security;
 
 import br.gov.to.tce.model.DefaultEnum;
 import br.gov.to.tce.model.UnidadeGestora;
+import br.gov.to.tce.util.Date;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.io.Serializable;
-import java.sql.Date;
 import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
-public class User {
+public class User implements Serializable {
     public String userName = "01277824193";
     public String certificado = "teste";
     public String nome = "CELSO SOARES REGO MORAIS";
     public String cpf = "01277824193";
     public Cargo cargo  = Cargo.Gestor; ///
-    public Date dateStart = new Date(Calendar.getInstance().getTime().getTime());
-    public Date dateEnd = new Date(Calendar.getInstance().getTime().getTime());
+    public Date dateStart = new Date();
+    public Date dateEnd = new Date();
     public List<String> systems = new ArrayList<>();
     public List<UnidadeGestora> unidadeGestoraList = new ArrayList<>();
     public UnidadeGestora unidadeGestora = new UnidadeGestora("00299180000154", "PREFEITURA MUNICIPAL DE PARAÍSO DO TOCANTINS", 1);
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public String getCpf() {
+        return cpf;
+    }
+
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
+    }
+
+    public Cargo getCargo() {
+        return cargo;
+    }
+
+    public void setCargo(Cargo cargo) {
+        this.cargo = cargo;
+    }
+    public void setCargoByInteger(Integer id) {
+        Optional<Cargo> val = Arrays.stream(Cargo.values()).filter(o->o.valor == id).findFirst();
+        cargo = val.orElse(null);
+    }
+
+    public List<UnidadeGestora> getUnidadeGestoraList() {
+        return unidadeGestoraList;
+    }
+
+    public void setUnidadeGestoraList(List<UnidadeGestora> unidadeGestoraList) {
+        this.unidadeGestoraList = unidadeGestoraList;
+    }
 
     public String getCertificado() {
         return certificado;
