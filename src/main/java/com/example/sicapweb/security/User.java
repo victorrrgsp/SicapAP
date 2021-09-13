@@ -20,6 +20,7 @@ public class User implements Serializable {
     public Cargo cargo  = Cargo.Gestor; ///
     public Date dateStart = new Date();
     public Date dateEnd = new Date();
+    public Integer sistema = null;
     public List<String> systems = new ArrayList<>();
     public List<UnidadeGestora> unidadeGestoraList = new ArrayList<>();
     public UnidadeGestora unidadeGestora = new UnidadeGestora("00299180000154", "PREFEITURA MUNICIPAL DE PARAÍSO DO TOCANTINS", 1);
@@ -30,6 +31,14 @@ public class User implements Serializable {
 
     public void setNome(String nome) {
         this.nome = nome;
+    }
+
+    public Integer getSistema() {
+        return sistema;
+    }
+
+    public void setSistema(Integer sistema) {
+        this.sistema = sistema;
     }
 
     public String getCpf() {

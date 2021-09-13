@@ -138,7 +138,8 @@ public class LoginController {
 
             JsonNode respostaJson = new ObjectMapper().readTree(resposta);
 
-            List<Object> lista = usuarioRepository.getUser(respostaJson.get("validacaoAssinatura").get("dados").get("cpf").asText());
+            List<Object> lista = usuarioRepository.getUser(respostaJson.get("validacaoAssinatura").get("dados").get("cpf").asText(),
+                    user.getSistema());
             if(lista == null || lista.isEmpty())
                 throw new ValidationException("Usuário sem permissão ou certificado inválido");
 
