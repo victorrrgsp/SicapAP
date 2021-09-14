@@ -27,6 +27,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.persistence.EntityManager;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import javax.validation.ValidationException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.Serializable;
@@ -67,6 +68,13 @@ public abstract class DefaultController<T> {
         }
 
         return new ResponseEntity<Object>(errors, new HttpHeaders(), HttpStatus.CONFLICT);
+    }
+
+
+    @ExceptionHandler(value = ValidationException.class)
+    public ResponseEntity handleValidationException(ValidationException ex) {
+
+        return new ResponseEntity<Object>(ex.getMessage(), new HttpHeaders(), HttpStatus.CONFLICT);
     }
 
     @CrossOrigin

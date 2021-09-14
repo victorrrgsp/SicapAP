@@ -7,6 +7,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.io.Serializable;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.Optional;
 
 public class User implements Serializable {
     public String userName = "01277824193";
+    public String id = "";
     public String certificado = "teste";
     public String nome = "CELSO SOARES REGO MORAIS";
     public String cpf = "01277824193";
@@ -24,6 +26,14 @@ public class User implements Serializable {
     public List<String> systems = new ArrayList<>();
     public List<UnidadeGestora> unidadeGestoraList = new ArrayList<>();
     public UnidadeGestora unidadeGestora = new UnidadeGestora("00299180000154", "PREFEITURA MUNICIPAL DE PARAÍSO DO TOCANTINS", 1);
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getNome() {
         return nome;
@@ -116,6 +126,16 @@ public class User implements Serializable {
 
     public Date getDateEnd() {
         return dateEnd;
+    }
+
+    public boolean isValid(){
+        try {
+            this.dateEnd = new Date(this.getDateEnd().toStringDateAndHourDatabaseFormat());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        Date dataAtual = new Date();
+        return this.dateEnd.isBiggerThan(dataAtual);
     }
 
     public void setDateEnd(Date dateEnd) {

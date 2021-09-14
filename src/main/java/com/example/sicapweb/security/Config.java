@@ -69,6 +69,12 @@ public class Config {
         return new Gson().toJson(object);
     }
 
+
+    public static <T> T fromJson(String object, Class<T> tClass){
+        return new Gson().fromJson(object, tClass);
+    }
+
+
     public String ip = "172.30.0.149";
     public Jedis jedis = new Jedis(ip, 6379);
 
