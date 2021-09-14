@@ -26,7 +26,7 @@ public class ChavesController {
      @GetMapping(path="/{searchParams}/{tipoParams}/pagination")
     public ResponseEntity<PaginacaoUtil<AdmAutenticacao>> listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
 
-        PaginacaoUtil<AdmAutenticacao> paginacaoUtil = admAutenticacaoRepository.buscaPaginadaUnidadeGestora(pageable,searchParams,tipoParams);
+        PaginacaoUtil<AdmAutenticacao> paginacaoUtil = admAutenticacaoRepository.buscaPaginadaChaves(pageable,searchParams,tipoParams);
         return ResponseEntity.ok().body(paginacaoUtil);
     }
 

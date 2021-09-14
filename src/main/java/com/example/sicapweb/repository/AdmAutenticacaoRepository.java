@@ -1,6 +1,9 @@
 package com.example.sicapweb.repository;
 import br.gov.to.tce.model.UnidadeGestora;
 import br.gov.to.tce.model.adm.AdmAutenticacao;
+import com.example.sicapweb.security.User;
+import com.example.sicapweb.util.PaginacaoUtil;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -27,4 +30,44 @@ public class AdmAutenticacaoRepository extends DefaultRepository<AdmAutenticacao
                "where idunidadegestora= '"+Cnpj+"' " +
                "AND exercicio="+Exercicio+" " + " AND remessa="+Remessa+" " ).getSingleResult();
     }
+
+    public PaginacaoUtil<AdmAutenticacao> buscaPaginadaChaves(Pageable pageable, String searchParams, Integer tipoParams) {
+
+        int pagina = Integer.valueOf(pageable.getPageNumber());
+        int tamanho = Integer.valueOf(pageable.getPageSize());
+        String search= "";
+
+        //monta pesquisa search
+        if(searchParams.length() > 3){/// entra
+
+            if(tipoParams==0){ //entra para tratar a string
+                String arrayOfStrings[]  = searchParams.split("=");
+                search = "" +arrayOfStrings[0] + " LIKE  '%"+arrayOfStrings[1]+"%' AND "  ;
+            }
+            else{//entra caso for um Integer
+                search = "" + searchParams + " AND   " ;
+            }
+        }
+
+        //retirar os : do Sort pageable
+        String campo = String.valueOf(pageable.getSort()).replace(":", "");
+
+        List<AdmAutenticacao> list = getEntityManager()
+                .createNativeQuery("select * from AdmAutenticacao WHERE " +search+"+ idUnidadeGestora= '"+ User.getUser().getUnidadeGestora().getId()+ "' ORDER BY " + campo, AdmAutenticacao.class)
+                .setFirstResult(pagina)
+                .setMaxResults(tamanho)
+                .getResultList();
+
+        long totalRegistros = countChaves();
+        long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
+
+
+        return new PaginacaoUtil<AdmAutenticacao>(tamanho, pagina, totalPaginas, totalRegistros, list);
+    }
+
+    public long countChaves() {
+        return getEntityManager().createQuery("select count(*) from AdmAutenticacao WHERE idUnidadeGestora= '"+ User.getUser().getUnidadeGestora().getId()+ "'", Long.class).getSingleResult();
+    }
+
+
 }

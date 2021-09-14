@@ -110,39 +110,6 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
     }
 
 
-    public PaginacaoUtil<T> buscaPaginadaUnidadeGestora(Pageable pageable, String searchParams, Integer tipoParams) {
-
-        int pagina = Integer.valueOf(pageable.getPageNumber());
-        int tamanho = Integer.valueOf(pageable.getPageSize());
-        String search= "";
-
-        //monta pesquisa search
-        if(searchParams.length() > 3){/// entra
-
-            if(tipoParams==0){ //entra para tratar a string
-                String arrayOfStrings[]  = searchParams.split("=");
-                search = "" +arrayOfStrings[0] + " LIKE  '%"+arrayOfStrings[1]+"%' AND "  ;
-            }
-            else{//entra caso for um Integer
-                search = "" + searchParams + " AND   " ;
-            }
-        }
-
-        //retirar os : do Sort pageable
-        String campo = String.valueOf(pageable.getSort()).replace(":", "");
-
-        List<T> list = getEntityManager()
-                .createNativeQuery("select * from " + entityClass.getSimpleName() + " WHERE " +search+"  idUnidadeGestora= '"+ User.getUser().getUnidadeGestora().getId() + "'  ORDER BY " + campo, entityClass)
-                .setFirstResult(pagina)
-                .setMaxResults(tamanho)
-                .getResultList();
-
-        long totalRegistros = countUnidadeGestora();
-        long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
-
-        return new PaginacaoUtil<T>(tamanho, pagina, totalPaginas, totalRegistros, list);
-    }
-
 
 
 
@@ -188,13 +155,15 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
         return new PaginacaoUtil<T>(tamanho, pagina, totalPaginas, totalRegistros, list);
     }
 
+
+
+
+
     public long count() {
         return getEntityManager().createQuery("select count(*) from " + entityClass.getSimpleName(), Long.class).getSingleResult();
     }
 
-    public long countUnidadeGestora() {
-        return getEntityManager().createQuery("select count(*) from " + entityClass.getSimpleName()+" WHERE idUnidadeGestora= '"+ User.getUser().getUnidadeGestora().getId() + "'", Long.class).getSingleResult();
-    }
+
 
 
     public InfoRemessa buscarPrimeiraRemessa() {

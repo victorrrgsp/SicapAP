@@ -1,12 +1,20 @@
 package com.example.sicapweb.repository;
 import br.gov.to.tce.model.UnidadeGestora;
+import com.example.sicapweb.security.User;
+import com.example.sicapweb.util.PaginacaoUtil;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.lang.reflect.ParameterizedType;
 import java.util.List;
 
 @Repository
 public class UnidadeGestoraRepository extends DefaultRepository<UnidadeGestora, String> {
+
+    private final Class<UnidadeGestora> entityClass = (Class<UnidadeGestora>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+
+
     @PersistenceContext
     EntityManager entityManager;
 
@@ -32,5 +40,47 @@ public class UnidadeGestoraRepository extends DefaultRepository<UnidadeGestora, 
                 "(vug.exercicioini < "+Exercicio+") AND (vug.exerciciofim = "+Exercicio+") AND (pj.codunidadegestora = '"+Cnpj+"') AND (vug.idSistema = 29) AND (vug.remessafim >= "+Remessa+" ) OR " +
                 "(vug.exercicioini < "+Exercicio+") AND (vug.exerciciofim > "+Exercicio+") AND (pj.codunidadegestora = '"+Cnpj+"') AND (vug.idSistema = 29))").getResultList();
     }
+
+
+    public PaginacaoUtil<UnidadeGestora> buscaPaginadaUnidadeGestora(Pageable pageable, String searchParams, Integer tipoParams) {
+
+        int pagina = Integer.valueOf(pageable.getPageNumber());
+        int tamanho = Integer.valueOf(pageable.getPageSize());
+        String search= "";
+
+        //monta pesquisa search
+        if(searchParams.length() > 3){
+
+            if(tipoParams==0){ //entra para tratar a string
+                String arrayOfStrings[]  = searchParams.split("=");
+                search = " WHERE " +arrayOfStrings[0] + " LIKE  '%"+arrayOfStrings[1]+"%' AND "  ;
+            }
+
+            else{//entra caso for um Integer
+                search = " WHERE " + searchParams + " AND   " ;
+            }
+
+        }
+
+        //retirar os : do Sort pageable
+        String campo = String.valueOf(pageable.getSort()).replace(":", "");
+
+        List<UnidadeGestora> list = getEntityManager()
+                .createNativeQuery("select * from UnidadeGestora  " +search+"    ORDER BY " + campo, UnidadeGestora.class)
+                .setFirstResult(pagina)
+                .setMaxResults(tamanho)
+                .getResultList();
+
+        long totalRegistros = countUnidadeGestora();
+        long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
+       // System.out.println(list);
+        return new PaginacaoUtil<UnidadeGestora>(tamanho, pagina, totalPaginas, totalRegistros, list);
+    }
+
+
+    public long countUnidadeGestora() {
+        return getEntityManager().createQuery("select count(*) from " + entityClass.getSimpleName(), Long.class).getSingleResult();
+    }
+
 
 }

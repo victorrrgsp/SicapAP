@@ -17,8 +17,8 @@ public class UnidadeGestoraController {
 
     @CrossOrigin
     @GetMapping(path="/{searchParams}/{tipoParams}/pagination")
-    public ResponseEntity<PaginacaoUtil<UnidadeGestora>> listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
-        PaginacaoUtil<UnidadeGestora> paginacaoUtil = unidadeGestoraRepository.buscaPaginada(pageable,searchParams,tipoParams);
+    public ResponseEntity<PaginacaoUtil<UnidadeGestora>> listUnidadeGestora(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
+        PaginacaoUtil<UnidadeGestora> paginacaoUtil = unidadeGestoraRepository.buscaPaginadaUnidadeGestora(pageable,searchParams,tipoParams);
         return ResponseEntity.ok().body(paginacaoUtil);
     }
 
