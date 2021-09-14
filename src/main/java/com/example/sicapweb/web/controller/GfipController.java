@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 @RestController
@@ -24,11 +25,76 @@ public class GfipController extends DefaultController<InfoRemessa>{
     @Autowired
     private GfipRepository gfipRepository;
 
+    HashMap<String, Object> gfip = new HashMap<String, Object>();
+
+    public class GfipDocumento{
+        private InfoRemessa infoRemessa;
+
+        private String situacaoGfip;
+
+        private String situacaoBoleto;
+
+        private String situacaoComprovante;
+
+        public InfoRemessa getInfoRemessa() {
+            return infoRemessa;
+        }
+
+        public void setInfoRemessa(InfoRemessa infoRemessa) {
+            this.infoRemessa = infoRemessa;
+        }
+
+        public String getSituacaoGfip() {
+            return situacaoGfip;
+        }
+
+        public void setSituacaoGfip(String situacaoGfip) {
+            this.situacaoGfip = situacaoGfip;
+        }
+
+        public String getSituacaoBoleto() {
+            return situacaoBoleto;
+        }
+
+        public void setSituacaoBoleto(String situacaoBoleto) {
+            this.situacaoBoleto = situacaoBoleto;
+        }
+
+        public String getSituacaoComprovante() {
+            return situacaoComprovante;
+        }
+
+        public void setSituacaoComprovante(String situacaoComprovante) {
+            this.situacaoComprovante = situacaoComprovante;
+        }
+    }
+
+    public ResponseEntity<?> findSituacao(String chave, String tipo) {
+        String situacao = gfipRepository.findSituacao(chave, tipo);
+        return ResponseEntity.ok().body(situacao);
+    }
+
     @CrossOrigin
     @GetMapping
     public ResponseEntity<List<InfoRemessa>> findAll(){
         List<InfoRemessa> list = infoRemessaRepository.findAll();
         return ResponseEntity.ok().body(list);
+    }
+
+    @CrossOrigin
+    @GetMapping(path = {"/getDocumentos"})
+    public ResponseEntity<?> findAllDocumentos(){
+        List<InfoRemessa> list = infoRemessaRepository.findAll();
+        GfipDocumento gfipDocumento = new GfipDocumento();
+        for(Integer i= 0; i < list.size(); i++){
+            gfipDocumento.setInfoRemessa(list.get(i));
+            gfipDocumento.setSituacaoGfip(gfipRepository.findSituacao(list.get(i).getChave(), "GFIP"));
+            gfipDocumento.setSituacaoBoleto(gfipRepository.findSituacao(list.get(i).getChave(), "boletoGFIP"));
+            gfipDocumento.setSituacaoComprovante(gfipRepository.findSituacao(list.get(i).getChave(), "comprovanteGFIP"));
+            gfip.put("Gfip", gfipDocumento);
+        }
+
+        return ResponseEntity.ok().body(gfip);
     }
 
     @CrossOrigin
