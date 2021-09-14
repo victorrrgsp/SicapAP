@@ -53,11 +53,11 @@ public class UnidadeGestoraRepository extends DefaultRepository<UnidadeGestora, 
 
             if(tipoParams==0){ //entra para tratar a string
                 String arrayOfStrings[]  = searchParams.split("=");
-                search = " WHERE " +arrayOfStrings[0] + " LIKE  '%"+arrayOfStrings[1]+"%' AND "  ;
+                search = " WHERE " +arrayOfStrings[0] + " LIKE  '%"+arrayOfStrings[1]+"%'  "  ;
             }
 
             else{//entra caso for um Integer
-                search = " WHERE " + searchParams + " AND   " ;
+                search = " WHERE " + searchParams + "    " ;
             }
 
         }
