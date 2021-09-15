@@ -2,7 +2,7 @@ package com.example.sicapweb.web.controller;
 
 import br.gov.to.tce.model.UnidadeGestora;
 import br.gov.to.tce.validation.ValidationException;
-import com.example.sicapweb.repository.UsuarioRepository;
+import com.example.sicapweb.repository.geral.UsuarioRepository;
 import com.example.sicapweb.security.Config;
 import com.example.sicapweb.security.User;
 import com.example.sicapweb.service.Login;

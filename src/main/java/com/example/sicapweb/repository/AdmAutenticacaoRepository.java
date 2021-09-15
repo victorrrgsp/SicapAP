@@ -53,7 +53,7 @@ public class AdmAutenticacaoRepository extends DefaultRepository<AdmAutenticacao
         String campo = String.valueOf(pageable.getSort()).replace(":", "");
 
         List<AdmAutenticacao> list = getEntityManager()
-                .createNativeQuery("select * from AdmAutenticacao WHERE " +search+"+ idUnidadeGestora= '"+ User.getUser().getUnidadeGestora().getId()+ "' ORDER BY " + campo, AdmAutenticacao.class)
+                .createNativeQuery("select * from AdmAutenticacao WHERE " +search+" idUnidadeGestora= '"+ User.getUser().getUnidadeGestora().getId()+ "' ORDER BY " + campo, AdmAutenticacao.class)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();

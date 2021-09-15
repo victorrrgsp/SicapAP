@@ -2,7 +2,7 @@ package com.example.sicapweb.web.converter;
 
 
 import br.gov.to.tce.model.ap.concurso.EmpresaOrganizadora;
-import com.example.sicapweb.repository.EmpresaOrganizadoraRepository;
+import com.example.sicapweb.repository.concurso.EmpresaOrganizadoraRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;

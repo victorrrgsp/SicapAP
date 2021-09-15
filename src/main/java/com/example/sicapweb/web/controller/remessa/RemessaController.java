@@ -1,6 +1,6 @@
 package com.example.sicapweb.web.controller.remessa;
 
-import com.example.sicapweb.repository.RemessaRepository;
+import com.example.sicapweb.repository.remessa.RemessaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

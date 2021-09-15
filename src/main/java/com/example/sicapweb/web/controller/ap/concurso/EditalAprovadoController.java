@@ -1,8 +1,8 @@
 package com.example.sicapweb.web.controller.ap.concurso;
 
 import br.gov.to.tce.model.ap.concurso.EditalAprovado;
-import com.example.sicapweb.repository.EditalAprovadoRepository;
-import com.example.sicapweb.repository.EditalVagaRepository;
+import com.example.sicapweb.repository.concurso.EditalAprovadoRepository;
+import com.example.sicapweb.repository.concurso.EditalVagaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;

@@ -1,9 +1,9 @@
 package com.example.sicapweb.web.controller.ap.concurso;
 
 import br.gov.to.tce.model.ap.concurso.EditalHomologacao;
-import com.example.sicapweb.repository.AtoRepository;
-import com.example.sicapweb.repository.EditalHomologacaoRepository;
-import com.example.sicapweb.repository.EditalRepository;
+import com.example.sicapweb.repository.geral.AtoRepository;
+import com.example.sicapweb.repository.concurso.EditalHomologacaoRepository;
+import com.example.sicapweb.repository.concurso.EditalRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;

@@ -1,12 +1,11 @@
 package com.example.sicapweb.web.controller.ap.concurso;
 
 
-import br.gov.to.tce.model.CastorFile;
 import br.gov.to.tce.model.ap.concurso.EditalHomologacao;
 import br.gov.to.tce.model.ap.concurso.documento.DocumentoEditalHomologacao;
 import com.example.sicapweb.model.Inciso;
-import com.example.sicapweb.repository.DocumentoEditalHomologacaoRepository;
-import com.example.sicapweb.repository.EditalHomologacaoRepository;
+import com.example.sicapweb.repository.concurso.DocumentoEditalHomologacaoRepository;
+import com.example.sicapweb.repository.concurso.EditalHomologacaoRepository;
 import com.example.sicapweb.web.controller.DefaultController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

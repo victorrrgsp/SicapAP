@@ -1,14 +1,10 @@
 package com.example.sicapweb.web.controller.ap.concessao;
 
-import br.gov.to.tce.annotation.JayValNotNull;
-import br.gov.to.tce.castor.arquivo.CastorController;
-import br.gov.to.tce.castor.arquivo.ObjetoCastor;
-import br.gov.to.tce.model.CastorFile;
 import br.gov.to.tce.model.ap.concessoes.DocumentoAposentadoria;
 import br.gov.to.tce.model.ap.pessoal.Aposentadoria;
 import com.example.sicapweb.model.Inciso;
-import com.example.sicapweb.repository.AposentadoriaRepository;
-import com.example.sicapweb.repository.DocumentoAposentadoriaRepository;
+import com.example.sicapweb.repository.concessao.AposentadoriaRepository;
+import com.example.sicapweb.repository.concessao.DocumentoAposentadoriaRepository;
 import com.example.sicapweb.web.controller.DefaultController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,9 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.persistence.Transient;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -1,7 +1,7 @@
 package com.example.sicapweb.web.controller.ap.concurso;
 
 import br.gov.to.tce.model.ap.concurso.EmpresaOrganizadora;
-import com.example.sicapweb.repository.EmpresaOrganizadoraRepository;
+import com.example.sicapweb.repository.concurso.EmpresaOrganizadoraRepository;
 import com.example.sicapweb.util.PaginacaoUtil;
 import com.example.sicapweb.web.controller.DefaultController;
 import org.springframework.beans.factory.annotation.Autowired;

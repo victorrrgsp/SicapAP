@@ -1,11 +1,10 @@
 package com.example.sicapweb.web.controller.ap.concessao;
 
 import br.gov.to.tce.model.ap.concessoes.DocumentoPensao;
-import br.gov.to.tce.model.ap.pessoal.Aposentadoria;
 import br.gov.to.tce.model.ap.pessoal.Pensao;
 import com.example.sicapweb.model.Inciso;
-import com.example.sicapweb.repository.DocumentoPensaoRepository;
-import com.example.sicapweb.repository.PensaoRepository;
+import com.example.sicapweb.repository.concessao.DocumentoPensaoRepository;
+import com.example.sicapweb.repository.concessao.PensaoRepository;
 import com.example.sicapweb.web.controller.DefaultController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

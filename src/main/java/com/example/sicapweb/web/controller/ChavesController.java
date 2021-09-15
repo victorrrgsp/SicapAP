@@ -52,6 +52,7 @@ public class ChavesController {
             autenticacao.setIdSistema(29);
             autenticacao.setData(strToDate);
             autenticacao.setChave(sha1);
+            autenticacao.setStatus(true);
             admAutenticacaoRepository.save(autenticacao);
 
         } catch (Exception e) {

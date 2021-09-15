@@ -3,8 +3,8 @@ package com.example.sicapweb.web.controller.remessa;
 
 import br.gov.to.tce.model.InfoRemessa;
 import br.gov.to.tce.model.ap.folha.documento.Gfip;
-import com.example.sicapweb.repository.GfipRepository;
-import com.example.sicapweb.repository.InfoRemessaRepository;
+import com.example.sicapweb.repository.remessa.GfipRepository;
+import com.example.sicapweb.repository.remessa.InfoRemessaRepository;
 import com.example.sicapweb.web.controller.DefaultController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

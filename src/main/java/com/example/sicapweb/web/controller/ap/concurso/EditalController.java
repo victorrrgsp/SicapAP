@@ -1,8 +1,8 @@
 package com.example.sicapweb.web.controller.ap.concurso;
 
 import br.gov.to.tce.model.ap.concurso.Edital;
-import com.example.sicapweb.repository.EditalRepository;
-import com.example.sicapweb.repository.EmpresaOrganizadoraRepository;
+import com.example.sicapweb.repository.concurso.EditalRepository;
+import com.example.sicapweb.repository.concurso.EmpresaOrganizadoraRepository;
 import com.example.sicapweb.util.PaginacaoUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;

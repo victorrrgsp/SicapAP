@@ -1,6 +1,6 @@
 package com.example.sicapweb.web.controller.ap.geral;
 import br.gov.to.tce.model.UnidadeGestora;
-import com.example.sicapweb.repository.UnidadeGestoraRepository;
+import com.example.sicapweb.repository.geral.UnidadeGestoraRepository;
 import com.example.sicapweb.util.PaginacaoUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;

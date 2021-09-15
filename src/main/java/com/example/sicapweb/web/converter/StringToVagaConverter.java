@@ -1,7 +1,7 @@
 package com.example.sicapweb.web.converter;
 
 import br.gov.to.tce.model.ap.concurso.EditalVaga;
-import com.example.sicapweb.repository.EditalVagaRepository;
+import com.example.sicapweb.repository.concurso.EditalVagaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;

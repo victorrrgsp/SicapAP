@@ -1,7 +1,7 @@
 package com.example.sicapweb.web.converter;
 
 import br.gov.to.tce.model.ap.relacional.UnidadeAdministrativa;
-import com.example.sicapweb.repository.UnidadeAdministrativaRepository;
+import com.example.sicapweb.repository.geral.UnidadeAdministrativaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;

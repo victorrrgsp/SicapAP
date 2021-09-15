@@ -2,8 +2,8 @@ package com.example.sicapweb.web.controller.ap.geral;
 
 import br.gov.to.tce.model.CastorFile;
 import br.gov.to.tce.model.ap.relacional.Lei;
-import com.example.sicapweb.repository.AtoRepository;
-import com.example.sicapweb.repository.LeiRepository;
+import com.example.sicapweb.repository.geral.AtoRepository;
+import com.example.sicapweb.repository.geral.LeiRepository;
 import com.example.sicapweb.util.PaginacaoUtil;
 import com.example.sicapweb.web.controller.DefaultController;
 import org.springframework.beans.factory.annotation.Autowired;

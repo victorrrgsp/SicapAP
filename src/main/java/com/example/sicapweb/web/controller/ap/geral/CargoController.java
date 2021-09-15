@@ -1,7 +1,7 @@
 package com.example.sicapweb.web.controller.ap.geral;
 
 import br.gov.to.tce.model.ap.relacional.Cargo;
-import com.example.sicapweb.repository.CargoRepository;
+import com.example.sicapweb.repository.geral.CargoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;

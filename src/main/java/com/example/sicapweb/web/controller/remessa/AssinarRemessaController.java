@@ -1,7 +1,7 @@
 package com.example.sicapweb.web.controller.remessa;
 
 import br.gov.to.tce.model.InfoRemessa;
-import com.example.sicapweb.repository.AssinarRemessaRepository;
+import com.example.sicapweb.repository.remessa.AssinarRemessaRepository;
 import com.example.sicapweb.security.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
