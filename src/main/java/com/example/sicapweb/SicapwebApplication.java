@@ -92,7 +92,7 @@ public class SicapwebApplication {
         return new WebMvcConfigurerAdapter() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**").allowedOrigins("http://172.30.0.149:8082");
+                registry.addMapping("/**").allowedOrigins("http://localhost:8082");
             }
         };
     }
