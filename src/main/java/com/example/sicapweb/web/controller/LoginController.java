@@ -4,6 +4,7 @@ import br.gov.to.tce.model.UnidadeGestora;
 import br.gov.to.tce.validation.ValidationException;
 import com.example.sicapweb.repository.geral.UsuarioRepository;
 import com.example.sicapweb.security.Config;
+import com.example.sicapweb.security.Session;
 import com.example.sicapweb.security.User;
 import com.example.sicapweb.service.Login;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -12,16 +13,19 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import okhttp3.RequestBody;
 import okhttp3.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.crypto.spec.SecretKeySpec;
+import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
 import java.security.Key;
@@ -42,8 +46,7 @@ public class LoginController extends DefaultController<Login> {
     @CrossOrigin
     @Transactional
     @PostMapping(path = {"/session/"})
-    public ResponseEntity<?> find(@org.springframework.web.bind.annotation.RequestBody String user) throws ValidationException {
-        ServletRequestAttributes attr = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+    public ResponseEntity<?> find(@org.springframework.web.bind.annotation.RequestBody String user, HttpServletRequest request) throws ValidationException {
 
         if(user == null || user.trim().isEmpty() || config.jedis.get(user.replace("=", "")) == null)
             throw new ValidationException("Usuário não autenticado");
@@ -58,7 +61,7 @@ public class LoginController extends DefaultController<Login> {
             config.jedis.del(user.replace("=", ""));
             throw new ValidationException("Sessão inválida");
         }
-
+        Session.usuarioLogado = userSession;
         return ResponseEntity.ok().body(true);
     }
 

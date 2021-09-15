@@ -3,8 +3,6 @@ package com.example.sicapweb.security;
 import br.gov.to.tce.model.DefaultEnum;
 import br.gov.to.tce.model.UnidadeGestora;
 import br.gov.to.tce.util.Date;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.io.Serializable;
 import java.text.ParseException;
@@ -84,16 +82,7 @@ public class User implements Serializable {
     }
 
     public static User getUser(){
-        try {
-            ServletRequestAttributes request = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
-            if (request == null) return new User();
-
-            User user = (User) request.getRequest().getSession().getAttribute("user");
-            return user != null ? user : new User();
-        }
-        catch (Exception e){
-            return new User();
-        }
+        return Session.usuarioLogado;
     }
 
     public void setCertificado(String certificado) {
