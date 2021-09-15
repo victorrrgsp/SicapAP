@@ -16,12 +16,12 @@ import redis.clients.jedis.Jedis;
 import javax.annotation.PostConstruct;
 import java.util.TimeZone;
 
-@SpringBootApplication(exclude = {SecurityAutoConfiguration.class })
+@SpringBootApplication(exclude = {SecurityAutoConfiguration.class})
 @EntityScan(basePackages = {"br.gov.to.tce.*"})
 public class SicapwebApplication {
 
     @PostConstruct
-    public void init(){
+    public void init() {
         TimeZone.setDefault(TimeZone.getTimeZone("America/Brasilia"));
     }
 
@@ -37,12 +37,10 @@ public class SicapwebApplication {
         SpringApplication.run(SicapwebApplication.class, args);
 
 
-
-
         UsernamePasswordAuthenticationToken authReq
                 = new UsernamePasswordAuthenticationToken("user", "pass");
 
-       // return new UsernamePasswordAuthenticationToken("username", null, Arrays.asList("sdfsfd"));
+        // return new UsernamePasswordAuthenticationToken("username", null, Arrays.asList("sdfsfd"));
 
     }
 
@@ -92,7 +90,7 @@ public class SicapwebApplication {
         return new WebMvcConfigurerAdapter() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**").allowedOrigins("http://localhost:8082");
+                registry.addMapping("/**").allowedOrigins("*").allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "TRACE", "CONNECT").allowedHeaders("*");
             }
         };
     }
