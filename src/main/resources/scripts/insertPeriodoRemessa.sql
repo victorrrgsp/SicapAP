@@ -1,0 +1,2 @@
+INSERT INTO Cadun.dbo.PeriodoRemessa (idSistema, numeroRemessa, dataInicialEnvio, dataFinalEnvio, exercicio, dataInicialReferencia, dataFinalReferencia, alterado, motivo, usuario, dataInicialAnalise, dataFinalAnalise, versao, historico, multar, motivoMultar, multados, processado, dataMultaProcessado, controlesGerados)
+VALUES (29, 2, N'2021-09-13 08:00:00.000', N'2021-11-12 23:59:59.000', 2021, N'2021-09-13 08:00:00.000', N'2021-11-12 23:59:59.000', null, null, null, null, null, 1, null, 1, null, 0, 0, null, null);
