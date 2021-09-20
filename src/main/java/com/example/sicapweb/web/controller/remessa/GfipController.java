@@ -28,7 +28,7 @@ public class GfipController extends DefaultController<InfoRemessa> {
 
     HashMap<String, Object> gfip = new HashMap<String, Object>();
 
-    public class GfipDocumento{
+    public class GfipDocumento {
         private InfoRemessa infoRemessa;
 
         private String situacaoGfip;
@@ -77,17 +77,17 @@ public class GfipController extends DefaultController<InfoRemessa> {
 
     @CrossOrigin
     @GetMapping
-    public ResponseEntity<List<InfoRemessa>> findAll(){
+    public ResponseEntity<List<InfoRemessa>> findAll() {
         List<InfoRemessa> list = infoRemessaRepository.findAll();
         return ResponseEntity.ok().body(list);
     }
 
     @CrossOrigin
     @GetMapping(path = {"/getDocumentos"})
-    public ResponseEntity<?> findAllDocumentos(){
+    public ResponseEntity<?> findAllDocumentos() {
         List<InfoRemessa> list = infoRemessaRepository.findAll();
         GfipDocumento gfipDocumento = new GfipDocumento();
-        for(Integer i= 0; i < list.size(); i++){
+        for (Integer i = 0; i < list.size(); i++) {
             gfipDocumento.setInfoRemessa(list.get(i));
             gfipDocumento.setSituacaoGfip(gfipRepository.findSituacao(list.get(i).getChave(), "GFIP"));
             gfipDocumento.setSituacaoBoleto(gfipRepository.findSituacao(list.get(i).getChave(), "boletoGFIP"));
@@ -100,7 +100,7 @@ public class GfipController extends DefaultController<InfoRemessa> {
 
     @CrossOrigin
     @GetMapping(path = {"/find/{chave}"})
-    public ResponseEntity<InfoRemessa> findById(@PathVariable String chave){
+    public ResponseEntity<InfoRemessa> findById(@PathVariable String chave) {
         InfoRemessa list = infoRemessaRepository.findById(chave);
         return ResponseEntity.ok().body(list);
     }
@@ -119,12 +119,11 @@ public class GfipController extends DefaultController<InfoRemessa> {
         gfipRepository.save(gfip);
         return ResponseEntity.ok().body(idCastor);
     }
+
     @CrossOrigin
     @GetMapping(path = {"anexos/{chave}/{tipo}"})
     public ResponseEntity<?> findByDocumento(@PathVariable String chave, @PathVariable String tipo) {
         Gfip list = gfipRepository.buscarDocumentoGfip(chave, tipo).get(0);
         return ResponseEntity.ok().body(list);
     }
-
-
 }

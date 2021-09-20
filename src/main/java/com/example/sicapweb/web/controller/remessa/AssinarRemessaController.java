@@ -2,12 +2,14 @@ package com.example.sicapweb.web.controller.remessa;
 
 import br.gov.to.tce.model.InfoRemessa;
 import com.example.sicapweb.repository.remessa.AssinarRemessaRepository;
+import com.example.sicapweb.repository.remessa.GfipRepository;
 import com.example.sicapweb.security.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Objects;
 
 
@@ -19,6 +21,9 @@ public class AssinarRemessaController {
 
     @Autowired
     private AssinarRemessaRepository assinarRemessaRepository;
+
+    @Autowired
+    private GfipRepository gfipRepository;
 
     @CrossOrigin
     @GetMapping(path = {"/{cargo}"})
@@ -66,5 +71,16 @@ public class AssinarRemessaController {
         assinarRemessaRepository.insertAdmAssinatura(info.getChave());
         return ResponseEntity.ok().body("Ok");
     }
+
+    @CrossOrigin
+    @GetMapping(path = {"/situacao"})
+    public ResponseEntity<?> findDocumentos() {
+        List<Integer> list = gfipRepository.findDocumentos(info.getChave());
+        if (list.size() >= 3)
+            return ResponseEntity.ok().body("Ok");
+        else
+            return ResponseEntity.ok().body("pendente");
+    }
+
 }
 
