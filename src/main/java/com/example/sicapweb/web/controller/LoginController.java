@@ -142,13 +142,10 @@ public class LoginController extends DefaultController<Login> {
         return ResponseEntity.ok().body("SemPermissao");
 
     }
-//    @PostMapping(path = {"/desafio/{certificado}"})
-//    public ResponseEntity<?> getDesafio(@PathVariable String certificado)   {
 
     @CrossOrigin
     @Transactional
     @PostMapping(path = {"/desafio/"})
-    //public ResponseEntity<?> getDesafio(@org.springframework.web.bind.annotation.RequestBody User user) {
     public ResponseEntity<?> getDesafio(@org.springframework.web.bind.annotation.RequestBody String user) {
 
         try {
