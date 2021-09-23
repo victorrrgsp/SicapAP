@@ -32,16 +32,11 @@ public class SicapwebApplication {
         Config config = new Config();
         config.jedis = new Jedis(config.ip, 6379);
         config.jedis.set(user.userName, Config.json(user));
-        System.out.println(config.jedis.get(user.userName));
 
         SpringApplication.run(SicapwebApplication.class, args);
 
-
         UsernamePasswordAuthenticationToken authReq
                 = new UsernamePasswordAuthenticationToken("user", "pass");
-
-        // return new UsernamePasswordAuthenticationToken("username", null, Arrays.asList("sdfsfd"));
-
     }
 
 //    public String registerUser(UserRegistrationFormBean userRegistrationFormBean,

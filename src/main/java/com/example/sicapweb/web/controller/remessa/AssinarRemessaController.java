@@ -26,6 +26,14 @@ public class AssinarRemessaController {
     private GfipRepository gfipRepository;
 
     @CrossOrigin
+    @GetMapping
+    public ResponseEntity<?> findRemessaOpen() {
+        InfoRemessa infoRemessa = assinarRemessaRepository.buscarRemessaAberta();
+        info = infoRemessa;
+        return ResponseEntity.ok().body(Objects.requireNonNullElse(infoRemessa, "semRemessa"));
+    }
+
+    @CrossOrigin
     @GetMapping(path = {"/{cargo}"})
     public ResponseEntity<?> findResponsavel(@PathVariable String cargo) {
         Integer tipoCargo;
@@ -45,13 +53,6 @@ public class AssinarRemessaController {
         }
         Object resp = assinarRemessaRepository.buscarResponsavelAssinatura(tipoCargo, info);
         return ResponseEntity.ok().body(Objects.requireNonNullElse(resp, "semPermissao"));
-    }
-
-    @CrossOrigin
-    @GetMapping
-    public ResponseEntity<?> findRemessaOpen() {
-        info = assinarRemessaRepository.buscarRemessaAberta();
-        return ResponseEntity.ok().body(Objects.requireNonNullElse(info, "semRemessa"));
     }
 
     @CrossOrigin
@@ -75,12 +76,14 @@ public class AssinarRemessaController {
     @CrossOrigin
     @GetMapping(path = {"/situacao"})
     public ResponseEntity<?> findDocumentos() {
-        List<Integer> list = gfipRepository.findDocumentos(info.getChave());
+        InfoRemessa infoRemessa = assinarRemessaRepository.buscarRemessaAberta();
+        List<Integer> list = gfipRepository.findDocumentos(infoRemessa.getChave());
         if (list.size() >= 3)
             return ResponseEntity.ok().body("Ok");
         else
             return ResponseEntity.ok().body("pendente");
     }
+
 
 }
 
