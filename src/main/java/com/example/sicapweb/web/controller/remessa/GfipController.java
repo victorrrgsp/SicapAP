@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/cadastrarGfip")
@@ -97,7 +98,7 @@ public class GfipController extends DefaultController<InfoRemessa> {
             }
         }
 
-        return ResponseEntity.ok().body(gfip);
+        return ResponseEntity.ok().body(Objects.requireNonNullElse(gfip, "semRemessa"));
     }
 
     @CrossOrigin
