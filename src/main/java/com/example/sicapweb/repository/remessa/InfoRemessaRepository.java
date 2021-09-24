@@ -13,11 +13,16 @@ import java.util.List;
 public class InfoRemessaRepository extends DefaultRepository<InfoRemessa, String> {
     @Override
     public List<InfoRemessa> findAll() {
-        return getEntityManager()
-                .createNativeQuery("select * from "+
-                        "InfoRemessa info where info.idUnidadeGestora = '"
-                        + User.getUser().getUnidadeGestora().getId() + "'", InfoRemessa.class)
-                .getResultList();
+        try {
+            return getEntityManager()
+                    .createNativeQuery("select * from " +
+                            "InfoRemessa info where info.idUnidadeGestora = '"
+                            + User.getUser().getUnidadeGestora().getId() + "'", InfoRemessa.class)
+                    .getResultList();
+        }catch (Exception e)
+        {
+            return null;
+        }
     }
 
 

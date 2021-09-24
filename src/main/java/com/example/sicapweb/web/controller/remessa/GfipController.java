@@ -86,13 +86,15 @@ public class GfipController extends DefaultController<InfoRemessa> {
     @GetMapping(path = {"/getDocumentos"})
     public ResponseEntity<?> findAllDocumentos() {
         List<InfoRemessa> list = infoRemessaRepository.findAll();
-        GfipDocumento gfipDocumento = new GfipDocumento();
-        for (Integer i = 0; i < list.size(); i++) {
-            gfipDocumento.setInfoRemessa(list.get(i));
-            gfipDocumento.setSituacaoGfip(gfipRepository.findSituacao(list.get(i).getChave(), "GFIP"));
-            gfipDocumento.setSituacaoBoleto(gfipRepository.findSituacao(list.get(i).getChave(), "boletoGFIP"));
-            gfipDocumento.setSituacaoComprovante(gfipRepository.findSituacao(list.get(i).getChave(), "comprovanteGFIP"));
-            gfip.put("Gfip", gfipDocumento);
+        if(list != null) {
+            GfipDocumento gfipDocumento = new GfipDocumento();
+            for (Integer i = 0; i < list.size(); i++) {
+                gfipDocumento.setInfoRemessa(list.get(i));
+                gfipDocumento.setSituacaoGfip(gfipRepository.findSituacao(list.get(i).getChave(), "GFIP"));
+                gfipDocumento.setSituacaoBoleto(gfipRepository.findSituacao(list.get(i).getChave(), "boletoGFIP"));
+                gfipDocumento.setSituacaoComprovante(gfipRepository.findSituacao(list.get(i).getChave(), "comprovanteGFIP"));
+                gfip.put("Gfip", gfipDocumento);
+            }
         }
 
         return ResponseEntity.ok().body(gfip);
