@@ -143,7 +143,8 @@ public class User implements Serializable {
         Gestor(4, "Gestor"),
         Contador(5, "Contador"),
         ControleInterno(3, "Controle Interno"),
-        ResponsavelRH(32, "Responsável R.H.");
+        ResponsavelRH(32, "Responsável R.H."),
+        LancamentoAP(362, "Lançamento AP");
 
         private final String label;
         private final int valor;
