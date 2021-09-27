@@ -70,6 +70,7 @@ public class LoginController extends DefaultController<Login> {
     @PostMapping(path = {"/logout/"})
     public ResponseEntity<?> logout(@org.springframework.web.bind.annotation.RequestBody String user) {
         config.jedis.del(user.replace("=", ""));
+        Session.usuarioLogado = null;
 
         return ResponseEntity.ok().body(true);
     }
@@ -131,6 +132,7 @@ public class LoginController extends DefaultController<Login> {
             });
             //System.out.println(cpf);
 
+            Session.usuarioLogado = userLogado;
             getIp.getRequest().getSession().setAttribute(userLogado.getCpf(), userLogado);
             config.jedis.set(userLogado.getId(), Config.json(userLogado));
 
