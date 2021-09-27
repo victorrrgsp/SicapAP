@@ -25,10 +25,11 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
     @Autowired
     public EntityManager entityManager;
 
-    public DefaultRepository(EntityManager em){
+    public DefaultRepository(EntityManager em) {
         entityManager = em;
     }
-    public DefaultRepository(){
+
+    public DefaultRepository() {
     }
 
     public EntityManager getEntityManager() {
@@ -39,19 +40,17 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
         return entityManager;
     }
 
-    @Transactional(rollbackFor = { SQLException.class })
+    @Transactional(rollbackFor = {SQLException.class})
     public void save(T entity) {
         getEntityManager().persist(entity);
     }
 
     //@Transactional(rollbackFor = { SQLException.class },  propagation = Propagation.NESTED )
     public void update(T entity) {
-
         try {
             getEntityManager().merge(entity);
             //getEntityManager().getTransaction().commit();
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -66,12 +65,10 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
 
     //@Transactional(rollbackFor = { SQLException.class },  propagation = Propagation.NESTED )
     public void delete(String id) {
-
         entityManager = getEntityManager();
         entityManager.getTransaction().begin();
         entityManager.remove(entityManager.find(entityClass, id));
         entityManager.getTransaction().commit();
-
     }
 
     //@Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
@@ -88,17 +85,16 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
                 .getResultList();
     }
 
-    public Integer findAllInciso(String entidade, String pk ,BigInteger id, String inciso ) {
-        return (Integer) getEntityManager().createNativeQuery("select count(*) from "+ entidade +
-                        " where "+ pk +" = "+ id +" and inciso = '"+ inciso +"'").getSingleResult();
+    public Integer findAllInciso(String entidade, String pk, BigInteger id, String inciso) {
+        return (Integer) getEntityManager().createNativeQuery("select count(*) from " + entidade +
+                " where " + pk + " = " + id + " and inciso = '" + inciso + "'").getSingleResult();
 
     }
 
-    public Integer findSituacao(String entidade, String pk ,BigInteger id, String incisos) {
+    public Integer findSituacao(String entidade, String pk, BigInteger id, String incisos) {
         return (Integer) getEntityManager().createNativeQuery("select count(*) \n" +
-                " Situacao from "+ entidade +
-                " where "+ pk +" = "+ id +" and inciso in ("+ incisos + ")" ).getSingleResult();
-
+                " Situacao from " + entidade +
+                " where " + pk + " = " + id + " and inciso in (" + incisos + ")").getSingleResult();
     }
 
     protected List<T> createQuery(String jpql, Object... params) {
@@ -109,31 +105,21 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
         return query.getResultList();
     }
 
-
-
-
-
-
-
-
-
-
     //public PaginacaoUtil<T> buscaPaginada(int pagina, int tamanho, String direcao, String campo) {
     //@Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public PaginacaoUtil<T> buscaPaginada(Pageable pageable, String searchParams, Integer tipoParams) {
 
         int pagina = Integer.valueOf(pageable.getPageNumber());
         int tamanho = Integer.valueOf(pageable.getPageSize());
-        String search= "";
+        String search = "";
 
         //monta pesquisa search
-        if(searchParams.length() > 3){
+        if (searchParams.length() > 3) {
 
-            if(tipoParams==0){ //entra para tratar a string
-                String arrayOfStrings[]  = searchParams.split("=");
-                search = " WHERE " +arrayOfStrings[0] + " LIKE  '%"+arrayOfStrings[1]+"%'  ";
-            }
-            else{
+            if (tipoParams == 0) { //entra para tratar a string
+                String arrayOfStrings[] = searchParams.split("=");
+                search = " WHERE " + arrayOfStrings[0] + " LIKE  '%" + arrayOfStrings[1] + "%'  ";
+            } else {
                 search = " WHERE " + searchParams + "   ";
             }
         }
@@ -144,7 +130,7 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
         List<T> list = getEntityManager()
                 .createNativeQuery("select a.* from " + entityClass.getSimpleName() + " a " +
                         " join InfoRemessa info on info.chave = a.chave and info.idUnidadeGestora = '"
-                        + User.getUser().getUnidadeGestora().getId() + "' " +search+" ORDER BY " + campo, entityClass)
+                        + User.getUser().getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, entityClass)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();
@@ -155,20 +141,13 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
         return new PaginacaoUtil<T>(tamanho, pagina, totalPaginas, totalRegistros, list);
     }
 
-
-
-
-
     public long count() {
         return getEntityManager().createQuery("select count(*) from " + entityClass.getSimpleName(), Long.class).getSingleResult();
     }
 
-
-
-
     public InfoRemessa buscarPrimeiraRemessa() {
         List<InfoRemessa> list = getEntityManager().createNativeQuery("select * from infoRemessa " +
-                "where remessa = 1 and exercicio = 2021 and idUnidadeGestora = '"+ User.getUser().getUnidadeGestora().getId() +"'", InfoRemessa.class).getResultList();
+                "where remessa = 1 and exercicio = 2021 and idUnidadeGestora = '" + User.getUser().getUnidadeGestora().getId() + "'", InfoRemessa.class).getResultList();
         return list.get(0);
     }
 }

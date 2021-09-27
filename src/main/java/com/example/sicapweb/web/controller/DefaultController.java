@@ -43,37 +43,33 @@ import java.util.List;
 @RequestMapping
 public abstract class DefaultController<T> {
     public String clazz;
-
     {
         try {
-            clazz = "com.example.sicapweb.repository."+
-                    Class.forName( ((ParameterizedType)this.getClass().getGenericSuperclass()).getActualTypeArguments()[0].getTypeName()).getSimpleName()+"Repository";
+            clazz = "com.example.sicapweb.repository." +
+                    Class.forName(((ParameterizedType) this.getClass().getGenericSuperclass()).getActualTypeArguments()[0].getTypeName()).getSimpleName() + "Repository";
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
+
     @Autowired
     private ApplicationContext applicationContext;
     @Autowired
     private UnidadeGestoraRepository repository;
 
-    public String path = System.getProperty("user.home")+ File.separator+"spring"+File.separator;
+    public String path = System.getProperty("user.home") + File.separator + "spring" + File.separator;
 
     @ExceptionHandler(value = ConstraintViolationException.class)
     public ResponseEntity handleConstraintViolationException(ConstraintViolationException ex, WebRequest request) {
         List<String> errors = new ArrayList<>();
-
         for (ConstraintViolation<?> violation : ex.getConstraintViolations()) {
             errors.add(violation.getMessage());
         }
-
         return new ResponseEntity<Object>(errors, new HttpHeaders(), HttpStatus.CONFLICT);
     }
 
-
     @ExceptionHandler(value = ValidationException.class)
     public ResponseEntity handleValidationException(ValidationException ex) {
-
         return new ResponseEntity<Object>(ex.getMessage(), new HttpHeaders(), HttpStatus.CONFLICT);
     }
 
@@ -89,7 +85,6 @@ public abstract class DefaultController<T> {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         //empresaOrganizadoraRepository.findAll();
         return ResponseEntity.ok().body(list);
     }
@@ -97,7 +92,6 @@ public abstract class DefaultController<T> {
     @CrossOrigin
     @GetMapping(path = {"/{id}"})
     public ResponseEntity<?> findById(@PathVariable BigInteger id) {
-
         T obj = null;
         try {
             obj = (T) JayReflection.executeMethod(clazz,
@@ -148,17 +142,16 @@ public abstract class DefaultController<T> {
         return ResponseEntity.noContent().build();
     }
 
-
     @CrossOrigin
     @PostMapping(value = {"/getFileName"})
-    public ResponseEntity<?> getCastorFileName(@RequestBody CastorFile castorFile){
+    public ResponseEntity<?> getCastorFileName(@RequestBody CastorFile castorFile) {
         new File(path).mkdirs();
         CastorController castor = new CastorController();
         ObjetoCastor objeto = new ObjetoCastor(castorFile.id);
-        if(castorFile.id != null){
+        if (castorFile.id != null) {
             try {
                 objeto = castor.carregar(objeto);
-                if(objeto.getBytes().length <= 0)   return null;
+                if (objeto.getBytes().length <= 0) return null;
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -171,7 +164,7 @@ public abstract class DefaultController<T> {
     @CrossOrigin
     @PostMapping(value = {"/downloadCastor"})
     public ResponseEntity<?> getCastorFile(@RequestBody CastorFile castorFile) {
-        if(castorFile.id == null) return ResponseEntity.ok().body(null);
+        if (castorFile.id == null) return ResponseEntity.ok().body(null);
 
         new File(path).mkdirs();
 
@@ -199,20 +192,19 @@ public abstract class DefaultController<T> {
                 body(new ByteArrayResource(objeto.getBytes()));
     }
 
-
     @CrossOrigin
     @GetMapping(value = {"/file"})
 //    public ResponseEntity<?> getCastorFile(@PathVariable BigInteger hash){
-    public ResponseEntity<?> getCastorFile( ){
+    public ResponseEntity<?> getCastorFile() {
         String hash = "006a96a25fd86176eaf78382bba2a496";
         new File(path).mkdirs();
         CastorController castor = new CastorController();
         ObjetoCastor objeto = new ObjetoCastor(hash);
-        if(hash != null){
+        if (hash != null) {
             try {
                 objeto = castor.carregar(objeto);
 
-                if(objeto.getBytes().length <= 0)   return null;
+                if (objeto.getBytes().length <= 0) return null;
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -232,11 +224,10 @@ public abstract class DefaultController<T> {
         return castorFile != null ? castorFile.getId() : "";
     }
 
-
     public CastorFile getCastorFile(MultipartFile file, String origem) {
         new File(path).mkdirs();
         String idCastor = "";
-        File fileTemp = new File(path+file.hashCode()+"."+
+        File fileTemp = new File(path + file.hashCode() + "." +
                 FilenameUtils.getExtension(file.getOriginalFilename()));
 
         CastorController castor = new CastorController();
