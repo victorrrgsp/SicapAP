@@ -87,7 +87,12 @@ public class GfipController extends DefaultController<InfoRemessa> {
     @GetMapping(path = {"/getDocumentos"})
     public ResponseEntity<?> findAllDocumentos() {
         List<InfoRemessa> list = infoRemessaRepository.findAll();
+        if(list == null){
+            gfip = null;
+            return ResponseEntity.ok().body(Objects.requireNonNullElse(gfip, "semRemessa"));
+        }
         if(list.size()>0) {
+            gfip = new HashMap<String, Object>();
             GfipDocumento gfipDocumento = new GfipDocumento();
             for (Integer i = 0; i < list.size(); i++) {
                 gfipDocumento.setInfoRemessa(list.get(i));
