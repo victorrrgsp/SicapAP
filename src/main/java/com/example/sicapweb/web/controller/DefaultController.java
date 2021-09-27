@@ -45,8 +45,12 @@ public abstract class DefaultController<T> {
     public String clazz;
     {
         try {
-            clazz = "com.example.sicapweb.repository." +
-                    Class.forName(((ParameterizedType) this.getClass().getGenericSuperclass()).getActualTypeArguments()[0].getTypeName()).getSimpleName() + "Repository";
+            clazz = JayReflection.getClassNameByPackage(
+                    "com.example.sicapweb",
+                    Class.forName(((ParameterizedType) this.getClass().getGenericSuperclass())
+                            .getActualTypeArguments()[0].getTypeName()).getSimpleName()+"Repository"
+                    );
+
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
