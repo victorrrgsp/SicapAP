@@ -1,25 +1,26 @@
 package com.example.sicapweb.web.controller.ap.concurso;
 
 import br.gov.to.tce.model.ap.concurso.EditalHomologacao;
-import com.example.sicapweb.repository.geral.AtoRepository;
 import com.example.sicapweb.repository.concurso.EditalHomologacaoRepository;
 import com.example.sicapweb.repository.concurso.EditalRepository;
+import com.example.sicapweb.util.PaginacaoUtil;
+import com.example.sicapweb.web.controller.DefaultController;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.math.BigInteger;
 import java.net.URI;
-import java.util.List;
+
 @Service
 @Transactional
 @RestController
 @RequestMapping("/concursoHomologacao")
-public class EditalHomologacaoController {
+public class EditalHomologacaoController extends DefaultController<EditalHomologacao> {
 
     @Autowired
     private EditalHomologacaoRepository editalHomologacaoRepository;
@@ -27,20 +28,11 @@ public class EditalHomologacaoController {
     @Autowired
     private EditalRepository editalRepository;
 
-    @Autowired
-    private AtoRepository atoRepository;
-
-    @GetMapping("/")
-    public String lista(ModelMap model, EditalHomologacao editalHomologacao) {
-        model.addAttribute("homologacoes", editalHomologacaoRepository.findAll());
-        return "concursoHomologacao";
-    }
-
     @CrossOrigin
-    @GetMapping
-    public ResponseEntity<List<EditalHomologacao>> findAll() {
-        List<EditalHomologacao> list = editalHomologacaoRepository.findAll();
-        return ResponseEntity.ok().body(list);
+    @GetMapping(path = "/{searchParams}/{tipoParams}/pagination")
+    public ResponseEntity<PaginacaoUtil<EditalHomologacao>> listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
+        PaginacaoUtil<EditalHomologacao> paginacaoUtil = editalHomologacaoRepository.buscaPaginada(pageable, searchParams, tipoParams);
+        return ResponseEntity.ok().body(paginacaoUtil);
     }
 
 
