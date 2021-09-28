@@ -29,6 +29,15 @@ public class UnidadeGestoraController {
         return ResponseEntity.ok().body(list);
     }
 
+
+    @CrossOrigin
+    @GetMapping(path = {"/todos"})
+    public ResponseEntity<List<UnidadeGestora>> findTodos() {
+        List<UnidadeGestora> list = unidadeGestoraRepository.buscaTodasUnidadeGestora();
+        return ResponseEntity.ok().body(list);
+    }
+
+
     @CrossOrigin
     @GetMapping(path = {"/{Cnpj}"})
     public ResponseEntity<?> findById(@PathVariable String Cnpj) {

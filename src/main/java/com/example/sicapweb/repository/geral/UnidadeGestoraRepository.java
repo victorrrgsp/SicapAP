@@ -28,6 +28,12 @@ public class UnidadeGestoraRepository extends DefaultRepository<UnidadeGestora, 
         return list.get(0);
     }
 
+    public List<UnidadeGestora> buscaTodasUnidadeGestora() {
+        List<UnidadeGestora> list = entityManager.createNativeQuery("select * from UnidadeGestora "
+                , UnidadeGestora.class).getResultList();
+        return list;
+    }
+
     public List<Integer> buscaVigenciaUnidadeGestoraPorCnpj(String Cnpj, Integer Exercicio, Integer Remessa) {
 
         return entityManager.createNativeQuery("select 1 as resposta where EXISTS("+
