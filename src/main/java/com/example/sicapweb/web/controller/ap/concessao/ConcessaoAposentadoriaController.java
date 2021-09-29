@@ -2,6 +2,7 @@ package com.example.sicapweb.web.controller.ap.concessao;
 
 import br.gov.to.tce.model.ap.concessoes.DocumentoAposentadoria;
 import br.gov.to.tce.model.ap.pessoal.Aposentadoria;
+import br.gov.to.tce.model.ap.pessoal.Reintegracao;
 import com.example.sicapweb.model.Inciso;
 import com.example.sicapweb.repository.concessao.AposentadoriaRepository;
 import com.example.sicapweb.repository.concessao.DocumentoAposentadoriaRepository;
@@ -56,6 +57,13 @@ public class ConcessaoAposentadoriaController extends DefaultController<Aposenta
     @Override
     public ResponseEntity<List<Aposentadoria>> findAll() {
         List<Aposentadoria> list = aposentadoriaRepository.buscarAposentadorias();
+        return ResponseEntity.ok().body(list);
+    }
+
+    @CrossOrigin
+    @GetMapping(path = {"/{id}"})
+    public ResponseEntity<?> findById(@PathVariable BigInteger id) {
+        Aposentadoria list = aposentadoriaRepository.findById(id);
         return ResponseEntity.ok().body(list);
     }
 
