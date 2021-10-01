@@ -57,10 +57,7 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
 
     //@Transactional(rollbackFor = { SQLException.class },  propagation = Propagation.NESTED )
     public void delete(BigInteger id) {
-        entityManager = getEntityManager();
-        entityManager.getTransaction().begin();
-        entityManager.remove(entityManager.find(entityClass, id));
-        entityManager.getTransaction().commit();
+        getEntityManager().remove(getEntityManager().find(entityClass, id));
     }
 
     //@Transactional(rollbackFor = { SQLException.class },  propagation = Propagation.NESTED )

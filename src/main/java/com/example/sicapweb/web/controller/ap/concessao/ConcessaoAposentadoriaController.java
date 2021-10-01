@@ -2,12 +2,13 @@ package com.example.sicapweb.web.controller.ap.concessao;
 
 import br.gov.to.tce.model.ap.concessoes.DocumentoAposentadoria;
 import br.gov.to.tce.model.ap.pessoal.Aposentadoria;
-import br.gov.to.tce.model.ap.pessoal.Reintegracao;
 import com.example.sicapweb.model.Inciso;
 import com.example.sicapweb.repository.concessao.AposentadoriaRepository;
 import com.example.sicapweb.repository.concessao.DocumentoAposentadoriaRepository;
+import com.example.sicapweb.util.PaginacaoUtil;
 import com.example.sicapweb.web.controller.DefaultController;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +21,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/documentoConcessaoAposentadoria")
-public class ConcessaoAposentadoriaController extends DefaultController<Aposentadoria> {
+public class ConcessaoAposentadoriaController extends DefaultController<DocumentoAposentadoria> {
 
     @Autowired
     private AposentadoriaRepository aposentadoriaRepository;
@@ -53,11 +54,10 @@ public class ConcessaoAposentadoriaController extends DefaultController<Aposenta
     }
 
     @CrossOrigin
-    @GetMapping
-    @Override
-    public ResponseEntity<List<Aposentadoria>> findAll() {
-        List<Aposentadoria> list = aposentadoriaRepository.buscarAposentadorias();
-        return ResponseEntity.ok().body(list);
+    @GetMapping(path="/{searchParams}/{tipoParams}/pagination")
+    public ResponseEntity<PaginacaoUtil<Aposentadoria>> listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
+        PaginacaoUtil<Aposentadoria> paginacaoUtil = aposentadoriaRepository.buscaPaginadaAposentadorias(pageable,searchParams,tipoParams);
+        return ResponseEntity.ok().body(paginacaoUtil);
     }
 
     @CrossOrigin
