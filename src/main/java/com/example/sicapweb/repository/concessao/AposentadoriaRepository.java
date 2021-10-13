@@ -18,9 +18,7 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
         super(em);
     }
 
-    public PaginacaoUtil<Aposentadoria> buscaPaginadaAposentadorias(Pageable pageable, String searchParams, Integer tipoParams) {
-        int pagina = Integer.valueOf(pageable.getPageNumber());
-        int tamanho = Integer.valueOf(pageable.getPageSize());
+    public String getSearch(String searchParams, Integer tipoParams) {
         String search = "";
         //monta pesquisa search
         if (searchParams.length() > 3) {
@@ -38,6 +36,15 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
                 search = " and " + searchParams + "   ";
             }
         }
+        return search;
+    }
+
+    public PaginacaoUtil<Aposentadoria> buscaPaginadaAposentadorias(Pageable pageable, String searchParams, Integer tipoParams) {
+        int pagina = Integer.valueOf(pageable.getPageNumber());
+        int tamanho = Integer.valueOf(pageable.getPageSize());
+        String search = "";
+        //monta pesquisa search
+        search = getSearch(searchParams, tipoParams);
         //retirar os : do Sort pageable
         String campo = String.valueOf(pageable.getSort()).replace(":", "");
 

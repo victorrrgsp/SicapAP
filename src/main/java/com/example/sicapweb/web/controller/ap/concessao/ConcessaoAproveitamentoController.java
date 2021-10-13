@@ -5,8 +5,10 @@ import br.gov.to.tce.model.ap.pessoal.Aproveitamento;
 import com.example.sicapweb.model.Inciso;
 import com.example.sicapweb.repository.concessao.AproveitamentoRepository;
 import com.example.sicapweb.repository.concessao.DocumentoAproveitamentoRepository;
+import com.example.sicapweb.util.PaginacaoUtil;
 import com.example.sicapweb.web.controller.DefaultController;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -14,11 +16,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @RestController
 @RequestMapping("/documentoConcessaoAproveitamento")
-public class ConcessaoAproveitamentoController extends DefaultController<Aproveitamento> {
+public class ConcessaoAproveitamentoController extends DefaultController<DocumentoAproveitamento> {
 
     @Autowired
     private AproveitamentoRepository aproveitamentoRepository;
@@ -26,11 +29,35 @@ public class ConcessaoAproveitamentoController extends DefaultController<Aprovei
     @Autowired
     private DocumentoAproveitamentoRepository documentoAproveitamentoRepository;
 
+    HashMap<String, Object> aproveitamento = new HashMap<String, Object>();
+
+    public class AproveitamentoDocumento {
+        private Aproveitamento aproveitamento;
+
+        private String situacao;
+
+        public Aproveitamento getAproveitamento() {
+            return aproveitamento;
+        }
+
+        public void setAproveitamento(Aproveitamento aproveitamento) {
+            this.aproveitamento = aproveitamento;
+        }
+
+        public String getSituacao() {
+            return situacao;
+        }
+
+        public void setSituacao(String situacao) {
+            this.situacao = situacao;
+        }
+    }
+
     @CrossOrigin
-    @GetMapping()
-    public ResponseEntity<List<Aproveitamento>> findAll() {
-        List<Aproveitamento> list = aproveitamentoRepository.findAll();
-        return ResponseEntity.ok().body(list);
+    @GetMapping(path = "/{searchParams}/{tipoParams}/pagination")
+    public ResponseEntity<PaginacaoUtil<Aproveitamento>> listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
+        PaginacaoUtil<Aproveitamento> paginacaoUtil = aproveitamentoRepository.buscaPaginadaAproveitamento(pageable, searchParams, tipoParams);
+        return ResponseEntity.ok().body(paginacaoUtil);
     }
 
     @CrossOrigin
@@ -55,6 +82,35 @@ public class ConcessaoAproveitamentoController extends DefaultController<Aprovei
     }
 
     @CrossOrigin
+    @GetMapping(path = {"getDocumentos"})
+    public ResponseEntity<?> findAllDocumentos() {
+        List<Aproveitamento> list = aproveitamentoRepository.findAll();
+        AproveitamentoDocumento situacao = new AproveitamentoDocumento();
+        for (Integer i = 0; i < list.size(); i++) {
+            Integer quantidadeDocumentos = documentoAproveitamentoRepository.findSituacao("documentoAproveitamento", "idAproveitamento", list.get(i).getId(), "'I - Seção V', 'II - Seção V', 'V - Seção V', 'VI - Seção V'");
+            if (quantidadeDocumentos == 0) {
+                situacao.setAproveitamento(list.get(i));
+                situacao.setSituacao("Pendente");
+            } else if (quantidadeDocumentos == 10) {
+                situacao.setAproveitamento(list.get(i));
+                situacao.setSituacao("Concluído");
+            } else {
+                situacao.setAproveitamento(list.get(i));
+                situacao.setSituacao("Aguardando verificação");
+            }
+            aproveitamento.put("Aproveitamento", situacao);
+        }
+        return ResponseEntity.ok().body(aproveitamento);
+    }
+
+    @CrossOrigin
+    @GetMapping(path = {"getSituacao/{id}"})
+    public ResponseEntity<?> findSituacao(@PathVariable BigInteger id) {
+        Integer situacao = documentoAproveitamentoRepository.findSituacao("documentoAproveitamento", "idAproveitamento", id, "'I - Seção V', 'II - Seção V', 'V - Seção V', 'VI - Seção V'");
+        return ResponseEntity.ok().body(situacao);
+    }
+
+    @CrossOrigin
     @GetMapping(path = {"getInciso/{id}"})
     public ResponseEntity<?> findInciso(@PathVariable BigInteger id) {
         List<Inciso> list = new ArrayList<>();
@@ -73,17 +129,18 @@ public class ConcessaoAproveitamentoController extends DefaultController<Aprovei
         list.add(new Inciso("", "Outros",
                 "Outros", "", "Não"));
 
-        for (int i = 0; i < list.size(); i++){
-            Integer existeArquivo = documentoAproveitamentoRepository.findAllInciso("documentoAproveitamento","idAproveitamento",id, list.get(i).getInciso());
-            if (existeArquivo > 0){
+        for (int i = 0; i < list.size(); i++) {
+            Integer existeArquivo = documentoAproveitamentoRepository.findAllInciso("documentoAproveitamento", "idAproveitamento", id, list.get(i).getInciso());
+            if (existeArquivo > 0) {
                 list.get(i).setStatus("Informado");
-            }else{
+            } else {
                 list.get(i).setStatus("Não informado");
             }
         }
 
         return ResponseEntity.ok().body(list);
     }
+
     @CrossOrigin
     @GetMapping(path = {"anexos/{inciso}/{id}"})
     public ResponseEntity<?> findByDocumento(@PathVariable String inciso, @PathVariable BigInteger id) {

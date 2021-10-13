@@ -20,4 +20,10 @@ public class DocumentoAproveitamentoRepository extends DefaultRepository<Documen
                         + coluna + "' and idAproveitamento = " + idAproveitamento, DocumentoAproveitamento.class)
                 .getResultList();
     }
+
+    public Integer findSituacao(String entidade, String pk ,BigInteger id, String incisos) {
+        return (Integer) getEntityManager().createNativeQuery("select count(*) \n" +
+                " Situacao from "+ entidade +
+                " where "+ pk +" = "+ id +" and inciso in ("+ incisos +")" ).getSingleResult();
+    }
 }
