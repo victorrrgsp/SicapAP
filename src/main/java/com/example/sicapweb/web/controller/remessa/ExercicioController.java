@@ -23,4 +23,12 @@ public class ExercicioController {
         return ResponseEntity.ok().body(list);
     }
 
+    @CrossOrigin
+    @GetMapping(path = "/all")
+    public ResponseEntity<List<Integer>> findExercicio(){
+        List<Integer> list = exercicioRepository.findExercicio();
+        return ResponseEntity.ok().body(list);
+    }
+
+
 }

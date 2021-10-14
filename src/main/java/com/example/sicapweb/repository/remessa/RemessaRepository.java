@@ -1,5 +1,6 @@
 package com.example.sicapweb.repository.remessa;
 
+import br.gov.to.tce.model.UnidadeGestora;
 import com.example.sicapweb.repository.DefaultRepository;
 import org.springframework.stereotype.Repository;
 

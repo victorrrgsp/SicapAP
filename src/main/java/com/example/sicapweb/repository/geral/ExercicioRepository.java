@@ -21,4 +21,8 @@ public class ExercicioRepository extends DefaultRepository<Integer, Integer> {
         return entityManager.createNativeQuery("select distinct exercicio from Cadun..PeriodoRemessa " + " where idSistema=29 and exercicio >= 2020 order by exercicio desc ").getResultList();
     }
 
+    public List<Integer> findExercicio() {
+        return entityManager.createNativeQuery("select distinct exercicio from Cadun..PeriodoRemessa " + " where idSistema=29 order by exercicio desc ").getResultList();
+    }
+
 }

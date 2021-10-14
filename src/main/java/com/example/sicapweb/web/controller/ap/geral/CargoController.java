@@ -1,5 +1,6 @@
 package com.example.sicapweb.web.controller.ap.geral;
 
+import br.gov.to.tce.model.UnidadeGestora;
 import br.gov.to.tce.model.ap.relacional.Cargo;
 import com.example.sicapweb.repository.geral.CargoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,13 @@ public class CargoController {
     @GetMapping
     public ResponseEntity<List<Cargo>> findAll() {
         List<Cargo> list = cargoRepository.findAll();
+        return ResponseEntity.ok().body(list);
+    }
+
+    @CrossOrigin
+    @GetMapping(path = {"/todos"})
+    public ResponseEntity<List<Cargo>> findTodos() {
+        List<Cargo> list = cargoRepository.buscaTodosCargos();
         return ResponseEntity.ok().body(list);
     }
 }
