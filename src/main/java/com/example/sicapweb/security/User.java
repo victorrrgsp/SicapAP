@@ -119,7 +119,7 @@ public class User implements Serializable {
 
     public boolean isValid(){
         try {
-            this.dateEnd = new Date(this.getDateEnd().toStringDateAndHourDatabaseFormat());
+            this.dateEnd = new Date(this.getDateEnd().toStringDateAndHourDatabaseFormat2());
         } catch (ParseException e) {
             e.printStackTrace();
         }

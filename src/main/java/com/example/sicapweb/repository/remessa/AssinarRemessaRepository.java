@@ -82,7 +82,7 @@ public class AssinarRemessaRepository extends DefaultRepository<String, String> 
         Query query = entityManager.createNativeQuery(
                 "INSERT INTO AutenticacaoAssinatura.dbo.Arquivo(MIME, Nome, URLASS, Label, DataEntrada, cpf) " +
                         "VALUES ('application/octet-stream', 'Remessa SICAP AP', 'Remessa SICAP AP', 'Remessa SICAP AP', :data, :cpf)");
-        query.setParameter("data", new br.gov.to.tce.util.Date().toStringDateAndHourDatabaseFormat());
+        query.setParameter("data", new br.gov.to.tce.util.Date().toStringDateAndHourDatabaseFormat2());
         query.setParameter("cpf", User.getUser().getCpf());
         query.executeUpdate();
 
@@ -98,7 +98,7 @@ public class AssinarRemessaRepository extends DefaultRepository<String, String> 
                         "VALUES (:cpf, :arquivo, :data)");
         query.setParameter("cpf", User.getUser().getCpf());
         query.setParameter("arquivo", idArquivo);
-        query.setParameter("data", new br.gov.to.tce.util.Date().toStringDateAndHourDatabaseFormat());
+        query.setParameter("data", new br.gov.to.tce.util.Date().toStringDateAndHourDatabaseFormat2());
         query.executeUpdate();
 
         Query query1 = entityManager.createNativeQuery(

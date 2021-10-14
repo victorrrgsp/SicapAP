@@ -53,7 +53,7 @@ public class LoginController extends DefaultController<Login> {
 
         User userSession = Config.fromJson(config.jedis.get(user.replace("=", "")), User.class);
         try {
-            new br.gov.to.tce.util.Date(userSession.getDateEnd().toStringDateAndHourDatabaseFormat());
+            new br.gov.to.tce.util.Date(userSession.getDateEnd().toStringDateAndHourDatabaseFormat2());
         } catch (ParseException e) {
             throw new ValidationException(e.getMessage());
         }
