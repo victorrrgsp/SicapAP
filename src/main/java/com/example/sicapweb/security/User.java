@@ -139,6 +139,10 @@ public class User implements Serializable {
         this.unidadeGestora = unidadeGestora;
     }
 
+    public void setUnidadeGestoraList(UnidadeGestora unidadeGestora) {
+        this.unidadeGestoraList.add(unidadeGestora);
+    }
+
     public enum Cargo implements DefaultEnum<Cargo>, Serializable {
         Gestor(4, "Gestor"),
         Contador(5, "Contador"),

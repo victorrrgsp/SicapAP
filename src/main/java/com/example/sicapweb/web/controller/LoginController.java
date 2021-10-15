@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.security.Key;
 import java.sql.Date;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -72,6 +73,37 @@ public class LoginController extends DefaultController<Login> {
         config.jedis.del(user.replace("=", ""));
         Session.usuarioLogado = null;
 
+        return ResponseEntity.ok().body(true);
+    }
+
+    @CrossOrigin
+    @Transactional
+    @PostMapping(path = {"/getugs/"})
+    public ResponseEntity<?> setUg(@org.springframework.web.bind.annotation.RequestBody String user) {
+        user = user.replace("=", "");
+
+        User userLogado = Config.fromJson(config.jedis.get(user.replace("=", "")), User.class);
+
+
+        return ResponseEntity.ok().body(userLogado.getUnidadeGestoraList());
+    }
+
+    @CrossOrigin
+    @Transactional
+    @PostMapping(path = {"/setug/"})
+    public ResponseEntity<?> setUg(@org.springframework.web.bind.annotation.RequestBody String user,
+                                   @org.springframework.web.bind.annotation.RequestBody String idUnidadeGestora) {
+        user = user.replace("=", "");
+        idUnidadeGestora = idUnidadeGestora.replace("=", "");
+
+        User userLogado = Config.fromJson(config.jedis.get(user.replace("=", "")), User.class);
+        String finalIdUnidadeGestora = idUnidadeGestora;
+        userLogado.setUnidadeGestora(userLogado.getUnidadeGestoraList()
+                .stream().filter(o -> o.getId().equalsIgnoreCase(finalIdUnidadeGestora.trim()))
+                .findFirst().get());
+
+        config.jedis.del(user.replace("=", ""));
+        config.jedis.set(userLogado.getId(), Config.json(userLogado));
         return ResponseEntity.ok().body(true);
     }
 
@@ -118,6 +150,7 @@ public class LoginController extends DefaultController<Login> {
 
             User userLogado = new User();
 
+            List<User> users = new ArrayList<>();
             lista.forEach(res -> {
                 userLogado.setId(java.util.UUID.randomUUID().toString());
                 userLogado.setCpf(respostaJson.get("validacaoAssinatura").get("dados").get("cpf").toString().replace("\"", ""));
@@ -127,6 +160,7 @@ public class LoginController extends DefaultController<Login> {
                 userLogado.getDateEnd().addHours(2);
                 userLogado.setUnidadeGestora(new UnidadeGestora(((Object[]) res)[1].toString(), ((Object[]) res)[2].toString(),
                         Integer.parseInt(((Object[]) res)[3].toString())));
+                userLogado.setUnidadeGestoraList(userLogado.getUnidadeGestora());
 
                 userLogado.setCargoByInteger(Integer.parseInt(((Object[]) res)[4].toString()));
             });
