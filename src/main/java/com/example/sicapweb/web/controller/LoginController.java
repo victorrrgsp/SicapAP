@@ -13,14 +13,12 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import okhttp3.RequestBody;
 import okhttp3.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -31,7 +29,6 @@ import java.io.IOException;
 import java.security.Key;
 import java.sql.Date;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -78,21 +75,19 @@ public class LoginController extends DefaultController<Login> {
 
     @CrossOrigin
     @Transactional
-    @PostMapping(path = {"/getugs/"})
-    public ResponseEntity<?> setUg(@org.springframework.web.bind.annotation.RequestBody String user) {
+    @GetMapping(path = {"/getugs"})
+    public ResponseEntity<?> setUg() {
+        String user = User.getUser().getId();
         user = user.replace("=", "");
-
         User userLogado = Config.fromJson(config.jedis.get(user.replace("=", "")), User.class);
-
-
         return ResponseEntity.ok().body(userLogado.getUnidadeGestoraList());
     }
 
     @CrossOrigin
     @Transactional
     @PostMapping(path = {"/setug/"})
-    public ResponseEntity<?> setUg(@org.springframework.web.bind.annotation.RequestBody String user,
-                                   @org.springframework.web.bind.annotation.RequestBody String idUnidadeGestora) {
+    public ResponseEntity<?> setUg(@org.springframework.web.bind.annotation.RequestBody String idUnidadeGestora) {
+        String user = User.getUser().getId();
         user = user.replace("=", "");
         idUnidadeGestora = idUnidadeGestora.replace("=", "");
 
@@ -150,7 +145,6 @@ public class LoginController extends DefaultController<Login> {
 
             User userLogado = new User();
 
-            List<User> users = new ArrayList<>();
             lista.forEach(res -> {
                 userLogado.setId(java.util.UUID.randomUUID().toString());
                 userLogado.setCpf(respostaJson.get("validacaoAssinatura").get("dados").get("cpf").toString().replace("\"", ""));

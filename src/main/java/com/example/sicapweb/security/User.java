@@ -3,6 +3,7 @@ package com.example.sicapweb.security;
 import br.gov.to.tce.model.DefaultEnum;
 import br.gov.to.tce.model.UnidadeGestora;
 import br.gov.to.tce.util.Date;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.io.Serializable;
 import java.text.ParseException;
@@ -12,6 +13,8 @@ import java.util.List;
 import java.util.Optional;
 
 public class User implements Serializable {
+    private static final long serialVersionUID = 5948741191102471780L;
+
     public String userName = "01277824193";
     public String id = "";
     public String certificado = "teste";
@@ -22,6 +25,7 @@ public class User implements Serializable {
     public Date dateEnd = new Date();
     public Integer sistema = null;
     public List<String> systems = new ArrayList<>();
+    @JsonIgnore
     public List<UnidadeGestora> unidadeGestoraList = new ArrayList<>();
     public UnidadeGestora unidadeGestora = new UnidadeGestora("00299180000154", "PREFEITURA MUNICIPAL DE PARAÍSO DO TOCANTINS", 1);
 
