@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class User implements Serializable {
-    private static final long serialVersionUID = 5948741191102471780L;
+    private static final long serialVersionUID = -6455849887168288989L;
 
     public String userName = "01277824193";
     public String id = "";

@@ -5,8 +5,10 @@ import br.gov.to.tce.model.ap.pessoal.Pensao;
 import com.example.sicapweb.model.Inciso;
 import com.example.sicapweb.repository.concessao.DocumentoPensaoRepository;
 import com.example.sicapweb.repository.concessao.PensaoRepository;
+import com.example.sicapweb.util.PaginacaoUtil;
 import com.example.sicapweb.web.controller.DefaultController;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -14,11 +16,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @RestController
 @RequestMapping("/documentoConcessaoPensao")
-public class ConcessaoPensaoController extends DefaultController<Pensao> {
+public class ConcessaoPensaoController extends DefaultController<DocumentoPensao> {
 
     @Autowired
     private PensaoRepository pensaoRepository;
@@ -26,20 +29,43 @@ public class ConcessaoPensaoController extends DefaultController<Pensao> {
     @Autowired
     private DocumentoPensaoRepository documentoPensaoRepository;
 
-    @CrossOrigin
-    @GetMapping()
-    @Override
-    public ResponseEntity<List<Pensao>> findAll() {
-        List<Pensao> list = pensaoRepository.buscarPensao();
-        return ResponseEntity.ok().body(list);
+    HashMap<String, Object> pensao = new HashMap<String, Object>();
+
+    public class PensaoDocumento{
+        private Pensao pensao;
+
+        private String situacao;
+
+        public Pensao getPensao() {
+            return pensao;
+        }
+
+        public void setPensao(Pensao pensao) {
+            this.pensao = pensao;
+        }
+
+        public String getSituacao() {
+            return situacao;
+        }
+
+        public void setSituacao(String situacao) {
+            this.situacao = situacao;
+        }
     }
 
-//    @CrossOrigin
-//    @GetMapping(path = {"/{id}"})
-//    public ResponseEntity<?> findById(@PathVariable BigInteger id) {
-//        Pensao list = pensaoRepository.findById(id);
-//        return ResponseEntity.ok().body(list);
-//    }
+    @CrossOrigin
+    @GetMapping(path="/{searchParams}/{tipoParams}/pagination")
+    public ResponseEntity<PaginacaoUtil<Pensao>> listPensoes(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
+        PaginacaoUtil<Pensao> paginacaoUtil = pensaoRepository.buscaPaginadaPensao(pageable,searchParams,tipoParams);
+        return ResponseEntity.ok().body(paginacaoUtil);
+    }
+
+    @CrossOrigin
+    @GetMapping(path = {"/{id}"})
+    public ResponseEntity<?> findById(@PathVariable BigInteger id) {
+        Pensao list = pensaoRepository.findById(id);
+        return ResponseEntity.ok().body(list);
+    }
 
     @CrossOrigin
     @Transactional
@@ -53,6 +79,37 @@ public class ConcessaoPensaoController extends DefaultController<Pensao> {
         documentoPensao.setStatus(DocumentoPensao.Status.Informado.getValor());
         documentoPensaoRepository.save(documentoPensao);
         return ResponseEntity.ok().body(idCastor);
+    }
+
+    @CrossOrigin
+    @GetMapping(path = {"getDocumentos"})
+    public ResponseEntity<?> findAllDocumentos() {
+        List<Pensao> list = pensaoRepository.buscarPensao();
+        PensaoDocumento situacao = new PensaoDocumento();
+        for(Integer i= 0; i < list.size(); i++){
+            Integer quantidadeDocumentos = documentoPensaoRepository.findSituacao("documentoPensao","idPensao", list.get(i).getId(), "'I', 'II', 'III', 'IV', 'VIII', 'IX', 'X', 'XI', 'XIII', 'XIV'");
+            if(quantidadeDocumentos == 0) {
+                situacao.setPensao(list.get(i));
+                situacao.setSituacao("Pendente");
+            } else if(quantidadeDocumentos == 10){
+                situacao.setPensao(list.get(i));
+                situacao.setSituacao("Concluído");
+            } else{
+                situacao.setPensao(list.get(i));
+                situacao.setSituacao("Aguardando verificação");
+            }
+            pensao.put("Aposentadoria", situacao);
+        }
+
+        return ResponseEntity.ok().body(pensao);
+    }
+
+
+    @CrossOrigin
+    @GetMapping(path = {"getSituacao/{id}"})
+    public ResponseEntity<?> findSituacao(@PathVariable BigInteger id) {
+        Integer situacao = documentoPensaoRepository.findSituacao("documentoPensao","idPensao",id, "'I', 'II', 'III', 'IV', 'VIII', 'IX', 'X', 'XI', 'XIII', 'XIV'");
+        return ResponseEntity.ok().body(situacao);
     }
 
     @CrossOrigin

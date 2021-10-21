@@ -44,7 +44,7 @@ public class AproveitamentoRepository extends DefaultRepository<Aproveitamento, 
                 .createNativeQuery("select a.* from Aproveitamento a " +
                         "join InfoRemessa i on a.chave = i.chave " +
                         "join Admissao ad on ad.id = a.id " +
-                        "join Cargo c on c.id = ad.idCargo " +
+                        "join Cargo c on c.id = a.idCargo " +
                         "join Servidor s on s.id = ad.idServidor " +
                         "join Ato ato on ato.id = a.idAto " +
                         "where i.idUnidadeGestora = '" + User.getUser().getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, Aproveitamento.class)
