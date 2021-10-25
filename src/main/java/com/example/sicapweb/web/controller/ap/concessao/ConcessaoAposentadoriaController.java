@@ -87,7 +87,7 @@ public class ConcessaoAposentadoriaController extends DefaultController<Document
         List<Aposentadoria> list = aposentadoriaRepository.buscarAposentadorias();
         AposentadoriaDocumento situacao = new AposentadoriaDocumento();
         for(Integer i= 0; i < list.size(); i++){
-            Integer quantidadeDocumentos = documentoAposentadoriaRepository.findSituacao("documentoAposentadoria","idAposentadoria", list.get(i).getId(), "'I', 'II', 'III', 'IV', 'V', 'VI', 'VI', 'VIII', 'XII', 'XIII'", "N", "N", "N", "N");
+            Integer quantidadeDocumentos = documentoAposentadoriaRepository.findSituacao("documentoAposentadoria","idAposentadoria", list.get(i).getId(), "'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'XII', 'XIII'", "N", "N", "N", "N");
             if(quantidadeDocumentos == 0) {
                 situacao.setAposentadoria(list.get(i));
                 situacao.setSituacao("Pendente");
@@ -108,7 +108,7 @@ public class ConcessaoAposentadoriaController extends DefaultController<Document
     @CrossOrigin
     @GetMapping(path = {"getSituacao/{id}"})
     public ResponseEntity<?> findSituacao(@PathVariable BigInteger id) {
-        Integer situacao = documentoAposentadoriaRepository.findSituacao("documentoAposentadoria","idAposentadoria",id, "'I', 'II', 'III', 'IV', 'V', 'VI', 'VI', 'VIII', 'XII', 'XIII'", "N", "N", "N", "N");
+        Integer situacao = documentoAposentadoriaRepository.findSituacao("documentoAposentadoria","idAposentadoria",id, "'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'XII', 'XIII'", "N", "N", "N", "N");
         return ResponseEntity.ok().body(situacao);
     }
 

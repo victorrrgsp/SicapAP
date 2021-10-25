@@ -5,8 +5,10 @@ import br.gov.to.tce.model.ap.pessoal.Reconducao;
 import com.example.sicapweb.model.Inciso;
 import com.example.sicapweb.repository.concessao.DocumentoReconducaoRepository;
 import com.example.sicapweb.repository.concessao.ReconducaoRepository;
+import com.example.sicapweb.util.PaginacaoUtil;
 import com.example.sicapweb.web.controller.DefaultController;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -14,11 +16,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @RestController
 @RequestMapping("/documentoConcessaoReconducao")
-public class ConcessaoReconducaoController extends DefaultController<Reconducao> {
+public class ConcessaoReconducaoController extends DefaultController<DocumentoReconducao> {
 
     @Autowired
     private ReconducaoRepository reconducaoRepository;
@@ -26,11 +29,35 @@ public class ConcessaoReconducaoController extends DefaultController<Reconducao>
     @Autowired
     private DocumentoReconducaoRepository documentoReconducaoRepository;
 
+    HashMap<String, Object> reconducao = new HashMap<String, Object>();
+
+    public class ReconducaoDocumento {
+        private Reconducao reconducao;
+
+        private String situacao;
+
+        public Reconducao getReconducao() {
+            return reconducao;
+        }
+
+        public void setReconducao(Reconducao reintegracao) {
+            this.reconducao = reconducao;
+        }
+
+        public String getSituacao() {
+            return situacao;
+        }
+
+        public void setSituacao(String situacao) {
+            this.situacao = situacao;
+        }
+    }
+
     @CrossOrigin
-    @GetMapping()
-    public ResponseEntity<List<Reconducao>> findAll() {
-        List<Reconducao> list = reconducaoRepository.findAll();
-        return ResponseEntity.ok().body(list);
+    @GetMapping(path = "/{searchParams}/{tipoParams}/pagination")
+    public ResponseEntity<PaginacaoUtil<Reconducao>> listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
+        PaginacaoUtil<Reconducao> paginacaoUtil = reconducaoRepository.buscaPaginadaReconducao(pageable, searchParams, tipoParams);
+        return ResponseEntity.ok().body(paginacaoUtil);
     }
 
     @CrossOrigin
@@ -55,6 +82,35 @@ public class ConcessaoReconducaoController extends DefaultController<Reconducao>
     }
 
     @CrossOrigin
+    @GetMapping(path = {"getDocumentos"})
+    public ResponseEntity<?> findAllDocumentos() {
+        List<Reconducao> list = reconducaoRepository.buscarReconducao();
+        ReconducaoDocumento situacao = new ReconducaoDocumento();
+        for (Integer i = 0; i < list.size(); i++) {
+            Integer quantidadeDocumentos = documentoReconducaoRepository.findSituacao("documentoReconducao", "idReconducao", list.get(i).getId(), "'I - Seção V', 'II - Seção V', 'V - Seção V', 'VI - Seção V'");
+            if (quantidadeDocumentos == 0) {
+                situacao.setReconducao(list.get(i));
+                situacao.setSituacao("Pendente");
+            } else if (quantidadeDocumentos == 10) {
+                situacao.setReconducao(list.get(i));
+                situacao.setSituacao("Concluído");
+            } else {
+                situacao.setReconducao(list.get(i));
+                situacao.setSituacao("Aguardando verificação");
+            }
+            reconducao.put("Aposentadoria", situacao);
+        }
+        return ResponseEntity.ok().body(reconducao);
+    }
+
+    @CrossOrigin
+    @GetMapping(path = {"getSituacao/{id}"})
+    public ResponseEntity<?> findSituacao(@PathVariable BigInteger id) {
+        Integer situacao = documentoReconducaoRepository.findSituacao("documentoReconducao", "idReconducao", id, "'I - Seção V', 'II - Seção V', 'V - Seção V', 'VI - Seção V'");
+        return ResponseEntity.ok().body(situacao);
+    }
+
+    @CrossOrigin
     @GetMapping(path = {"getInciso/{id}"})
     public ResponseEntity<?> findInciso(@PathVariable BigInteger id) {
         List<Inciso> list = new ArrayList<>();
@@ -71,11 +127,11 @@ public class ConcessaoReconducaoController extends DefaultController<Reconducao>
         list.add(new Inciso("", "Outros",
                 "Outros", "", "Não"));
 
-        for (int i = 0; i < list.size(); i++){
-            Integer existeArquivo = documentoReconducaoRepository.findAllInciso("documentoReconducao","idReconducao",id, list.get(i).getInciso());
-            if (existeArquivo > 0){
+        for (int i = 0; i < list.size(); i++) {
+            Integer existeArquivo = documentoReconducaoRepository.findAllInciso("documentoReconducao", "idReconducao", id, list.get(i).getInciso());
+            if (existeArquivo > 0) {
                 list.get(i).setStatus("Informado");
-            }else{
+            } else {
                 list.get(i).setStatus("Não informado");
             }
         }

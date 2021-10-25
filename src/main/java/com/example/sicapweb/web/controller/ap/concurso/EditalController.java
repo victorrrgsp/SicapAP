@@ -2,7 +2,6 @@ package com.example.sicapweb.web.controller.ap.concurso;
 
 import br.gov.to.tce.model.ap.concurso.Edital;
 import com.example.sicapweb.repository.concurso.EditalRepository;
-import com.example.sicapweb.repository.concurso.EmpresaOrganizadoraRepository;
 import com.example.sicapweb.util.PaginacaoUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -21,9 +20,6 @@ public class EditalController {
 
     @Autowired
     private EditalRepository editalRepository;
-
-    @Autowired
-    private EmpresaOrganizadoraRepository empresaOrganizadoraRepository;
 
     @CrossOrigin
     @GetMapping(path="/{searchParams}/{tipoParams}/pagination")
@@ -69,7 +65,6 @@ public class EditalController {
     public ResponseEntity<Edital> update(@RequestBody Edital edital, @PathVariable BigInteger id) {
         edital.setInfoRemessa(editalRepository.buscarPrimeiraRemessa());
         edital.setId(id);
-        edital.setEmpresaOrganizadora(empresaOrganizadoraRepository.buscaEmpresaPorCnpj(edital.getCnpjEmpresaOrganizadora()));
         editalRepository.update(edital);
         return ResponseEntity.noContent().build();
     }

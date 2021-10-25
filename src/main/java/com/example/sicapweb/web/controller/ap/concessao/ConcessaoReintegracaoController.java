@@ -6,8 +6,10 @@ import br.gov.to.tce.model.ap.pessoal.Reintegracao;
 import com.example.sicapweb.model.Inciso;
 import com.example.sicapweb.repository.concessao.DocumentoReintegracaoRepository;
 import com.example.sicapweb.repository.concessao.ReintegracaoRepository;
+import com.example.sicapweb.util.PaginacaoUtil;
 import com.example.sicapweb.web.controller.DefaultController;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -15,11 +17,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @RestController
 @RequestMapping("/documentoConcessaoReintegracao")
-public class ConcessaoReintegracaoController extends DefaultController<Reintegracao> {
+public class ConcessaoReintegracaoController extends DefaultController<DocumentoReintegracao> {
 
     @Autowired
     private ReintegracaoRepository reintegracaoRepository;
@@ -27,11 +30,35 @@ public class ConcessaoReintegracaoController extends DefaultController<Reintegra
     @Autowired
     private DocumentoReintegracaoRepository documentoReintegracaoRepository;
 
+    HashMap<String, Object> reintegracao = new HashMap<String, Object>();
+
+    public class ReintegracaoDocumento{
+        private Reintegracao reintegracao;
+
+        private String situacao;
+
+        public Reintegracao getReintegracao() {
+            return reintegracao;
+        }
+
+        public void setReintegracao(Reintegracao reintegracao) {
+            this.reintegracao = reintegracao;
+        }
+
+        public String getSituacao() {
+            return situacao;
+        }
+
+        public void setSituacao(String situacao) {
+            this.situacao = situacao;
+        }
+    }
+
     @CrossOrigin
-    @GetMapping()
-    public ResponseEntity<List<Reintegracao>> findAll() {
-        List<Reintegracao> list = reintegracaoRepository.findAll();
-        return ResponseEntity.ok().body(list);
+    @GetMapping(path="/{searchParams}/{tipoParams}/pagination")
+    public ResponseEntity<PaginacaoUtil<Reintegracao>> listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
+        PaginacaoUtil<Reintegracao> paginacaoUtil = reintegracaoRepository.buscaPaginadaReintegracao(pageable,searchParams,tipoParams);
+        return ResponseEntity.ok().body(paginacaoUtil);
     }
 
     @CrossOrigin
@@ -53,6 +80,36 @@ public class ConcessaoReintegracaoController extends DefaultController<Reintegra
         documentoReintegracao.setStatus(DocumentoReintegracao.Status.Informado.getValor());
         documentoReintegracaoRepository.save(documentoReintegracao);
         return ResponseEntity.ok().body(idCastor);
+    }
+
+    @CrossOrigin
+    @GetMapping(path = {"getDocumentos"})
+    public ResponseEntity<?> findAllDocumentos() {
+        List<Reintegracao> list = reintegracaoRepository.buscarReintegracao();
+        ReintegracaoDocumento situacao = new ReintegracaoDocumento();
+        for (Integer i = 0; i < list.size(); i++) {
+            Integer quantidadeDocumentos = documentoReintegracaoRepository.findSituacao("documentoReintegracao", "idReintegracao", list.get(i).getId(), "'I - Seção V', 'II - Seção V', 'V - Seção V', 'VI - Seção V'");
+            if (quantidadeDocumentos == 0) {
+                situacao.setReintegracao(list.get(i));
+                situacao.setSituacao("Pendente");
+            } else if (quantidadeDocumentos == 10) {
+                situacao.setReintegracao(list.get(i));
+                situacao.setSituacao("Concluído");
+            } else {
+                situacao.setReintegracao(list.get(i));
+                situacao.setSituacao("Aguardando verificação");
+            }
+            reintegracao.put("Aposentadoria", situacao);
+        }
+
+        return ResponseEntity.ok().body(reintegracao);
+    }
+
+    @CrossOrigin
+    @GetMapping(path = {"getSituacao/{id}"})
+    public ResponseEntity<?> findSituacao(@PathVariable BigInteger id) {
+        Integer situacao = documentoReintegracaoRepository.findSituacao("documentoReintegracao", "idReintegracao", id, "'I - Seção V', 'II - Seção V', 'V - Seção V', 'VI - Seção V'");
+        return ResponseEntity.ok().body(situacao);
     }
 
     @CrossOrigin
