@@ -19,7 +19,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/concursoVaga")
+@RequestMapping({"/concursoVaga"})
 public class EditalVagaController extends DefaultController<EditalVaga> {
 
     @Autowired

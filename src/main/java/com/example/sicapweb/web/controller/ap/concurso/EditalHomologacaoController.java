@@ -8,7 +8,6 @@ import com.example.sicapweb.web.controller.DefaultController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -16,10 +15,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.math.BigInteger;
 import java.net.URI;
 
-@Service
-@Transactional
 @RestController
-@RequestMapping("/concursoHomologacao")
+@RequestMapping({"/concursoHomologacao"})
 public class EditalHomologacaoController extends DefaultController<EditalHomologacao> {
 
     @Autowired

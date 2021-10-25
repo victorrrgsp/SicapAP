@@ -16,7 +16,7 @@ import java.math.BigInteger;
 import java.net.URI;
 
 @RestController
-@RequestMapping("/concursoAprovado")
+@RequestMapping({"/concursoAprovado"})
 public class EditalAprovadoController extends DefaultController<EditalAprovado> {
 
     @Autowired

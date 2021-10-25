@@ -3,6 +3,7 @@ package com.example.sicapweb.web.controller.ap.concurso;
 import br.gov.to.tce.model.ap.concurso.Edital;
 import com.example.sicapweb.repository.concurso.EditalRepository;
 import com.example.sicapweb.util.PaginacaoUtil;
+import com.example.sicapweb.web.controller.DefaultController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -15,8 +16,8 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/concursoEdital")
-public class EditalController {
+@RequestMapping({"/concursoEdital"})
+public class EditalController extends DefaultController<Edital> {
 
     @Autowired
     private EditalRepository editalRepository;
