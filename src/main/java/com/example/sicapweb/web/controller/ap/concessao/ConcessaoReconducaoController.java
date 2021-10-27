@@ -98,7 +98,7 @@ public class ConcessaoReconducaoController extends DefaultController<DocumentoRe
                 situacao.setReconducao(list.get(i));
                 situacao.setSituacao("Aguardando verificação");
             }
-            reconducao.put("Aposentadoria", situacao);
+            reconducao.put("Reconducao", situacao);
         }
         return ResponseEntity.ok().body(reconducao);
     }

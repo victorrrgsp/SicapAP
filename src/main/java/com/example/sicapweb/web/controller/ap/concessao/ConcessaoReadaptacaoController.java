@@ -5,8 +5,10 @@ import br.gov.to.tce.model.ap.pessoal.Readaptacao;
 import com.example.sicapweb.model.Inciso;
 import com.example.sicapweb.repository.concessao.DocumentoReadaptacaoRepository;
 import com.example.sicapweb.repository.concessao.ReadaptacaoRepository;
+import com.example.sicapweb.util.PaginacaoUtil;
 import com.example.sicapweb.web.controller.DefaultController;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -14,11 +16,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @RestController
 @RequestMapping("/documentoConcessaoReadaptacao")
-public class ConcessaoReadaptacaoController extends DefaultController<Readaptacao> {
+public class ConcessaoReadaptacaoController extends DefaultController<DocumentoReadaptacao> {
 
     @Autowired
     private ReadaptacaoRepository readaptacaoRepository;
@@ -26,11 +29,35 @@ public class ConcessaoReadaptacaoController extends DefaultController<Readaptaca
     @Autowired
     private DocumentoReadaptacaoRepository documentoReadaptacaoRepository;
 
+    HashMap<String, Object> readaptacao = new HashMap<String, Object>();
+
+    public class ReadaptacaoDocumento {
+        private Readaptacao readaptacao;
+
+        private String situacao;
+
+        public Readaptacao getReadaptacao() {
+            return readaptacao;
+        }
+
+        public void setReadaptacao(Readaptacao readaptacao) {
+            this.readaptacao = readaptacao;
+        }
+
+        public String getSituacao() {
+            return situacao;
+        }
+
+        public void setSituacao(String situacao) {
+            this.situacao = situacao;
+        }
+    }
+
     @CrossOrigin
-    @GetMapping()
-    public ResponseEntity<List<Readaptacao>> findAll() {
-        List<Readaptacao> list = readaptacaoRepository.findAll();
-        return ResponseEntity.ok().body(list);
+    @GetMapping(path = "/{searchParams}/{tipoParams}/pagination")
+    public ResponseEntity<PaginacaoUtil<Readaptacao>> listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
+        PaginacaoUtil<Readaptacao> paginacaoUtil = readaptacaoRepository.buscaPaginadaReadaptacao(pageable, searchParams, tipoParams);
+        return ResponseEntity.ok().body(paginacaoUtil);
     }
 
     @CrossOrigin
@@ -53,6 +80,36 @@ public class ConcessaoReadaptacaoController extends DefaultController<Readaptaca
         documentoReadaptacaoRepository.save(documentoReadaptacao);
         return ResponseEntity.ok().body(idCastor);
     }
+
+    @CrossOrigin
+    @GetMapping(path = {"getDocumentos"})
+    public ResponseEntity<?> findAllDocumentos() {
+        List<Readaptacao> list = readaptacaoRepository.buscarReadaptacao();
+        ReadaptacaoDocumento situacao = new ReadaptacaoDocumento();
+        for (Integer i = 0; i < list.size(); i++) {
+            Integer quantidadeDocumentos = documentoReadaptacaoRepository.findSituacao("documentoReadaptacao", "idReadaptacao", list.get(i).getId(), "'I - Seção V', 'II - Seção V', 'VI - Seção V'");
+            if (quantidadeDocumentos == 0) {
+                situacao.setReadaptacao(list.get(i));
+                situacao.setSituacao("Pendente");
+            } else if (quantidadeDocumentos == 10) {
+                situacao.setReadaptacao(list.get(i));
+                situacao.setSituacao("Concluído");
+            } else {
+                situacao.setReadaptacao(list.get(i));
+                situacao.setSituacao("Aguardando verificação");
+            }
+            readaptacao.put("Readaptacao", situacao);
+        }
+        return ResponseEntity.ok().body(readaptacao);
+    }
+
+    @CrossOrigin
+    @GetMapping(path = {"getSituacao/{id}"})
+    public ResponseEntity<?> findSituacao(@PathVariable BigInteger id) {
+        Integer situacao = documentoReadaptacaoRepository.findSituacao("documentoReadaptacao", "idReadaptacao", id, "'I - Seção V', 'II - Seção V', 'VI - Seção V'");
+        return ResponseEntity.ok().body(situacao);
+    }
+
     @CrossOrigin
     @GetMapping(path = {"getInciso/{id}"})
     public ResponseEntity<?> findInciso(@PathVariable BigInteger id) {

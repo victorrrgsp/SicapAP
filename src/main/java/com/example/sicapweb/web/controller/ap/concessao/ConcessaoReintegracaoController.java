@@ -99,7 +99,7 @@ public class ConcessaoReintegracaoController extends DefaultController<Documento
                 situacao.setReintegracao(list.get(i));
                 situacao.setSituacao("Aguardando verificação");
             }
-            reintegracao.put("Aposentadoria", situacao);
+            reintegracao.put("Reintegracao", situacao);
         }
 
         return ResponseEntity.ok().body(reintegracao);

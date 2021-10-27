@@ -98,7 +98,7 @@ public class ConcessaoPensaoController extends DefaultController<DocumentoPensao
                 situacao.setPensao(list.get(i));
                 situacao.setSituacao("Aguardando verificação");
             }
-            pensao.put("Aposentadoria", situacao);
+            pensao.put("Pensao", situacao);
         }
 
         return ResponseEntity.ok().body(pensao);
