@@ -6,7 +6,6 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -14,8 +13,6 @@ public class DocumentoPensaoRepository extends DefaultRepository<DocumentoPensao
     public DocumentoPensaoRepository(EntityManager em) {
         super(em);
     }
-
-    ArrayList<String> incisos = new ArrayList();
 
     public List<DocumentoPensao> buscarDocumentoPensao(String coluna, BigInteger idPensao) {
 

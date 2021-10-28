@@ -64,6 +64,46 @@ public class PensaoRepository extends DefaultRepository<Pensao, BigInteger> {
                 .getResultList();
     }
 
+    public PaginacaoUtil<Pensao> buscaPaginadaPensaoRevisao(Pageable pageable, String searchParams, Integer tipoParams) {
+        int pagina = Integer.valueOf(pageable.getPageNumber());
+        int tamanho = Integer.valueOf(pageable.getPageSize());
+        String search = "";
+        //monta pesquisa search
+        if (searchParams.length() > 3) {
+            if (tipoParams == 0) { //entra para tratar a string
+                String arrayOfStrings[] = searchParams.split("=");
+                if (arrayOfStrings[0].equals("nomeCargo"))
+                    search = " and c." + arrayOfStrings[0] + " LIKE '%" + arrayOfStrings[1] + "%'  ";
+                else if (arrayOfStrings[0].equals("numeroAto"))
+                    search = " and ato." + arrayOfStrings[0] + " LIKE '%" + arrayOfStrings[1] + "%'  ";
+                else if (arrayOfStrings[0].equals("cpfServidor"))
+                    search = " and a." + arrayOfStrings[0] + " LIKE '%" + arrayOfStrings[1] + "%'  ";
+                else
+                    search = " and " + arrayOfStrings[0] + " LIKE '%" + arrayOfStrings[1] + "%'  ";
+            } else {
+                search = " and " + searchParams + "   ";
+            }
+        }
+        //retirar os : do Sort pageable
+        String campo = String.valueOf(pageable.getSort()).replace(":", "");
+
+        List<Pensao> list = getEntityManager()
+                .createNativeQuery("select a.* from Pensao a " +
+                        "join InfoRemessa i on a.chave = i.chave " +
+                        "join Admissao ad on ad.id = a.id " +
+                        "join Cargo c on c.id = ad.idCargo " +
+                        "join Servidor s on s.cpfServidor = a.cpfServidor " +
+                        "join Ato ato on ato.id = a.idAto " +
+                        "where a.revisao = 1 " +
+                        "and i.idUnidadeGestora = '" + User.getUser().getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, Pensao.class)
+                .setFirstResult(pagina)
+                .setMaxResults(tamanho)
+                .getResultList();
+        long totalRegistros = count();
+        long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
+        return new PaginacaoUtil<Pensao>(tamanho, pagina, totalPaginas, totalRegistros, list);
+    }
+
     public List<Pensao> buscarPensaoRevisao() {
         return getEntityManager().createNativeQuery(
                 "select * from Pensao where revisao = 1", Pensao.class)

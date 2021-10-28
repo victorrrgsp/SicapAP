@@ -144,6 +144,32 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
                 .getResultList();
     }
 
+    public PaginacaoUtil<Aposentadoria> buscaPaginadaRevisaoReserva(Pageable pageable, String searchParams, Integer tipoParams) {
+        int pagina = Integer.valueOf(pageable.getPageNumber());
+        int tamanho = Integer.valueOf(pageable.getPageSize());
+        String search = "";
+        //monta pesquisa search
+        search = getSearch(searchParams, tipoParams);
+        //retirar os : do Sort pageable
+        String campo = String.valueOf(pageable.getSort()).replace(":", "");
+
+        List<Aposentadoria> list = getEntityManager()
+                .createNativeQuery("select a.* from Aposentadoria a " +
+                        "join InfoRemessa i on a.chave = i.chave " +
+                        "join Admissao ad on ad.id = a.id " +
+                        "join Cargo c on c.id = ad.idCargo " +
+                        "join Servidor s on s.cpfServidor = a.cpfServidor " +
+                        "join Ato ato on ato.id = a.idAto " +
+                        "where a.reversao = 0 and a.revisao = 1 and a.tipoAposentadoria = "+ Aposentadoria.TipoAposentadoria.Reserva.getValor() +
+                        " and i.idUnidadeGestora = '" + User.getUser().getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, Aposentadoria.class)
+                .setFirstResult(pagina)
+                .setMaxResults(tamanho)
+                .getResultList();
+        long totalRegistros = count();
+        long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
+        return new PaginacaoUtil<Aposentadoria>(tamanho, pagina, totalPaginas, totalRegistros, list);
+    }
+
     public List<Aposentadoria> buscarAposentadoriaRevisaoReserva() {
         return getEntityManager().createNativeQuery(
                 "select a.* from Aposentadoria a " +

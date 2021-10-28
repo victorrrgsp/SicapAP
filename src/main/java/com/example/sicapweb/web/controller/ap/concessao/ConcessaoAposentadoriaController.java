@@ -157,23 +157,6 @@ public class ConcessaoAposentadoriaController extends DefaultController<Document
         return ResponseEntity.ok().body(list);
     }
 
-
-    //    @CrossOrigin
-//    @DeleteMapping(path = {"getSituacao/{id}"})
-//    public ResponseEntity<?> deleteInciso(@PathVariable BigInteger id) {
-//        CastorController c = new CastorController();
-//        c.isMutable = false;
-//
-//        try {
-//            c.deletar(new ObjetoCastor("45c368d4a15550700a00ba11dd0c9855"));
-//
-//        } catch (Exception e) {
-//            System.out.println(e.getMessage());
-//            e.printStackTrace();
-//        }
-//        return ResponseEntity.noContent().build();
-//    }
-
     @CrossOrigin
     @GetMapping(path = {"anexos/{inciso}/{id}"})
     public ResponseEntity<?> findByDocumento(@PathVariable String inciso, @PathVariable BigInteger id) {
