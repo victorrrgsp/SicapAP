@@ -160,7 +160,7 @@ public class LoginController extends DefaultController<Login> {
             });
             //System.out.println(cpf);
 
-            Session.usuarioLogado = userLogado;
+            Session.setUsuario(userLogado);
             getIp.getRequest().getSession().setAttribute(userLogado.getCpf(), userLogado);
             config.jedis.set(userLogado.getId(), Config.json(userLogado));
 

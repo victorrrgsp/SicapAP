@@ -3,6 +3,7 @@ package com.example.sicapweb.web.controller.remessa;
 
 import br.gov.to.tce.model.InfoRemessa;
 import br.gov.to.tce.model.ap.folha.documento.Gfip;
+import com.example.sicapweb.repository.remessa.AssinarRemessaRepository;
 import com.example.sicapweb.repository.remessa.GfipRepository;
 import com.example.sicapweb.repository.remessa.InfoRemessaRepository;
 import com.example.sicapweb.web.controller.DefaultController;
@@ -26,6 +27,9 @@ public class GfipController extends DefaultController<InfoRemessa> {
 
     @Autowired
     private GfipRepository gfipRepository;
+
+    @Autowired
+    private AssinarRemessaRepository assinarRemessaRepository;
 
     HashMap<String, Object> gfip = new HashMap<String, Object>();
 
@@ -86,22 +90,20 @@ public class GfipController extends DefaultController<InfoRemessa> {
     @CrossOrigin
     @GetMapping(path = {"/getDocumentos"})
     public ResponseEntity<?> findAllDocumentos() {
-        List<InfoRemessa> list = infoRemessaRepository.findAll();
-        if(list == null){
+        InfoRemessa infoRemessa = assinarRemessaRepository.buscarRemessaAberta();
+        if (infoRemessa == null) {
             gfip = null;
             return ResponseEntity.ok().body(Objects.requireNonNullElse(gfip, "semRemessa"));
         }
-        if(list.size()>0) {
+        if (infoRemessa != null) {
             gfip = new HashMap<String, Object>();
             GfipDocumento gfipDocumento = new GfipDocumento();
-            for (Integer i = 0; i < list.size(); i++) {
-                gfipDocumento.setInfoRemessa(list.get(i));
-                gfipDocumento.setSituacaoGfip(gfipRepository.findSituacao(list.get(i).getChave(), "GFIP"));
-                gfipDocumento.setSituacaoBoleto(gfipRepository.findSituacao(list.get(i).getChave(), "boletoGFIP"));
-                gfipDocumento.setSituacaoComprovante(gfipRepository.findSituacao(list.get(i).getChave(), "comprovanteGFIP"));
-                gfip.put("Gfip", gfipDocumento);
-            }
-        }else {
+            gfipDocumento.setInfoRemessa(infoRemessa);
+            gfipDocumento.setSituacaoGfip(gfipRepository.findSituacao(infoRemessa.getChave(), "GFIP"));
+            gfipDocumento.setSituacaoBoleto(gfipRepository.findSituacao(infoRemessa.getChave(), "boletoGFIP"));
+            gfipDocumento.setSituacaoComprovante(gfipRepository.findSituacao(infoRemessa.getChave(), "comprovanteGFIP"));
+            gfip.put("Gfip", gfipDocumento);
+        } else {
             gfip = null;
         }
 

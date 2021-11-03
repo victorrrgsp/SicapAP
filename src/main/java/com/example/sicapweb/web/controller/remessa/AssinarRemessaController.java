@@ -5,19 +5,29 @@ import com.example.sicapweb.repository.remessa.AssinarRemessaRepository;
 import com.example.sicapweb.repository.remessa.GfipRepository;
 import com.example.sicapweb.security.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Objects;
 
 
+@Transactional
+@Controller
 @RestController
 @RequestMapping(value = "/assinarRemessa")
 public class AssinarRemessaController {
 
     public InfoRemessa info;
+
+    @Autowired
+    private ApplicationContext applicationContext;
+    @Autowired
+    private HttpSession httpSession;
 
     @Autowired
     private AssinarRemessaRepository assinarRemessaRepository;
@@ -57,8 +67,11 @@ public class AssinarRemessaController {
 
     @CrossOrigin
     @GetMapping(path = {"/autenticacao"})
-    public ResponseEntity<User> findeUserAutenticacao() {
-        User user = User.getUser();
+    public ResponseEntity<User> findeUserAutenticacao(HttpSession session) {
+        session.setAttribute("user", User.getUser());
+        System.out.println(httpSession.getId());
+        System.out.println(session.getId());
+        User user = User.getUser();session.getAttribute("user");
         return ResponseEntity.ok().body(user);
     }
 

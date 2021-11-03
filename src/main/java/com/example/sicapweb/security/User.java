@@ -4,6 +4,11 @@ import br.gov.to.tce.model.DefaultEnum;
 import br.gov.to.tce.model.UnidadeGestora;
 import br.gov.to.tce.util.Date;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.annotation.SessionScope;
 
 import java.io.Serializable;
 import java.text.ParseException;
@@ -12,6 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+@SessionScope
 public class User implements Serializable {
     private static final long serialVersionUID = -6455849887168288989L;
 
@@ -85,6 +91,10 @@ public class User implements Serializable {
         return certificado;
     }
 
+    @Bean
+    @Scope(
+            value = WebApplicationContext.SCOPE_SESSION,
+            proxyMode = ScopedProxyMode.TARGET_CLASS)
     public static User getUser(){
         return Session.usuarioLogado;
     }
