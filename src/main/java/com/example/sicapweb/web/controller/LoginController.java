@@ -39,6 +39,9 @@ public class LoginController extends DefaultController<Login> {
     private Config config;
 
     @Autowired
+    private HttpServletRequest httpServletRequest;
+
+    @Autowired
     private UsuarioRepository usuarioRepository;
 
     @CrossOrigin
