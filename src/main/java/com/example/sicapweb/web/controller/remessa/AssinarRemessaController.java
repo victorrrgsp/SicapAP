@@ -43,7 +43,15 @@ public class AssinarRemessaController {
         return ResponseEntity.ok().body(Objects.requireNonNullElse(infoRemessa, "semRemessa"));
     }
 
-    @CrossOrigin
+  @CrossOrigin
+  @GetMapping(path = {"/close"})
+  public ResponseEntity<?> findRemessaClose() {
+    InfoRemessa infoRemessa = assinarRemessaRepository.buscarRemessaFechada();
+    info = infoRemessa;
+    return ResponseEntity.ok().body(Objects.requireNonNullElse(infoRemessa, "semRemessa"));
+  }
+
+  @CrossOrigin
     @GetMapping(path = {"/{cargo}"})
     public ResponseEntity<?> findResponsavel(@PathVariable String cargo) {
         Integer tipoCargo;

@@ -27,4 +27,9 @@ public class CargoRepository extends DefaultRepository<Cargo, BigInteger> {
                 , Cargo.class).getResultList();
         return list;
     }
+  public List<Cargo> buscaTodosCargo() {
+    List<Cargo> list = entityManager.createNativeQuery("select * from Cargo ORDER BY nomeCargo ASC"
+      , Cargo.class).getResultList();
+    return list;
+  }
 }

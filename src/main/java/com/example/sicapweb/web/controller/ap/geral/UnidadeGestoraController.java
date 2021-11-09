@@ -37,8 +37,15 @@ public class UnidadeGestoraController {
         return ResponseEntity.ok().body(list);
     }
 
-
     @CrossOrigin
+  @GetMapping(path = {"/todosNome"})
+  public ResponseEntity<List<Object>> findTodosNome() {
+    List<Object> list = unidadeGestoraRepository.buscaNomeCnpjUnidadeGestora();
+    return ResponseEntity.ok().body(list);
+  }
+
+
+  @CrossOrigin
     @GetMapping(path = {"/{Cnpj}"})
     public ResponseEntity<?> findById(@PathVariable String Cnpj) {
         UnidadeGestora list = unidadeGestoraRepository.buscaUnidadeGestoraPorCnpj(Cnpj);
@@ -51,7 +58,6 @@ public class UnidadeGestoraController {
         List<Integer> resposta = unidadeGestoraRepository.buscaVigenciaUnidadeGestoraPorCnpj(Cnpj, Exercicio, Remessa);
         return ResponseEntity.ok().body(resposta);
     }
-
 
 
 }

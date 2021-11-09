@@ -29,10 +29,16 @@ public class UnidadeGestoraRepository extends DefaultRepository<UnidadeGestora, 
     }
 
     public List<UnidadeGestora> buscaTodasUnidadeGestora() {
-        List<UnidadeGestora> list = entityManager.createNativeQuery("select * from UnidadeGestora "
+        List<UnidadeGestora> list = entityManager.createNativeQuery("select * from UnidadeGestora ORDER BY nome ASC"
                 , UnidadeGestora.class).getResultList();
         return list;
     }
+
+  public List<Object> buscaNomeCnpjUnidadeGestora() {
+    List<Object> list = entityManager.createNativeQuery("select id , nome From UnidadeGestora  "
+      ).getResultList();
+    return list;
+  }
 
     public List<Integer> buscaVigenciaUnidadeGestoraPorCnpj(String Cnpj, Integer Exercicio, Integer Remessa) {
 

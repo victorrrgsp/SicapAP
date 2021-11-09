@@ -29,7 +29,7 @@ public class CargoController {
     @CrossOrigin
     @GetMapping(path = {"/todos"})
     public ResponseEntity<List<Cargo>> findTodos() {
-        List<Cargo> list = cargoRepository.buscaTodosCargos();
+        List<Cargo> list = cargoRepository.buscaTodosCargo();
         return ResponseEntity.ok().body(list);
     }
 }
