@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -60,9 +61,17 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();
-        long totalRegistros = count();
+        long totalRegistros = countAposentadoria();
         long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
         return new PaginacaoUtil<Aposentadoria>(tamanho, pagina, totalPaginas, totalRegistros, list);
+    }
+
+    public Integer countAposentadoria() {
+        Query query = getEntityManager().createNativeQuery("select count(*) from Aposentadoria a " +
+                "join InfoRemessa i on a.chave = i.chave " +
+                "where a.reversao = 0 and a.revisao = 0 and a.tipoAposentadoria not in (6,7) " +
+                "and i.idUnidadeGestora= '"+ User.getUser().getUnidadeGestora().getId()+ "'");
+        return (Integer) query.getSingleResult();
     }
 
     public List<Aposentadoria> buscarAposentadorias() {
@@ -95,9 +104,17 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();
-        long totalRegistros = count();
+        long totalRegistros = countAposentadoriaPorTipo(tipoAposentadoria);
         long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
         return new PaginacaoUtil<Aposentadoria>(tamanho, pagina, totalPaginas, totalRegistros, list);
+    }
+
+    public Integer countAposentadoriaPorTipo(Integer tipoAposentadoria) {
+        Query query = getEntityManager().createNativeQuery("select count(*) from Aposentadoria a " +
+                "join InfoRemessa i on a.chave = i.chave " +
+                "where a.reversao = 0 and a.revisao = 0 and a.tipoAposentadoria = " + tipoAposentadoria +
+                " and i.idUnidadeGestora= '"+ User.getUser().getUnidadeGestora().getId()+ "'");
+        return (Integer) query.getSingleResult();
     }
 
     public List<Aposentadoria> buscarAposentadoriaPorTipo(Integer tipoAposentadoria) {
@@ -130,9 +147,17 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();
-        long totalRegistros = count();
+        long totalRegistros = countAposentadoriaRevisao();
         long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
         return new PaginacaoUtil<Aposentadoria>(tamanho, pagina, totalPaginas, totalRegistros, list);
+    }
+
+    public Integer countAposentadoriaRevisao() {
+        Query query = getEntityManager().createNativeQuery("select count(*) from Aposentadoria a " +
+                "join InfoRemessa i on a.chave = i.chave " +
+                "where a.reversao = 0 and revisao = 1 and tipoAposentadoria not in (6,7) " +
+                "and i.idUnidadeGestora= '"+ User.getUser().getUnidadeGestora().getId()+ "'");
+        return (Integer) query.getSingleResult();
     }
 
     public List<Aposentadoria> buscarAposentadoriaRevisao() {
@@ -165,9 +190,17 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();
-        long totalRegistros = count();
+        long totalRegistros = countAposentadoriaRevisaoReserva();
         long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
         return new PaginacaoUtil<Aposentadoria>(tamanho, pagina, totalPaginas, totalRegistros, list);
+    }
+
+    public Integer countAposentadoriaRevisaoReserva() {
+        Query query = getEntityManager().createNativeQuery("select count(*) from Aposentadoria a " +
+                "join InfoRemessa i on a.chave = i.chave " +
+                "where revisao = 1 and tipoAposentadoria = " + Aposentadoria.TipoAposentadoria.Reserva.getValor() +
+                " and i.idUnidadeGestora= '"+ User.getUser().getUnidadeGestora().getId()+ "'");
+        return (Integer) query.getSingleResult();
     }
 
     public List<Aposentadoria> buscarAposentadoriaRevisaoReserva() {
@@ -179,6 +212,40 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
                 .getResultList();
     }
 
+    public PaginacaoUtil<Aposentadoria> buscaPaginadaRevisaoReforma(Pageable pageable, String searchParams, Integer tipoParams) {
+        int pagina = Integer.valueOf(pageable.getPageNumber());
+        int tamanho = Integer.valueOf(pageable.getPageSize());
+        String search = "";
+        //monta pesquisa search
+        search = getSearch(searchParams, tipoParams);
+        //retirar os : do Sort pageable
+        String campo = String.valueOf(pageable.getSort()).replace(":", "");
+
+        List<Aposentadoria> list = getEntityManager()
+                .createNativeQuery("select a.* from Aposentadoria a " +
+                        "join InfoRemessa i on a.chave = i.chave " +
+                        "join Admissao ad on ad.id = a.id " +
+                        "join Cargo c on c.id = ad.idCargo " +
+                        "join Servidor s on s.cpfServidor = a.cpfServidor " +
+                        "join Ato ato on ato.id = a.idAto " +
+                        "where a.reversao = 0 and a.revisao = 1 and a.tipoAposentadoria = "+ Aposentadoria.TipoAposentadoria.Reforma.getValor() +
+                        " and i.idUnidadeGestora = '" + User.getUser().getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, Aposentadoria.class)
+                .setFirstResult(pagina)
+                .setMaxResults(tamanho)
+                .getResultList();
+        long totalRegistros = countAposentadoriaRevisaoReforma();
+        long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
+        return new PaginacaoUtil<Aposentadoria>(tamanho, pagina, totalPaginas, totalRegistros, list);
+    }
+
+    public Integer countAposentadoriaRevisaoReforma() {
+        Query query = getEntityManager().createNativeQuery("select count(*) from Aposentadoria a " +
+                "join InfoRemessa i on a.chave = i.chave " +
+                "where revisao = 1 and tipoAposentadoria = " + Aposentadoria.TipoAposentadoria.Reforma.getValor() +
+                " and i.idUnidadeGestora= '"+ User.getUser().getUnidadeGestora().getId()+ "'");
+        return (Integer) query.getSingleResult();
+    }
+
     public List<Aposentadoria> buscarAposentadoriaRevisaoReforma() {
         return getEntityManager().createNativeQuery(
                 "select a.* from Aposentadoria a " +
@@ -188,12 +255,46 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
                 .getResultList();
     }
 
+    public PaginacaoUtil<Aposentadoria> buscaPaginadaReversaoAposentadoriaReserva(Pageable pageable, String searchParams, Integer tipoParams) {
+        int pagina = Integer.valueOf(pageable.getPageNumber());
+        int tamanho = Integer.valueOf(pageable.getPageSize());
+        String search = "";
+        //monta pesquisa search
+        search = getSearch(searchParams, tipoParams);
+        //retirar os : do Sort pageable
+        String campo = String.valueOf(pageable.getSort()).replace(":", "");
+
+        List<Aposentadoria> list = getEntityManager()
+                .createNativeQuery("select a.* from Aposentadoria a " +
+                        "join InfoRemessa i on a.chave = i.chave " +
+                        "join Admissao ad on ad.id = a.id " +
+                        "join Cargo c on c.id = ad.idCargo " +
+                        "join Servidor s on s.cpfServidor = a.cpfServidor " +
+                        "join Ato ato on ato.id = a.idAto " +
+                        "where a.reversao = 1 and a.revisao = 0 and a.tipoAposentadoria != "+ Aposentadoria.TipoAposentadoria.Reforma.getValor() +
+                        " and i.idUnidadeGestora = '" + User.getUser().getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, Aposentadoria.class)
+                .setFirstResult(pagina)
+                .setMaxResults(tamanho)
+                .getResultList();
+        long totalRegistros = countReversaoAposentadoriaReserva();
+        long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
+        return new PaginacaoUtil<Aposentadoria>(tamanho, pagina, totalPaginas, totalRegistros, list);
+    }
+
+    public Integer countReversaoAposentadoriaReserva() {
+        Query query = getEntityManager().createNativeQuery("select count(*) from Aposentadoria a " +
+                "join InfoRemessa i on a.chave = i.chave " +
+                "where reversao = 1 and tipoAposentadoria != "+ Aposentadoria.TipoAposentadoria.Reforma.getValor() +
+                " and i.idUnidadeGestora= '"+ User.getUser().getUnidadeGestora().getId()+ "'");
+        return (Integer) query.getSingleResult();
+    }
+
     public List<Aposentadoria> buscarReversaoAposentadoriaReserva() {
         return getEntityManager().createNativeQuery(
                 "select * from Aposentadoria a " +
                         "join InfoRemessa i on a.chave = i.chave " +
-                        "where reversao = 1 and tipoAposentadoria != 7 " +
-                        "and i.idUnidadeGestora = '" + User.getUser().getUnidadeGestora().getId() + "'", Aposentadoria.class)
+                        "where reversao = 1 and tipoAposentadoria != "+ Aposentadoria.TipoAposentadoria.Reforma.getValor() +
+                        " and i.idUnidadeGestora = '" + User.getUser().getUnidadeGestora().getId() + "'", Aposentadoria.class)
                 .getResultList();
     }
 }

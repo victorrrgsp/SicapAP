@@ -92,7 +92,7 @@ public class ConcessaoRevisaoPensaoController extends DefaultController<Document
             if(quantidadeDocumentos == 0) {
                 situacao.setPensao(list.get(i));
                 situacao.setSituacao("Pendente");
-            } else if(quantidadeDocumentos == 10){
+            } else if(quantidadeDocumentos == 6){
                 situacao.setPensao(list.get(i));
                 situacao.setSituacao("Concluído");
             } else{

@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
@@ -138,8 +139,10 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
         return new PaginacaoUtil<T>(tamanho, pagina, totalPaginas, totalRegistros, list);
     }
 
-    public long count() {
-        return getEntityManager().createQuery("select count(*) from " + entityClass.getSimpleName(), Long.class).getSingleResult();
+    public Integer count() {
+        Query query = getEntityManager().createNativeQuery("select count(*) from " + entityClass.getSimpleName()
+                + " a join InfoRemessa i on a.chave = i.chave where i.idUnidadeGestora= '"+ User.getUser().getUnidadeGestora().getId()+ "'");
+        return (Integer) query.getSingleResult();
     }
 
     public InfoRemessa buscarPrimeiraRemessa() {

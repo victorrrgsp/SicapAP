@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -53,9 +54,16 @@ public class PensaoRepository extends DefaultRepository<Pensao, BigInteger> {
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();
-        long totalRegistros = count();
+        long totalRegistros = countPensao();
         long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
         return new PaginacaoUtil<Pensao>(tamanho, pagina, totalPaginas, totalRegistros, list);
+    }
+
+    public Integer countPensao() {
+        Query query = getEntityManager().createNativeQuery("select count(*) from Pensao a " +
+                "join InfoRemessa i on a.chave = i.chave " +
+                "where a.revisao = 0 and i.idUnidadeGestora= '"+ User.getUser().getUnidadeGestora().getId()+ "'");
+        return (Integer) query.getSingleResult();
     }
 
     public List<Pensao> buscarPensao() {
@@ -99,9 +107,16 @@ public class PensaoRepository extends DefaultRepository<Pensao, BigInteger> {
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();
-        long totalRegistros = count();
+        long totalRegistros = countPensaoRevisao();
         long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
         return new PaginacaoUtil<Pensao>(tamanho, pagina, totalPaginas, totalRegistros, list);
+    }
+
+    public Integer countPensaoRevisao() {
+        Query query = getEntityManager().createNativeQuery("select count(*) from Pensao a " +
+                "join InfoRemessa i on a.chave = i.chave " +
+                "where a.revisao = 1 and i.idUnidadeGestora= '"+ User.getUser().getUnidadeGestora().getId()+ "'");
+        return (Integer) query.getSingleResult();
     }
 
     public List<Pensao> buscarPensaoRevisao() {

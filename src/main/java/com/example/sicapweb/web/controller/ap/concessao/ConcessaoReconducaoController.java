@@ -91,7 +91,7 @@ public class ConcessaoReconducaoController extends DefaultController<DocumentoRe
             if (quantidadeDocumentos == 0) {
                 situacao.setReconducao(list.get(i));
                 situacao.setSituacao("Pendente");
-            } else if (quantidadeDocumentos == 10) {
+            } else if (quantidadeDocumentos == 4) {
                 situacao.setReconducao(list.get(i));
                 situacao.setSituacao("Concluído");
             } else {

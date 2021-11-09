@@ -69,8 +69,6 @@ public class AssinarRemessaController {
     @GetMapping(path = {"/autenticacao"})
     public ResponseEntity<User> findeUserAutenticacao(HttpSession session) {
         session.setAttribute("user", User.getUser());
-        System.out.println(httpSession.getId());
-        System.out.println(session.getId());
         User user = User.getUser();session.getAttribute("user");
         return ResponseEntity.ok().body(user);
     }

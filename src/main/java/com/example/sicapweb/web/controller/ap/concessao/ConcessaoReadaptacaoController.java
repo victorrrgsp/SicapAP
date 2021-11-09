@@ -91,7 +91,7 @@ public class ConcessaoReadaptacaoController extends DefaultController<DocumentoR
             if (quantidadeDocumentos == 0) {
                 situacao.setReadaptacao(list.get(i));
                 situacao.setSituacao("Pendente");
-            } else if (quantidadeDocumentos == 10) {
+            } else if (quantidadeDocumentos == 3) {
                 situacao.setReadaptacao(list.get(i));
                 situacao.setSituacao("Concluído");
             } else {

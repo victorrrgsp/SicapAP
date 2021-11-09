@@ -91,7 +91,7 @@ public class ConcessaoAproveitamentoController extends DefaultController<Documen
             if (quantidadeDocumentos == 0) {
                 situacao.setAproveitamento(list.get(i));
                 situacao.setSituacao("Pendente");
-            } else if (quantidadeDocumentos == 10) {
+            } else if (quantidadeDocumentos == 4) {
                 situacao.setAproveitamento(list.get(i));
                 situacao.setSituacao("Concluído");
             } else {

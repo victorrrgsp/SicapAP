@@ -86,7 +86,7 @@ public class ConcessaoRevisaoReservaController  extends DefaultController<Docume
     @CrossOrigin
     @GetMapping(path = {"getDocumentos"})
     public ResponseEntity<?> findAllDocumentos() {
-        List<Aposentadoria> list = aposentadoriaRepository.buscarAposentadorias();
+        List<Aposentadoria> list = aposentadoriaRepository.buscarAposentadoriaRevisaoReserva();
         AposentadoriaDocumento situacao = new AposentadoriaDocumento();
         for(Integer i= 0; i < list.size(); i++){
             Integer quantidadeDocumentos = documentoAposentadoriaRepository.findSituacao("documentoAposentadoria","idAposentadoria", list.get(i).getId(), "'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'", "S", "N", "N", "S");
