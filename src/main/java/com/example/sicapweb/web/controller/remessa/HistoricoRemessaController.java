@@ -1,11 +1,15 @@
 package com.example.sicapweb.web.controller.remessa;
 
 import br.gov.to.tce.model.InfoRemessa;
+import br.gov.to.tce.model.ap.pessoal.Aproveitamento;
+import br.gov.to.tce.model.ap.relacional.Lei;
 import com.example.sicapweb.repository.remessa.GfipRepository;
 import com.example.sicapweb.repository.remessa.HistoricoRemessaRepository;
 import com.example.sicapweb.repository.remessa.InfoRemessaRepository;
 import com.example.sicapweb.security.User;
+import com.example.sicapweb.util.PaginacaoUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -36,9 +40,16 @@ public class HistoricoRemessaController {
 
       return ResponseEntity.ok().body(Objects.requireNonNullElse(infoRemessa, "semRemessa"));
     }
+  @CrossOrigin
+  @GetMapping(path = {"/filtro/{exercicio}"})
+  public ResponseEntity<?> filtroRemessaClose(@PathVariable String exercicio) {
+    List<InfoRemessa> infoRemessa = historicoRemessaRepository.filtroRemessaFechada(exercicio);
+
+    return ResponseEntity.ok().body(Objects.requireNonNullElse(infoRemessa, "semRemessa"));
+  }
 
   @CrossOrigin
-  @GetMapping(path = {"/fechado"})
+  @GetMapping(path = {"/fechado/{chave}"})
   public ResponseEntity<?> findRemessaFechado(@PathVariable String chave) {
    InfoRemessa infoRemessa = historicoRemessaRepository.findRemessaFechada(chave);
 
@@ -76,6 +87,11 @@ public class HistoricoRemessaController {
       User user = User.getUser();
       return ResponseEntity.ok().body(user);
     }
-
-
+  @CrossOrigin
+  @GetMapping(path = "/{searchParams}/{tipoParams}/pagination")
+  public ResponseEntity<PaginacaoUtil<InfoRemessa>> listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
+    PaginacaoUtil<InfoRemessa> paginacaoUtil = historicoRemessaRepository.buscaPaginadaHistorico(pageable, searchParams, tipoParams);
+    return ResponseEntity.ok().body(paginacaoUtil);
   }
+
+}
