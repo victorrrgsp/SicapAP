@@ -129,7 +129,7 @@ public class ConcessaoReversaoAposentadoriaReservaController extends DefaultCont
                 "Laudo médico pericial declarando a habilitação do aposentado para o exercício do cargo anteriormente ocupado", "", "Sim"));
         list.add(new Inciso("VIII - Seção V", "Documento de comprovação de idade do servidor",
                 "Documento de comprovação de idade do servidor", "", "Sim"));
-        list.add(new Inciso("", "Outros",
+        list.add(new Inciso("Outros", "Outros",
                 "Outros", "", "Não"));
 
         for (int i = 0; i < list.size(); i++) {

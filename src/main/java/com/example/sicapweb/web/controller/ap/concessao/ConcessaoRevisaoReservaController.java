@@ -140,7 +140,7 @@ public class ConcessaoRevisaoReservaController  extends DefaultController<Docume
                 "Parecer jurídico atestando a legalidade da concessão do benefício", "", "Sim"));
         list.add(new Inciso("XI", "Laudo pericial",
                 "Laudo pericial, com a indicação da moléstia que ensejou a incapacidade definitiva do militar, nos casos de reforma por invalidez", "", "Não"));
-        list.add(new Inciso("", "Outros",
+        list.add(new Inciso("Outros", "Outros",
                 "Outros", "", "Não"));
 
         for (int i = 0; i < list.size(); i++){

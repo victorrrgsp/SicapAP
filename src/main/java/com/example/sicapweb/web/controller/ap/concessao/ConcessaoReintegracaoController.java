@@ -128,7 +128,7 @@ public class ConcessaoReintegracaoController extends DefaultController<Documento
                 "Declaração do órgão competente da existência de vaga no cargo em que se der a reintegração", "", "Sim"));
         list.add(new Inciso("VI -  Seção V", "Parecer jurídico atestando a legalidade do ato",
                 "Parecer jurídico atestando a legalidade do ato", "", "Sim"));
-        list.add(new Inciso("", "Outros",
+        list.add(new Inciso("Outros", "Outros",
                 "Outros", "", "Não"));
 
         for (int i = 0; i < list.size(); i++){

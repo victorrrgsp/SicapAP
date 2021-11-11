@@ -142,7 +142,7 @@ public class ConcessaoAposentadoriaController extends DefaultController<Document
                 "Informação emitida pelo instituto previdenciário ao qual o beneficiário esteja vinculado constando o demonstrativo de apuração do tempo de contribuição e de cálculo do benefício", "", "Sim"));
         list.add(new Inciso("XIII", "Parecer jurídico atestando a legalidade da concessão do benefício",
                 "Parecer jurídico atestando a legalidade da concessão do benefício", "", "Sim"));
-        list.add(new Inciso("", "Outros",
+        list.add(new Inciso("Outros", "Outros",
                 "Outros", "", "Não"));
 
         for (int i = 0; i < list.size(); i++){

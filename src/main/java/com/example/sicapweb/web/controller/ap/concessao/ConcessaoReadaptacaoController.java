@@ -122,7 +122,7 @@ public class ConcessaoReadaptacaoController extends DefaultController<DocumentoR
                 "Parecer jurídico atestando a legalidade do ato", "", "Não"));
         list.add(new Inciso("VI - Seção V", "Parecer jurídico atestando a legalidade do ato",
                 "Parecer jurídico atestando a legalidade do ato", "", "Sim"));
-        list.add(new Inciso("", "Outros",
+        list.add(new Inciso("Outros", "Outros",
                 "Outros", "", "Não"));
 
         for (int i = 0; i < list.size(); i++){

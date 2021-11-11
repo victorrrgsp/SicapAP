@@ -124,7 +124,7 @@ public class ConcessaoReconducaoController extends DefaultController<DocumentoRe
                 "Parecer jurídico atestando a legalidade do ato", "", "Sim"));
         list.add(new Inciso("IX - Seção V", "Cópia dos atos que declararam os resultados da avaliação de desempenho",
                 "Cópia dos atos que declararam os resultados da avaliação de desempenho, nos casos de recondução por inabilitação em estágio probatório", "", "Não"));
-        list.add(new Inciso("", "Outros",
+        list.add(new Inciso("Outros", "Outros",
                 "Outros", "", "Não"));
 
         for (int i = 0; i < list.size(); i++) {

@@ -129,7 +129,7 @@ public class ConcessaoRevisaoPensaoController extends DefaultController<Document
                 "Parecer jurídico atestando a legalidade da concessão do benefício", "", "Sim"));
         list.add(new Inciso("VI", "Ato de concessão da revisão de proventos",
                 "Ato de concessão da revisão de proventos constando o documento revisado, o nome do servidor e a fundamentação legal, acompanhado da respectiva publicação", "", "Sim"));
-        list.add(new Inciso("", "Outros",
+        list.add(new Inciso("Outros", "Outros",
                 "Outros", "", "Não"));
 
         for (int i = 0; i < list.size(); i++){

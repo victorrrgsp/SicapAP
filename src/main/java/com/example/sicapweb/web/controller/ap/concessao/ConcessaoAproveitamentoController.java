@@ -126,7 +126,7 @@ public class ConcessaoAproveitamentoController extends DefaultController<Documen
                 "Cópia devidamente publicada da lei que o extinguiu, no caso de aproveitamento decorrente de extinção de cargo", "", "Não"));
         list.add(new Inciso("XI -  Seção V", "A comprovação do cumprimento dos requisitos exigidos para o desempenho das atividades",
                 "A comprovação do cumprimento dos requisitos exigidos para o desempenho das atividades", "", "Não"));
-        list.add(new Inciso("", "Outros",
+        list.add(new Inciso("Outros", "Outros",
                 "Outros", "", "Não"));
 
         for (int i = 0; i < list.size(); i++) {

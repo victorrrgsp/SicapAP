@@ -144,7 +144,7 @@ public class ConcessaoPensaoController extends DefaultController<DocumentoPensao
                 "Informação emitida pela entidade em que o servidor falecido mantém o vínculo previdenciário, constando o demonstrativo de apuração do tempo de contribuição e de cálculo do benefício", "", "Sim"));
         list.add(new Inciso("XIV", "Parecer jurídico",
                 "Parecer jurídico atestando a legalidade da concessão do benefício", "", "Sim"));
-        list.add(new Inciso("", "Outros",
+        list.add(new Inciso("Outros", "Outros",
                 "Outros", "", "Não"));
 
         for (int i = 0; i < list.size(); i++) {
