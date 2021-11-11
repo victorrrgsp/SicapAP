@@ -16,15 +16,15 @@ import java.util.Date;
 import java.util.List;
 
 @Repository
-public class HistoricoRemessaRepository extends DefaultRepository<String, String> {
+public class AcompanhamentoDeRemessasRepository extends DefaultRepository<String, String> {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public HistoricoRemessaRepository(EntityManager em) {
+    public AcompanhamentoDeRemessasRepository(EntityManager em) {
         super(em);
     }
 
-    public HistoricoRemessaRepository() {
+    public AcompanhamentoDeRemessasRepository() {
 
     }
 
@@ -124,7 +124,7 @@ public class HistoricoRemessaRepository extends DefaultRepository<String, String
     List<InfoRemessa> list = getEntityManager()
       .createNativeQuery("select * from InfoRemessa i" +
         " where (select count(*) from AdmAssinatura a where a.chave = i.chave) > 0" +
-        " and i.idUnidadeGestora = '" + User.getUser().getUnidadeGestora().getId() + "' "+search , InfoRemessa.class)
+        " and i.idUnidadeGestora = '" + User.getUser().getUnidadeGestora().getId() + "' "+search +"ORDER BY data desc", InfoRemessa.class)
       .setFirstResult(pagina)
       .setMaxResults(tamanho)
       .getResultList();
