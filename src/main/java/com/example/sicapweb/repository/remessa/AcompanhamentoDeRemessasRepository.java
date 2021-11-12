@@ -1,7 +1,6 @@
 package com.example.sicapweb.repository.remessa;
 
 import br.gov.to.tce.model.InfoRemessa;
-import br.gov.to.tce.model.ap.pessoal.Aproveitamento;
 import com.example.sicapweb.repository.DefaultRepository;
 import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
@@ -11,7 +10,6 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -124,7 +122,7 @@ public class AcompanhamentoDeRemessasRepository extends DefaultRepository<String
     List<InfoRemessa> list = getEntityManager()
       .createNativeQuery("select * from InfoRemessa i" +
         " where (select count(*) from AdmAssinatura a where a.chave = i.chave) > 0" +
-        " and i.idUnidadeGestora = '" + User.getUser().getUnidadeGestora().getId() + "' "+search +"ORDER BY data desc", InfoRemessa.class)
+        " and i.idUnidadeGestora = '" + User.getUser().getUnidadeGestora().getId() + "' "+search +"ORDER BY i.exercicio, i.remessa desc", InfoRemessa.class)
       .setFirstResult(pagina)
       .setMaxResults(tamanho)
       .getResultList();
