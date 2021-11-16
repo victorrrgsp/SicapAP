@@ -79,7 +79,7 @@ public class LoginController extends DefaultController<Login> {
     @CrossOrigin
     @Transactional
     @GetMapping(path = {"/getugs"})
-    public ResponseEntity<?> setUg() {
+    public ResponseEntity<?> getUg() {
         String user = User.getUser().getId();
         user = user.replace("=", "");
         User userLogado = Config.fromJson(config.jedis.get(user.replace("=", "")), User.class);

@@ -68,22 +68,23 @@ public class AssinarRemessaRepository extends DefaultRepository<String, String> 
         try {
             return (InfoRemessa) entityManager.createNativeQuery(
                     "select * from InfoRemessa i" +
-                            " where (select count(*) from AdmAssinatura a where a.chave = i.chave) < 3" +
+                            " where (select count(DISTINCT a.idCargo) from AdmAssinatura a where a.chave = i.chave) < 3" +
                             " and i.idUnidadeGestora = '" + User.getUser().getUnidadeGestora().getId() + "'", InfoRemessa.class).getSingleResult();
         } catch (Exception e) {
             return null;
         }
     }
-  public InfoRemessa buscarRemessaFechada() {
-    try {
-      return (InfoRemessa) entityManager.createNativeQuery(
-        "select * from InfoRemessa i" +
-          " where (select count(*) from AdmAssinatura a where a.chave = i.chave) = 3" +
-          " and i.idUnidadeGestora = '" + User.getUser().getUnidadeGestora().getId() + "'", InfoRemessa.class).getSingleResult();
-    } catch (Exception e) {
-      return null;
+
+    public InfoRemessa buscarRemessaFechada() {
+        try {
+            return (InfoRemessa) entityManager.createNativeQuery(
+                    "select * from InfoRemessa i" +
+                            " where (select count(DISTINCT a.idCargo) from AdmAssinatura a where a.chave = i.chave) = 3" +
+                            " and i.idUnidadeGestora = '" + User.getUser().getUnidadeGestora().getId() + "'", InfoRemessa.class).getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
     }
-  }
 
     BigDecimal idArquivo;
     BigDecimal idAssinatura;

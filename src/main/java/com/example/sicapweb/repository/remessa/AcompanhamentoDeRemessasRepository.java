@@ -71,7 +71,7 @@ public class AcompanhamentoDeRemessasRepository extends DefaultRepository<String
     try {
       return  entityManager.createNativeQuery(
         "select * from InfoRemessa i" +
-          " where (select count(*) from AdmAssinatura a where a.chave = i.chave) > 0" +
+          " where (select count(DISTINCT a.idCargo) from AdmAssinatura a where a.chave = i.chave) > 0" +
           " and i.idUnidadeGestora = '" + User.getUser().getUnidadeGestora().getId() + "'", InfoRemessa.class).getResultList();
     } catch (Exception e) {
       return null;
@@ -82,7 +82,7 @@ public class AcompanhamentoDeRemessasRepository extends DefaultRepository<String
     try {
       return (InfoRemessa) entityManager.createNativeQuery(
         "select * from InfoRemessa i" +
-          " where (select count(*) from AdmAssinatura a where a.chave = i.chave) = 3" +
+          " where (select count(DISTINCT a.idCargo) from AdmAssinatura a where a.chave = i.chave) = 3" +
           " and i.chave = '" + chave + "'", InfoRemessa.class).getSingleResult();
     } catch (Exception e) {
       return null;
@@ -92,7 +92,7 @@ public class AcompanhamentoDeRemessasRepository extends DefaultRepository<String
     try {
       return  entityManager.createNativeQuery(
         "select * from InfoRemessa i" +
-          " where (select count(*) from AdmAssinatura a where a.chave = i.chave) > 0" +
+          " where (select count(DISTINCT a.idCargo) from AdmAssinatura a where a.chave = i.chave) > 0" +
           " and i.exercicio = '" + exercicio + "'"+
           " and i.idUnidadeGestora = '" + User.getUser().getUnidadeGestora().getId() + "'", InfoRemessa.class).getResultList();
     } catch (Exception e) {
@@ -121,7 +121,7 @@ public class AcompanhamentoDeRemessasRepository extends DefaultRepository<String
 
     List<InfoRemessa> list = getEntityManager()
       .createNativeQuery("select * from InfoRemessa i" +
-        " where (select count(*) from AdmAssinatura a where a.chave = i.chave) > 0" +
+        " where (select count(DISTINCT a.idCargo) from AdmAssinatura a where a.chave = i.chave) > 0" +
         " and i.idUnidadeGestora = '" + User.getUser().getUnidadeGestora().getId() + "' "+search +"ORDER BY i.exercicio, i.remessa desc", InfoRemessa.class)
       .setFirstResult(pagina)
       .setMaxResults(tamanho)
@@ -133,7 +133,7 @@ public class AcompanhamentoDeRemessasRepository extends DefaultRepository<String
 
   public Integer counts() {
     Query query = getEntityManager().createNativeQuery("select count(*) from InfoRemessa i" +
-      " where (select count(*) from AdmAssinatura a where a.chave = i.chave) > 0" +
+      " where (select count(DISTINCT a.idCargo) from AdmAssinatura a where a.chave = i.chave) > 0" +
       " and i.idUnidadeGestora = '" + User.getUser().getUnidadeGestora().getId() + "' " );
     return (Integer) query.getSingleResult();
   }
