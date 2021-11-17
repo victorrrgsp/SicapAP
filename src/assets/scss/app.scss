@@ -1,0 +1,29 @@
+@import '../../../node_modules/bootstrap/scss/bootstrap.scss';
+@import url('https://fonts.googleapis.com/css?family=Rubik&display=swap');
+@import '../../../node_modules/material-design-icons/iconfont/material-icons.css';
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.css');
+@import 'variables';
+
+*{
+  font-family: 'Avenir', 'Poppins', sans-serif;
+}
+
+.alert,
+.form-control,
+.modal-content {
+    border-radius: 0 !important;
+}
+
+.btn-primary {
+    background-color: $azul-tce;
+    border-color: $cinza-claro-tce;
+  &:hover {
+    background-color: $azul-escuro-tce;
+  }
+}
+
+
+.material-icons.md-18 { font-size: 18px }
+.material-icons.md-24 { font-size: 24px }
+.material-icons.md-36 { font-size: 36px }
+.material-icons.md-48 { font-size: 48px } 

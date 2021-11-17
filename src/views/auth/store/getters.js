@@ -1,0 +1,1 @@
+export const hasToken = ({ access_token }) => !!access_token

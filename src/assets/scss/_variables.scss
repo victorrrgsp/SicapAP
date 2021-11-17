@@ -1,0 +1,42 @@
+$dark: #000 !important;
+$darker: #111 !important;
+$dark-medium: #333 !important;
+$dark-low: #666 !important;
+$light-low: #999 !important;
+$light-medium: #ddd !important;
+$ligther: #ddd !important;
+$light: #fff !important;
+
+$featured: #ff9900 !important;
+$featured-dark: #d68100 !important;
+$azul-tce: #0066B0 !important;
+$azul-escuro-tce: #00477D !important;
+$cinza-ligt-tce: #EAEAEA;
+$cinza-claro-tce: #D3D3D3;
+$cinza-medio-tce: #898989;
+$cinza-escuro-tce: #707070;
+$vermelho-escuro-tce:#931d19;
+
+//$logo-tce: ' ';
+
+:root {
+    --dark: #{$dark};
+    --darker: #{$darker};
+    --dark-medium: #{$dark-medium};
+    --dark-low: #{$dark-low};
+    --light-low: #{$light-low};
+    --light-medium: #{$light-medium};
+    --ligther: #{$ligther};
+    --light: #{$light};
+    --featured: #{$featured};
+    --featured-dark: #{$featured-dark};
+    --cinza-claro-tce: #{$cinza-claro-tce};
+    --cinza-medio-tce: #{$cinza-medio-tce};
+    --cinza-escuro-tce: #{$cinza-escuro-tce};
+    --azul-tce: #{$azul-tce};
+    --azul-escuro-tce: #{$azul-escuro-tce};
+    --vermelho-escuro-tce: #{$vermelho-escuro-tce};
+    --cinza-ligt-tce: #{$cinza-ligt-tce};
+   // --logo-tce: #{$logo-tce};
+  }
+
