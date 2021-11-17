@@ -24,9 +24,4 @@ npm run lint
 See [Configuration Reference](https://cli.vuejs.org/config/).
 
 
-#autenticacao api rest
-#.env.development
-VUE_APP_SISTEMA = 'Portal Servidor'
-
-VUE_APP_AUTENTICAR = 'http://172.28.3.31:8080/'
 
