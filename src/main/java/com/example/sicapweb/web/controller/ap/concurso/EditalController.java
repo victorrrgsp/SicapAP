@@ -30,13 +30,6 @@ public class EditalController extends DefaultController<Edital> {
     }
 
     @CrossOrigin
-    @GetMapping
-    public ResponseEntity<List<Edital>> findAll() {
-        List<Edital> list = editalRepository.findAll();
-        return ResponseEntity.ok().body(list);
-    }
-
-    @CrossOrigin
     @GetMapping(path = {"/editaisNaoHomologados"})
     public ResponseEntity<List<Edital>> findEditalNaoHomologado() {
         List<Edital> list = editalRepository.buscarEditaisNaoHomologados();

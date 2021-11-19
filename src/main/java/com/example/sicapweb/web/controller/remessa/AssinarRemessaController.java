@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -43,15 +44,15 @@ public class AssinarRemessaController {
         return ResponseEntity.ok().body(Objects.requireNonNullElse(infoRemessa, "semRemessa"));
     }
 
-  @CrossOrigin
-  @GetMapping(path = {"/close"})
-  public ResponseEntity<?> findRemessaClose() {
-    InfoRemessa infoRemessa = assinarRemessaRepository.buscarRemessaFechada();
-    info = infoRemessa;
-    return ResponseEntity.ok().body(Objects.requireNonNullElse(infoRemessa, "semRemessa"));
-  }
+    @CrossOrigin
+    @GetMapping(path = {"/close"})
+    public ResponseEntity<?> findRemessaClose() {
+        InfoRemessa infoRemessa = assinarRemessaRepository.buscarRemessaFechada();
+        info = infoRemessa;
+        return ResponseEntity.ok().body(Objects.requireNonNullElse(infoRemessa, "semRemessa"));
+    }
 
-  @CrossOrigin
+    @CrossOrigin
     @GetMapping(path = {"/{cargo}"})
     public ResponseEntity<?> findResponsavel(@PathVariable String cargo) {
         Integer tipoCargo;
@@ -95,7 +96,9 @@ public class AssinarRemessaController {
     @GetMapping(path = {"/situacao"})
     public ResponseEntity<?> findDocumentos() {
         InfoRemessa infoRemessa = assinarRemessaRepository.buscarRemessaAberta();
-        List<Integer> list = gfipRepository.findDocumentos(infoRemessa.getChave());
+        List<Integer> list = new ArrayList<>();
+        if (infoRemessa != null)
+            list = gfipRepository.findDocumentos(infoRemessa.getChave());
         if (list.size() >= 3)
             return ResponseEntity.ok().body("Ok");
         else
