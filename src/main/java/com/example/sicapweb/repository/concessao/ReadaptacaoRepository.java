@@ -47,7 +47,7 @@ public class ReadaptacaoRepository extends DefaultRepository<Readaptacao, BigInt
                         "join Cargo c on c.id = ad.idCargo " +
                         "join Servidor s on s.id = ad.idServidor " +
                         "join Ato ato on ato.id = a.idAto " +
-                        "where i.idUnidadeGestora = '" + User.getUser().getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, Readaptacao.class)
+                        "where i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, Readaptacao.class)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();
@@ -60,7 +60,7 @@ public class ReadaptacaoRepository extends DefaultRepository<Readaptacao, BigInt
         return getEntityManager().createNativeQuery(
                 "select a.* from Readaptacao a " +
                         "join InfoRemessa i on a.chave = i.chave " +
-                        "where i.idUnidadeGestora = '" + User.getUser().getUnidadeGestora().getId() + "'", Readaptacao.class)
+                        "where i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "'", Readaptacao.class)
                 .getResultList();
     }
 }

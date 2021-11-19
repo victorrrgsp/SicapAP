@@ -55,7 +55,7 @@ public class AssinarRemessaRepository extends DefaultRepository<String, String> 
                             "group by nome, cpf, CodigoCargo;");
             query.setParameter("tipo", tipoCargo);
             query.setParameter("date", new Date());
-            query.setParameter("unidade", User.getUser().getUnidadeGestora().getId());
+            query.setParameter("unidade", User.getUser(super.request).getUnidadeGestora().getId());
             query.setParameter("exercicio", infoRemessa.getExercicio());
             query.setParameter("remessa", infoRemessa.getRemessa());
             return query.getSingleResult();
@@ -69,7 +69,7 @@ public class AssinarRemessaRepository extends DefaultRepository<String, String> 
             return (InfoRemessa) entityManager.createNativeQuery(
                     "select * from InfoRemessa i" +
                             " where (select count(DISTINCT a.idCargo) from AdmAssinatura a where a.chave = i.chave) < 3" +
-                            " and i.idUnidadeGestora = '" + User.getUser().getUnidadeGestora().getId() + "'", InfoRemessa.class).getSingleResult();
+                            " and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "'", InfoRemessa.class).getSingleResult();
         } catch (Exception e) {
             return null;
         }
@@ -80,7 +80,7 @@ public class AssinarRemessaRepository extends DefaultRepository<String, String> 
             return (InfoRemessa) entityManager.createNativeQuery(
                     "select * from InfoRemessa i" +
                             " where (select count(DISTINCT a.idCargo) from AdmAssinatura a where a.chave = i.chave) = 3" +
-                            " and i.idUnidadeGestora = '" + User.getUser().getUnidadeGestora().getId() + "'", InfoRemessa.class).getSingleResult();
+                            " and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "'", InfoRemessa.class).getSingleResult();
         } catch (Exception e) {
             return null;
         }
@@ -94,7 +94,7 @@ public class AssinarRemessaRepository extends DefaultRepository<String, String> 
                 "INSERT INTO AutenticacaoAssinatura.dbo.Arquivo(MIME, Nome, URLASS, Label, DataEntrada, cpf) " +
                         "VALUES ('application/octet-stream', 'Remessa SICAP AP', 'Remessa SICAP AP', 'Remessa SICAP AP', :data, :cpf)");
         query.setParameter("data", new br.gov.to.tce.util.Date().toStringDateAndHourDatabaseFormat2());
-        query.setParameter("cpf", User.getUser().getCpf());
+        query.setParameter("cpf", User.getUser(super.request).getCpf());
         query.executeUpdate();
 
         Query query1 = entityManager.createNativeQuery(
@@ -107,7 +107,7 @@ public class AssinarRemessaRepository extends DefaultRepository<String, String> 
         Query query = entityManager.createNativeQuery(
                 "INSERT INTO AutenticacaoAssinatura.dbo.Assinatura(Usuario, Arquivo, DataAssinatura) " +
                         "VALUES (:cpf, :arquivo, :data)");
-        query.setParameter("cpf", User.getUser().getCpf());
+        query.setParameter("cpf", User.getUser(super.request).getCpf());
         query.setParameter("arquivo", idArquivo);
         query.setParameter("data", new br.gov.to.tce.util.Date().toStringDateAndHourDatabaseFormat2());
         query.executeUpdate();
@@ -123,7 +123,7 @@ public class AssinarRemessaRepository extends DefaultRepository<String, String> 
         Query query = entityManager.createNativeQuery(
                 "INSERT INTO AutenticacaoAssinatura.dbo.InfoAssinatura(CodUndGestora, Bimestre, Exercicio, Assinatura, Aplicacao) " +
                         "VALUES (:unidade, :remessa, :exercicio, :assinatura, 29)");
-        query.setParameter("unidade", User.getUser().getUnidadeGestora().getId());
+        query.setParameter("unidade", User.getUser(super.request).getUnidadeGestora().getId());
         query.setParameter("remessa", infoRemessa.getRemessa());
         query.setParameter("exercicio", infoRemessa.getExercicio());
         query.setParameter("assinatura", idAssinatura);
@@ -137,7 +137,7 @@ public class AssinarRemessaRepository extends DefaultRepository<String, String> 
                         "VALUES (:chave, :assinatura, :cargo)");
         query.setParameter("chave", chave);
         query.setParameter("assinatura", idAssinatura);
-        query.setParameter("cargo", User.getUser().getCargo().getValor());
+        query.setParameter("cargo", User.getUser(super.request).getCargo().getValor());
         query.executeUpdate();
     }
 }

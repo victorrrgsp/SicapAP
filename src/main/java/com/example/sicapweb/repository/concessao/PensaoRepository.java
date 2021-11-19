@@ -50,7 +50,7 @@ public class PensaoRepository extends DefaultRepository<Pensao, BigInteger> {
                         "join Servidor s on s.cpfServidor = a.cpfServidor " +
                         "join Ato ato on ato.id = a.idAto " +
                         "where a.revisao = 0 " +
-                        "and i.idUnidadeGestora = '" + User.getUser().getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, Pensao.class)
+                        "and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, Pensao.class)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();
@@ -62,7 +62,7 @@ public class PensaoRepository extends DefaultRepository<Pensao, BigInteger> {
     public Integer countPensao() {
         Query query = getEntityManager().createNativeQuery("select count(*) from Pensao a " +
                 "join InfoRemessa i on a.chave = i.chave " +
-                "where a.revisao = 0 and i.idUnidadeGestora= '"+ User.getUser().getUnidadeGestora().getId()+ "'");
+                "where a.revisao = 0 and i.idUnidadeGestora= '"+ User.getUser(super.request).getUnidadeGestora().getId()+ "'");
         return (Integer) query.getSingleResult();
     }
 
@@ -103,7 +103,7 @@ public class PensaoRepository extends DefaultRepository<Pensao, BigInteger> {
                         "join Servidor s on s.cpfServidor = a.cpfServidor " +
                         "join Ato ato on ato.id = a.idAto " +
                         "where a.revisao = 1 " +
-                        "and i.idUnidadeGestora = '" + User.getUser().getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, Pensao.class)
+                        "and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, Pensao.class)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();
@@ -115,7 +115,7 @@ public class PensaoRepository extends DefaultRepository<Pensao, BigInteger> {
     public Integer countPensaoRevisao() {
         Query query = getEntityManager().createNativeQuery("select count(*) from Pensao a " +
                 "join InfoRemessa i on a.chave = i.chave " +
-                "where a.revisao = 1 and i.idUnidadeGestora= '"+ User.getUser().getUnidadeGestora().getId()+ "'");
+                "where a.revisao = 1 and i.idUnidadeGestora= '"+ User.getUser(super.request).getUnidadeGestora().getId()+ "'");
         return (Integer) query.getSingleResult();
     }
 

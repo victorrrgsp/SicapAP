@@ -4,12 +4,9 @@ import br.gov.to.tce.model.DefaultEnum;
 import br.gov.to.tce.model.UnidadeGestora;
 import br.gov.to.tce.util.Date;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
-import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.annotation.SessionScope;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -34,6 +31,14 @@ public class User implements Serializable {
     @JsonIgnore
     public List<UnidadeGestora> unidadeGestoraList = new ArrayList<>();
     public UnidadeGestora unidadeGestora = new UnidadeGestora("00299180000154", "PREFEITURA MUNICIPAL DE PARAÍSO DO TOCANTINS", 1);
+
+    public static User getUser(String user) {
+        return Config.fromJson(new Config().jedis.get(user.replace("=", "")), User.class);
+    }
+
+    public static User getUser(HttpServletRequest request) {
+        return getUser(request.getHeader("user"));
+    }
 
     public String getId() {
         return id;
@@ -89,14 +94,6 @@ public class User implements Serializable {
 
     public String getCertificado() {
         return certificado;
-    }
-
-    @Bean
-    @Scope(
-            value = WebApplicationContext.SCOPE_SESSION,
-            proxyMode = ScopedProxyMode.TARGET_CLASS)
-    public static User getUser(){
-        return Session.usuarioLogado;
     }
 
     public void setCertificado(String certificado) {

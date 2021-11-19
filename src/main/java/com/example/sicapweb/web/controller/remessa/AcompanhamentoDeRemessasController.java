@@ -81,7 +81,7 @@ public class AcompanhamentoDeRemessasController {
     @CrossOrigin
     @GetMapping(path = {"/autenticacao"})
     public ResponseEntity<User> findeUserAutenticacao() {
-      User user = User.getUser();
+      User user = User.getUser(acompanhamentoDeRemessasRepository.getRequest());
       return ResponseEntity.ok().body(user);
     }
   @CrossOrigin

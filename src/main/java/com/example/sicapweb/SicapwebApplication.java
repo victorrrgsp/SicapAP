@@ -1,7 +1,5 @@
 package com.example.sicapweb;
 
-import com.example.sicapweb.security.Config;
-import com.example.sicapweb.security.User;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -11,7 +9,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
-import redis.clients.jedis.Jedis;
 
 import javax.annotation.PostConstruct;
 import java.util.TimeZone;
@@ -26,12 +23,6 @@ public class SicapwebApplication {
     }
 
     public static void main(String[] args) {
-        User user = new User();
-        //user.getDateEnd().cdate.addHours(3)
-        User.getUser();
-        Config config = new Config();
-        config.jedis = new Jedis(config.ip, 6379);
-        config.jedis.set(user.userName, Config.json(user));
 
         SpringApplication.run(SicapwebApplication.class, args);
 

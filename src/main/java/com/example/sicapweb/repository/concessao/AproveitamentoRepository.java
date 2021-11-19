@@ -47,7 +47,7 @@ public class AproveitamentoRepository extends DefaultRepository<Aproveitamento, 
                         "join Cargo c on c.id = a.idCargo " +
                         "join Servidor s on s.id = ad.idServidor " +
                         "join Ato ato on ato.id = a.idAto " +
-                        "where i.idUnidadeGestora = '" + User.getUser().getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, Aproveitamento.class)
+                        "where i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, Aproveitamento.class)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();

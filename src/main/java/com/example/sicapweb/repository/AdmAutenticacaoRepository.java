@@ -52,8 +52,11 @@ public class AdmAutenticacaoRepository extends DefaultRepository<AdmAutenticacao
         //retirar os : do Sort pageable
         String campo = String.valueOf(pageable.getSort()).replace(":", "");
 
-        List<AdmAutenticacao> list = getEntityManager()
-                .createNativeQuery("select * from AdmAutenticacao WHERE " +search+" idUnidadeGestora= '"+ User.getUser().getUnidadeGestora().getId()+ "' ORDER BY " + campo, AdmAutenticacao.class)
+        List<AdmAutenticacao> list = null;
+        list = getEntityManager()
+                .createNativeQuery("select * from AdmAutenticacao " +
+                        "WHERE " +search+" idUnidadeGestora= '"+ User.getUser(super.request).getUnidadeGestora().getId()+ "' " +
+                        "ORDER BY " + campo, AdmAutenticacao.class)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();
@@ -66,7 +69,7 @@ public class AdmAutenticacaoRepository extends DefaultRepository<AdmAutenticacao
     }
 
     public long countChaves() {
-        return getEntityManager().createQuery("select count(*) from AdmAutenticacao WHERE idUnidadeGestora= '"+ User.getUser().getUnidadeGestora().getId()+ "'", Long.class).getSingleResult();
+        return getEntityManager().createQuery("select count(*) from AdmAutenticacao WHERE idUnidadeGestora= '"+ User.getUser(super.request).getUnidadeGestora().getId()+ "'", Long.class).getSingleResult();
     }
 
 

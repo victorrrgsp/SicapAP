@@ -11,6 +11,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
+import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.math.BigInteger;
@@ -26,11 +27,18 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
     @Autowired
     public EntityManager entityManager;
 
+    @Autowired
+    protected HttpServletRequest request;
+
     public DefaultRepository(EntityManager em) {
         entityManager = em;
     }
 
     public DefaultRepository() {
+    }
+
+    public HttpServletRequest getRequest() {
+        return request;
     }
 
     public EntityManager getEntityManager() {
@@ -79,7 +87,7 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
         return getEntityManager()
                 .createQuery("select a from " + entityClass.getSimpleName() +
                         " a, InfoRemessa info where a.infoRemessa.chave = info.chave and info.idUnidadeGestora = '"
-                        + User.getUser().getUnidadeGestora().getId() + "'", entityClass)
+                        + User.getUser(request).getUnidadeGestora().getId() + "'", entityClass)
                 .getResultList();
     }
 
@@ -128,7 +136,7 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
         List<T> list = getEntityManager()
                 .createNativeQuery("select a.* from " + entityClass.getSimpleName() + " a " +
                         " join InfoRemessa info on info.chave = a.chave and info.idUnidadeGestora = '"
-                        + User.getUser().getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, entityClass)
+                        + User.getUser(request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, entityClass)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();
@@ -141,13 +149,13 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
 
     public Integer count() {
         Query query = getEntityManager().createNativeQuery("select count(*) from " + entityClass.getSimpleName()
-                + " a join InfoRemessa i on a.chave = i.chave where i.idUnidadeGestora= '"+ User.getUser().getUnidadeGestora().getId()+ "'");
+                + " a join InfoRemessa i on a.chave = i.chave where i.idUnidadeGestora= '"+ User.getUser(request).getUnidadeGestora().getId()+ "'");
         return (Integer) query.getSingleResult();
     }
 
     public InfoRemessa buscarPrimeiraRemessa() {
         List<InfoRemessa> list = getEntityManager().createNativeQuery("select * from infoRemessa " +
-                "where remessa = 1 and exercicio = 2021 and idUnidadeGestora = '" + User.getUser().getUnidadeGestora().getId() + "'", InfoRemessa.class).getResultList();
+                "where remessa = 1 and exercicio = 2021 and idUnidadeGestora = '" + User.getUser(request).getUnidadeGestora().getId() + "'", InfoRemessa.class).getResultList();
         return list.get(0);
     }
 }

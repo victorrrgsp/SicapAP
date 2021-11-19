@@ -47,7 +47,7 @@ public class ReconducaoRepository extends DefaultRepository<Reconducao, BigInteg
                         "join Cargo c on c.id = ad.idCargo " +
                         "join Servidor s on s.id = ad.idServidor " +
                         "join Ato ato on ato.id = a.idAto " +
-                        "where i.idUnidadeGestora = '" + User.getUser().getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, Reconducao.class)
+                        "where i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, Reconducao.class)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();
@@ -60,7 +60,7 @@ public class ReconducaoRepository extends DefaultRepository<Reconducao, BigInteg
         return getEntityManager().createNativeQuery(
                 "select a.* from Reconducao a " +
                         "join InfoRemessa i on a.chave = i.chave " +
-                        "where i.idUnidadeGestora = '" + User.getUser().getUnidadeGestora().getId() + "'", Reconducao.class)
+                        "where i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "'", Reconducao.class)
                 .getResultList();
     }
 }

@@ -47,7 +47,7 @@ public class ReintegracaoRepository extends DefaultRepository<Reintegracao, BigI
                         "join Cargo c on c.id = ad.idCargo " +
                         "join Servidor s on s.id = ad.idServidor " +
                         "join Ato ato on ato.id = a.idAto " +
-                        "where i.idUnidadeGestora = '" + User.getUser().getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, Reintegracao.class)
+                        "where i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, Reintegracao.class)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();
@@ -60,7 +60,7 @@ public class ReintegracaoRepository extends DefaultRepository<Reintegracao, BigI
         return getEntityManager().createNativeQuery(
                 "select a.* from Reintegracao a " +
                         "join InfoRemessa i on a.chave = i.chave " +
-                        "where i.idUnidadeGestora = '" + User.getUser().getUnidadeGestora().getId() + "'", Reintegracao.class)
+                        "where i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "'", Reintegracao.class)
                 .getResultList();
     }
 }

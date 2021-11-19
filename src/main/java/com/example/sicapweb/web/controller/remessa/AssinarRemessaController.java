@@ -76,8 +76,7 @@ public class AssinarRemessaController {
     @CrossOrigin
     @GetMapping(path = {"/autenticacao"})
     public ResponseEntity<User> findeUserAutenticacao(HttpSession session) {
-        session.setAttribute("user", User.getUser());
-        User user = User.getUser();session.getAttribute("user");
+        User user = User.getUser(assinarRemessaRepository.getRequest());
         return ResponseEntity.ok().body(user);
     }
 

@@ -23,7 +23,6 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.crypto.spec.SecretKeySpec;
-import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
 import java.security.Key;
@@ -39,15 +38,12 @@ public class LoginController extends DefaultController<Login> {
     private Config config;
 
     @Autowired
-    private HttpServletRequest httpServletRequest;
-
-    @Autowired
     private UsuarioRepository usuarioRepository;
 
     @CrossOrigin
     @Transactional
     @PostMapping(path = {"/session/"})
-    public ResponseEntity<?> find(@org.springframework.web.bind.annotation.RequestBody String user, HttpServletRequest request) throws ValidationException {
+    public ResponseEntity<?> find(@org.springframework.web.bind.annotation.RequestBody String user) throws ValidationException {
 
         if (user == null || user.trim().isEmpty() || config.jedis.get(user.replace("=", "")) == null)
             throw new ValidationException("Usuário não autenticado");
@@ -80,7 +76,7 @@ public class LoginController extends DefaultController<Login> {
     @Transactional
     @GetMapping(path = {"/getugs"})
     public ResponseEntity<?> getUg() {
-        String user = User.getUser().getId();
+        String user = User.getUser(usuarioRepository.getRequest()).getId();
         user = user.replace("=", "");
         User userLogado = Config.fromJson(config.jedis.get(user.replace("=", "")), User.class);
         return ResponseEntity.ok().body(userLogado.getUnidadeGestoraList());
@@ -90,7 +86,7 @@ public class LoginController extends DefaultController<Login> {
     @Transactional
     @PostMapping(path = {"/setug/"})
     public ResponseEntity<?> setUg(@org.springframework.web.bind.annotation.RequestBody String idUnidadeGestora) {
-        String user = User.getUser().getId();
+        String user = User.getUser(usuarioRepository.getRequest()).getId();
         user = user.replace("=", "");
         idUnidadeGestora = idUnidadeGestora.replace("=", "");
 
