@@ -37,13 +37,6 @@ public class EditalController extends DefaultController<Edital> {
     }
 
     @CrossOrigin
-    @GetMapping(path = {"/{id}"})
-    public ResponseEntity<?> findById(@PathVariable BigInteger id) {
-        Edital list = editalRepository.findById(id);
-        return ResponseEntity.ok().body(list);
-    }
-
-    @CrossOrigin
     @Transactional
     @PostMapping
     public ResponseEntity<Edital> create(@RequestBody Edital edital) {
@@ -62,13 +55,4 @@ public class EditalController extends DefaultController<Edital> {
         editalRepository.update(edital);
         return ResponseEntity.noContent().build();
     }
-
-    @CrossOrigin
-    @Transactional
-    @DeleteMapping(value = {"/{id}"})
-    public ResponseEntity<?> delete(@PathVariable BigInteger id) {
-        editalRepository.delete(id);
-        return ResponseEntity.noContent().build();
-    }
-
 }

@@ -70,7 +70,8 @@ public class AssinarRemessaController {
                 tipoCargo = 0;
                 break;
         }
-        Object resp = assinarRemessaRepository.buscarResponsavelAssinatura(tipoCargo, info);
+        InfoRemessa infoRemessa = assinarRemessaRepository.buscarRemessaAberta();
+        Object resp = assinarRemessaRepository.buscarResponsavelAssinatura(tipoCargo, infoRemessa);
         return ResponseEntity.ok().body(Objects.requireNonNullElse(resp, "semPermissao"));
     }
 
@@ -85,10 +86,11 @@ public class AssinarRemessaController {
     @Transactional
     @GetMapping(path = {"/insertDados"})
     public ResponseEntity<?> insertDados() {
+        InfoRemessa infoRemessa = assinarRemessaRepository.buscarRemessaAberta();
         assinarRemessaRepository.insertArquivo();
         assinarRemessaRepository.insertAssinatura();
-        assinarRemessaRepository.insertInfoAssinatura(info);
-        assinarRemessaRepository.insertAdmAssinatura(info.getChave());
+        assinarRemessaRepository.insertInfoAssinatura(infoRemessa);
+        assinarRemessaRepository.insertAdmAssinatura(infoRemessa.getChave());
         return ResponseEntity.ok().body("Ok");
     }
 
