@@ -1,6 +1,8 @@
 package com.example.sicapweb.repository.externo;
 
 import br.gov.to.tce.model.InfoRemessa;
+import br.gov.to.tce.model.UnidadeGestora;
+import br.gov.to.tce.model.ap.relacional.Cargo;
 import com.example.sicapweb.repository.DefaultRepository;
 import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
@@ -10,8 +12,8 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import java.util.Date;
-import java.util.List;
+import java.math.BigInteger;
+import java.util.*;
 
 @Repository
 public class AcompanhamentoRemessaRepository extends DefaultRepository<String, String> {
@@ -67,81 +69,105 @@ public class AcompanhamentoRemessaRepository extends DefaultRepository<String, S
     }
 
 
-    public List<Object> buscarRemessaFechada() {
-        try {
-            return entityManager.createNativeQuery("" +
-                    "SELECT  COUNT(DISTINCT idCargo) AS contAssinaturas, IDUNIDADEGESTORA , i.nomeUnidade ," +
-                    " i.EXERCICIO, i.remessa, max(i.relatoria) relatoria, " +
-                    "max(f.dataEnvio) dataEntrega, max(dataAssinatura) dataAssinatura " +
-                    "FROM inforemessa i  left join " +
-                    "admassinatura  a on a.chave = i.CHAVE  left join " +
-                    "AutenticacaoAssinatura..Assinatura  ass on ass.oid = a.idAssinatura left join " +
-                    "admfilarecebimento f on f.id = i.idfilarecebimento " +
-                    "group by IDUNIDADEGESTORA,  i.nomeUnidade ,i.EXERCICIO, i.REMESSA").getResultList();
-        } catch (Exception e) {
-            return null;
-        }
+//    public List<Object> buscarRemessaFechada_old() {
+//        try {
+//            return entityManager.createNativeQuery("" +
+//                    "SELECT  COUNT(DISTINCT idCargo) AS contAssinaturas, IDUNIDADEGESTORA , i.nomeUnidade ," +
+//                    " i.EXERCICIO, i.remessa, max(i.relatoria) relatoria, " +
+//                    "max(f.dataEnvio) dataEntrega, max(dataAssinatura) dataAssinatura " +
+//                    "FROM inforemessa i  left join " +
+//                    "admassinatura  a on a.chave = i.CHAVE  left join " +
+//                    "AutenticacaoAssinatura..Assinatura  ass on ass.oid = a.idAssinatura left join " +
+//                    "admfilarecebimento f on f.id = i.idfilarecebimento " +
+//                    "group by IDUNIDADEGESTORA,  i.nomeUnidade ,i.EXERCICIO, i.REMESSA").getResultList();
+//        } catch (Exception e) {
+//            return null;
+//        }
+//    }
+
+//    public List<Cargo> buscaTodosCargos() {
+//        List<Cargo> list = entityManager.createNativeQuery("select * from Cargo "
+//                , Cargo.class).getResultList();
+//        return list;
+//    }
+
+    public List<Map<String,Object>> buscarRemessaFechada(Integer exercicio, Integer remessa) {
+
+        List<Map<String,Object>> retorno = new ArrayList<Map<String,Object>>();
+
+
+//        mapa.put("id", 2);
+//        mapa.put("cnpj", "00000000000000");
+//        mapa.put("nome", "UNIDADE GESTORA TESTE DE PALMAS");
+//
+//        Map<String, Object> mapa2 = new HashMap<String, Object>();
+//        mapa2.put("id", 4);
+//        mapa2.put("cnpj", "11111111111111");
+//        mapa2.put("nome", "Wesley");
+
+
+       // retorno.add(mapa2);
+   //     try {
+
+            List<Object[]> list = entityManager.createNativeQuery("with ugsAptas as (" +
+                    "select *" +
+                    " from cadun.dbo.vwUnidadeGestora" +
+                    " where  cadun.dbo.EhVigente("+exercicio+", "+remessa+",CNPJ,  29) = 1" +
+                    ")," +
+                    " ugsAssinantes as (" +
+                    " SELECT COUNT(DISTINCT idCargo) AS contAssinaturas, IDUNIDADEGESTORA , i.EXERCICIO, i.remessa, max(i.relatoria) relatoria, max(f.dataEnvio) dataEntrega, max(dataAssinatura) dataAssinatura" +
+                    " FROM ugsAptas ug left join" +
+                    " inforemessa i on i.IDUNIDADEGESTORA = ug.CNPJ and i.EXERCICIO = "+exercicio+" and i.REMESSA = "+remessa+" and i.status = 1 left join" +
+                    " admassinatura  a on a.chave = i.CHAVE  left join" +
+                    " AutenticacaoAssinatura..Assinatura  ass on ass.oid = a.idAssinatura left join" +
+                    " admfilarecebimento f on f.id = i.idfilarecebimento" +
+                    " group by IDUNIDADEGESTORA, i.EXERCICIO, i.REMESSA" +
+                    ")" +
+                    " select  cnpj, NomeMunicipio + ' - '+ nomeEntidade nomeEntidade, case when b.relatoria is null then a.numeroRelatoria else b.relatoria end relatoria," +
+                    " dataEntrega, dataAssinatura, contAssinaturas, case when  contAssinaturas >= 3 then 1 else 0 end mostraRecibo, exercicio, remessa" +
+                    " from ugsAptas a left join" +
+                    " ugsAssinantes b on a.cnpj = idUnidadeGestora" +
+                    " where CNPJ <> '00000000000000'" +
+                    " order by NomeMunicipio, nomeEntidade").getResultList();
+
+
+
+        //list.stream().forEach((record) -> {
+
+          for(Object[] obj : list){
+
+              Map<String, Object> mapa = new HashMap<String, Object>();
+
+                  mapa.put("cnpj", (String) obj[0]);
+                  mapa.put("nomeEntidade", (String) obj[1]);
+                  mapa.put("relatoria", (Integer) obj[2]);
+                  mapa.put("dataEntrega", (String) obj[3]);
+                  mapa.put("dataAssinatura", (String) obj[4]);
+                  mapa.put("contAssinaturas", (Integer) obj[5]);
+                  mapa.put("mostraRecibo", (Integer) obj[6]);
+                  mapa.put("exercicio", (Integer) obj[7]);
+                  mapa.put("remessa", (Integer) obj[8]);
+                  retorno.add(mapa);
+
+        };
+
+        return retorno;
+
+
+
+
+
+
+//            return list;
+//
+//        } catch (Exception e) {
+//            return null;
+//        }
+
+
     }
 
-    public InfoRemessa findRemessaFechada(String chave) {
-        try {
-            return (InfoRemessa) entityManager.createNativeQuery(
-                    "select * from InfoRemessa i" +
-                            " where (select count(DISTINCT a.idCargo) from AdmAssinatura a where a.chave = i.chave) = 3" +
-                            " and i.chave = '" + chave + "'", InfoRemessa.class).getSingleResult();
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    public List<InfoRemessa> filtroRemessaFechada(String exercicio) {
-        try {
-            return entityManager.createNativeQuery(
-                    "select * from InfoRemessa i" +
-                            " where (select count(DISTINCT a.idCargo) from AdmAssinatura a where a.chave = i.chave) > 0" +
-                            " and i.exercicio = '" + exercicio + "'" +
-                            " and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "'", InfoRemessa.class).getResultList();
-        } catch (Exception e) {
-            return null;
-        }
-    }
 
 
-    public PaginacaoUtil<InfoRemessa> buscaPaginadaHistorico(Pageable pageable, String searchParams, Integer tipoParams) {
-        int pagina = Integer.valueOf(pageable.getPageNumber());
-        int tamanho = Integer.valueOf(pageable.getPageSize());
-        String search = "";
-        //monta pesquisa search
-        if (searchParams.length() > 3) {
-            if (tipoParams == 0) { //entra para tratar a string
-                String arrayOfStrings[] = searchParams.split("=");
-
-                search = " and i." + arrayOfStrings[0] + "=" + arrayOfStrings[1];
-            } else {
-                search = " and " + searchParams + "   ";
-            }
-        }
-        //retirar os : do Sort pageable
-        String campo = String.valueOf(pageable.getSort()).replace(":", "");
-
-
-        List<InfoRemessa> list = getEntityManager()
-                .createNativeQuery("select * from InfoRemessa i" +
-                        " where (select count(DISTINCT a.idCargo) from AdmAssinatura a where a.chave = i.chave) > 0" +
-                        " and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' " + search + "ORDER BY i.exercicio, i.remessa desc", InfoRemessa.class)
-                .setFirstResult(pagina)
-                .setMaxResults(tamanho)
-                .getResultList();
-        long totalRegistros = counts();
-        long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
-        return new PaginacaoUtil<InfoRemessa>(tamanho, pagina, totalPaginas, totalRegistros, list);
-    }
-
-    public Integer counts() {
-        Query query = getEntityManager().createNativeQuery("select count(*) from InfoRemessa i" +
-                " where (select count(DISTINCT a.idCargo) from AdmAssinatura a where a.chave = i.chave) > 0" +
-                " and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' ");
-        return (Integer) query.getSingleResult();
-    }
 
 }
