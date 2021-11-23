@@ -71,12 +71,8 @@ export default {
 
     async submit () {
       try {
-          //  alert('rrwerw')
           await this.ActionSignOut(this.form)
-
-          //if(this.routes[0].name!='home'){//redireciona somente se estiver em alguma pagina internar... caso contrario permanece no login
               this.$router.push({ name: 'login' })
-       //   }
 
           } catch (err) {
             alert('Não foi possível fazer logof')

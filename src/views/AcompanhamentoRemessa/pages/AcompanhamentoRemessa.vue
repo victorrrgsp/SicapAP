@@ -16,7 +16,7 @@
               id="filter-input"
               v-model="filter"
               type="search"
-              placeholder="Nome Entidade"
+              placeholder="Digite aqui..."
             ></b-form-input>
 
             <b-input-group-append>
@@ -27,17 +27,15 @@
       </b-col> 
 
 
-    <p align="right" >
+          <p align="right" >
               Exercicio: <b-form-select v-model="formdata.exercicio" :options="formdata.exercicios"></b-form-select>
-              &nbsp;   Remessa:&nbsp;
-              <b-form-select v-model="formdata.remessa" :options="formdata.remessas"></b-form-select>
-             &nbsp;   &nbsp;    &nbsp;
-            <b-button @click="pesquisarRemesssa"  pill 
-            variant="success" 
-            size="sm">Pesquisar</b-button>
-     </p>
+              &nbsp;   
+              Remessa:&nbsp;<b-form-select v-model="formdata.remessa" :options="formdata.remessas"></b-form-select>
+              &nbsp;   &nbsp;    &nbsp;
+              <b-button @click="pesquisarRemesssa"  pill variant="success"  size="sm">Pesquisar</b-button>
+          </p>
 
-     <b-table striped hover responsive 
+     <b-table striped hover responsive  :busy="isBusy"
          id="my-table"
         :items="tableData" 
         :filter="filter"
@@ -47,6 +45,13 @@
         aria-controls="my-table"
         small
         >
+        <template #table-busy>
+              <div class="text-center text-danger my-2">
+                <b-spinner class="align-middle"></b-spinner>
+                <strong>Loading...</strong>
+              </div>
+        </template>
+
          <template #cell(index)="data">{{ data.index + 1 }}</template>
      </b-table>
     <b-pagination
@@ -66,11 +71,11 @@ import { mapActions, mapState } from 'vuex'
 import maskMixins from '@/helpers/mixins/mask'
 export default {
 
-
         mixins:[maskMixins], 
 
         data () {
           return {
+            isBusy: true,
             perPage: 20,
             currentPage: 1,
             filter: null,
@@ -92,17 +97,17 @@ export default {
                          label:'Cnpj',
                          sortable: false,
                          thStyle: { width: "10%" },
-                         formatter: 'mascaraCNPJ'
+                         formatter: 'mascaraCnpj'
                       },
                       {
                          key: 'exercicio',
                          label:'Exercicio',
-                         sortable: false
+                         sortable: true
                       },
                       {
                          key: 'remessa',
                          label:'Remessa',
-                         sortable: false
+                         sortable: true
                       },   
                       {
                          key: 'relatoria',
@@ -147,27 +152,28 @@ export default {
         },
        
        mounted(){
-
-            this.ActionFind()
-              
+            this.ActionFind(),
+             setTimeout(() =>{// aguarda com spinner antes da pesquisa aparecer na pesquisa inicial
+                  this.isBusy = false
+                  }, 2.0*2000)
         },
-
+      
         computed:{
-            
                   rows() {
                   return this.tableData.length
                   },
                   ...mapState('remessas', ['tableData'])
         },
-
         methods: {
                    ...mapActions('remessas', ['ActionFind']),
                    ...mapActions('remessas', ['ActionFindByRemessa']),
 
                 async pesquisarRemesssa() {
-                                await this.ActionFindByRemessa(this.formdata)
+                                 this.isBusy = !this.isBusy //loading
+                                 await this.ActionFindByRemessa(this.formdata)
+                                 this.isBusy = false
                 },
-                 mascaraCNPJ(value) {
+                  mascaraCnpj(value) {
                             var mascara = (`${value}`).replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5")
                             return mascara;
                   },
