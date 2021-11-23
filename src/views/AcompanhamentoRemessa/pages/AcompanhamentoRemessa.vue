@@ -28,10 +28,10 @@
 
 
     <p align="right" >
-              <b-form-select v-model="formdata.exercicio" :options="formdata.exercicios"></b-form-select>
-              &nbsp;   &nbsp;
+              Exercicio: <b-form-select v-model="formdata.exercicio" :options="formdata.exercicios"></b-form-select>
+              &nbsp;   Remessa:&nbsp;
               <b-form-select v-model="formdata.remessa" :options="formdata.remessas"></b-form-select>
-             &nbsp;   &nbsp;   &nbsp;
+             &nbsp;   &nbsp;    &nbsp;
             <b-button @click="pesquisarRemesssa"  pill 
             variant="success" 
             size="sm">Pesquisar</b-button>

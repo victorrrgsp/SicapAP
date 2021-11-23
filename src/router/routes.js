@@ -6,6 +6,7 @@ import { routes as remessas } from '../views/AcompanhamentoRemessa'
 export default [
   ...auth,
   ...home,
-  ...fila,
-  ...remessas
+  ...remessas,
+  ...fila
+ 
 ]
