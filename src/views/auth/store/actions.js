@@ -1,17 +1,17 @@
 import * as storage from '../resource/storage'
 import * as types from './mutation-types'
-import jwt_decode from "jwt-decode";
-import { http } from '@/plugins/axios'
+//import jwt_decode from "jwt-decode";
+//import { http } from '@/plugins/axios'
 
-export const ActionDoLogin = ({ dispatch }, payload) => {
+// export const ActionDoLogin = ({ dispatch }, payload) => {
   
-    return http.post('token',payload).then(res => {
-      var decodedPayload = jwt_decode(res.data.access_token, { payload: true })
-      dispatch('ActionSetUser', decodedPayload)
-      dispatch('ActionSetToken', res.data.access_token)
-  })
+//     return http.post('token',payload).then(res => {
+//       var decodedPayload = jwt_decode(res.data.access_token, { payload: true })
+//       dispatch('ActionSetUser', decodedPayload)
+//       dispatch('ActionSetToken', res.data.access_token)
+//   })
 
-}
+// }
 
 export const ActionSetUser = ({ commit }, payload) => {
     commit(types.SET_USER, payload)
@@ -39,7 +39,7 @@ export const ActionCheckToken = ({ dispatch, state }) => {
   return dispatch('ActionLoadSession')
 }
 
-export const ActionLoadSession = ({ dispatch }) => {
+//export const ActionLoadSession = ({ dispatch }) => {
 
   // http.get('userinfo').then(res => {
   //         const data =res.data
@@ -58,51 +58,40 @@ export const ActionLoadSession = ({ dispatch }) => {
   //    //   return Promise.reject(err)
   //     })
 
- return http.get('userinfo').then((res => {
+//  return http.get('userinfo').then((res => {
 
-    const data =res.data
+//     const data =res.data
 
-    // console.log(data)
-  //  if(JSON.stringify(data) === '{}'){
+//     // console.log(data)
+//   //  if(JSON.stringify(data) === '{}'){
      
-  //  }
-    dispatch('ActionSetUser', data)
-   // return Promise.resolve()
-}),(rej) => {
+//   //  }
+//     dispatch('ActionSetUser', data)
+//    // return Promise.resolve()
+// }),(rej) => {
 
-  console.log(rej)
+//   console.log(rej)
 
-})
-}
+// })
+//}
 
 
 
-export const RefreshToken = ({ dispatch}) =>{
+// export const RefreshToken = ({ dispatch}) =>{
 
-  http.get('callback/refreshtoken').then(res => {
+//   http.get('callback/refreshtoken').then(res => {
     
-    const data2 =res.data
-    dispatch('ActionSetUser', data2)
+//     const data2 =res.data
+//     dispatch('ActionSetUser', data2)
   
-  })
+//   })
 
 
-}
+// }
 
 
 
-export const finalizarSessao = ({ dispatch })  =>{
 
-  var params = encodeURIComponent(JSON.stringify({"client_id":"fbca71a8-5898-4a67-934d-c4947477090e","client_secret":"fbca71a8-5898-4a67-934d-c4947477090e"}))
-
-  http.post('logout', params).then(res => {
-    const data2 =res.data
-
-   dispatch('ActionSetUser', data2)
-  
-  })
-
-}
 
 
 

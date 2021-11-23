@@ -1,0 +1,1 @@
+export const SET_DADOS = 'REMESSAS/SET_DADOS'
