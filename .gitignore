@@ -5,10 +5,10 @@ node_modules
 /deploy
 
 # local env files
-.env
-.env.*
-.env.development
-.env.*.local
+# .env
+# .env.*
+# .env.development
+# .env.*.local
 
 # Log files
 npm-debug.log*
