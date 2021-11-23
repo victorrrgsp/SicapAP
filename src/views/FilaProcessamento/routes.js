@@ -1,6 +1,6 @@
 export default [
   {
-    path: '/FilaProcessamento',
+    path: '/sicapapexterno/FilaProcessamento',
     name: 'filaprocessamento',
     meta: {
       showNavbar: true,

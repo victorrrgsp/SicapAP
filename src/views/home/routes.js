@@ -1,6 +1,6 @@
   export default [
     {
-      path: '/',
+      path: '/sicapapexterno/',
       name: 'home',
       component: () => import(/* webpackChunkName: "home" */ './Home'),
       meta: {
