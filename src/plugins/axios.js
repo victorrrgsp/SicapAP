@@ -3,8 +3,8 @@ import store from '@/store'
 
 export const api = axios.create({
   
-  //  baseURL: `${process.env.VUE_APP_HTTP_API}`,
-    baseURL:'https://www.tceto.tc.br/backend',
+   baseURL: `${process.env.VUE_APP_HTTP_API}`,
+    //baseURL:'https://www.tceto.tc.br/backend',
     headers: {
         'Content-type': 'application/x-www-form-urlencoded', 
         'Accept': 'application/json'
