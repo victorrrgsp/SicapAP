@@ -29,15 +29,16 @@ public class FilaProcessamentoController {
     @CrossOrigin
     @GetMapping(path = {"/processos"})
     public ResponseEntity<?> findProcessos() {
-        List<Object[]> infoRemessa = filaProcessamentoRepository.processo();
+        var infoRemessa = filaProcessamentoRepository.processo();
 
-        return ResponseEntity.ok().body(Objects.requireNonNullElse(ProcessoVO.convertList(infoRemessa), "semRemessa"));
+        return ResponseEntity.ok().body(Objects.requireNonNullElse(infoRemessa, "semRemessa"));
     }
+
+
     @CrossOrigin
     @GetMapping(path = {"/fila"})
     public ResponseEntity<?> filaProcessos() {
-        List<Object> infoRemessa = filaProcessamentoRepository.filaProcessamentos();
-
+        var infoRemessa = filaProcessamentoRepository.filaProcessamentos();
         return ResponseEntity.ok().body(Objects.requireNonNullElse(infoRemessa, "semRemessa"));
     }
 
