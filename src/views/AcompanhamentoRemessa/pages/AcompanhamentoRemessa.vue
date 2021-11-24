@@ -35,7 +35,7 @@
               <b-button @click="pesquisarRemesssa"  pill variant="success"  size="sm">Pesquisar</b-button>
           </p>
  <!-- :tbody-tr-class="rowClass" -->
-     <b-table striped hover responsive  
+     <b-table striped hover responsive sticky-header="700px" 
          id="my-table"
        
         :busy="isBusy"
@@ -54,9 +54,7 @@
               </div>
         </template>
 
-        
-
-         <template #cell(index)="data">{{ data.index + 1 }}</template>
+      
      </b-table>
     <b-pagination
       v-model="currentPage"
@@ -80,62 +78,66 @@ export default {
         data () {
           return {
             isBusy: true,
-            perPage: 20,
+            perPage: 325,
             currentPage: 1,
             filter: null,
             items:[],
             columns:[  
-                      
-                      {
-                        key:'index',
-                        label:'Indice',
-                        formatter: 'index'
-                      },
                       {
                         key: 'nomeEntidade',
                         label:'Unidade Gestora',
-                        sortable: true
-                       // formatter: 'todasMaiusculas'
+                        sortable: true,
+                        thStyle: { width: "45%",  },
+                        tdClass: 'fonteLinhas'
                       },
                        {
                         key: 'cnpj',
                          label:'Cnpj',
                          sortable: false,
                          thStyle: { width: "10%" },
-                         formatter: 'mascaraCnpj'
+                         formatter: 'mascaraCnpj',
+                         tdClass: 'fonteLinhas'
                       },
                       {
                          key: 'exercicio',
                          label:'Exercicio',
-                         sortable: true
+                         sortable: true,
+                        tdClass: 'fonteLinhas'
                       },
                       {
                          key: 'remessa',
                          label:'Remessa',
-                         sortable: true
+                         sortable: true,
+                        tdClass: 'fonteLinhas'
                       },   
                       {
                          key: 'relatoria',
                          label:'Relatoria',
-                         sortable: false
+                         sortable: false,
+                        tdClass: 'fonteLinhas'
                       },
                       {
                         key:'contAssinaturas',
                         label:'Assinaturas',
                         sortable: true,
+                        tdClass: 'fonteLinhas'
                       //  formatter: 'index'
                       },
                       {
                           key: 'dataEntrega',
                           label:'Data Entrega',
                           sortable: false,
-                          formatter: 'formatarData'
+                          formatter: 'formatarData',
+                           thStyle: { width: "10%",  },
+                          tdClass: 'fonteLinhas'
                       },
                       {
                           key: 'dataAssinatura',
                           label:'Data Assinatura',
                           sortable: true,
-                          formatter: 'formatarData'
+                          formatter: 'formatarData',
+                          thStyle: { width: "10%",  },
+                          tdClass: 'fonteLinhas'
                       }
                       
           ],
@@ -192,6 +194,7 @@ export default {
                        if (value === null) { return null }
                       return new Date(value).toLocaleString('pt-BR', { year: 'numeric', month: '2-digit', day: '2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit' })
                   },
+                  
                   // rowClass(item, type) {
 
                   //     var icon = ""
@@ -206,5 +209,8 @@ export default {
   }
 </script>
 <style >
+.fonteLinhas {
+   font-size:14px;
+}
 
 </style>
