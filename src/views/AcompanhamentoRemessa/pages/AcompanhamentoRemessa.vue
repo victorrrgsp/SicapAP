@@ -2,29 +2,29 @@
    <div>
 <!-- {{ '2021-11-17 12:37:31.9100000' | formatarDataEntrada }} -->
 
-      <b-col lg="6" class="my-1">
-        <b-form-group
-          label="Busca"
-          label-for="filter-input"
-          label-cols-sm="3"
-          label-align-sm="right"
-          label-size="sm"
-          class="mb-0"
-        >
-          <b-input-group size="sm">
-            <b-form-input
-              id="filter-input"
-              v-model="filter"
-              type="search"
-              placeholder="Digite aqui..."
-            ></b-form-input>
+            <b-col lg="6" class="my-1">
+              <b-form-group
+                label="Busca"
+                label-for="filter-input"
+                label-cols-sm="3"
+                label-align-sm="right"
+                label-size="sm"
+                class="mb-0"
+              >
+                <b-input-group size="sm">
+                  <b-form-input
+                    id="filter-input"
+                    v-model="filter"
+                    type="search"
+                    placeholder="Digite aqui..."
+                  ></b-form-input>
 
-            <b-input-group-append>
-              <b-button :disabled="!filter" @click="filter = ''">Clear</b-button>
-            </b-input-group-append>
-          </b-input-group>
-        </b-form-group>
-      </b-col> 
+                  <b-input-group-append>
+                    <b-button :disabled="!filter" @click="filter = ''">Clear</b-button>
+                  </b-input-group-append>
+                </b-input-group>
+              </b-form-group>
+            </b-col> 
 
 
           <p align="right" >
@@ -54,8 +54,44 @@
               </div>
         </template>
 
-      
+          <template #cell(opcao)="data">
+            <b-icon icon="pen-fill" 
+                cursor= "pointer" 
+                title="Assinaturas"
+                @click="info(data.item, data.index, $event.target)" pill 
+                variant="primary" 
+                size="sm">
+            </b-icon>
+         &nbsp;   
+       
+        </template>
      </b-table>
+<!-- Info modal -->
+    <b-modal :id="infoModal.id" :title="infoModal.title" ok-only @hide="resetInfoModal" size="xl"  >
+     
+     <b-container fluid="xl">
+      <b-row>
+        <b-col><b>Gestor</b></b-col>
+        <b-col><b>Responsável R.H.</b></b-col> 
+        <b-col><b>Controle Interno</b></b-col>
+      </b-row>
+
+      <b-row class="fonteLinhas">
+        <b-col>{{gestor}}</b-col>
+        <b-col>{{rh}}</b-col> 
+        <b-col>{{controleInterno}}</b-col>
+      </b-row>
+
+      <b-row class="fonteLinhas">
+        <b-col>Data Assinatura: {{ dataAssinaturaGestor == "" ? '---' :  formatarData(dataAssinaturaGestor) }}</b-col>
+        <b-col>Data Assinatura: {{ dataAssinaturaRh === "" ? '---' : formatarData(dataAssinaturaRh) }}</b-col> 
+        <b-col>Data Assinatura: {{ dataAssinaturaCI === "" ? '---' : formatarData(dataAssinaturaCI) }}</b-col>
+      </b-row>
+
+     </b-container>
+
+    </b-modal>
+
     <b-pagination
       v-model="currentPage"
       :total-rows="rows"
@@ -64,10 +100,14 @@
     ></b-pagination>
     
     </div>
+
+
+    
 </template>
 
 
 <script>
+import {api} from '@/plugins/axios'
 
 import { mapActions, mapState } from 'vuex'
 import maskMixins from '@/helpers/mixins/mask'
@@ -82,7 +122,20 @@ export default {
             currentPage: 1,
             filter: null,
             items:[],
-            columns:[  
+          
+            gestor: "",
+            rh: "",
+            controleInterno: "",
+            dataAssinaturaGestor: "",
+            dataAssinaturaRh: "",
+            dataAssinaturaCI: "",
+
+             infoModal: {
+                        id: 'info-modal',
+                        title: '',
+                        content: ''
+                       },
+             columns:[  
                       {
                         key: 'nomeEntidade',
                         label:'Unidade Gestora',
@@ -138,6 +191,11 @@ export default {
                           formatter: 'formatarData',
                           thStyle: { width: "10%",  },
                           tdClass: 'fonteLinhas'
+                      },
+                       {
+                        key: 'opcao',
+                        label:'Opções',
+                        sortable: true
                       }
                       
           ],
@@ -146,7 +204,7 @@ export default {
                exercicio: 2021,
                exercicios: [
                             { value: '2021', text: '2021' }
-                          ],
+                           ],
                remessa: 1,
                remessas: [
                             { value: '1', text: '1' },
@@ -166,6 +224,7 @@ export default {
        
        mounted(){
             this.ActionFind(),
+            
              setTimeout(() =>{// aguarda com spinner antes da pesquisa aparecer na pesquisa inicial
                   this.isBusy = false
                   }, 2.0*2000)
@@ -180,6 +239,7 @@ export default {
         methods: {
                    ...mapActions('remessas', ['ActionFind']),
                    ...mapActions('remessas', ['ActionFindByRemessa']),
+              
 
                 async pesquisarRemesssa() {
                                  this.isBusy = !this.isBusy //loading
@@ -195,16 +255,88 @@ export default {
                       return new Date(value).toLocaleString('pt-BR', { year: 'numeric', month: '2-digit', day: '2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit' })
                   },
                   
-                  // rowClass(item, type) {
+                  info(item, index, button) {
 
-                  //     var icon = ""
+                          this.$root.$emit('bv::show::modal', this.infoModal.id, button)
+                          this.infoModal.title = `Unidade Gestora: ${item.nomeEntidade}`
+                          this.buscarDadoRemessa(item.chave)
 
-                  //    if (!item || type !== 'row') return
-                  //    (item.contAssinaturas == 3) ? icon= item.contAssinaturas='door-open' : icon=item.contAssinaturas='trash'
+                    },
 
-                  //     return icon
 
-                  //  }
+                     resetInfoModal() {
+                                      this.infoModal.title = ''
+                                      this.infoModal.content = ''
+                                      this.gestor= "",
+                                      this.rh= "",
+                                      this.controleInterno= "",
+                                      this.dataAssinaturaGestor= "",
+                                      this.dataAssinaturaRh= "",
+                                      this.dataAssinaturaCI= ""
+                                    },
+
+                   //   abrirRecibo(ug, chave, remessa, exercicio) {
+                     abrirRecibo(item) {
+                                 window.open("http://relatorios.tce-to.tce.to.gov.br/Relatorios/Pages/ReportViewer.aspx?%2fSicapAP2021%2fReciboRemessa&rs:Command=Render" + "&ug=" + item.cnpj + "&remessa=" + item.remessa + "&exercicio=" + item.exercicio + "&rs:Format=PDF");
+                     },
+
+
+
+
+
+ buscarDadoRemessa (chave) {
+
+    this.findGestor(chave);
+    this.findRh(chave);
+    this.findControleInterno(chave);
+
+
+  },
+
+ async findGestor(chave){
+
+    const data =  await this.getResponsavel('Gestor', chave);
+
+    if (data !== 'semPermissao') {
+      this.gestor = data[0];
+      this.dataAssinaturaGestor = data[3]
+      this.statusGestor = this.dataAssinaturaGestor !== null ? 'Assinado' : 'Não Assinado';
+    } else {
+      this.statusGestor = 'Sem Permissão';
+    }
+  },
+
+ async findRh (chave) {
+    const data =  await this.getResponsavel('Responsável R.H.', chave);
+    if (data !== 'semPermissao') {
+      this.rh = data[0];
+      this.dataAssinaturaRh = data[3];
+      this.statusRh = this.dataAssinaturaRh !== null ? 'Assinado' : 'Não Assinado';
+    } else {
+      this.statusRh = 'Sem Permissão';
+    }
+  },
+
+ async findControleInterno(chave)  {
+    const data = await  this.getResponsavel('Controle Interno', chave);
+    if (data !== 'semPermissao') {
+      this.controleInterno = data[0];
+      this.dataAssinaturaCI = data[3];
+      this.statusCI = this.dataAssinaturaCI !== null ? 'Assinado' : 'Não Assinado';
+    } else {
+      this.statusCI = data;
+    }
+  },
+   async getResponsavel(cargo,chave) {
+
+    const response = await api.get("externo/acompanhamentoRemessa/" + cargo +"/" +chave)
+    return response.data;
+
+  }
+
+
+
+
           }
   }
 </script>
