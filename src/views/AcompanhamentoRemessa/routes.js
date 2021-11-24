@@ -1,6 +1,6 @@
 export default [
   {
-    path: '/AcompanhamentoRemessa',
+    path: '/sicapapexterno/AcompanhamentoRemessa',
     name: 'acompanhamentoremessa',
     meta: {
       showNavbar: true,
