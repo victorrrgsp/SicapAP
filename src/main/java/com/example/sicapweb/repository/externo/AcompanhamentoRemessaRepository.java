@@ -91,23 +91,11 @@ public class AcompanhamentoRemessaRepository extends DefaultRepository<String, S
 //        return list;
 //    }
 
-    public List<Map<String,Object>> buscarRemessaFechada(Integer exercicio, Integer remessa) {
+    public List<Map<String,Object>> buscarAcompanhamentoRemessa(Integer exercicio, Integer remessa) {
 
         List<Map<String,Object>> retorno = new ArrayList<Map<String,Object>>();
 
-
-//        mapa.put("id", 2);
-//        mapa.put("cnpj", "00000000000000");
-//        mapa.put("nome", "UNIDADE GESTORA TESTE DE PALMAS");
-//
-//        Map<String, Object> mapa2 = new HashMap<String, Object>();
-//        mapa2.put("id", 4);
-//        mapa2.put("cnpj", "11111111111111");
-//        mapa2.put("nome", "Wesley");
-
-
-       // retorno.add(mapa2);
-   //     try {
+        try {
 
             List<Object[]> list = entityManager.createNativeQuery("with ugsAptas as (" +
                     "select *" +
@@ -115,16 +103,16 @@ public class AcompanhamentoRemessaRepository extends DefaultRepository<String, S
                     " where  cadun.dbo.EhVigente("+exercicio+", "+remessa+",CNPJ,  29) = 1" +
                     ")," +
                     " ugsAssinantes as (" +
-                    " SELECT COUNT(DISTINCT idCargo) AS contAssinaturas, IDUNIDADEGESTORA , i.EXERCICIO, i.remessa, max(i.relatoria) relatoria, max(f.dataEnvio) dataEntrega, max(dataAssinatura) dataAssinatura" +
+                    " SELECT COUNT(DISTINCT idCargo) AS contAssinaturas, IDUNIDADEGESTORA , i.EXERCICIO, i.remessa, i.chave, max(i.relatoria) relatoria, max(f.dataEnvio) dataEntrega, max(dataAssinatura) dataAssinatura" +
                     " FROM ugsAptas ug left join" +
                     " inforemessa i on i.IDUNIDADEGESTORA = ug.CNPJ and i.EXERCICIO = "+exercicio+" and i.REMESSA = "+remessa+" and i.status = 1 left join" +
                     " admassinatura  a on a.chave = i.CHAVE  left join" +
                     " AutenticacaoAssinatura..Assinatura  ass on ass.oid = a.idAssinatura left join" +
                     " admfilarecebimento f on f.id = i.idfilarecebimento" +
-                    " group by IDUNIDADEGESTORA, i.EXERCICIO, i.REMESSA" +
+                    " group by IDUNIDADEGESTORA, i.EXERCICIO, i.REMESSA, i.CHAVE" +
                     ")" +
                     " select  cnpj, NomeMunicipio + ' - '+ nomeEntidade nomeEntidade, case when b.relatoria is null then a.numeroRelatoria else b.relatoria end relatoria," +
-                    " dataEntrega, dataAssinatura, contAssinaturas, case when  contAssinaturas >= 3 then 1 else 0 end mostraRecibo, exercicio, remessa" +
+                    " dataEntrega, dataAssinatura, contAssinaturas, case when  contAssinaturas >= 3 then 1 else 0 end mostraRecibo, exercicio, remessa, chave" +
                     " from ugsAptas a left join" +
                     " ugsAssinantes b on a.cnpj = idUnidadeGestora" +
                     " where CNPJ <> '00000000000000'" +
@@ -147,6 +135,7 @@ public class AcompanhamentoRemessaRepository extends DefaultRepository<String, S
                   mapa.put("mostraRecibo", (Integer) obj[6]);
                   mapa.put("exercicio", (Integer) obj[7]);
                   mapa.put("remessa", (Integer) obj[8]);
+                  mapa.put("chave", (String) obj[9]);
                   retorno.add(mapa);
 
         };
@@ -154,15 +143,9 @@ public class AcompanhamentoRemessaRepository extends DefaultRepository<String, S
         return retorno;
 
 
-
-
-
-
-//            return list;
-//
-//        } catch (Exception e) {
-//            return null;
-//        }
+       } catch (Exception e) {
+            return null;
+        }
 
 
     }
