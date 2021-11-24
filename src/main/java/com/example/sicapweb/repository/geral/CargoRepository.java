@@ -1,6 +1,5 @@
 package com.example.sicapweb.repository.geral;
 
-import br.gov.to.tce.model.UnidadeGestora;
 import br.gov.to.tce.model.ap.relacional.Cargo;
 import com.example.sicapweb.repository.DefaultRepository;
 import org.springframework.stereotype.Repository;
@@ -18,7 +17,7 @@ public class CargoRepository extends DefaultRepository<Cargo, BigInteger> {
 
     public Cargo buscarCargoPorcodigo(String codigo) {
         List<Cargo> list = getEntityManager().createNativeQuery("select * from Cargo ed" +
-                " where codigoCargo = " + codigo, Cargo.class).getResultList();
+                " where codigoCargo = '" + codigo + "'", Cargo.class).getResultList();
         return list.get(0);
     }
 

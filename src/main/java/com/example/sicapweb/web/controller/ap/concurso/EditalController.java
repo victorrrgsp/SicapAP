@@ -69,4 +69,12 @@ public class EditalController extends DefaultController<Edital> {
         editalRepository.update(edital);
         return ResponseEntity.noContent().build();
     }
+
+    @CrossOrigin
+    @Transactional
+    @DeleteMapping(value = {"/{id}"})
+    public ResponseEntity<?> delete(@PathVariable BigInteger id) {
+        editalRepository.delete(id);
+        return ResponseEntity.noContent().build();
+    }
 }

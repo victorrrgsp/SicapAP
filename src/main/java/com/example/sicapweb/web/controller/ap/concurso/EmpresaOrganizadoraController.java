@@ -14,6 +14,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.math.BigInteger;
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping({"/concursoEmpresaOrganizadora"})
@@ -27,6 +28,13 @@ public class EmpresaOrganizadoraController extends DefaultController<EmpresaOrga
     public ResponseEntity<PaginacaoUtil<EmpresaOrganizadora>> listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
         PaginacaoUtil<EmpresaOrganizadora> paginacaoUtil = empresaOrganizadoraRepository.buscaPaginada(pageable,searchParams,tipoParams);
         return ResponseEntity.ok().body(paginacaoUtil);
+    }
+
+    @CrossOrigin
+    @GetMapping
+    public ResponseEntity<List<EmpresaOrganizadora>> findAll() {
+        List<EmpresaOrganizadora> list = empresaOrganizadoraRepository.findAll();
+        return ResponseEntity.ok().body(list);
     }
 
     @CrossOrigin
