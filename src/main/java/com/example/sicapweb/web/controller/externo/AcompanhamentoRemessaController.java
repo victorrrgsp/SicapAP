@@ -50,6 +50,31 @@ public class AcompanhamentoRemessaController {
 
 
 
+    @CrossOrigin
+    @GetMapping(path = {"/{cargo}/{chave}"})
+    public ResponseEntity<?> findResponsavel(@PathVariable String cargo, @PathVariable String chave ) {
+        Integer tipoCargo;
+        switch (cargo) {
+            case "Gestor":
+                tipoCargo = User.Cargo.Gestor.getValor();
+                break;
+            case "Responsável R.H.":
+                tipoCargo = User.Cargo.ResponsavelRH.getValor();
+                break;
+            case "Controle Interno":
+                tipoCargo = User.Cargo.ControleInterno.getValor();
+                break;
+            default:
+                tipoCargo = 0;
+                break;
+
+        }
+        InfoRemessa info = infoRemessaRepository.findById(chave);
+        Object resp = acompanhamentoRemessaRepository.buscarResponsavelAssinatura(tipoCargo, info);
+        return ResponseEntity.ok().body(Objects.requireNonNullElse(resp, "semPermissao"));
+    }
+
+
 
 
 
