@@ -34,9 +34,11 @@
               &nbsp;   &nbsp;    &nbsp;
               <b-button @click="pesquisarRemesssa"  pill variant="success"  size="sm">Pesquisar</b-button>
           </p>
-
-     <b-table striped hover responsive  :busy="isBusy"
+ <!-- :tbody-tr-class="rowClass" -->
+     <b-table striped hover responsive  
          id="my-table"
+       
+        :busy="isBusy"
         :items="tableData" 
         :filter="filter"
         :fields="columns" 
@@ -51,6 +53,8 @@
                 <strong>Loading...</strong>
               </div>
         </template>
+
+        
 
          <template #cell(index)="data">{{ data.index + 1 }}</template>
      </b-table>
@@ -81,7 +85,8 @@ export default {
             filter: null,
             items:[],
             columns:[  
-               {
+                      
+                      {
                         key:'index',
                         label:'Indice',
                         formatter: 'index'
@@ -113,6 +118,12 @@ export default {
                          key: 'relatoria',
                          label:'Relatoria',
                          sortable: false
+                      },
+                      {
+                        key:'contAssinaturas',
+                        label:'Assinaturas',
+                        sortable: true,
+                      //  formatter: 'index'
                       },
                       {
                           key: 'dataEntrega',
@@ -181,8 +192,16 @@ export default {
                        if (value === null) { return null }
                       return new Date(value).toLocaleString('pt-BR', { year: 'numeric', month: '2-digit', day: '2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit' })
                   },
-                
+                  // rowClass(item, type) {
 
+                  //     var icon = ""
+
+                  //    if (!item || type !== 'row') return
+                  //    (item.contAssinaturas == 3) ? icon= item.contAssinaturas='door-open' : icon=item.contAssinaturas='trash'
+
+                  //     return icon
+
+                  //  }
           }
   }
 </script>
