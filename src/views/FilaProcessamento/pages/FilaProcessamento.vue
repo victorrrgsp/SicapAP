@@ -8,7 +8,7 @@
       
       </b-nav>
     </b-card-header>
-     <b-card-body v-if="fila === null">
+     <b-card-body v-if="this.fila === []">
        {{'Sem processos'}}
      </b-card-body>
 <b-card-body v-else>
