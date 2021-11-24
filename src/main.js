@@ -9,7 +9,6 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 import './assets/scss/app.scss'
 import VueTheMask from 'vue-the-mask'
 import './plugins/axios'
-import Axios from 'axios'
 
 
 Vue.use(VueTheMask)
@@ -37,5 +36,3 @@ window._Vue = new Vue({
   render: h => h(App)
 }).$mount('#app')
 
-
-Axios.defaults.baseURL = "https://www.tceto.tc.br/backend"
