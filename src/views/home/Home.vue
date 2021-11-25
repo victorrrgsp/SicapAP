@@ -65,7 +65,7 @@ export default {
       }
     }
     .home-link:first-child { background-color: var(--bs-blue) }
-    //.home-link:nth-child(2) { background-color: var(--bs-orange) }
+    .home-link:nth-child(2) { background-color: var(--bs-orange) }
     //.home-link:last-child { background-color: var(--bs-red) }
   }
 }

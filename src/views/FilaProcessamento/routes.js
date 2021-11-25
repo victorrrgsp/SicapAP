@@ -5,7 +5,7 @@ export default [
     meta: {
       showNavbar: true,
       showDashboard: true,
-      icon: 'layout-text-window-reverse', 
+      icon: 'list-nested', 
       title: 'FilaProcessamento',
       label: 'Fila Processamento'
     },
