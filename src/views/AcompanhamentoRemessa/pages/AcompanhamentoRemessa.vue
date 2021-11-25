@@ -33,8 +33,6 @@
           </p>
 
 
- <!-- :tbody-tr-class="rowClass" -->
-
 
      <b-table striped hover responsive sticky-header="700px" 
          id="my-table"
@@ -55,9 +53,9 @@
         </template>
 
 
-  <!--  @hidden="verIcon(data.item)" -->
-  <!--  :hidden="verIcon(data.item)"   -->
-          <template #cell(opcao)="data">
+
+  <!--  Assinaturas  -->
+          <template #cell(assinaturas)="data">
             <b-icon 
                 icon="pen-fill" 
                 :hidden="verIconAssinatura(data.item)"    
@@ -77,6 +75,20 @@
                 size="sm">
             </b-icon>
         </template>
+
+  <!--  Status  -->
+            <template #cell(status)="data">
+                      <b-icon 
+                          :icon="iconStatus(data.item)" 
+                          cursor= "pointer" 
+                          :title="iconStatusTitle(data.item)"
+                          :variant="iconStatusVariant(data.item)" 
+                          size="sm">
+                      </b-icon>
+            </template>
+
+
+
      </b-table>
 
 
@@ -182,11 +194,7 @@ export default {
                          sortable: false,
                         tdClass: 'fonteLinhas'
                       },
-                        {
-                        key: 'opcao',
-                        label:'Assinaturas',
-                        sortable: true
-                      },
+                       
                    
                       {
                           key: 'dataEntrega',
@@ -203,7 +211,24 @@ export default {
                           formatter: 'formatarData',
                           thStyle: { width: "10%",  },
                           tdClass: 'fonteLinhas'
-                      }
+                      },
+                        {
+                        key: 'contAssinaturas',
+                        label:'Qtd. Assinaturas',
+                        sortable: true
+                      },
+
+                       {
+                        key: 'assinaturas',
+                        label:'Assinaturas',
+                        sortable: true
+                      },
+
+                      {
+                        key: 'status',
+                        label:'Status',
+                        sortable: true
+                      },
                      
                       
           ],
@@ -247,11 +272,64 @@ export default {
                    ...mapActions('remessas', ['ActionFindByRemessa']),
 
 
+                    iconStatusTitle(item){
+                       if(item.contAssinaturas > 2){
+                                return 'Assinado'
+                          }
+                          
+                           if((item.contAssinaturas >= 1)&& (item.contAssinaturas <= 2)){
+                                return 'Pendente de Assinatura'
+                          }  
+
+                          else{
+                           return 'Aguardando Envio'
+                          }
+
+                    },
+
+
+                  iconStatus(item){
+
+                          if(item.contAssinaturas > 2){
+                                return 'check-square'
+                          }
+                          
+                             if((item.contAssinaturas >= 1) && (item.contAssinaturas <= 2)){
+                                return 'exclamation-triangle-fill'
+                          }  
+
+                          else{
+                           return 'x-circle'
+                          }
+
+                  },
+
+                  iconStatusVariant(item){
+
+                          if(item.contAssinaturas > 2){
+                                return 'success'
+                          }
+
+                            if((item.contAssinaturas >= 1) && (item.contAssinaturas <= 2)){
+                                return 'warning'
+                          }  
+                          
+                          else{
+                            return 'danger'
+                          }
+
+                  },
+
+
                     verIconAssinatura(item){
 
                           if(item.contAssinaturas >= 1){
                                 return false
                           }
+
+                         
+
+
                           else{
                             return true
                           }

@@ -1,7 +1,7 @@
 <template>
   <div>
     <b-sidebar id="sidebar-menu" aria-labelledby="sidebar-menu-title" no-header shadow backdrop>
-      <template #default="{ hiden }">
+      <template #default="{ hide }">
         <div class="sidebar-tce" >
            <div class="row" >
                     <div class="col-3" style="margin-top: 5px; margin-bottom: 5px;">
@@ -30,9 +30,10 @@
                         </router-link>
                 </b-nav>
            </nav>
+
            <br/>
            <br/>
-          <b-button variant="primary" block @click="hiden">Fechar</b-button>
+          <b-button variant="primary" block @click="hide">Fechar</b-button>
         </div>
       </template>
     </b-sidebar>
@@ -119,8 +120,6 @@ export default {
     padding: 0 0 0 0 !important;
     width: calc(100% + 10px);
  }
-
-
 
 
 </style>
