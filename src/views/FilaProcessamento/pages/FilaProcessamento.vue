@@ -1,6 +1,6 @@
 <template>
   <div class="overflow-auto">
-    <b-card no-body class="mb-5">
+    <b-card no-body class="mb-5 mt-5">
       <b-card-header header-tag="nav">
         <b-nav card-header tabs>
           <b-nav-item active>Fila de Processamento</b-nav-item>
@@ -29,7 +29,17 @@
               <strong>Loading...</strong>
             </div>
           </template>
-         
+          <template #cell(status)="data">
+            <b-icon  v-if="(data.item.value == aprovado)"  :icon=da
+                cursor= "pointer" 
+                title="Status"
+                @click="info(data.item, data.index, $event.target)" pill 
+                variant="primary" 
+                size="sm">
+            </b-icon>
+         &nbsp;   
+       
+        </template>
         </b-table>
        <p v-if="(fila.length == 0)" class="text-danger"> Sem processos!</p>
       </b-card-body>
@@ -62,6 +72,30 @@
               <strong>Loading...</strong>
             </div>
           </template>
+
+          <template #cell(status)="data">
+            <b-icon  v-if= "statusIcon( data.value ) == 'exclamation-triangle-fill'" class="h2 mb-1"
+                :icon="statusIcon( data.value )" 
+               
+                 variant="warning"
+                cursor= "pointer" 
+                title="Assinaturas"
+                @click="info(data.item, data.index, $event.target)" pill 
+               
+                size="sm">
+            </b-icon> 
+            <b-icon  v-else class="h2 mb-2"
+                :icon="statusIcon( data.value )" 
+               
+                 variant="success"
+                cursor= "pointer" 
+                title="Assinaturas"
+                @click="info(data.item, data.index, $event.target)" pill 
+               
+                size="sm">
+            </b-icon>
+    
+          </template>
         </b-table>
       </b-card-body>
     </b-card>
@@ -80,6 +114,7 @@ import { api } from "@/plugins/axios";
 export default {
   data() {
     return {
+      aprovado: "aprovado",
       isBusy: true,
       perPage: 5000,
       currentPage: 1,
@@ -116,11 +151,11 @@ export default {
           formatter: "formatarData",
           sortable: true,
         },
-        // {
-        // key: 'status',
-        // label:'Status',
-        // sortable: false
-        // },
+        {
+        key: 'status',
+        label:'Status',
+        sortable: false
+        },
       ],
       items2: [
         {
@@ -205,9 +240,15 @@ export default {
     //     return;
     //   }
     // },
+    statusIcon(label){
+      console.log("label",label)
+        if(label === "ok") return 'check'
+        else if (label === 'mapear erro') return 'exclamation-triangle-fill'
+    },
      rowClass(item, type) {
         if (!item || type !== 'row') return
-        if (item.status === 'mapear erro') return 'table-danger'
+        if (item.status === 'mapear erro') return 'check'
+        else if (item.status === 'ok')  return 'x'
       }
   },
 
