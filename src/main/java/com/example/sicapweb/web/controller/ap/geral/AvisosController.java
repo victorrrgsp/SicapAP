@@ -9,16 +9,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/avisos")
+@RequestMapping("/")
 public class AvisosController {
 
     @Autowired
     UnidadeGestoraRepository unidadeGestoraRepository;
 
-    @GetMapping("/")
+    @GetMapping("")
     public String avisos(ModelMap model) {
         UnidadeGestora unidadeGestora = unidadeGestoraRepository.buscarDadosUnidadeTeste();
         model.addAttribute("unidade", unidadeGestora);
-        return "avisos";
+        return "index";
     }
 }
