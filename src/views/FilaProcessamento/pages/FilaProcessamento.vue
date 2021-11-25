@@ -29,7 +29,9 @@
               <strong>Loading...</strong>
             </div>
           </template>
+         
         </b-table>
+       <p v-if="(fila.length == 0)" class="text-danger"> Sem processos!</p>
       </b-card-body>
     </b-card>
     <b-card no-body>
@@ -40,6 +42,7 @@
       </b-card-header>
       <b-card-body>
         <b-table
+        :busy="isBusy"
           striped
           hover
           responsive
@@ -50,7 +53,8 @@
           :per-page="perPage"
           :current-page="currentPage"
           aria-controls="my-table"
-          small
+          :tbody-tr-class="rowClass"
+         
         >
           <template #table-busy>
             <div class="text-center text-danger my-2">
@@ -112,11 +116,11 @@ export default {
           formatter: "formatarData",
           sortable: true,
         },
-        //{
+        // {
         // key: 'status',
         // label:'Status',
         // sortable: false
-        //},
+        // },
       ],
       items2: [
         {
@@ -152,14 +156,17 @@ export default {
           key: "status",
           label: "Status",
           sortable: false,
+          //formatter: "rowClass"
         },
       ],
     };
   },
   mounted() {
     this.FindAll();
-    // this.FindFila();
-    //this.readForms();
+     setTimeout(() =>{// aguarda com spinner antes da pesquisa aparecer na pesquisa inicial
+                  this.isBusy = false
+                  }, 1.0*100)
+        
     setInterval(this.readForms, 1000);
   },
   methods: {
@@ -172,10 +179,12 @@ export default {
 
     readForms() {
       api.get("filaProcessamento/fila").then((resp) => {
-        console.log("data", resp.data);
+       if (resp.data.length ){
+          console.log("data", resp.data);
+       } 
         this.fila = resp.data;
       });
-      console.log(this.fila);
+      
     },
     formatarData: function (value) {
       if (value === null) {
@@ -191,11 +200,15 @@ export default {
       });
     },
 
-    FormatarStatus: function (value) {
-      if (value === "ok") {
-        return;
+    // FormatarStatus: function (value) {
+    //   if (value === "ok") {
+    //     return;
+    //   }
+    // },
+     rowClass(item, type) {
+        if (!item || type !== 'row') return
+        if (item.status === 'mapear erro') return 'table-danger'
       }
-    },
   },
 
   computed: {
