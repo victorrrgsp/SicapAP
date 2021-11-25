@@ -1,7 +1,5 @@
 <template>
    <div>
-<!-- {{ '2021-11-17 12:37:31.9100000' | formatarDataEntrada }} -->
-
             <b-col lg="6" class="my-1">
               <b-form-group
                 label="Busca"
@@ -20,12 +18,11 @@
                   ></b-form-input>
 
                   <b-input-group-append>
-                    <b-button :disabled="!filter" @click="filter = ''">Clear</b-button>
+                    <b-button :disabled="!filter" @click="filter = ''">Limpar</b-button>
                   </b-input-group-append>
                 </b-input-group>
               </b-form-group>
             </b-col> 
-
 
           <p align="right" >
               Exercicio: <b-form-select v-model="formdata.exercicio" :options="formdata.exercicios"></b-form-select>
@@ -34,10 +31,13 @@
               &nbsp;   &nbsp;    &nbsp;
               <b-button @click="pesquisarRemesssa"  pill variant="success"  size="sm">Pesquisar</b-button>
           </p>
+
+
  <!-- :tbody-tr-class="rowClass" -->
+
+
      <b-table striped hover responsive sticky-header="700px" 
          id="my-table"
-       
         :busy="isBusy"
         :items="tableData" 
         :filter="filter"
@@ -54,8 +54,12 @@
               </div>
         </template>
 
+:hidden="verIcon(data.item)"  
+  <!-- @hidden="verIcon(data.item)" -->
           <template #cell(opcao)="data">
-            <b-icon icon="pen-fill" 
+            <b-icon 
+                :hidden="verIcon(data.item)"    
+                :icon="verIcon2(data.item)" 
                 cursor= "pointer" 
                 title="Assinaturas"
                 @click="info(data.item, data.index, $event.target)" pill 
@@ -64,54 +68,52 @@
             </b-icon>
          &nbsp;   
             <b-icon icon="file-earmark-arrow-down" 
+                :hidden="verIcon(data.item)"  
                 cursor= "pointer" 
                 title="Assinaturas"
                 @click="abrirRecibo(data.item)" pill 
                 variant="primary" 
                 size="sm">
             </b-icon>
-
-       
-       
         </template>
      </b-table>
-<!-- Info modal -->
-    <b-modal :id="infoModal.id" :title="infoModal.title" ok-only @hide="resetInfoModal" size="xl"  >
-     
-     <b-container fluid="xl">
-      <b-row>
-        <b-col><b>Gestor</b></b-col>
-        <b-col><b>Responsável R.H.</b></b-col> 
-        <b-col><b>Controle Interno</b></b-col>
-      </b-row>
 
-      <b-row class="fonteLinhas">
-        <b-col>{{gestor}}</b-col>
-        <b-col>{{rh}}</b-col> 
-        <b-col>{{controleInterno}}</b-col>
-      </b-row>
 
-      <b-row class="fonteLinhas">
-        <b-col>Data Assinatura: {{ dataAssinaturaGestor == "" ? '---' :  formatarData(dataAssinaturaGestor) }}</b-col>
-        <b-col>Data Assinatura: {{ dataAssinaturaRh === "" ? '---' : formatarData(dataAssinaturaRh) }}</b-col> 
-        <b-col>Data Assinatura: {{ dataAssinaturaCI === "" ? '---' : formatarData(dataAssinaturaCI) }}</b-col>
-      </b-row>
 
-     </b-container>
+          <!-- Info modal -->
+              <b-modal :id="infoModal.id" :title="infoModal.title" ok-only @hide="resetInfoModal" size="xl"  >
+              
+              <b-container fluid="xl">
+                <b-row>
+                  <b-col><b>Gestor</b></b-col>
+                  <b-col><b>Responsável R.H.</b></b-col> 
+                  <b-col><b>Controle Interno</b></b-col>
+                </b-row>
 
-    </b-modal>
+                <b-row class="fonteLinhas">
+                  <b-col>{{gestor}}</b-col>
+                  <b-col>{{rh}}</b-col> 
+                  <b-col>{{controleInterno}}</b-col>
+                </b-row>
 
-    <b-pagination
-      v-model="currentPage"
-      :total-rows="rows"
-      :per-page="perPage"
-      aria-controls="my-table"
-    ></b-pagination>
-    
+                <b-row class="fonteLinhas">
+                  <b-col>Data Assinatura: {{ dataAssinaturaGestor == "" ? '---' :  formatarData(dataAssinaturaGestor) }}</b-col>
+                  <b-col>Data Assinatura: {{ dataAssinaturaRh === "" ? '---' : formatarData(dataAssinaturaRh) }}</b-col> 
+                  <b-col>Data Assinatura: {{ dataAssinaturaCI === "" ? '---' : formatarData(dataAssinaturaCI) }}</b-col>
+                </b-row>
+
+              </b-container>
+
+              </b-modal>
+
+          <b-pagination
+            v-model="currentPage"
+            :total-rows="rows"
+            :per-page="perPage"
+            aria-controls="my-table"
+          ></b-pagination>
+          
     </div>
-
-
-    
 </template>
 
 
@@ -233,13 +235,11 @@ export default {
         },
        
        mounted(){
-            this.ActionFind(),
-            
+             this.ActionFind(),
              setTimeout(() =>{// aguarda com spinner antes da pesquisa aparecer na pesquisa inicial
                   this.isBusy = false
                   }, 2.0*2000)
         },
-      
         computed:{
                   rows() {
                   return this.tableData.length
@@ -249,32 +249,60 @@ export default {
         methods: {
                    ...mapActions('remessas', ['ActionFind']),
                    ...mapActions('remessas', ['ActionFindByRemessa']),
-              
 
-                async pesquisarRemesssa() {
-                                 this.isBusy = !this.isBusy //loading
-                                 await this.ActionFindByRemessa(this.formdata)
-                                 this.isBusy = false
-                },
+
+                    verIcon(item){
+
+                          if(item.chave){
+
+                                return false
+                                       
+                          }
+
+                          else{
+                            return true
+                             
+                          }
+                    },
+                
+                
+                
+                verIcon2(item){
+
+                          if(item.chave){
+                                       return "pen-fill"
+                          }
+
+                          else{
+                               return "pencil"
+                          }
+                    },
+
+
+
+                  async pesquisarRemesssa() {
+                                  this.isBusy = !this.isBusy //loading
+                                  await this.ActionFindByRemessa(this.formdata)
+                                  this.isBusy = false
+                  },
+
                   mascaraCnpj(value) {
                             var mascara = (`${value}`).replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5")
                             return mascara;
                   },
+
                   formatarData: function (value) {
                        if (value === null) { return null }
                       return new Date(value).toLocaleString('pt-BR', { year: 'numeric', month: '2-digit', day: '2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit' })
                   },
                   
                   info(item, index, button) {
-
                           this.$root.$emit('bv::show::modal', this.infoModal.id, button)
                           this.infoModal.title = `Unidade Gestora: ${item.nomeEntidade}`
                           this.buscarDadoRemessa(item.chave)
-
                     },
 
-
-                     resetInfoModal() {
+                  resetInfoModal() {
                                       this.infoModal.title = ''
                                       this.infoModal.content = ''
                                       this.gestor= "",
@@ -285,7 +313,7 @@ export default {
                                       this.dataAssinaturaCI= ""
                                     },
 
-                     abrirRecibo(item) {
+                  abrirRecibo(item) {
 
                                         let pdfName = 'Recibo Sicap AP '+item.cnpj+'_'+item.exercicio+'_'+item.remessa; 
                                         var doc = new jsPDF();
@@ -327,10 +355,8 @@ export default {
                                         doc.setFont(undefined, 'bold')
                                         doc.text("Última Asinatura: ", 10, 100);
 
-
                                         doc.setFont(undefined, 'normal')
                                         doc.text(""+this.formatarData(item.dataAssinatura)+"", 40, 100);
-
 
                                         doc.text("O Tribunal de Contas do Tocantins, atesta o recebimento das informações referentes aos dados do(s) mês(es) " +item.remessa+ " de "+item.exercicio, 10, 120);  
 
@@ -338,7 +364,6 @@ export default {
 
                      },
                   
-
                     buscarDadoRemessa (chave) {
 
                         this.findGestor(chave);
@@ -346,7 +371,6 @@ export default {
                         this.findControleInterno(chave);
 
                       },
-
                     async findGestor(chave){
 
                         const data =  await this.getResponsavel('Gestor', chave);

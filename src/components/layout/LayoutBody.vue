@@ -1,7 +1,7 @@
 <template>
   <div>
     <b-sidebar id="sidebar-menu" aria-labelledby="sidebar-menu-title" no-header shadow backdrop>
-      <template #default="{ hide }">
+      <template #default="{ hiden }">
         <div class="sidebar-tce" >
            <div class="row" >
                     <div class="col-3" style="margin-top: 5px; margin-bottom: 5px;">
@@ -30,10 +30,9 @@
                         </router-link>
                 </b-nav>
            </nav>
-
            <br/>
            <br/>
-          <b-button variant="primary" block @click="hide">Fechar</b-button>
+          <b-button variant="primary" block @click="hiden">Fechar</b-button>
         </div>
       </template>
     </b-sidebar>
@@ -75,7 +74,6 @@ export default {
     font-size: 1.25rem/17.50px;
     margin-left: -15px;
     width: calc(100% + 30px);
-    //height: calc(100vh - 30px);
   .nav-link {
     color: var(--cinza-escuro-tce);
     transition: .4s;
@@ -93,14 +91,11 @@ export default {
 .sidebar-tce {
     background-color: var(--azul-escuro-tce);
     box-shadow: 0px 5px 2px var(--vermelho-escuro-tce);
-    //position: relative;
     padding: 0 0 0 0 !important;
     width: calc(100% + 2px);
-    //  height: calc(100vh - 830px);
 }
 
 .fonte_titulo_logo {
-   // font-family: "Montserrat" !important;
     font-size: 1.953rem/27.34px !important;
     font-weight: bold;
     color: var(--cinza-ligt-tce) !important;
@@ -116,18 +111,16 @@ export default {
     font-weight: 300;
     position: relative;
     top: 10px; 
-    //left: 1px;
     margin-left: 6px;
-     
 }
 
 .row{
-
     display: flex !important;
     padding: 0 0 0 0 !important;
     width: calc(100% + 10px);
- 
  }
+
+
 
 
 </style>

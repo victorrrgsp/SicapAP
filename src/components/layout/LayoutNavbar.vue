@@ -24,7 +24,6 @@
                   <b-navbar-nav class="ms-left">
                   <div class="row" style="margin-left: 2rem;">
                     <b-nav >
-                        
                         <b-nav-text style="margin-top: 5px; margin-left: 5px;"><span class="text-white h4">Sicap Atos de Pessoal Público</span></b-nav-text>
                     </b-nav>
                   </div>
