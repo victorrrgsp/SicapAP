@@ -54,12 +54,13 @@
               </div>
         </template>
 
-:hidden="verIcon(data.item)"  
-  <!-- @hidden="verIcon(data.item)" -->
+
+  <!--  @hidden="verIcon(data.item)" -->
+  <!--  :hidden="verIcon(data.item)"   -->
           <template #cell(opcao)="data">
             <b-icon 
-                :hidden="verIcon(data.item)"    
-                :icon="verIcon2(data.item)" 
+                icon="pen-fill" 
+                :hidden="verIconAssinatura(data.item)"    
                 cursor= "pointer" 
                 title="Assinaturas"
                 @click="info(data.item, data.index, $event.target)" pill 
@@ -68,7 +69,7 @@
             </b-icon>
          &nbsp;   
             <b-icon icon="file-earmark-arrow-down" 
-                :hidden="verIcon(data.item)"  
+                :hidden="verIconRecibo(data.item)"  
                 cursor= "pointer" 
                 title="Assinaturas"
                 @click="abrirRecibo(data.item)" pill 
@@ -181,13 +182,12 @@ export default {
                          sortable: false,
                         tdClass: 'fonteLinhas'
                       },
-                      {
-                        key:'contAssinaturas',
+                        {
+                        key: 'opcao',
                         label:'Assinaturas',
-                        sortable: true,
-                        tdClass: 'fonteLinhas'
-                      //  formatter: 'index'
+                        sortable: true
                       },
+                   
                       {
                           key: 'dataEntrega',
                           label:'Data Entrega',
@@ -203,12 +203,8 @@ export default {
                           formatter: 'formatarData',
                           thStyle: { width: "10%",  },
                           tdClass: 'fonteLinhas'
-                      },
-                       {
-                        key: 'opcao',
-                        label:'Opções',
-                        sortable: true
                       }
+                     
                       
           ],
          
@@ -251,34 +247,25 @@ export default {
                    ...mapActions('remessas', ['ActionFindByRemessa']),
 
 
-                    verIcon(item){
+                    verIconAssinatura(item){
 
-                          if(item.chave){
-
+                          if(item.contAssinaturas >= 1){
                                 return false
-                                       
                           }
-
                           else{
                             return true
-                             
                           }
                     },
-                
-                
-                
-                verIcon2(item){
 
-                          if(item.chave){
-                                       return "pen-fill"
+                     verIconRecibo(item){
+
+                          if(item.contAssinaturas > 2){
+                                return false
                           }
-
                           else{
-                               return "pencil"
+                            return true
                           }
                     },
-
-
 
                   async pesquisarRemesssa() {
                                   this.isBusy = !this.isBusy //loading
