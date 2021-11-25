@@ -6,11 +6,17 @@ import com.example.sicapweb.repository.remessa.AcompanhamentoDeRemessasRepositor
 import com.example.sicapweb.repository.remessa.InfoRemessaRepository;
 import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.util.List;
 import java.util.Objects;
 @RestController
@@ -91,4 +97,39 @@ public class AcompanhamentoDeRemessasController {
     return ResponseEntity.ok().body(paginacaoUtil);
   }
 
-}
+  @GetMapping("/gerarPdf")
+  public void gerarPdf() throws Exception {
+
+    // criação do documento
+    Document document = new Document();
+    try {
+
+      PdfWriter.getInstance(document,
+              new FileOutputStream("C:\\Users\\luanamm\\Downloads\\Recibo1.pdf"));
+      document.open();
+
+
+      document.add(new Paragraph("                                                           "));
+
+      // adicionando um parágrafo no documento
+      Paragraph aux = new Paragraph("Recibo");
+      aux.setAlignment(1);
+      document.add(aux);
+      document.add(new Paragraph("                                                           "));
+
+
+      document.add(new Paragraph("teste"));
+      document.add(new Paragraph("                                                           "));
+
+
+      document.close();
+
+
+    } catch (DocumentException e) {
+      e.printStackTrace();
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    }
+
+  }
+  }
