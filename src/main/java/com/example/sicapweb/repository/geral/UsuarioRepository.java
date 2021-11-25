@@ -16,11 +16,11 @@ public class UsuarioRepository extends DefaultRepository<Cargo, BigInteger> {
     }
 
     public List<Object> getUser(String codigo, Integer sistema) {
-        return getEntityManager().createNativeQuery("  \n" +
-                "select cpf, unidadeGestora, nomeEntidade, codpoder, Cargo \n" +
-                "from AutenticacaoAssinatura..usuario a \n" +
-                "\tjoin AutenticacaoAssinatura..UsuarioAplicacao b on a.CPF = b.Usuario\n" +
-                "\tjoin UnidadeGestoraCadun c on UnidadeGestora = cnpj\n" +
+        return getEntityManager().createNativeQuery("   " +
+                "select cpf, unidadeGestora, nomeEntidade, codpoder, Cargo  " +
+                "from AutenticacaoAssinatura..usuario a  " +
+                "join AutenticacaoAssinatura..UsuarioAplicacao b on a.CPF = b.Usuario " +
+                "join UnidadeGestoraCadun c on UnidadeGestora = cnpj " +
                 "where cpf=  '"+codigo+"' and Aplicacao = "+ sistema).getResultList();
     }
 }
