@@ -74,9 +74,4 @@ public class AcompanhamentoRemessaController {
         return ResponseEntity.ok().body(Objects.requireNonNullElse(resp, "semPermissao"));
     }
 
-
-
-
-
-
 }

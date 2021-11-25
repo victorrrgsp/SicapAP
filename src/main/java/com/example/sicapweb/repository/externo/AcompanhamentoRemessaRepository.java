@@ -118,8 +118,6 @@ public class AcompanhamentoRemessaRepository extends DefaultRepository<String, S
                     " where CNPJ <> '00000000000000'" +
                     " order by NomeMunicipio, nomeEntidade").getResultList();
 
-
-
         //list.stream().forEach((record) -> {
 
           for(Object[] obj : list){
