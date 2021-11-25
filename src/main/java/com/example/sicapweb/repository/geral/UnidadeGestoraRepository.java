@@ -1,9 +1,11 @@
 package com.example.sicapweb.repository.geral;
+
 import br.gov.to.tce.model.UnidadeGestora;
 import com.example.sicapweb.repository.DefaultRepository;
 import com.example.sicapweb.util.PaginacaoUtil;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.lang.reflect.ParameterizedType;
@@ -94,5 +96,10 @@ public class UnidadeGestoraRepository extends DefaultRepository<UnidadeGestora, 
         return getEntityManager().createQuery("select count(*) from " + entityClass.getSimpleName(), Long.class).getSingleResult();
     }
 
+    public UnidadeGestora buscarDadosUnidadeTeste() {
+        List<UnidadeGestora> list = getEntityManager().createNativeQuery("select * from UnidadeGestora " +
+                "where nome = 'Unidade de teste'", UnidadeGestora.class).getResultList();
+        return list.get(0);
+    }
 
 }
