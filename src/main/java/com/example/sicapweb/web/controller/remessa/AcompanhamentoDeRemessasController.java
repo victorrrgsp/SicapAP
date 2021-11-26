@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 @RestController
 @RequestMapping(value = "/acompanhamentoDeRemessas")
@@ -92,8 +93,8 @@ public class AcompanhamentoDeRemessasController {
     }
   @CrossOrigin
   @GetMapping(path = "/{searchParams}/{tipoParams}/pagination")
-  public ResponseEntity<PaginacaoUtil<InfoRemessa>> listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
-    PaginacaoUtil<InfoRemessa> paginacaoUtil = acompanhamentoDeRemessasRepository.buscaPaginadaHistorico(pageable, searchParams, tipoParams);
+  public ResponseEntity<PaginacaoUtil<Object>>  listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
+    var paginacaoUtil = acompanhamentoDeRemessasRepository.buscaPaginadaAcompanhamento(pageable, searchParams, tipoParams);
     return ResponseEntity.ok().body(paginacaoUtil);
   }
 
@@ -131,5 +132,12 @@ public class AcompanhamentoDeRemessasController {
       e.printStackTrace();
     }
 
+  }
+
+  @CrossOrigin
+  @GetMapping(path = {"/getRemessa/{exercicio}/{remessa}/{chave}"})
+  public ResponseEntity<?> findByRemessa(@PathVariable Integer exercicio, @PathVariable Integer remessa, @PathVariable String chave) {
+    List<Map<String, Object>> infoRemessa = acompanhamentoDeRemessasRepository.buscarAcompanhamentoRemessa(exercicio, remessa, chave);
+    return ResponseEntity.ok().body(Objects.requireNonNullElse(infoRemessa, "semRemessa"));
   }
   }

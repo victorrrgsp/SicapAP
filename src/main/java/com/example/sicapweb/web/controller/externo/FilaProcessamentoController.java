@@ -38,7 +38,7 @@ public class FilaProcessamentoController {
     @CrossOrigin
     @GetMapping(path = {"/fila"})
     public ResponseEntity<?> filaProcessos() {
-        var infoRemessa = filaProcessamentoRepository.filaProcess();
+        var infoRemessa = filaProcessamentoRepository.filaProcessamentos();
         return ResponseEntity.ok().body(Objects.requireNonNullElse(infoRemessa, "semRemessa"));
     }
 
