@@ -64,7 +64,7 @@
           :current-page="currentPage"
           aria-controls="my-table"
           :tbody-tr-class="rowClass"
-         
+         small
         >
           <template #table-busy>
             <div class="text-center text-danger my-2">
@@ -200,14 +200,14 @@ export default {
     this.FindAll();
      setTimeout(() =>{// aguarda com spinner antes da pesquisa aparecer na pesquisa inicial
                   this.isBusy = false
-                  }, 1.0*100)
+                  }, 1.0*1000)
         
     setInterval(this.readForms, 1000);
   },
   methods: {
     FindAll() {
       api.get("filaProcessamento/processos").then((resp) => {
-        console.log("data", resp.data);
+       
         this.processos = resp.data;
       });
     },
@@ -241,7 +241,7 @@ export default {
     //   }
     // },
     statusIcon(label){
-      console.log("label",label)
+      
         if(label === "ok") return 'check'
         else if (label === 'mapear erro') return 'exclamation-triangle-fill'
     },
