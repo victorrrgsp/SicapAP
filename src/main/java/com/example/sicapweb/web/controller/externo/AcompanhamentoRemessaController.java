@@ -35,7 +35,7 @@ public class AcompanhamentoRemessaController {
     @CrossOrigin
     @GetMapping(path = {"/all"})
     public ResponseEntity<?> findTodos() {
-        List<Map<String, Object>> infoRemessa = acompanhamentoRemessaRepository.buscarAcompanhamentoRemessa(2021,1);
+        List<Map<String, Object>> infoRemessa = acompanhamentoRemessaRepository.buscarTodosAcompanhamentoRemessa();
         return ResponseEntity.ok().body(Objects.requireNonNullElse(infoRemessa, "semRemessa"));
     }
 
