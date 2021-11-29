@@ -227,7 +227,8 @@ public class AcompanhamentoDeRemessasRepository extends DefaultRepository<String
                                         "left join AutenticacaoAssinatura..Assinatura ass on ass.oid = a.idAssinatura " +
                                         "left join admfilarecebimento f on f.id = i.idfilarecebimento " +
                         "where IDUNIDADEGESTORA = '"+User.getUser(super.request).getUnidadeGestora().getId()+"' " +
-                                        "group by IDUNIDADEGESTORA, i.EXERCICIO, i.REMESSA, i.CHAVE, i.nomeUnidade")
+                                        "group by IDUNIDADEGESTORA, i.EXERCICIO, i.REMESSA, i.CHAVE, i.nomeUnidade " +
+                        "   order by i.EXERCICIO desc, i.REMESSA desc")
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();
