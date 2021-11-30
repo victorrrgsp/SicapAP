@@ -50,6 +50,30 @@
           <b-nav-item active>Fila de Processamento</b-nav-item>
         </b-nav>
       </b-card-header>
+              <b-col lg="6" class="my-1">
+              <b-form-group
+                label="Busca"
+                label-for="filter-input"
+                label-cols-sm="3"
+                label-align-sm="right"
+                label-size="sm"
+                class="mb-0"
+              >
+                <b-input-group size="sm">
+                  <b-form-input
+                    id="filter-input"
+                    v-model="filter"
+                    type="search"
+                    placeholder="Digite aqui..."
+                  ></b-form-input>
+
+                  <b-input-group-append>
+                    <b-button :disabled="!filter" @click="filter = ''">Limpar</b-button>
+                  </b-input-group-append>
+                </b-input-group>
+              </b-form-group>
+            </b-col> 
+
       <b-card-body>
         <b-table
         :busy="isBusy"
@@ -58,6 +82,7 @@
           responsive
           sticky-header="700px"
           id="my-table"
+          :filter="filter"
           :items="processos"
           :fields="items"
           :per-page="perPage"
@@ -118,6 +143,7 @@ export default {
       isBusy: true,
       perPage: 5000,
       currentPage: 1,
+      filter: null,
       processos: [],
       fila: [],
       items: [
