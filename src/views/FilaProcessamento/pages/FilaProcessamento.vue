@@ -30,10 +30,10 @@
             </div>
           </template>
           <template #cell(status)="data">
-            <b-icon  v-if="(data.item.value == aprovado)"  :icon=da
+            <b-icon  v-if="(data.item.value == aprovado)"  
                 cursor= "pointer" 
                 title="Status"
-                @click="info(data.item, data.index, $event.target)" pill 
+                pill 
                 variant="primary" 
                 size="sm">
             </b-icon>
@@ -99,10 +99,10 @@
           </template>
 
           <template #cell(status)="data">
-            <b-icon  v-if= "statusIcon( data.value ) == 'exclamation-triangle-fill'" class="h2 mb-1"
+            <b-icon  v-if= "statusIcon( data.value ) == 'dash-circle'" class="h2 mb-1"
                 :icon="statusIcon( data.value )" 
                
-                 variant="warning"
+                 variant="danger"
                 cursor= "pointer" 
                 title="Assinaturas"
                 @click="info(data.item, data.index, $event.target)" pill 
@@ -122,6 +122,8 @@
     
           </template>
         </b-table>
+      <b-icon  class="h1 mb-2" icon="check"  variant="success"> </b-icon> &nbsp;    &nbsp;Enviado  &nbsp;   &nbsp;    &nbsp;
+     <b-icon  class="h3 mb-1" icon="dash-circle"  variant="danger"> </b-icon> &nbsp;    &nbsp;Cancelado 
       </b-card-body>
     </b-card>
     <b-pagination
@@ -269,7 +271,7 @@ export default {
     statusIcon(label){
       
         if(label === "ok") return 'check'
-        else if (label === 'mapear erro') return 'exclamation-triangle-fill'
+        else if (label === 'mapear erro') return 'dash-circle'
     },
      rowClass(item, type) {
         if (!item || type !== 'row') return
