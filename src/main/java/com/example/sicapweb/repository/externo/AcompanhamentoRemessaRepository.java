@@ -163,8 +163,11 @@ public class AcompanhamentoRemessaRepository extends DefaultRepository<String, S
                     " admfilarecebimento f on f.id = i.idfilarecebimento " +
                     "group by IDUNIDADEGESTORA, i.EXERCICIO, i.REMESSA,  i.CHAVE " +
                     ") " +
-                    "select IDUNIDADEGESTORA, c.NomeMunicipio + ' - '+ c.nomeEntidade nomeEntidade, case when b.relatoria is null then c.numeroRelatoria else b.relatoria end relatoria, " +
-                    "dataEntrega, dataAssinatura, contAssinaturas, case when  contAssinaturas >= 3 then 1 else 0 end mostraRecibo, exercicio, remessa, chave " +
+                    " SELECT IDUNIDADEGESTORA, c.NomeMunicipio + ' - '+ c.nomeEntidade nomeEntidade, case when b.relatoria is null then c.numeroRelatoria else b.relatoria end relatoria, " +
+                    " dataEntrega, dataAssinatura, contAssinaturas, case when  contAssinaturas >= 3 then 1 else 0 end mostraRecibo, exercicio, remessa, chave ," +
+                    " (SELECT COUNT(DISTINCT tipo ) "+
+                    " FROM SICAPAP21.dbo.DocumentoGfip t "+
+                    " WHERE idInfoRemessa = chave) as qntDocumentoGFIP "+
                     "from" +
                     " ugsAptas b inner join  cadun.dbo.vwUnidadeGestora c on IDUNIDADEGESTORA = c.cnpj " +
                     " where CNPJ <> '00000000000000' " +
@@ -186,6 +189,7 @@ public class AcompanhamentoRemessaRepository extends DefaultRepository<String, S
                 mapa.put("exercicio", (Integer) obj[7]);
                 mapa.put("remessa", (Integer) obj[8]);
                 mapa.put("chave", (String) obj[9]);
+                mapa.put("qntDocumentoGFIP", obj[10]);
                 retorno.add(mapa);
 
             };
