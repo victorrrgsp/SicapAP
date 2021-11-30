@@ -47,6 +47,13 @@ public class AcompanhamentoRemessaController {
         return ResponseEntity.ok().body(Objects.requireNonNullElse(infoRemessa, "semRemessa"));
     }
 
+    @CrossOrigin
+    @GetMapping(path = {"/getExercicio/{exercicio}/{remessa}"})
+    public ResponseEntity<?> findByExercicio(@PathVariable Integer exercicio, @PathVariable Integer remessa) {
+        List<Map<String, Object>> infoRemessa = acompanhamentoRemessaRepository.buscarExercicioAcompanhamentoRemessa(exercicio, remessa);
+        return ResponseEntity.ok().body(Objects.requireNonNullElse(infoRemessa, "semRemessa"));
+    }
+
 
 
 
