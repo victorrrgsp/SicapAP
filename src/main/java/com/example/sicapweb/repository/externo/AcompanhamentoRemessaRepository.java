@@ -116,7 +116,7 @@ public class AcompanhamentoRemessaRepository extends DefaultRepository<String, S
                     " from ugsAptas a left join" +
                     " ugsAssinantes b on a.cnpj = idUnidadeGestora" +
                     " where CNPJ <> '00000000000000'" +
-                    " order by NomeMunicipio, nomeEntidade").getResultList();
+                    " order by NomeMunicipio, nomeEntidade remessa asc").getResultList();
 
         //list.stream().forEach((record) -> {
 
@@ -171,7 +171,73 @@ public class AcompanhamentoRemessaRepository extends DefaultRepository<String, S
                     "from" +
                     " ugsAptas b inner join  cadun.dbo.vwUnidadeGestora c on IDUNIDADEGESTORA = c.cnpj " +
                     " where CNPJ <> '00000000000000' " +
-                    "order by NomeMunicipio, nomeEntidade;").getResultList();
+                    "order by NomeMunicipio, nomeEntidade, remessa asc;").getResultList();
+
+            //list.stream().forEach((record) -> {
+
+            for(Object[] obj : list){
+
+                Map<String, Object> mapa = new HashMap<String, Object>();
+
+                mapa.put("cnpj", (String) obj[0]);
+                mapa.put("nomeEntidade", (String) obj[1]);
+                mapa.put("relatoria", (Integer) obj[2]);
+                mapa.put("dataEntrega", (String) obj[3]);
+                mapa.put("dataAssinatura", (String) obj[4]);
+                mapa.put("contAssinaturas", (Integer) obj[5]);
+                mapa.put("mostraRecibo", (Integer) obj[6]);
+                mapa.put("exercicio", (Integer) obj[7]);
+                mapa.put("remessa", (Integer) obj[8]);
+                mapa.put("chave", (String) obj[9]);
+                retorno.add(mapa);
+
+            };
+
+            return retorno;
+
+
+        } catch (Exception e) {
+            return null;
+        }
+
+
+    }
+
+    public List<Map<String,Object>> buscarExercicioAcompanhamentoRemessa(Integer exercicio, Integer remessa) {
+
+        List<Map<String,Object>> retorno = new ArrayList<Map<String,Object>>();
+
+        try {
+            String existeRemessa= " ";
+            if (remessa != 0 && exercicio == 0 ){
+                existeRemessa = " where i.REMESSA = "+remessa+" ";
+            }
+
+            if (remessa != 0 && exercicio != 0){
+                existeRemessa = " and i.REMESSA = "+remessa+" ";
+            }
+
+                String existeExercicio= " ";
+            if (exercicio != 0 ){
+                existeExercicio= " where i.exercicio = "+exercicio+"";
+            }
+
+            List<Object[]> list = entityManager.createNativeQuery(
+                    "with ugsAptas as ( " +
+                            " SELECT  COUNT(DISTINCT idCargo) AS contAssinaturas, IDUNIDADEGESTORA , i.EXERCICIO, i.remessa, i.chave, max(i.relatoria) relatoria, max(f.dataEnvio) dataEntrega, max(dataAssinatura) dataAssinatura" +
+                            " FROM inforemessa i left join " +
+                            " admassinatura  a on a.chave = i.CHAVE  left join " +
+                            " AutenticacaoAssinatura..Assinatura  ass on ass.oid = a.idAssinatura left join " +
+                            " admfilarecebimento f on f.id = i.idfilarecebimento " +
+                            ""+existeExercicio+ existeRemessa + " " +
+                            "group by IDUNIDADEGESTORA, i.EXERCICIO, i.REMESSA,  i.CHAVE " +
+                            ") " +
+                            "select IDUNIDADEGESTORA, c.NomeMunicipio + ' - '+ c.nomeEntidade nomeEntidade, case when b.relatoria is null then c.numeroRelatoria else b.relatoria end relatoria, " +
+                            "dataEntrega, dataAssinatura, contAssinaturas, case when  contAssinaturas >= 3 then 1 else 0 end mostraRecibo, exercicio, remessa, chave " +
+                            "from" +
+                            " ugsAptas b inner join  cadun.dbo.vwUnidadeGestora c on IDUNIDADEGESTORA = c.cnpj " +
+                            " where CNPJ <> '00000000000000' " +
+                            "order by NomeMunicipio, nomeEntidade, remessa asc;").getResultList();
 
             //list.stream().forEach((record) -> {
 
