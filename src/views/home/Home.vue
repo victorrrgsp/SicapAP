@@ -1,6 +1,20 @@
 <template>
   <div id="home">
     <div class="user-info"></div>
+    <div class="home-links aconp1">
+        <a class="home-link" href="href" @click="redirect">
+                  <b-icon class="h1 mb-2" icon="layout-text-window-reverse" ></b-icon>
+                  <span class="h4 mb-2">acompanhamento de <br>remessas</span>
+        </a>
+      <!-- <router-link
+        class="home-link"
+        to="www.google.com"
+        exact-path
+      >
+        <b-icon class="h1 mb-2" icon="" ></b-icon>
+        <span class="h3 mb-2">tesrte</span>
+      </router-link> -->
+    </div>
     <div class="home-links">
       <router-link
         :key="i"
@@ -12,6 +26,7 @@
         <span class="h3 mb-2">{{ route.meta.label }}</span>
       </router-link>
     </div>
+
   </div>
 </template>
 
@@ -19,6 +34,11 @@
 import { mapState } from 'vuex'
 export default {
   name: 'Home',
+    methods:{
+      redirect(){
+        window.open("https://app.tce.to.gov.br/sicap/ap/externo/app/index.php")
+      }
+    },
     computed: {
     ...mapState('auth', ['user']),
     routes () {
@@ -66,7 +86,7 @@ export default {
     }
     .home-link:first-child { background-color: var(--bs-blue) }
     .home-link:nth-child(2) { background-color: var(--bs-orange) }
-    //.home-link:last-child { background-color: var(--bs-red) }
+    //.aconp1{ background-color: #4169E1 }
   }
 }
 </style>
