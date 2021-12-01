@@ -141,5 +141,6 @@ public class AssinarRemessaRepository extends DefaultRepository<String, String> 
         query.setParameter("assinatura", idAssinatura);
         query.setParameter("cargo", User.getUser(super.request).getCargo().getValor());
         query.executeUpdate();
+        entityManager.flush();
     }
 }
