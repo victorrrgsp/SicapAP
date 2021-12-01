@@ -29,17 +29,7 @@
               <strong>Loading...</strong>
             </div>
           </template>
-          <template #cell(status)="data">
-            <b-icon  v-if="(data.item.value == aprovado)"  
-                cursor= "pointer" 
-                title="Status"
-                pill 
-                variant="primary" 
-                size="sm">
-            </b-icon>
-         &nbsp;   
-       
-        </template>
+          
         </b-table>
        <p v-if="(fila.length == 0)" class="text-danger"> Sem processos!</p>
       </b-card-body>
@@ -265,7 +255,7 @@ export default {
   methods: {
     pesquisarRemesssa() {
       api.get("filaProcessamento/processos").then((resp) => {
-        console.log("remessa:",)
+        
         this.processos = resp.data.filter(p => {return !( p.remessa !== this.formdata.remessa && p.exercicio !== this.formdata.exercicio)} );
       });
     },
