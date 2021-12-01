@@ -45,10 +45,12 @@ public class AcompanhamentoDeRemessasRepository extends DefaultRepository<String
                             "                  join AutenticacaoAssinatura..UsuarioAplicacao ua on ua.Usuario = pf.cpf" +
                             "                  join AutenticacaoAssinatura..Assinatura b on ua.Usuario = b.Usuario" +
                             "                  join AutenticacaoAssinatura..InfoAssinatura c on c.Assinatura = b.OID and ua.Aplicacao = c.Aplicacao" +
-                            "         join Cadun.dbo.PessoaJuridica pj on upc.CodigoPessoaJuridica = pj.Codigo" +
+                            "                  join Cadun.dbo.PessoaJuridica pj on upc.CodigoPessoaJuridica = pj.Codigo" +
+                            "                  join SICAPAP21..AdmAssinatura ad on ad.idAssinatura = b.OID " +
+                            "                  join SICAPAP21..InfoRemessa i on i.chave = ad.chave" +
                             "         where upc.CodigoCargo in (:tipo)" +
                             "           and (dataInicio <= :date and (datafim is null or datafim >= :date))" +
-                            "           and pj.CNPJ = :unidade" +
+                            "           and i.idUnidadeGestora = :unidade" +
                             "           and c.Exercicio = :exercicio" +
                             "           and c.Bimestre = :remessa" +
                             "           and ua.Aplicacao = 29" +
