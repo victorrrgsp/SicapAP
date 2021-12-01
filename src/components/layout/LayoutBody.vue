@@ -1,7 +1,15 @@
 <template>
-  <div>
-    <b-sidebar id="sidebar-menu" aria-labelledby="sidebar-menu-title" no-header shadow backdrop>
-      <template #default="{ hide }">
+  <div> 
+    <!-- <b-sidebar id="sidebar-menu" v-model="isSidebarOpen" aria-labelledby="sidebar-menu-title" no-header shadow> -->
+      <b-sidebar  
+      v-model="active"
+      id="sidebar-menu"  
+      aria-labelledby="sidebar-menu-title" 
+      no-header 
+      shadow
+      >
+      <template >
+        
         <div class="sidebar-tce" >
            <div class="row" >
                     <div class="col-3" style="margin-top: 5px; margin-bottom: 5px;">
@@ -30,13 +38,16 @@
                         </router-link>
                 </b-nav>
            </nav>
-
            <br/>
            <br/>
-          <b-button variant="primary" block @click="hide">Fechar</b-button>
+           <!--  -->
+          <b-button variant="primary" block @click="closeSidebar" >Fechar</b-button>
         </div>
+
+
       </template>
     </b-sidebar>
+   
   </div>
 </template>
 <script>
@@ -44,26 +55,61 @@
 import { mapActions, mapState } from 'vuex'
 
 export default {
+
+  data(){
+
+      return {
+
+        active:true
+     
+      }
+  },
+
   computed: {
+    
     ...mapState('auth', ['user']),
+
     routes () {
       return this.$router.options.routes.filter(route => (
         route.meta && route.meta.showNavbar
       ))
     }
   },
-  
+
+beforeMount(){
+             
+},
+
+  mounted() {
+          setTimeout(() =>{
+                        this.active = true
+                      }, 2.0*1000)
+     },
+
   methods: {
+    
+    // openSidebar() {
+    //     this.isSidebarOpen = false
+    //   },
+       closeSidebar() {
+        this.active = false
+      },
 
     ...mapActions('auth', ['ActionSignOut']),
 
     async submit () {
+
       try {
+
           await this.ActionSignOut(this.form)
           this.$router.push({ name: 'login' })
+
           } catch (err) {
+
             alert('Não foi possível fazer logof')
+
           }
+
     }
   }
 }
