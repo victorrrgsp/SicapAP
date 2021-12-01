@@ -71,8 +71,16 @@
                     <b-button :disabled="!filter" @click="filter = ''">Limpar</b-button>
                   </b-input-group-append>
                 </b-input-group>
+                  
               </b-form-group>
             </b-col> 
+              <p align="right" >
+                    Exercicio: <b-form-select class="select-selected" v-model="formdata.exercicio" :options="formdata.exercicios"></b-form-select>
+                    &nbsp;   
+                    Remessa:&nbsp;<b-form-select class="select-selected" v-model="formdata.remessa" :options="formdata.remessas"></b-form-select>
+                    &nbsp;   &nbsp;    &nbsp;
+                    <b-button @click="pesquisarRemesssa"  pill variant="success"  size="sm">Pesquisar</b-button>
+              </p>
 
       <b-card-body>
         <b-table
@@ -147,6 +155,28 @@ export default {
       currentPage: 1,
       filter: null,
       processos: [],
+      formdata:{
+               exercicio: null,
+               exercicios: [
+                            { value: null, text: 'Todos' },
+                            { value: 2021, text: '2021' },
+                           ],
+               remessa: null,
+               remessas: [
+
+                            { value: null, text: 'Todos' },
+                            { value: 1, text: '1' },
+                            { value: 2, text: '2' },
+                            { value: 3, text: '3' },
+                            { value: 4, text: '4' },
+                            { value: 5, text: '5' },
+                            { value: 6, text: '6' },
+                            { value: 7, text: '7' },
+                            { value: 8, text: '8' },
+                            { value: 9, text: '9' },
+                            { value: 10, text: '10' }
+                          ]
+            },
       fila: [],
       items: [
         {
@@ -233,6 +263,12 @@ export default {
     setInterval(this.readForms, 1000);
   },
   methods: {
+    pesquisarRemesssa() {
+      api.get("filaProcessamento/processos").then((resp) => {
+        console.log("remessa:",)
+        this.processos = resp.data.filter(p => {return !( p.remessa !== this.formdata.remessa && p.exercicio !== this.formdata.exercicio)} );
+      });
+    },
     FindAll() {
       api.get("filaProcessamento/processos").then((resp) => {
        
@@ -241,10 +277,7 @@ export default {
     },
 
     readForms() {
-      api.get("filaProcessamento/fila").then((resp) => {
-       if (resp.data.length ){
-          console.log("data", resp.data);
-       } 
+      api.get("filaProcessamento/fila").then((resp) => { 
         this.fila = resp.data;
       });
       
@@ -287,3 +320,51 @@ export default {
   },
 };
 </script>
+<style >
+
+
+.select-selected {
+  border-color: black;
+  border: 6px solid;
+}
+
+.select-selected.select-arrow-active:after {
+  border-color: black;
+  top: 7px;
+}
+.select-items div,
+.select-selected {
+  color: black;
+  padding: 8px 16px;
+  border: 1px solid;
+  border-color: rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+}
+
+.select-items {
+  position: absolute;
+
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 99;
+}
+
+.select-hide {
+  display: none;
+}
+
+.select-items div:hover,
+.same-as-selected {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+@mixin flex-center($columns: false) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  @if $columns {
+    flex-direction: column;
+  }
+}
+
+</style>

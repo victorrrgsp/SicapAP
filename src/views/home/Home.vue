@@ -4,7 +4,7 @@
     <div class="home-links aconp1">
         <a class="home-link" href="href" @click="redirect">
                   <b-icon class="h1 mb-2" icon="layout-text-window-reverse" ></b-icon>
-                  <span class="h4 mb-2">acompanhamento de <br>remessas</span>
+                  <span class="h4 mb-2">acompanhamento de <br>remessas</span><span class="h4 mb-2" >(anterior 2021)</span>
         </a>
       <!-- <router-link
         class="home-link"
@@ -71,6 +71,7 @@ export default {
     width: 100%;
     @include flex-center();
     .home-link {
+      height: 100%;
       flex: 0 0 25%;
       margin: 0 15px;
       padding: 40px 0;

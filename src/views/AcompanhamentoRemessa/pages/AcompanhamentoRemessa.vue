@@ -90,6 +90,37 @@
 
 
      </b-table>
+<!--
+                      if(item.contAssinaturas > 2){
+                              return 'Assinado'
+                        }
+                        if((item.contAssinaturas >= 1)&& (item.contAssinaturas <= 2)){
+                              return 'Pendente de Assinatura'
+                        }else if( item.qntDocumentoGFIP < 3 ) {
+                                return 'Pendente GFIP '
+                        }else{
+                          return 'Aguardando Envio'
+                        }
+
+                  },
+                      if(item.contAssinaturas > 2){
+                                return 'check-square'
+                          }
+                          if((item.contAssinaturas >= 1) && (item.contAssinaturas <= 2)){
+                                return 'exclamation-triangle-fill'
+                          }else if( item.qntDocumentoGFIP < 3 ) {
+                                return 'dash-circle'
+                          } else  {
+                           return 'x-circle'
+                          }
+
+                  },
+ -->
+     <b-icon  class="h6 mb-2" icon="check-square"  variant="success"> </b-icon> &nbsp;    &nbsp;Assinado  &nbsp;   &nbsp;    &nbsp;
+     <b-icon  class="h6 mb-2" icon="exclamation-triangle-fill"  variant="warning"> </b-icon> &nbsp;    &nbsp;Pendente de Assinatura  &nbsp;   &nbsp;    &nbsp;
+     <b-icon  class="h6 mb-1" icon="dash-circle"  variant="warning"> </b-icon> &nbsp;    &nbsp;Pendente GFIP &nbsp;    &nbsp;
+     <b-icon  class="h6 mb-1" icon="x-circle"  variant="danger"> </b-icon> &nbsp;    &nbsp;Aguardando Envio &nbsp;    &nbsp;
+      
 
 
 
@@ -229,6 +260,11 @@ export default {
                         label:'Status',
                         sortable: true
                       },
+                      // {
+                      //   key: 'qntDocumentoGFIP',
+                      //   label:'Documentos asinados ',
+                      //   sortable: true,
+                      // }
                      
                       
           ],
@@ -271,38 +307,35 @@ export default {
                   ...mapState('remessas', ['tableData'])
         },
         methods: {
-                   ...mapActions('remessas', ['ActionFind']),
-                   ...mapActions('remessas', ['ActionFindByRemessa']),
-                    ...mapActions('remessas', ['ActionFindByExercicio']),
+                  ...mapActions('remessas', ['ActionFind']),
+                  ...mapActions('remessas', ['ActionFindByRemessa']),
+                  ...mapActions('remessas', ['ActionFindByExercicio']),
 
 
-                    iconStatusTitle(item){
-                       if(item.contAssinaturas > 2){
-                                return 'Assinado'
-                          }
-                          
-                           if((item.contAssinaturas >= 1)&& (item.contAssinaturas <= 2)){
-                                return 'Pendente de Assinatura'
-                          }  
+                  iconStatusTitle(item){
+                      if(item.contAssinaturas > 2){
+                              return 'Assinado'
+                        }
+                        if((item.contAssinaturas >= 1)&& (item.contAssinaturas <= 2)){
+                              return 'Pendente de Assinatura'
+                        }else if( item.qntDocumentoGFIP < 3 ) {
+                                return 'Pendente GFIP '
+                        }else{
+                          return 'Aguardando Envio'
+                        }
 
-                          else{
-                           return 'Aguardando Envio'
-                          }
-
-                    },
-
+                  },
 
                   iconStatus(item){
 
                           if(item.contAssinaturas > 2){
                                 return 'check-square'
                           }
-                          
-                             if((item.contAssinaturas >= 1) && (item.contAssinaturas <= 2)){
+                          if((item.contAssinaturas >= 1) && (item.contAssinaturas <= 2)){
                                 return 'exclamation-triangle-fill'
-                          }  
-
-                          else{
+                          }else if( item.qntDocumentoGFIP < 3 ) {
+                                return 'dash-circle'
+                          } else  {
                            return 'x-circle'
                           }
 
@@ -314,40 +347,38 @@ export default {
                                 return 'success'
                           }
 
-                            if((item.contAssinaturas >= 1) && (item.contAssinaturas <= 2)){
+                          if(((item.contAssinaturas >= 1) && (item.contAssinaturas <= 2))|item.qntDocumentoGFIP < 3){
                                 return 'warning'
-                          }  
-                          
-                          else{
+                          }else{
                             return 'danger'
                           }
 
                   },
 
 
-                    verIconAssinatura(item){
+                  verIconAssinatura(item){
 
-                          if(item.contAssinaturas >= 1){
-                                return false
-                          }
+                        if(item.contAssinaturas >= 1){
+                              return false
+                        }
 
-                         
+                        
 
 
-                          else{
-                            return true
-                          }
-                    },
+                        else{
+                          return true
+                        }
+                  },
 
-                     verIconRecibo(item){
+                  verIconRecibo(item){
 
-                          if(item.contAssinaturas > 2){
-                                return false
-                          }
-                          else{
-                            return true
-                          }
-                    },
+                      if(item.contAssinaturas > 2){
+                            return false
+                      }
+                      else{
+                        return true
+                      }
+                  },
 
                   async pesquisarRemesssa() {
                                   this.isBusy = !this.isBusy //loading
@@ -380,7 +411,7 @@ export default {
                                       this.dataAssinaturaGestor= "",
                                       this.dataAssinaturaRh= "",
                                       this.dataAssinaturaCI= ""
-                                    },
+                  },
 
                   abrirRecibo(item) {
 
@@ -432,62 +463,62 @@ export default {
                                        window.open(doc.output('bloburl'), '_blank');
 
 
-                     },
+                  },
                   
-                    buscarDadoRemessa (chave) {
+                  buscarDadoRemessa (chave) {
 
-                        this.findGestor(chave);
-                        this.findRh(chave);
-                        this.findControleInterno(chave);
-                        
+                      this.findGestor(chave);
+                      this.findRh(chave);
+                      this.findControleInterno(chave);
+                      
 
-                      },
-                    async findGestor(chave){
+                  },
+                  async findGestor(chave){
 
-                        const data =  await this.getResponsavel('Gestor', chave);
+                      const data =  await this.getResponsavel('Gestor', chave);
 
-                        if (data !== 'semPermissao') {
+                      if (data !== 'semPermissao') {
 
-                          this.gestor = data[0];
-                          this.dataAssinaturaGestor = data[3]
-                          this.statusGestor = this.dataAssinaturaGestor !== null ? 'Assinado' : 'Não Assinado';
+                        this.gestor = data[0];
+                        this.dataAssinaturaGestor = data[3]
+                        this.statusGestor = this.dataAssinaturaGestor !== null ? 'Assinado' : 'Não Assinado';
 
-                        } else {
-                          this.statusGestor = 'Sem Permissão';
-                        }
-                         console.log(data)
-                      },
+                      } else {
+                        this.statusGestor = 'Sem Permissão';
+                      }
+                        console.log(data)
+                  },
 
-                      async findRh (chave) {
-                          const data =  await this.getResponsavel('Responsável R.H.', chave);
-                          if (data !== 'semPermissao') {
-                            this.rh = data[0];
-                            this.dataAssinaturaRh = data[3];
-                            this.statusRh = this.dataAssinaturaRh !== null ? 'Assinado' : 'Não Assinado';
-                          } else {
-                            this.statusRh = 'Sem Permissão';
-                          }
-                           console.log(data)
-                        },
+                  async findRh (chave) {
+                      const data =  await this.getResponsavel('Responsável R.H.', chave);
+                      if (data !== 'semPermissao') {
+                        this.rh = data[0];
+                        this.dataAssinaturaRh = data[3];
+                        this.statusRh = this.dataAssinaturaRh !== null ? 'Assinado' : 'Não Assinado';
+                      } else {
+                        this.statusRh = 'Sem Permissão';
+                      }
+                        console.log(data)
+                  },
 
-                        async findControleInterno(chave)  {
-                            const data = await  this.getResponsavel('Controle Interno', chave);
-                            if (data !== 'semPermissao') {
-                              this.controleInterno = data[0];
-                              this.dataAssinaturaCI = data[3];
-                              this.statusCI = this.dataAssinaturaCI !== null ? 'Assinado' : 'Não Assinado';
-                            } else {
-                              this.statusCI = data;
-                            }
-                            console.log(data)
-                          },
+                  async findControleInterno(chave)  {
+                      const data = await  this.getResponsavel('Controle Interno', chave);
+                      if (data !== 'semPermissao') {
+                        this.controleInterno = data[0];
+                        this.dataAssinaturaCI = data[3];
+                        this.statusCI = this.dataAssinaturaCI !== null ? 'Assinado' : 'Não Assinado';
+                      } else {
+                        this.statusCI = data;
+                      }
+                      console.log(data)
+                  },
 
-                          async getResponsavel(cargo,chave) {
+                  async getResponsavel(cargo,chave) {
 
-                            const response = await api.get("externo/acompanhamentoRemessa/" + cargo +"/" +chave)
-                            return response.data;
+                    const response = await api.get("externo/acompanhamentoRemessa/" + cargo +"/" +chave)
+                    return response.data;
 
-                          }
+                  }
 
 
 
