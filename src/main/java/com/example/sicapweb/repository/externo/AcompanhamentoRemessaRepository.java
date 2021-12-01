@@ -1,18 +1,12 @@
 package com.example.sicapweb.repository.externo;
 
 import br.gov.to.tce.model.InfoRemessa;
-import br.gov.to.tce.model.UnidadeGestora;
-import br.gov.to.tce.model.ap.relacional.Cargo;
 import com.example.sicapweb.repository.DefaultRepository;
-import com.example.sicapweb.security.User;
-import com.example.sicapweb.util.PaginacaoUtil;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import java.math.BigInteger;
 import java.util.*;
 
 @Repository
@@ -25,7 +19,6 @@ public class AcompanhamentoRemessaRepository extends DefaultRepository<String, S
     }
 
     public AcompanhamentoRemessaRepository() {
-
     }
 
     public Object buscarResponsavelAssinatura(Integer tipoCargo, InfoRemessa infoRemessa) {
@@ -48,10 +41,12 @@ public class AcompanhamentoRemessaRepository extends DefaultRepository<String, S
                             "                  join AutenticacaoAssinatura..UsuarioAplicacao ua on ua.Usuario = pf.cpf" +
                             "                  join AutenticacaoAssinatura..Assinatura b on ua.Usuario = b.Usuario" +
                             "                  join AutenticacaoAssinatura..InfoAssinatura c on c.Assinatura = b.OID and ua.Aplicacao = c.Aplicacao" +
-                            "         join Cadun.dbo.PessoaJuridica pj on upc.CodigoPessoaJuridica = pj.Codigo" +
+                            "                  join Cadun.dbo.PessoaJuridica pj on upc.CodigoPessoaJuridica = pj.Codigo" +
+                            "                  join SICAPAP21..AdmAssinatura ad on ad.idAssinatura = b.OID " +
+                            "                  join SICAPAP21..InfoRemessa i on i.chave = ad.chave" +
                             "         where upc.CodigoCargo in (:tipo)" +
                             "           and (dataInicio <= :date and (datafim is null or datafim >= :date))" +
-                            "           and pj.CNPJ = :unidade" +
+                            "           and i.idUnidadeGestora = :unidade" +
                             "           and c.Exercicio = :exercicio" +
                             "           and c.Bimestre = :remessa" +
                             "           and ua.Aplicacao = 29" +
@@ -91,21 +86,18 @@ public class AcompanhamentoRemessaRepository extends DefaultRepository<String, S
 //        return list;
 //    }
 
-    public List<Map<String,Object>> buscarAcompanhamentoRemessa(Integer exercicio, Integer remessa) {
-
-        List<Map<String,Object>> retorno = new ArrayList<Map<String,Object>>();
-
+    public List<Map<String, Object>> buscarAcompanhamentoRemessa(Integer exercicio, Integer remessa) {
+        List<Map<String, Object>> retorno = new ArrayList<Map<String, Object>>();
         try {
-
             List<Object[]> list = entityManager.createNativeQuery("with ugsAptas as (" +
                     "select *" +
                     " from cadun.dbo.vwUnidadeGestora" +
-                    " where  cadun.dbo.EhVigente("+exercicio+", "+remessa+",CNPJ,  29) = 1" +
+                    " where  cadun.dbo.EhVigente(" + exercicio + ", " + remessa + ",CNPJ,  29) = 1" +
                     ")," +
                     " ugsAssinantes as (" +
                     " SELECT COUNT(DISTINCT idCargo) AS contAssinaturas, IDUNIDADEGESTORA , i.EXERCICIO, i.remessa, i.chave, max(i.relatoria) relatoria, max(f.dataEnvio) dataEntrega, max(dataAssinatura) dataAssinatura" +
                     " FROM ugsAptas ug left join" +
-                    " inforemessa i on i.IDUNIDADEGESTORA = ug.CNPJ and i.EXERCICIO = "+exercicio+" and i.REMESSA = "+remessa+" and i.status = 1 left join" +
+                    " inforemessa i on i.IDUNIDADEGESTORA = ug.CNPJ and i.EXERCICIO = " + exercicio + " and i.REMESSA = " + remessa + " and i.status = 1 left join" +
                     " admassinatura  a on a.chave = i.CHAVE  left join" +
                     " AutenticacaoAssinatura..Assinatura  ass on ass.oid = a.idAssinatura left join" +
                     " admfilarecebimento f on f.id = i.idfilarecebimento" +
@@ -118,64 +110,9 @@ public class AcompanhamentoRemessaRepository extends DefaultRepository<String, S
                     " where CNPJ <> '00000000000000'" +
                     " order by NomeMunicipio, nomeEntidade remessa asc").getResultList();
 
-        //list.stream().forEach((record) -> {
-
-          for(Object[] obj : list){
-
-              Map<String, Object> mapa = new HashMap<String, Object>();
-
-                  mapa.put("cnpj", (String) obj[0]);
-                  mapa.put("nomeEntidade", (String) obj[1]);
-                  mapa.put("relatoria", (Integer) obj[2]);
-                  mapa.put("dataEntrega", (String) obj[3]);
-                  mapa.put("dataAssinatura", (String) obj[4]);
-                  mapa.put("contAssinaturas", (Integer) obj[5]);
-                  mapa.put("mostraRecibo", (Integer) obj[6]);
-                  mapa.put("exercicio", (Integer) obj[7]);
-                  mapa.put("remessa", (Integer) obj[8]);
-                  mapa.put("chave", (String) obj[9]);
-                  retorno.add(mapa);
-
-        };
-
-        return retorno;
-
-
-       } catch (Exception e) {
-            return null;
-        }
-
-
-    }
-
-    public List<Map<String,Object>> buscarTodosAcompanhamentoRemessa() {
-
-        List<Map<String,Object>> retorno = new ArrayList<Map<String,Object>>();
-
-        try {
-
-            List<Object[]> list = entityManager.createNativeQuery(
-                    "with ugsAptas as ( " +
-                    " SELECT  COUNT(DISTINCT idCargo) AS contAssinaturas, IDUNIDADEGESTORA , i.EXERCICIO, i.remessa, i.chave, max(i.relatoria) relatoria, max(f.dataEnvio) dataEntrega, max(dataAssinatura) dataAssinatura" +
-                    " FROM inforemessa i left join " +
-                    " admassinatura  a on a.chave = i.CHAVE  left join " +
-                    " AutenticacaoAssinatura..Assinatura  ass on ass.oid = a.idAssinatura left join " +
-                    " admfilarecebimento f on f.id = i.idfilarecebimento " +
-                    "group by IDUNIDADEGESTORA, i.EXERCICIO, i.REMESSA,  i.CHAVE " +
-                    ") " +
-                    " SELECT IDUNIDADEGESTORA, c.NomeMunicipio + ' - '+ c.nomeEntidade nomeEntidade, case when b.relatoria is null then c.numeroRelatoria else b.relatoria end relatoria, " +
-                    " dataEntrega, dataAssinatura, contAssinaturas, case when  contAssinaturas >= 3 then 1 else 0 end mostraRecibo, exercicio, remessa, chave ," +
-                    " (SELECT COUNT(DISTINCT tipo ) "+
-                    " FROM SICAPAP21.dbo.DocumentoGfip t "+
-                    " WHERE idInfoRemessa = chave) as qntDocumentoGFIP "+
-                    "from" +
-                    " ugsAptas b inner join  cadun.dbo.vwUnidadeGestora c on IDUNIDADEGESTORA = c.cnpj " +
-                    " where CNPJ <> '00000000000000' " +
-                    "order by NomeMunicipio, nomeEntidade, remessa asc;").getResultList();
-
             //list.stream().forEach((record) -> {
 
-            for(Object[] obj : list){
+            for (Object[] obj : list) {
 
                 Map<String, Object> mapa = new HashMap<String, Object>();
 
@@ -190,36 +127,76 @@ public class AcompanhamentoRemessaRepository extends DefaultRepository<String, S
                 mapa.put("remessa", (Integer) obj[8]);
                 mapa.put("chave", (String) obj[9]);
                 retorno.add(mapa);
-
-            };
-
+            }
             return retorno;
-
-
         } catch (Exception e) {
             return null;
         }
-
-
     }
 
-    public List<Map<String,Object>> buscarExercicioAcompanhamentoRemessa(Integer exercicio, Integer remessa) {
+    public List<Map<String, Object>> buscarTodosAcompanhamentoRemessa() {
+        List<Map<String, Object>> retorno = new ArrayList<Map<String, Object>>();
+        try {
+            List<Object[]> list = entityManager.createNativeQuery(
+                    "with ugsAptas as ( " +
+                            " SELECT  COUNT(DISTINCT idCargo) AS contAssinaturas, IDUNIDADEGESTORA , i.EXERCICIO, i.remessa, i.chave, max(i.relatoria) relatoria, max(f.dataEnvio) dataEntrega, max(dataAssinatura) dataAssinatura" +
+                            " FROM inforemessa i left join " +
+                            " admassinatura  a on a.chave = i.CHAVE  left join " +
+                            " AutenticacaoAssinatura..Assinatura  ass on ass.oid = a.idAssinatura left join " +
+                            " admfilarecebimento f on f.id = i.idfilarecebimento " +
+                            "group by IDUNIDADEGESTORA, i.EXERCICIO, i.REMESSA,  i.CHAVE " +
+                            ") " +
+                            " SELECT IDUNIDADEGESTORA, c.NomeMunicipio + ' - '+ c.nomeEntidade nomeEntidade, case when b.relatoria is null then c.numeroRelatoria else b.relatoria end relatoria, " +
+                            " dataEntrega, dataAssinatura, contAssinaturas, case when  contAssinaturas >= 3 then 1 else 0 end mostraRecibo, exercicio, remessa, chave ," +
+                            " (SELECT COUNT(DISTINCT tipo ) " +
+                            " FROM SICAPAP21.dbo.DocumentoGfip t " +
+                            " WHERE idInfoRemessa = chave) as qntDocumentoGFIP " +
+                            "from" +
+                            " ugsAptas b inner join  cadun.dbo.vwUnidadeGestora c on IDUNIDADEGESTORA = c.cnpj " +
+                            " where CNPJ <> '00000000000000' " +
+                            "order by NomeMunicipio, nomeEntidade, remessa asc;").getResultList();
 
-        List<Map<String,Object>> retorno = new ArrayList<Map<String,Object>>();
+            //list.stream().forEach((record) -> {
+
+            for (Object[] obj : list) {
+
+                Map<String, Object> mapa = new HashMap<String, Object>();
+
+                mapa.put("cnpj", (String) obj[0]);
+                mapa.put("nomeEntidade", (String) obj[1]);
+                mapa.put("relatoria", (Integer) obj[2]);
+                mapa.put("dataEntrega", (String) obj[3]);
+                mapa.put("dataAssinatura", (String) obj[4]);
+                mapa.put("contAssinaturas", (Integer) obj[5]);
+                mapa.put("mostraRecibo", (Integer) obj[6]);
+                mapa.put("exercicio", (Integer) obj[7]);
+                mapa.put("remessa", (Integer) obj[8]);
+                mapa.put("chave", (String) obj[9]);
+                retorno.add(mapa);
+            }
+            return retorno;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public List<Map<String, Object>> buscarExercicioAcompanhamentoRemessa(Integer exercicio, Integer remessa) {
+
+        List<Map<String, Object>> retorno = new ArrayList<Map<String, Object>>();
 
         try {
-            String existeRemessa= " ";
-            if (remessa != 0 && exercicio == 0 ){
-                existeRemessa = " where i.REMESSA = "+remessa+" ";
+            String existeRemessa = " ";
+            if (remessa != 0 && exercicio == 0) {
+                existeRemessa = " where i.REMESSA = " + remessa + " ";
             }
 
-            if (remessa != 0 && exercicio != 0){
-                existeRemessa = " and i.REMESSA = "+remessa+" ";
+            if (remessa != 0 && exercicio != 0) {
+                existeRemessa = " and i.REMESSA = " + remessa + " ";
             }
 
-                String existeExercicio= " ";
-            if (exercicio != 0 ){
-                existeExercicio= " where i.exercicio = "+exercicio+"";
+            String existeExercicio = " ";
+            if (exercicio != 0) {
+                existeExercicio = " where i.exercicio = " + exercicio + "";
             }
 
             List<Object[]> list = entityManager.createNativeQuery(
@@ -229,7 +206,7 @@ public class AcompanhamentoRemessaRepository extends DefaultRepository<String, S
                             " admassinatura  a on a.chave = i.CHAVE  left join " +
                             " AutenticacaoAssinatura..Assinatura  ass on ass.oid = a.idAssinatura left join " +
                             " admfilarecebimento f on f.id = i.idfilarecebimento " +
-                            ""+existeExercicio+ existeRemessa + " " +
+                            "" + existeExercicio + existeRemessa + " " +
                             "group by IDUNIDADEGESTORA, i.EXERCICIO, i.REMESSA,  i.CHAVE " +
                             ") " +
                             "select IDUNIDADEGESTORA, c.NomeMunicipio + ' - '+ c.nomeEntidade nomeEntidade, case when b.relatoria is null then c.numeroRelatoria else b.relatoria end relatoria, " +
@@ -241,7 +218,7 @@ public class AcompanhamentoRemessaRepository extends DefaultRepository<String, S
 
             //list.stream().forEach((record) -> {
 
-            for(Object[] obj : list){
+            for (Object[] obj : list) {
 
                 Map<String, Object> mapa = new HashMap<String, Object>();
 
@@ -257,20 +234,10 @@ public class AcompanhamentoRemessaRepository extends DefaultRepository<String, S
                 mapa.put("chave", (String) obj[9]);
                 mapa.put("qntDocumentoGFIP", obj[10]);
                 retorno.add(mapa);
-
-            };
-
+            }
             return retorno;
-
-
         } catch (Exception e) {
             return null;
         }
-
-
     }
-
-
-
-
 }
