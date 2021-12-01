@@ -33,6 +33,13 @@ public class FilaProcessamentoController {
 
         return ResponseEntity.ok().body(Objects.requireNonNullElse(infoRemessa, "semRemessa"));
     }
+    @CrossOrigin
+    @GetMapping(path = {"/processos/{exercicio}/{remessa}"})
+    public ResponseEntity<?> findProcessosByRemessa(@PathVariable Integer exercicio, @PathVariable Integer remessa) {
+        var infoRemessa = filaProcessamentoRepository.processoByRemessa(exercicio, remessa);
+
+        return ResponseEntity.ok().body(Objects.requireNonNullElse(infoRemessa, "semRemessa"));
+    }
 
 
     @CrossOrigin
