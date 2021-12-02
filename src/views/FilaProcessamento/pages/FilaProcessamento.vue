@@ -183,6 +183,7 @@ export default {
           key: "nome",
           label: "Unidade Gestora",
           sortable: true,
+          //tdClass: 'fonteLinhasLeft'
           // formatter: 'todasMaiusculas'
         },
 
@@ -190,11 +191,13 @@ export default {
           key: "exercicio",
           label: "Exercicio",
           sortable: true,
+          tdClass: 'fonteLinhas'
         },
         {
           key: "remessa",
           label: "Remessa",
           sortable: true,
+          tdClass: 'fonteLinhas'
         },
 
         {
@@ -202,17 +205,21 @@ export default {
           label: "Data Envio",
           formatter: "formatarData",
           sortable: false,
+          tdClass: 'fonteLinhas'
         },
         {
           key: "dataProcessamento",
           label: "Data Procesamento",
           formatter: "formatarData",
           sortable: true,
+          tdClass: 'fonteLinhas'
         },
         {
         key: 'status',
         label:'Status',
-        sortable: false
+        sortable: false,
+        tdClass: 'fonteLinhas'
+
         },
       ],
       items2: [
@@ -255,11 +262,16 @@ export default {
     };
   },
   mounted() {
+    this.isBusy = true
     this.FindAll();
-     setTimeout(() =>{// aguarda com spinner antes da pesquisa aparecer na pesquisa inicial
-                  this.isBusy = false
-                  }, 1.0*1000)
-        
+    //  setTimeout(() =>{// aguarda com spinner antes da pesquisa aparecer na pesquisa inicial
+    //               this.isBusy = false
+    //               }, 1.0*1000)
+    
+   // this.isBusy = false
+    
+    //this.pesquisar()
+      
     setInterval(this.readForms, 1000);
   
   },
@@ -272,11 +284,14 @@ export default {
     },
     FindAll() {
       api.get("filaProcessamento/processos").then((resp) => {
-       
-        this.processos = resp.data;
-
-        
+        this.processos = resp.data;  
+        this.isBusy = false        
       });
+    },
+    async pesquisar() {
+      this.isBusy = !this.isBusy //loading 
+      this.FindAll()
+      this.isBusy = false
     },
 
     readForms() {
@@ -325,7 +340,14 @@ export default {
 </script>
 <style >
 
+.fonteLinhas {
+   font-size:14px;
+   text-align: center
+}
+.fonteLinhasLeft {
+   font-size:14px;
 
+}
 .select-selected {
   border-color: black;
   border: 6px solid;

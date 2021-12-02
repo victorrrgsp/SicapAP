@@ -3,7 +3,7 @@
     <b-card no-body>
       <b-card-header header-tag="nav">
         <b-nav card-header tabs>
-          <b-nav-item active>Remessas</b-nav-item>
+          <b-nav-item active>Remessa</b-nav-item>
         </b-nav>
       </b-card-header>
      <b-row>
@@ -310,10 +310,12 @@ export default {
         },
        
        mounted(){
-             this.ActionFind(),
-             setTimeout(() =>{// aguarda com spinner antes da pesquisa aparecer na pesquisa inicial
-                  this.isBusy = false
-                  }, 2.0*2000)
+            this.isBusy = false
+            this.pesquisar()
+            //  this.ActionFind(),
+            //  setTimeout(() =>{// aguarda com spinner antes da pesquisa aparecer na pesquisa inicial
+            //       this.isBusy = false
+            //       }, 2.0*2000)
         },
         computed:{
                   rows() {
@@ -394,6 +396,11 @@ export default {
                   async pesquisarRemesssa() {
                                   this.isBusy = !this.isBusy //loading
                                   await this.ActionFindByExercicio(this.formdata).then({})
+                                  this.isBusy = false
+                  },
+                  async pesquisar() {
+                                  this.isBusy = !this.isBusy //loading
+                                  await this.ActionFind()
                                   this.isBusy = false
                   },
 
