@@ -31,6 +31,19 @@ public class AdmAutenticacaoRepository extends DefaultRepository<AdmAutenticacao
                "AND exercicio="+Exercicio+" " + " AND remessa="+Remessa+" " ).getSingleResult();
     }
 
+
+
+
+
+    public Integer getQtdAssinaturas(String Cnpj, Integer Exercicio, Integer Remessa){
+
+        return (Integer) entityManager.createNativeQuery("select COUNT(*) from SICAPAP21..AdmAssinatura ass " +
+                "inner join SICAPAP21..Inforemessa inf ON ass.chave=inf.chave " +
+                "where idunidadegestora= "+Cnpj+" " +
+                "AND exercicio="+Exercicio+" " + " AND remessa="+Remessa+" " ).getSingleResult();
+    }
+
+
     public PaginacaoUtil<AdmAutenticacao> buscaPaginadaChaves(Pageable pageable, String searchParams, Integer tipoParams) {
 
         int pagina = Integer.valueOf(pageable.getPageNumber());

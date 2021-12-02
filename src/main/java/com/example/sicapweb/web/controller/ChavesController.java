@@ -71,4 +71,13 @@ public class ChavesController {
         return status;
     }
 
+
+
+    @CrossOrigin
+    @GetMapping(path = {"/qtdassinaturas/{Cnpj}/{Exercicio}/{Remessa}"})
+    public Integer findQtdAssinaturas(@PathVariable String Cnpj, @PathVariable Integer Exercicio, @PathVariable Integer Remessa) {
+        Integer status = admAutenticacaoRepository.getQtdAssinaturas(Cnpj, Exercicio, Remessa);
+        return status;
+    }
+
 }
