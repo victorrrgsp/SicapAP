@@ -1,6 +1,11 @@
 <template>
    <div>
-  
+    <b-card no-body>
+      <b-card-header header-tag="nav">
+        <b-nav card-header tabs>
+          <b-nav-item active>Remessas</b-nav-item>
+        </b-nav>
+      </b-card-header>
      <b-row>
       <b-col  >
          <p align="left" >
@@ -43,8 +48,12 @@
 
 
 
-     <b-table striped hover responsive sticky-header="700px" 
-         id="my-table"
+     <b-table 
+        striped 
+        hover 
+        responsive 
+        sticky-header="700px" 
+        id="my-table"
         :busy="isBusy"
         :items="tableData" 
         :filter="filter"
@@ -95,6 +104,8 @@
 
 
      </b-table>
+     </b-card>
+     
 <!--
                       if(item.contAssinaturas > 2){
                               return 'Assinado'
@@ -123,11 +134,11 @@
  -->
      <b-icon  class="h6 mb-2" icon="check-square"  variant="success"> </b-icon> &nbsp;    &nbsp;Assinado  &nbsp;   &nbsp;    &nbsp;
      <b-icon  class="h6 mb-2" icon="exclamation-triangle-fill"  variant="warning"> </b-icon> &nbsp;    &nbsp;Pendente de Assinatura  &nbsp;   &nbsp;    &nbsp;
-     <b-icon  class="h6 mb-1" icon="dash-circle"  variant="warning"> </b-icon> &nbsp;    &nbsp;Pendente GFIP &nbsp;    &nbsp;
+     <b-icon  class="h6 mb-1" icon="dash-circle"  variant="warning"> </b-icon> &nbsp;    &nbsp;GFIP Pendente  &nbsp;    &nbsp;
      <b-icon  class="h6 mb-1" icon="x-circle"  variant="danger"> </b-icon> &nbsp;    &nbsp;Aguardando Envio &nbsp;    &nbsp;
       
 
-
+    
 
           <!-- Info modal -->
               <b-modal :id="infoModal.id" :title="infoModal.title" ok-only @hide="resetInfoModal" size="xl"  >

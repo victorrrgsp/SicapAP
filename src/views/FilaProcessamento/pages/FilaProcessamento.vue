@@ -40,9 +40,10 @@
           <b-nav-item active>Fila de Processamento</b-nav-item>
         </b-nav>
       </b-card-header>
-              <b-col lg="6" class="my-1">
+      <b-row>
+      <b-col  >
+         <p align="left" >
               <b-form-group
-                label="Busca"
                 label-for="filter-input"
                 label-cols-sm="3"
                 label-align-sm="right"
@@ -50,27 +51,35 @@
                 class="mb-0"
               >
                 <b-input-group size="sm">
-                  <b-form-input
-                    id="filter-input"
-                    v-model="filter"
-                    type="search"
-                    placeholder="Digite aqui..."
-                  ></b-form-input>
+                        <b-form-input
+                          id="filter-input"
+                          v-model="filter"
+                          type="search"
+                          placeholder="Pesquise aqui..."
+                        >
+                        </b-form-input>
 
-                  <b-input-group-append>
-                    <b-button :disabled="!filter" @click="filter = ''">Limpar</b-button>
-                  </b-input-group-append>
+                        <b-input-group-append>
+                          <b-button :disabled="!filter" @click="filter = ''">Limpar</b-button>
+                        </b-input-group-append>
                 </b-input-group>
-                  
               </b-form-group>
-            </b-col> 
-              <p align="right" >
-                    Exercicio: <b-form-select class="select-selected" v-model="formdata.exercicio" :options="formdata.exercicios"></b-form-select>
-                    &nbsp;   
-                    Remessa:&nbsp;<b-form-select class="select-selected" v-model="formdata.remessa" :options="formdata.remessas"></b-form-select>
-                    &nbsp;   &nbsp;    &nbsp;
-                    <b-button @click="pesquisarRemesssa"  pill variant="success"  size="sm">Pesquisar</b-button>
-              </p>
+          </p>
+      </b-col> 
+
+      <b-col >
+        <p align="right" class="pesquisa_select" >
+              <b>Exercicio:</b> &nbsp; <b-form-select class="select-selected" v-model="formdata.exercicio" :options="formdata.exercicios"> </b-form-select>
+              &nbsp;   
+               <b>Remessa:</b> &nbsp; <b-form-select class="select-selected" v-model="formdata.remessa" :options="formdata.remessas"> </b-form-select>
+              &nbsp;   
+              <b-button @click="pesquisarRemesssa" pill variant="success" size="sm"> Pesquisar </b-button>
+        </p>
+      </b-col>
+
+
+     </b-row>
+
 
       <b-card-body>
         <b-table
@@ -121,15 +130,16 @@
           </template>
         </b-table>
       <b-icon  class="h1 mb-2" icon="check"  variant="success"> </b-icon> &nbsp;    &nbsp;Enviado  &nbsp;   &nbsp;    &nbsp;
-     <b-icon  class="h3 mb-1" icon="dash-circle"  variant="danger"> </b-icon> &nbsp;    &nbsp;Cancelado 
+      <b-icon  class="h3 mb-1" icon="dash-circle"  variant="danger"> </b-icon> &nbsp;    &nbsp;Cancelado 
       </b-card-body>
     </b-card>
-    <b-pagination
+    <!-- <b-pagination
       v-model="currentPage"
       :total-rows="rows"
       :per-page="perPage"
       aria-controls="my-table"
     ></b-pagination>
+     -->
   </div>
 </template>
 
@@ -346,7 +356,12 @@ export default {
 .select-hide {
   display: none;
 }
+.pesquisa_select{
 
+  position: relative;
+  margin-top: 20px;
+
+}
 .select-items div:hover,
 .same-as-selected {
   background-color: rgba(0, 0, 0, 0.1);
