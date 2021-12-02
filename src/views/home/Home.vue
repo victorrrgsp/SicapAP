@@ -2,7 +2,7 @@
   <div id="home">
     <div class="user-info"></div>
     <div class="home-links linkexterno">
-        <a class="home-link nth-child" href="href" @click="redirect">
+        <a class="home-link nth-child" href="" @click="redirect" >
                   <b-icon class="h1 mb-2" icon="layout-text-window-reverse" ></b-icon>
                   <span class="h4 mb-2">Acompanhamento de Remessas</span><span class="h4 mb-2" >(anterior 2021)</span>
         </a>
@@ -52,19 +52,19 @@ export default {
   }
 }
 #home {
+  
   width: 100%;
   height: 70vh;
   @include flex-center(true);
   justify-content: space-around;
+
   .user-info {
     text-align: center;
   }
-
  
   .linkexterno{
           opacity: 0.6 !important;
   }
-
 
   .home-links {
     width: 100%;
@@ -86,9 +86,6 @@ export default {
     }
     .home-link:first-child { background-color: var(--bs-blue) }
     .home-link:nth-child(2) { background-color: var(--bs-orange) }
-  
-
-
   }
 }
 </style>
