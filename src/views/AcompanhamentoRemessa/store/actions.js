@@ -15,3 +15,11 @@ export const ActionFindByRemessa = ( {commit}, payload) => (
     })
 )
 
+export const ActionFindByExercicio = ( {commit}, payload) => (
+    api.get('/externo/acompanhamentoRemessa/getExercicio/'+payload.exercicio+'/'+payload.remessa).then(resp => {
+        commit(types.SET_DADOS, resp.data)
+    })
+)
+
+
+

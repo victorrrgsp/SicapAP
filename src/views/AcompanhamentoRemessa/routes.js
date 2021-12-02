@@ -1,13 +1,13 @@
 export default [
   {
     path: '/sicapapexterno/AcompanhamentoRemessa',
-    name: 'acompanhamentoremessa',
+    name: 'acompanhamento remessa',
     meta: {
       showNavbar: true,
       showDashboard: true,
       icon: 'layout-text-window-reverse', 
       title: 'AcompanhamentoRemessa',
-      label: 'Remessas'
+      label: 'acompanhamento de remessas'
     },
     component: () => import(/* webpackChunkName: "AcompanhamentoRemessa" */ './pages/AcompanhamentoRemessa'),
   }
