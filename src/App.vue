@@ -1,7 +1,7 @@
 <template>
   <div id="app">
         <layout-navbar />
-        <layout-body v-if="showNavbar" />
+        <div class="menu"> <menus v-if="showNavbar" /> </div>
         <div class="body" > 
           <base-spinner />
           <router-view/>
@@ -10,7 +10,8 @@
 </template>
 
 <script>
-import LayoutBody from './components/layout/LayoutBody'
+
+import Menus from './components/layout/Menus'
 import LayoutNavbar from './components/layout/LayoutNavbar'
 import BaseSpinner from './components/global/BaseSpinner'
 
@@ -18,12 +19,12 @@ import BaseSpinner from './components/global/BaseSpinner'
           name: 'App',
           components: {
             LayoutNavbar,
-            LayoutBody,
-            BaseSpinner
+            BaseSpinner,
+            Menus
           },
           computed: {
             showNavbar () {
-             return this.$route.name !== 'login'
+             return this.$route.name !== 'home'
             }
           },
           mounted(){
@@ -56,9 +57,16 @@ import BaseSpinner from './components/global/BaseSpinner'
 
   .body{
       position: absolute;
-      margin-top: 6px;
-      left: 320px;
-      right: 100px;
+      margin-top: 80px;
+      left: 20px;
+      right: 20px;
+    }
+
+  .menu{
+      position: absolute;
+      margin-top: 2px;
+      left: 20px;
+      right: 20px;
     }
 
 }

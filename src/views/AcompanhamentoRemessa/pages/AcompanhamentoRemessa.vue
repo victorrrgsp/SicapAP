@@ -1,8 +1,10 @@
 <template>
    <div>
-            <b-col lg="6" class="my-1">
+  
+     <b-row>
+      <b-col  >
+         <p align="left" >
               <b-form-group
-                label="Busca"
                 label-for="filter-input"
                 label-cols-sm="3"
                 label-align-sm="right"
@@ -10,27 +12,34 @@
                 class="mb-0"
               >
                 <b-input-group size="sm">
-                  <b-form-input
-                    id="filter-input"
-                    v-model="filter"
-                    type="search"
-                    placeholder="Digite aqui..."
-                  ></b-form-input>
+                        <b-form-input
+                          id="filter-input"
+                          v-model="filter"
+                          type="search"
+                          placeholder="Pesquise aqui..."
+                        >
+                        </b-form-input>
 
-                  <b-input-group-append>
-                    <b-button :disabled="!filter" @click="filter = ''">Limpar</b-button>
-                  </b-input-group-append>
+                        <b-input-group-append>
+                          <b-button :disabled="!filter" @click="filter = ''">Limpar</b-button>
+                        </b-input-group-append>
                 </b-input-group>
               </b-form-group>
-            </b-col> 
-
-          <p align="right" >
-              Exercicio: <b-form-select class="select-selected" v-model="formdata.exercicio" :options="formdata.exercicios"></b-form-select>
-              &nbsp;   
-              Remessa:&nbsp;<b-form-select class="select-selected" v-model="formdata.remessa" :options="formdata.remessas"></b-form-select>
-              &nbsp;   &nbsp;    &nbsp;
-              <b-button @click="pesquisarRemesssa"  pill variant="success"  size="sm">Pesquisar</b-button>
           </p>
+      </b-col> 
+
+      <b-col >
+        <p align="right" class="pesquisa_select" >
+              <b>Exercicio:</b> &nbsp; <b-form-select class="select-selected" v-model="formdata.exercicio" :options="formdata.exercicios"> </b-form-select>
+              &nbsp;   
+               <b>Remessa:</b> &nbsp; <b-form-select class="select-selected" v-model="formdata.remessa" :options="formdata.remessas"> </b-form-select>
+              &nbsp;   
+              <b-button @click="pesquisarRemesssa" pill variant="success" size="sm"> Pesquisar </b-button>
+        </p>
+      </b-col>
+
+
+     </b-row>
 
 
 
@@ -52,31 +61,27 @@
               </div>
         </template>
 
-
-
   <!--  Assinaturas  -->
-          <template #cell(assinaturas)="data">
-            <b-icon 
-                icon="pen-fill" 
-                :hidden="verIconAssinatura(data.item)"    
-                cursor= "pointer" 
-                title="Assinaturas"
-                @click="info(data.item, data.index, $event.target)" pill 
-                variant="primary" 
-                size="sm">
-            </b-icon>
-         &nbsp;   
-            <b-icon icon="file-earmark-arrow-down" 
-                :hidden="verIconRecibo(data.item)"  
-                cursor= "pointer" 
-                title="Assinaturas"
-                @click="abrirRecibo(data.item)" pill 
-                variant="primary" 
-                size="sm">
-            </b-icon>
-        </template>
-
-  <!--  Status  -->
+              <template #cell(assinaturas)="data">
+                  <b-icon 
+                      icon="pen-fill" 
+                      :hidden="verIconAssinatura(data.item)"    
+                      cursor= "pointer" 
+                      title="Assinaturas"
+                      @click="info(data.item, data.index, $event.target)" pill 
+                      variant="primary" 
+                      size="sm">
+                  </b-icon>
+                   &nbsp;   
+                  <b-icon icon="file-earmark-arrow-down" 
+                      :hidden="verIconRecibo(data.item)"  
+                      cursor= "pointer" 
+                      title="Assinaturas"
+                      @click="abrirRecibo(data.item)" pill 
+                      variant="primary" 
+                      size="sm">
+                  </b-icon>
+              </template>
             <template #cell(status)="data">
                       <b-icon 
                           :icon="iconStatus(data.item)" 
@@ -196,8 +201,8 @@ export default {
                         key: 'nomeEntidade',
                         label:'Unidade Gestora',
                         sortable: true,
-                        thStyle: { width: "45%",  },
-                        tdClass: 'fonteLinhas'
+                        thStyle: { width: "30%"},
+                        tdClass: 'fonteLinhasLeft'
                       },
                        {
                         key: 'cnpj',
@@ -205,19 +210,20 @@ export default {
                          sortable: false,
                          thStyle: { width: "10%" },
                          formatter: 'mascaraCnpj',
-                         tdClass: 'fonteLinhas'
+                         tdClass: 'fonteLinhasLeft'
                       },
                       {
                          key: 'exercicio',
                          label:'Exercicio',
                          sortable: true,
-                        tdClass: 'fonteLinhas'
+                         tdClass: 'fonteLinhas'
                       },
                       {
                          key: 'remessa',
                          label:'Remessa',
                          sortable: true,
-                        tdClass: 'fonteLinhas'
+                         
+                         tdClass: 'fonteLinhas'
                       },   
                       {
                          key: 'relatoria',
@@ -233,7 +239,7 @@ export default {
                           sortable: false,
                           formatter: 'formatarData',
                            thStyle: { width: "10%",  },
-                          tdClass: 'fonteLinhas'
+                          tdClass: 'fonteLinhasLeft'
                       },
                       {
                           key: 'dataAssinatura',
@@ -241,31 +247,29 @@ export default {
                           sortable: true,
                           formatter: 'formatarData',
                           thStyle: { width: "10%",  },
-                          tdClass: 'fonteLinhas'
+                          tdClass: 'fonteLinhasLeft'
                       },
-                        {
+                      {
                         key: 'contAssinaturas',
                         label:'Qtd. Assinaturas',
+                        thStyle: { width: "10%",  },
+                        tdClass: 'fonteLinhas',
                         sortable: true
                       },
 
                        {
                         key: 'assinaturas',
                         label:'Assinaturas',
+                        tdClass: 'fonteLinhas',
                         sortable: true
                       },
 
                       {
                         key: 'status',
                         label:'Status',
+                        tdClass: 'fonteLinhas',
                         sortable: true
-                      },
-                      // {
-                      //   key: 'qntDocumentoGFIP',
-                      //   label:'Documentos asinados ',
-                      //   sortable: true,
-                      // }
-                     
+                      }
                       
           ],
          
@@ -361,10 +365,6 @@ export default {
                         if(item.contAssinaturas >= 1){
                               return false
                         }
-
-                        
-
-
                         else{
                           return true
                         }
@@ -382,7 +382,7 @@ export default {
 
                   async pesquisarRemesssa() {
                                   this.isBusy = !this.isBusy //loading
-                                  await this.ActionFindByExercicio(this.formdata)
+                                  await this.ActionFindByExercicio(this.formdata).then({})
                                   this.isBusy = false
                   },
 
@@ -529,8 +529,12 @@ export default {
 <style >
 .fonteLinhas {
    font-size:14px;
+   text-align: center
 }
+.fonteLinhasLeft {
+   font-size:14px;
 
+}
 .select-selected {
   border-color: black;
   border: 6px solid;
@@ -551,7 +555,6 @@ export default {
 
 .select-items {
   position: absolute;
-
   top: 100%;
   left: 0;
   right: 0;
@@ -561,6 +564,14 @@ export default {
 .select-hide {
   display: none;
 }
+
+.pesquisa_select{
+
+  position: relative;
+  margin-top: 20px;
+
+}
+
 
 .select-items div:hover,
 .same-as-selected {

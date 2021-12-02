@@ -6,8 +6,8 @@ export default [
       showNavbar: true,
       showDashboard: true,
       icon: 'list-nested', 
-      title: 'FilaProcessamento',
-      label: 'Fila Processamento'
+      title: 'Fila de Processamento',
+      label: 'Fila de Processamento'
     },
     component: () => import(/* webpackChunkName: "FilaProcessamento" */ './pages/FilaProcessamento'),
   }

@@ -1,19 +1,11 @@
 <template>
   <div id="home">
     <div class="user-info"></div>
-    <div class="home-links aconp1">
-        <a class="home-link" href="href" @click="redirect">
+    <div class="home-links linkexterno">
+        <a class="home-link nth-child" href="href" @click="redirect">
                   <b-icon class="h1 mb-2" icon="layout-text-window-reverse" ></b-icon>
-                  <span class="h4 mb-2">acompanhamento de <br>remessas</span><span class="h4 mb-2" >(anterior 2021)</span>
+                  <span class="h4 mb-2">Acompanhamento de Remessas</span><span class="h4 mb-2" >(anterior 2021)</span>
         </a>
-      <!-- <router-link
-        class="home-link"
-        to="www.google.com"
-        exact-path
-      >
-        <b-icon class="h1 mb-2" icon="" ></b-icon>
-        <span class="h3 mb-2">tesrte</span>
-      </router-link> -->
     </div>
     <div class="home-links">
       <router-link
@@ -67,6 +59,13 @@ export default {
   .user-info {
     text-align: center;
   }
+
+ 
+  .linkexterno{
+          opacity: 0.6 !important;
+  }
+
+
   .home-links {
     width: 100%;
     @include flex-center();
@@ -87,7 +86,9 @@ export default {
     }
     .home-link:first-child { background-color: var(--bs-blue) }
     .home-link:nth-child(2) { background-color: var(--bs-orange) }
-    //.aconp1{ background-color: #4169E1 }
+  
+
+
   }
 }
 </style>

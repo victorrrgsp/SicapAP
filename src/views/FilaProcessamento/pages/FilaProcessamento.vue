@@ -251,6 +251,7 @@ export default {
                   }, 1.0*1000)
         
     setInterval(this.readForms, 1000);
+  
   },
   methods: {
     pesquisarRemesssa() {
@@ -263,6 +264,8 @@ export default {
       api.get("filaProcessamento/processos").then((resp) => {
        
         this.processos = resp.data;
+
+        
       });
     },
 
