@@ -6,9 +6,7 @@
                 <div class="col-2">
                     <b-collapse class="header1" id="collapse-1"  is-nav>
                           <b-navbar-brand class="col-s-4">
-                              <b-button class="botao-menu" size="sm" v-b-toggle.sidebar-menu >
-                                <b-icon icon="list"></b-icon>
-                              </b-button>
+                             
                               <img src="@/assets/imgs/logo_TCE.jpg" class="img-logo">
                           </b-navbar-brand>
                           <b-navbar-nav class="col-s-8">
@@ -163,8 +161,8 @@ export default {
   
 
   .col1-head {width: 18%;}
-  .col2-head {width: 57%;}
-  .col3-head {width: 30%;}
+  //.col2-head {width: 57%;}
+  .col3-head {width: 40%;}
 
 
   .col-s-1 {width: 8.33%;}
@@ -186,8 +184,8 @@ export default {
 @media only screen and (min-width: 1200px) {
   
   .col1-head {width: 18%;}
-  .col2-head {width: 57%;}
-  .col3-head {width: 25%;}
+ // .col2-head {width: 57%;}
+  .col3-head {width: 40%;}
   .col5-head {width: 32%;}
   
   .col-s-1 {width: 8.33%;}

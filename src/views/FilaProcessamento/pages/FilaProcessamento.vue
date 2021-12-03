@@ -3,7 +3,7 @@
     <b-card no-body class="mb-5 mt-5">
       <b-card-header header-tag="nav">
         <b-nav card-header tabs>
-          <b-nav-item active>Fila de Processamento</b-nav-item>
+          <b-nav-item active>Fila de Processamento - Em andamento</b-nav-item>
         </b-nav>
       </b-card-header>
       <b-card-body v-if="this.fila === []">
@@ -37,7 +37,7 @@
     <b-card no-body>
       <b-card-header header-tag="nav">
         <b-nav card-header tabs>
-          <b-nav-item active>Fila de Processamento</b-nav-item>
+          <b-nav-item active>Fila de Processamento - Finalizados</b-nav-item>
         </b-nav>
       </b-card-header>
       <b-row>
