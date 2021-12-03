@@ -53,14 +53,14 @@
                 <b-input-group size="sm">
                         <b-form-input
                           id="filter-input"
-                          v-model="filter"
+                          v-model.lazy="filterForm"
                           type="search"
                           placeholder="Pesquise aqui..."
                         >
                         </b-form-input>
 
                         <b-input-group-append>
-                          <b-button :disabled="!filter" @click="filter = ''">Limpar</b-button>
+                          <b-button @click="filter = 'filterForm'">pesquisar</b-button>
                         </b-input-group-append>
                 </b-input-group>
               </b-form-group>
@@ -91,6 +91,8 @@
           id="my-table"
           :filter="filter"
           :items="processos"
+          :filter-debounce = 5000
+          :filter-included-fields="['nome']"
           :fields="items"
           :per-page="perPage"
           :current-page="currentPage"
@@ -154,6 +156,7 @@ export default {
       perPage: 5000,
       currentPage: 1,
       filter: null,
+      filterForm:null,
       processos: [],
       formdata:{
                exercicio: null,
@@ -276,6 +279,7 @@ export default {
   
   },
   methods: {
+    
     pesquisarRemesssa() {
       api.get("filaProcessamento/processos").then((resp) => {
         

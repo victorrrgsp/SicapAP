@@ -19,14 +19,14 @@
                 <b-input-group size="sm">
                         <b-form-input
                           id="filter-input"
-                          v-model="filter"
+                          v-model="filterForm"
                           type="search"
                           placeholder="Pesquise aqui..."
                         >
                         </b-form-input>
 
                         <b-input-group-append>
-                          <b-button :disabled="!filter" @click="filter = ''">Limpar</b-button>
+                          <b-button  @click="filter = filterform">Limpar</b-button>
                         </b-input-group-append>
                 </b-input-group>
               </b-form-group>
@@ -57,8 +57,10 @@
         :busy="isBusy"
         :items="tableData" 
         :filter="filter"
+        filter-debounce = 5500
         :fields="columns" 
         :per-page="perPage"
+        :filter-included-fields="['nomeEntidade']"
         :current-page="currentPage"
         aria-controls="my-table"
         small
@@ -201,7 +203,7 @@ export default {
             dataAssinaturaGestor: "",
             dataAssinaturaRh: "",
             dataAssinaturaCI: "",
-
+            filterform: null,
              infoModal: {
                         id: 'info-modal',
                         title: '',
