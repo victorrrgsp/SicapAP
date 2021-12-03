@@ -87,7 +87,7 @@
                   <b-icon icon="file-earmark-arrow-down" 
                       :hidden="verIconRecibo(data.item)"  
                       cursor= "pointer" 
-                      title="Assinaturas"
+                      title="Recibo"
                       @click="abrirRecibo(data.item)" pill 
                       variant="primary" 
                       size="sm">

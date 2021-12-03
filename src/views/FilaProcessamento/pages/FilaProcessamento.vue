@@ -3,7 +3,7 @@
     <b-card no-body class="mb-5 mt-5">
       <b-card-header header-tag="nav">
         <b-nav card-header tabs>
-          <b-nav-item active>Fila de Processamento</b-nav-item>
+          <b-nav-item active>Fila de Processamento - Em andamento</b-nav-item>
         </b-nav>
       </b-card-header>
       <b-card-body v-if="this.fila === []">
@@ -37,7 +37,7 @@
     <b-card no-body>
       <b-card-header header-tag="nav">
         <b-nav card-header tabs>
-          <b-nav-item active>Fila de Processamento</b-nav-item>
+          <b-nav-item active>Fila de Processamento - Finalizados</b-nav-item>
         </b-nav>
       </b-card-header>
       <b-row>
@@ -108,7 +108,7 @@
           </template>
 
           <template #cell(status)="data">
-            <b-icon  v-if= "statusIcon( data.value ) == 'dash-circle'" class="h2 mb-1"
+            <b-icon  v-if= "statusIcon( data.value ) == 'x-circle'" class="h6 mb-1"
                 :icon="statusIcon( data.value )" 
                
                  variant="danger"
@@ -118,7 +118,7 @@
                
                 size="sm">
             </b-icon> 
-            <b-icon  v-else class="h2 mb-2"
+            <b-icon  v-else class="h6 mb-1"
                 :icon="statusIcon( data.value )" 
                
                  variant="success"
@@ -131,8 +131,8 @@
     
           </template>
         </b-table>
-      <b-icon  class="h1 mb-2" icon="check"  variant="success"> </b-icon> &nbsp;    &nbsp;Enviado  &nbsp;   &nbsp;    &nbsp;
-      <b-icon  class="h3 mb-1" icon="dash-circle"  variant="danger"> </b-icon> &nbsp;    &nbsp;Cancelado 
+      <b-icon  class="h6 mb-1" icon="check-square"  variant="success"> </b-icon> &nbsp;    &nbsp;Enviado  &nbsp;   &nbsp;    &nbsp;
+      <b-icon  class="h6 mb-1" icon="x-circle"  variant="danger"> </b-icon> &nbsp;    &nbsp;Cancelado 
       </b-card-body>
     </b-card>
     <!-- <b-pagination
@@ -325,8 +325,8 @@ export default {
     // },
     statusIcon(label){
       
-        if(label === "ok") return 'check'
-        else if (label === 'mapear erro') return 'dash-circle'
+        if(label === "ok") return 'check-square'
+        else if (label === 'mapear erro') return 'x-circle'
     },
      rowClass(item, type) {
         if (!item || type !== 'row') return
