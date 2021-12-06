@@ -116,6 +116,7 @@ public class FilaProcessamentosRepository extends DefaultRepository<String, Stri
 
     public List<Map<String,Object>> processo() {
         try {
+
             List<Object[]> queryResut = entityManager.createNativeQuery("" +
                     "SELECT u.nome, f.exercicio, dataEnvio,  dataprocessamento, f.remessa, (case when f.status = 2  then 'ok' else 'mapear erro' end) status " +
                     "FROM admfilarecebimento f join AdmAutenticacao a on a.id = f.idAdmAutenticacao " +
@@ -139,5 +140,41 @@ public class FilaProcessamentosRepository extends DefaultRepository<String, Stri
         }
     }
 
+    public List<Map<String,Object>> processoByRemessa(Integer exercicio, Integer remessa) {
+        try {
+            String existeRemessa= " ";
+
+
+            if (remessa != 0 && exercicio != 0){
+                existeRemessa = " and f.REMESSA = "+remessa+" ";
+            }
+
+            String existeExercicio= " ";
+            if (exercicio != 0 ){
+                existeExercicio= " and f.exercicio = "+exercicio+"";
+            }
+            List<Object[]> queryResut = entityManager.createNativeQuery("" +
+                    "SELECT u.nome, f.exercicio, dataEnvio,  dataprocessamento, f.remessa, (case when f.status = 2  then 'ok' else 'mapear erro' end) status " +
+                    "FROM admfilarecebimento f join AdmAutenticacao a on a.id = f.idAdmAutenticacao " +
+                    "join UnidadeGestora u on u.id = idunidadegestora " +
+                    " where  f.status between 2 and 10 " +
+                    " "+existeExercicio+ existeRemessa + " " +
+                    "order by dataEnvio desc;").getResultList();
+            List<Map<String,Object>> retorno = new ArrayList<Map<String,Object>>();
+            queryResut.forEach(r ->{
+                Map<String,Object> aux = new HashMap<String,Object>();
+                aux.put("nome",             (String)r[0]);
+                aux.put("exercicio",        (Integer)r[1]);
+                aux.put("dataEnvio",        (String)r[2]);
+                aux.put("dataProcessamento",(String)r[3]);
+                aux.put("remessa",          (Integer)r[4]);
+                aux.put("status",           (String)r[5]);
+                retorno.add(aux);
+            });
+            return retorno;
+        } catch (Exception e) {
+            return null;
+        }
+    }
 
 }
