@@ -64,35 +64,29 @@ public class AcompanhamentoRemessaRepository extends DefaultRepository<String, S
     }
 
 
-//    public List<Object> buscarRemessaFechada_old() {
-//        try {
-//            return entityManager.createNativeQuery("" +
-//                    "SELECT  COUNT(DISTINCT idCargo) AS contAssinaturas, IDUNIDADEGESTORA , i.nomeUnidade ," +
-//                    " i.EXERCICIO, i.remessa, max(i.relatoria) relatoria, " +
-//                    "max(f.dataEnvio) dataEntrega, max(dataAssinatura) dataAssinatura " +
-//                    "FROM inforemessa i  left join " +
-//                    "admassinatura  a on a.chave = i.CHAVE  left join " +
-//                    "AutenticacaoAssinatura..Assinatura  ass on ass.oid = a.idAssinatura left join " +
-//                    "admfilarecebimento f on f.id = i.idfilarecebimento " +
-//                    "group by IDUNIDADEGESTORA,  i.nomeUnidade ,i.EXERCICIO, i.REMESSA").getResultList();
-//        } catch (Exception e) {
-//            return null;
-//        }
-//    }
+    public List<Map<String, Object>> buscarTodosAcompanhamentoRemessa(Integer exercicio, Integer remessa) {
 
-//    public List<Cargo> buscaTodosCargos() {
-//        List<Cargo> list = entityManager.createNativeQuery("select * from Cargo "
-//                , Cargo.class).getResultList();
-//        return list;
-//    }
 
-    public List<Map<String, Object>> buscarAcompanhamentoRemessa(Integer exercicio, Integer remessa) {
+
         List<Map<String, Object>> retorno = new ArrayList<Map<String, Object>>();
         try {
-            List<Object[]> list = entityManager.createNativeQuery("with ugsAptas as (" +
-                    "select *" +
-                    " from cadun.dbo.vwUnidadeGestora" +
-                    " where  cadun.dbo.EhVigente(" + exercicio + ", " + remessa + ",CNPJ,  29) = 1" +
+            List<Object[]> list = getEntityManager().createNativeQuery("with vigentes as (\n" +
+                    "\t\n" +
+                    "\tSELECT DISTINCT pj.CNPJ\n" +
+                    "                        FROM Cadun.dbo.VigenciaUnidadeGestora AS vug INNER JOIN\n" +
+                    "                            Cadun.dbo.vwUnidadeGestora AS pj ON vug.CodigoPessoaJuridica = pj.idPessoa\n" +
+                    "\t  WHERE ( (vug.exercicioini = " + exercicio + ") AND (vug.remessaini <= " + remessa + ") AND (vug.exerciciofim IS NULL) AND (vug.idSistema = 29) OR\n" +
+                    "                        (vug.exercicioini = " + exercicio + ") AND (vug.remessaini <= " + remessa + ") AND (vug.exerciciofim = " + exercicio + ") AND (vug.idSistema = 29) AND (vug.remessafim >= " + remessa + ") OR\n" +
+                    "                        (vug.exercicioini = " + exercicio + ") AND (vug.remessaini <= " + remessa + ") AND (vug.exerciciofim > " + exercicio + ") AND (vug.idSistema = 29) OR\n" +
+                    "                        (vug.exercicioini < " + exercicio + ") AND (vug.exerciciofim IS NULL) AND (vug.idSistema = 29) OR\n" +
+                    "                        (vug.exercicioini < " + exercicio + ") AND (vug.exerciciofim = " + exercicio + ") AND (vug.idSistema = 29) AND (vug.remessafim >= " + remessa + ") OR\n" +
+                    "                        (vug.exercicioini < " + exercicio + ") AND (vug.exerciciofim > " + exercicio + ") AND (vug.idSistema = 29))\n" +
+                    "),\n" +
+                    "\n" +
+                    "ugsAptas as (\n" +
+                    "\tselect a.*\n" +
+                    "    from cadun.dbo.vwUnidadeGestora a join \n" +
+                    "\t\tvigentes v on v.CNPJ = a.cnpj \n" +
                     ")," +
                     " ugsAssinantes as (" +
                     " SELECT COUNT(DISTINCT idCargo) AS contAssinaturas, IDUNIDADEGESTORA , i.EXERCICIO, i.remessa, i.chave, max(i.relatoria) relatoria, max(f.dataEnvio) dataEntrega, max(dataAssinatura) dataAssinatura" +
@@ -108,7 +102,7 @@ public class AcompanhamentoRemessaRepository extends DefaultRepository<String, S
                     " from ugsAptas a left join" +
                     " ugsAssinantes b on a.cnpj = idUnidadeGestora" +
                     " where CNPJ <> '00000000000000'" +
-                    " order by NomeMunicipio, nomeEntidade remessa asc").getResultList();
+                    " order by NomeMunicipio, nomeEntidade, remessa desc").getResultList();
 
             //list.stream().forEach((record) -> {
 
@@ -134,110 +128,5 @@ public class AcompanhamentoRemessaRepository extends DefaultRepository<String, S
         }
     }
 
-    public List<Map<String, Object>> buscarTodosAcompanhamentoRemessa() {
-        List<Map<String, Object>> retorno = new ArrayList<Map<String, Object>>();
-        try {
-            List<Object[]> list = entityManager.createNativeQuery(
-                    "with ugsAptas as ( " +
-                            " SELECT  COUNT(DISTINCT idCargo) AS contAssinaturas, IDUNIDADEGESTORA , i.EXERCICIO, i.remessa, i.chave, max(i.relatoria) relatoria, max(f.dataEnvio) dataEntrega, max(dataAssinatura) dataAssinatura" +
-                            " FROM inforemessa i left join " +
-                            " admassinatura  a on a.chave = i.CHAVE  left join " +
-                            " AutenticacaoAssinatura..Assinatura  ass on ass.oid = a.idAssinatura left join " +
-                            " admfilarecebimento f on f.id = i.idfilarecebimento " +
-                            "group by IDUNIDADEGESTORA, i.EXERCICIO, i.REMESSA,  i.CHAVE " +
-                            ") " +
-                            " SELECT IDUNIDADEGESTORA, c.NomeMunicipio + ' - '+ c.nomeEntidade nomeEntidade, case when b.relatoria is null then c.numeroRelatoria else b.relatoria end relatoria, " +
-                            " dataEntrega, dataAssinatura, contAssinaturas, case when  contAssinaturas >= 3 then 1 else 0 end mostraRecibo, exercicio, remessa, chave ," +
-                            " (SELECT COUNT(DISTINCT tipo ) " +
-                            " FROM SICAPAP21.dbo.DocumentoGfip t " +
-                            " WHERE idInfoRemessa = chave) as qntDocumentoGFIP " +
-                            "from" +
-                            " ugsAptas b inner join  cadun.dbo.vwUnidadeGestora c on IDUNIDADEGESTORA = c.cnpj " +
-                            " where CNPJ <> '00000000000000' " +
-                            "order by NomeMunicipio, nomeEntidade, remessa asc;").getResultList();
 
-            //list.stream().forEach((record) -> {
-
-            for (Object[] obj : list) {
-
-                Map<String, Object> mapa = new HashMap<String, Object>();
-
-                mapa.put("cnpj", (String) obj[0]);
-                mapa.put("nomeEntidade", (String) obj[1]);
-                mapa.put("relatoria", (Integer) obj[2]);
-                mapa.put("dataEntrega", (String) obj[3]);
-                mapa.put("dataAssinatura", (String) obj[4]);
-                mapa.put("contAssinaturas", (Integer) obj[5]);
-                mapa.put("mostraRecibo", (Integer) obj[6]);
-                mapa.put("exercicio", (Integer) obj[7]);
-                mapa.put("remessa", (Integer) obj[8]);
-                mapa.put("chave", (String) obj[9]);
-                retorno.add(mapa);
-            }
-            return retorno;
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    public List<Map<String, Object>> buscarExercicioAcompanhamentoRemessa(Integer exercicio, Integer remessa) {
-
-        List<Map<String, Object>> retorno = new ArrayList<Map<String, Object>>();
-
-        try {
-            String existeRemessa = " ";
-            if (remessa != 0 && exercicio == 0) {
-                existeRemessa = " where i.REMESSA = " + remessa + " ";
-            }
-
-            if (remessa != 0 && exercicio != 0) {
-                existeRemessa = " and i.REMESSA = " + remessa + " ";
-            }
-
-            String existeExercicio = " ";
-            if (exercicio != 0) {
-                existeExercicio = " where i.exercicio = " + exercicio + "";
-            }
-
-            List<Object[]> list = entityManager.createNativeQuery(
-                    "with ugsAptas as ( " +
-                            " SELECT  COUNT(DISTINCT idCargo) AS contAssinaturas, IDUNIDADEGESTORA , i.EXERCICIO, i.remessa, i.chave, max(i.relatoria) relatoria, max(f.dataEnvio) dataEntrega, max(dataAssinatura) dataAssinatura" +
-                            " FROM inforemessa i left join " +
-                            " admassinatura  a on a.chave = i.CHAVE  left join " +
-                            " AutenticacaoAssinatura..Assinatura  ass on ass.oid = a.idAssinatura left join " +
-                            " admfilarecebimento f on f.id = i.idfilarecebimento " +
-                            "" + existeExercicio + existeRemessa + " " +
-                            "group by IDUNIDADEGESTORA, i.EXERCICIO, i.REMESSA,  i.CHAVE " +
-                            ") " +
-                            "select IDUNIDADEGESTORA, c.NomeMunicipio + ' - '+ c.nomeEntidade nomeEntidade, case when b.relatoria is null then c.numeroRelatoria else b.relatoria end relatoria, " +
-                            "dataEntrega, dataAssinatura, contAssinaturas, case when  contAssinaturas >= 3 then 1 else 0 end mostraRecibo, exercicio, remessa, chave " +
-                            "from" +
-                            " ugsAptas b inner join  cadun.dbo.vwUnidadeGestora c on IDUNIDADEGESTORA = c.cnpj " +
-                            " where CNPJ <> '00000000000000' " +
-                            "order by NomeMunicipio, nomeEntidade, remessa asc;").getResultList();
-
-            //list.stream().forEach((record) -> {
-
-            for (Object[] obj : list) {
-
-                Map<String, Object> mapa = new HashMap<String, Object>();
-
-                mapa.put("cnpj", (String) obj[0]);
-                mapa.put("nomeEntidade", (String) obj[1]);
-                mapa.put("relatoria", (Integer) obj[2]);
-                mapa.put("dataEntrega", (String) obj[3]);
-                mapa.put("dataAssinatura", (String) obj[4]);
-                mapa.put("contAssinaturas", (Integer) obj[5]);
-                mapa.put("mostraRecibo", (Integer) obj[6]);
-                mapa.put("exercicio", (Integer) obj[7]);
-                mapa.put("remessa", (Integer) obj[8]);
-                mapa.put("chave", (String) obj[9]);
-                mapa.put("qntDocumentoGFIP", obj[10]);
-                retorno.add(mapa);
-            }
-            return retorno;
-        } catch (Exception e) {
-            return null;
-        }
-    }
 }
