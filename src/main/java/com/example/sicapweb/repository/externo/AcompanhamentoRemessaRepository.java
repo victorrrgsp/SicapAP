@@ -172,6 +172,7 @@ public class AcompanhamentoRemessaRepository extends DefaultRepository<String, S
                 mapa.put("exercicio", (Integer) obj[7]);
                 mapa.put("remessa", (Integer) obj[8]);
                 mapa.put("chave", (String) obj[9]);
+                mapa.put("qntDocumentoGFIP", obj[10]);
                 retorno.add(mapa);
             }
             return retorno;
@@ -232,7 +233,6 @@ public class AcompanhamentoRemessaRepository extends DefaultRepository<String, S
                 mapa.put("exercicio", (Integer) obj[7]);
                 mapa.put("remessa", (Integer) obj[8]);
                 mapa.put("chave", (String) obj[9]);
-                mapa.put("qntDocumentoGFIP", obj[10]);
                 retorno.add(mapa);
             }
             return retorno;
