@@ -26,7 +26,7 @@
                         </b-form-input>
 
                         <b-input-group-append>
-                          <b-button  @click="filter = filterform">Limpar</b-button>
+                          <b-button  @click=" filter = filterform ">pesquisar</b-button>
                         </b-input-group-append>
                 </b-input-group>
               </b-form-group>
@@ -57,9 +57,7 @@
         :busy="isBusy"
         :items="tableData" 
         :filter="filter"
-        filter-debounce = 5500
         :fields="columns" 
-        :per-page="perPage"
         :filter-included-fields="['nomeEntidade']"
         :current-page="currentPage"
         aria-controls="my-table"
@@ -289,23 +287,23 @@ export default {
             formdata:{
                exercicio: 0,
                exercicios: [
-                            { value: '0', text: 'Todos' },
+                            
                             { value: '2021', text: '2021' }
                            ],
                remessa: 0,
                remessas: [
 
-                            { value: '0', text: 'Todos' },
-                            { value: '1', text: '1' },
-                            { value: '2', text: '2' },
-                            { value: '3', text: '3' },
-                            { value: '4', text: '4' },
-                            { value: '5', text: '5' },
-                            { value: '6', text: '6' },
-                            { value: '7', text: '7' },
-                            { value: '8', text: '8' },
+                            
+                            { value: '10', text: '10'},
                             { value: '9', text: '9' },
-                            { value: '10', text: '10' }
+                            { value: '8', text: '8' },
+                            { value: '7', text: '7' },
+                            { value: '6', text: '6' },
+                            { value: '5', text: '5' },
+                            { value: '4', text: '4' },
+                            { value: '3', text: '3' },
+                            { value: '2', text: '2' },
+                            { value: '1', text: '1' },
                           ]
             },
           }
