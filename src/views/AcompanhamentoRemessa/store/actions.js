@@ -8,7 +8,11 @@ export const ActionFind = ({ commit }) => (
             commit(types.SET_DADOS, resp.data)
         })
 )
-
+export const ActionFindExercicio = ( {commit}) => (
+    api.get('/exercicio').then(resp => {
+        commit(types.SET_DADOS, resp.data)
+    })
+)
 export const ActionFindByRemessa = ( {commit}, payload) => (
     api.get('/externo/acompanhamentoRemessa/getRemessa/'+payload.exercicio+'/'+payload.remessa).then(resp => {
         commit(types.SET_DADOS, resp.data)

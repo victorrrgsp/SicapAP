@@ -19,7 +19,7 @@
                 <b-input-group size="sm">
                         <b-form-input
                           id="filter-input"
-                          v-model="filterForm"
+                          v-model="filterform"
                           type="search"
                           placeholder="Pesquise aqui..."
                         >
@@ -54,6 +54,7 @@
         responsive 
         sticky-header="700px" 
         id="my-table"
+        filter-debounce = 5500
         :busy="isBusy"
         :items="tableData" 
         :filter="filter"
@@ -187,7 +188,8 @@ export default {
             isBusy: true,
             perPage: 325,
             currentPage: 1,
-            filter: null,
+            filter: "",
+            filterform: "",
             items:[],
           
             gestor: "",
@@ -196,88 +198,87 @@ export default {
             dataAssinaturaGestor: "",
             dataAssinaturaRh: "",
             dataAssinaturaCI: "",
-            filterform: null,
-             infoModal: {
-                        id: 'info-modal',
-                        title: '',
-                        content: ''
-                       },
-             columns:[  
+            infoModal: {
+                      id: 'info-modal',
+                      title: '',
+                      content: ''
+                      },
+            columns:[  
+                    {
+                      key: 'nomeEntidade',
+                      label:'Unidade Gestora',
+                      sortable: true,
+                      thStyle: { width: "30%"},
+                      tdClass: 'fonteLinhasLeft'
+                    },
                       {
-                        key: 'nomeEntidade',
-                        label:'Unidade Gestora',
-                        sortable: true,
-                        thStyle: { width: "30%"},
+                      key: 'cnpj',
+                        label:'Cnpj',
+                        sortable: false,
+                        thStyle: { width: "10%" },
+                        formatter: 'mascaraCnpj',
                         tdClass: 'fonteLinhasLeft'
-                      },
-                       {
-                        key: 'cnpj',
-                         label:'Cnpj',
-                         sortable: false,
-                         thStyle: { width: "10%" },
-                         formatter: 'mascaraCnpj',
-                         tdClass: 'fonteLinhasLeft'
-                      },
-                      {
-                         key: 'exercicio',
-                         label:'Exercicio',
-                         sortable: true,
-                         tdClass: 'fonteLinhas'
-                      },
-                      {
-                         key: 'remessa',
-                         label:'Remessa',
-                         sortable: true,
-                         
-                         tdClass: 'fonteLinhas'
-                      },   
-                      {
-                         key: 'relatoria',
-                         label:'Relatoria',
-                         sortable: false,
+                    },
+                    {
+                        key: 'exercicio',
+                        label:'Exercicio',
+                        sortable: true,
                         tdClass: 'fonteLinhas'
-                      },
-                       
-                   
-                      {
-                          key: 'dataEntrega',
-                          label:'Data Entrega',
-                          sortable: false,
-                          formatter: 'formatarData',
-                           thStyle: { width: "10%",  },
-                          tdClass: 'fonteLinhasLeft'
-                      },
-                      {
-                          key: 'dataAssinatura',
-                          label:'Data Assinatura',
-                          sortable: true,
-                          formatter: 'formatarData',
-                          thStyle: { width: "10%",  },
-                          tdClass: 'fonteLinhasLeft'
-                      },
-                      {
-                        key: 'contAssinaturas',
-                        label:'Qtd. Assinaturas',
-                        thStyle: { width: "10%",  },
-                        tdClass: 'fonteLinhas',
-                        sortable: true
-                      },
-
-                       {
-                        key: 'assinaturas',
-                        label:'Assinaturas',
-                        tdClass: 'fonteLinhas',
-                        sortable: true
-                      },
-
-                      {
-                        key: 'status',
-                        label:'Status',
-                        tdClass: 'fonteLinhas',
-                        sortable: true
-                      }
+                    },
+                    {
+                        key: 'remessa',
+                        label:'Remessa',
+                        sortable: true,
+                        
+                        tdClass: 'fonteLinhas'
+                    },   
+                    {
+                        key: 'relatoria',
+                        label:'Relatoria',
+                        sortable: false,
+                      tdClass: 'fonteLinhas'
+                    },
                       
-          ],
+                  
+                    {
+                        key: 'dataEntrega',
+                        label:'Data Entrega',
+                        sortable: false,
+                        formatter: 'formatarData',
+                          thStyle: { width: "10%",  },
+                        tdClass: 'fonteLinhasLeft'
+                    },
+                    {
+                        key: 'dataAssinatura',
+                        label:'Data Assinatura',
+                        sortable: true,
+                        formatter: 'formatarData',
+                        thStyle: { width: "10%",  },
+                        tdClass: 'fonteLinhasLeft'
+                    },
+                    {
+                      key: 'contAssinaturas',
+                      label:'Qtd. Assinaturas',
+                      thStyle: { width: "10%",  },
+                      tdClass: 'fonteLinhas',
+                      sortable: true
+                    },
+
+                      {
+                      key: 'assinaturas',
+                      label:'Assinaturas',
+                      tdClass: 'fonteLinhas',
+                      sortable: true
+                    },
+
+                    {
+                      key: 'status',
+                      label:'Status',
+                      tdClass: 'fonteLinhas',
+                      sortable: true
+                    }
+                    
+            ],
          
             formdata:{
                exercicio: 0,
@@ -306,6 +307,7 @@ export default {
        
        mounted(){
             this.isBusy = false
+            this.ActionFindExercicio().then(resp => console.log(resp.data))
             this.pesquisar()
             //  this.ActionFind(),
             //  setTimeout(() =>{// aguarda com spinner antes da pesquisa aparecer na pesquisa inicial
@@ -322,6 +324,7 @@ export default {
                   ...mapActions('remessas', ['ActionFind']),
                   ...mapActions('remessas', ['ActionFindByRemessa']),
                   ...mapActions('remessas', ['ActionFindByExercicio']),
+                  ...mapActions('remessas', ['ActionFindExercicio']),
 
 
                   iconStatusTitle(item){
