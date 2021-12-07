@@ -296,19 +296,24 @@ export default {
             value: p ,
             text: ""+p 
         }});
+     
       });
     },
     pesquisarRemessas() {
       api.get("/remessa/"+this.formdata.exercicio).then(resp => {
+
         console.log("resp.data remessa",resp.data)
         this.formdata.remessas = resp.data.map(p =>{return {
             value: p ,
             text: ""+p 
-        }});
+        }}
+        );
+        
+
       });
     },
-    pesquisarRemesssa() {
-      api.get("filaProcessamento/processos").then((resp) => {
+    pesquisarRemesssa(exercicio, remessa) {
+      api.get("filaProcessamento/processos/"+exercicio+"/"+remessa).then((resp) => {
         
         this.processos = resp.data 
         });

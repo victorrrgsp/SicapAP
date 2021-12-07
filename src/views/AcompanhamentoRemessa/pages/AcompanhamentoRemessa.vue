@@ -334,6 +334,8 @@ export default {
                          value: p ,
                          text: ""+p 
                       }});
+                       this.formdata.exercicios[this.formdata.exercicios.length] = {value : 0 , text:'Todos'} 
+                       this.formdata.exercicio = 0
                     });
                   },
                   pesquisarRemessas() {
@@ -343,6 +345,8 @@ export default {
                          value: p ,
                          text: ""+p 
                       }});
+                       this.formdata.remessas[this.formdata.remessas.length] ={value : 0 , text:'Todos'} 
+                       this.formdata.remessa = 0
                     });
                   },
                   iconStatusTitle(item){
