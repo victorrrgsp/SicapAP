@@ -7,7 +7,7 @@
         </b-nav>
       </b-card-header>
      <b-row>
-      <b-col  >
+      &nbsp;&nbsp;&nbsp; <b-col  >
          <p align="left" >
               <b-form-group
                 label-for="filter-input"
@@ -22,7 +22,7 @@
                           v-model="filterform"
                           type="search"
                           placeholder="Pesquise aqui..."
-                        >
+                        >  <b-button  @click=" filter = filterform ">pesquisar</b-button>
                         </b-form-input>
 
                         <b-input-group-append>
@@ -39,7 +39,7 @@
               &nbsp;   
                <b>Remessa:</b> &nbsp; <b-form-select class="select-selected" v-model="formdata.remessa" :options="formdata.remessas"> </b-form-select>
               &nbsp;   
-              <b-button @click="pesquisarRemesssa" pill variant="success" size="sm"> Pesquisar </b-button>
+              <b-button @click="pesquisar" pill variant="success" size="sm"> Pesquisar </b-button> &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
         </p>
       </b-col>
 
@@ -52,9 +52,8 @@
         striped 
         hover 
         responsive 
-        sticky-header="700px" 
+        sticky-header="450px" 
         id="my-table"
-        filter-debounce = 5500
         :busy="isBusy"
         :items="tableData" 
         :filter="filter"
@@ -281,12 +280,12 @@ export default {
             ],
          
             formdata:{
-               exercicio: 0,
+               exercicio: 2021,
                exercicios: [
                             
                             { value: '2021', text: '2021' }
                            ],
-               remessa: 0,
+               remessa: 10,
                remessas: [
 
                             
@@ -307,7 +306,7 @@ export default {
        
        mounted(){
             this.isBusy = false
-            this.ActionFindExercicio().then(resp => console.log(resp.data))
+            this.ActionFindExercicio().then() 
             this.pesquisar()
             //  this.ActionFind(),
             //  setTimeout(() =>{// aguarda com spinner antes da pesquisa aparecer na pesquisa inicial
@@ -398,7 +397,7 @@ export default {
                   },
                   async pesquisar() {
                                   this.isBusy = !this.isBusy //loading
-                                  await this.ActionFind()
+                                  await this.ActionFind(this.formdata)
                                   this.isBusy = false
                   },
 
@@ -502,7 +501,7 @@ export default {
                       } else {
                         this.statusGestor = 'Sem Permissão';
                       }
-                        console.log(data)
+                     
                   },
 
                   async findRh (chave) {
@@ -514,7 +513,7 @@ export default {
                       } else {
                         this.statusRh = 'Sem Permissão';
                       }
-                        console.log(data)
+                       
                   },
 
                   async findControleInterno(chave)  {
@@ -526,7 +525,7 @@ export default {
                       } else {
                         this.statusCI = data;
                       }
-                      console.log(data)
+                   
                   },
 
                   async getResponsavel(cargo,chave) {
