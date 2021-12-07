@@ -14,7 +14,7 @@
           striped
           hover
           responsive
-          sticky-header="700px"
+          sticky-header="450px"
           id="table"
           :items="fila"
           :fields="items2"
@@ -41,7 +41,7 @@
         </b-nav>
       </b-card-header>
       <b-row>
-      <b-col  >
+       &nbsp;&nbsp;&nbsp;<b-col  >
          <p align="left" >
               <b-form-group
                 label-for="filter-input"
@@ -53,14 +53,15 @@
                 <b-input-group size="sm">
                         <b-form-input
                           id="filter-input"
-                          v-model.lazy="filterForm"
+                          v-model="filterForm"
                           type="search"
                           placeholder="Pesquise aqui..."
+                          @v-on:keyuo.13="filter = filterForm"
                         >
                         </b-form-input>
 
                         <b-input-group-append>
-                          <b-button @click="filter = 'filterForm'">pesquisar</b-button>
+                          <b-button @click="filter = filterForm">pesquisar</b-button>
                         </b-input-group-append>
                 </b-input-group>
               </b-form-group>
@@ -73,7 +74,7 @@
               &nbsp;   
                <b>Remessa:</b> &nbsp; <b-form-select class="select-selected" v-model="formdata.remessa" :options="formdata.remessas"> </b-form-select>
               &nbsp;   
-              <b-button @click="pesquisarRemesssa" pill variant="success" size="sm"> Pesquisar </b-button>
+              <b-button @click="pesquisarRemesssa(formdata.exercicio, formdata.remessa)" pill variant="success" size="sm"> Pesquisar </b-button> &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
         </p>
       </b-col>
 
@@ -87,11 +88,11 @@
           striped
           hover
           responsive
-          sticky-header="700px"
+          sticky-header="450px"
           id="my-table"
           :filter="filter"
           :items="processos"
-          :filter-debounce = 5000
+          
           :filter-included-fields="['nome']"
           :fields="items"
           :per-page="perPage"
@@ -100,6 +101,7 @@
           :tbody-tr-class="rowClass"
          small
         >
+
           <template #table-busy>
             <div class="text-center text-danger my-2">
               <b-spinner class="align-middle"></b-spinner>
@@ -159,15 +161,15 @@ export default {
       filterForm:null,
       processos: [],
       formdata:{
-               exercicio: null,
+               exercicio: 2021,
                exercicios: [
-                            { value: null, text: 'Todos' },
+                           
                             { value: 2021, text: '2021' },
                            ],
-               remessa: null,
+               remessa: 10,
                remessas: [
 
-                            { value: null, text: 'Todos' },
+                            
                             { value: 1, text: '1' },
                             { value: 2, text: '2' },
                             { value: 3, text: '3' },
@@ -186,7 +188,7 @@ export default {
           key: "nome",
           label: "Unidade Gestora",
           sortable: true,
-          //tdClass: 'fonteLinhasLeft'
+          tdClass: 'fonteLinhasLeft'
           // formatter: 'todasMaiusculas'
         },
 
@@ -230,6 +232,7 @@ export default {
           key: "nome",
           label: "Unidade Gestora",
           sortable: true,
+          tdClass: 'fonteLinhasLeft'
           // formatter: 'todasMaiusculas'
         },
 
@@ -237,11 +240,13 @@ export default {
           key: "exercicio",
           label: "Exercicio",
           sortable: true,
+          tdClass: 'fonteLinhas'
         },
         {
           key: "remessa",
           label: "Remessa",
           sortable: true,
+          tdClass: 'fonteLinhas'
         },
 
         {
@@ -249,16 +254,19 @@ export default {
           label: "Data Envio",
           sortable: false,
           formatter: "formatarData",
+          tdClass: 'fonteLinhas'
         },
         {
           key: "posicao",
           label: "Posição",
           sortable: true,
+          tdClass: 'fonteLinhas'
         },
         {
           key: "status",
           label: "Status",
           sortable: false,
+          tdClass: 'fonteLinhas'
           //formatter: "rowClass"
         },
       ],
@@ -280,11 +288,11 @@ export default {
   },
   methods: {
     
-    pesquisarRemesssa() {
-      api.get("filaProcessamento/processos").then((resp) => {
+    pesquisarRemesssa(exercicio, remessa) {
+      api.get("filaProcessamento/processos/"+exercicio+"/"+remessa).then((resp) => {
         
-        this.processos = resp.data.filter(p => {return !( p.remessa !== this.formdata.remessa && p.exercicio !== this.formdata.exercicio)} );
-      });
+        this.processos = resp.data 
+        });
     },
     FindAll() {
       api.get("filaProcessamento/processos").then((resp) => {

@@ -3,8 +3,8 @@ import * as types from './mutation-types'
 import {api} from '@/plugins/axios'
 
 
-export const ActionFind = ({ commit }, payload) => (
-        api.get('/externo/acompanhamentoRemessa/all/'+payload.exercicio+'/'+payload.remessa).then(resp => {
+export const ActionFind = ({ commit }) => (
+        api.get('/externo/acompanhamentoRemessa/all/').then(resp => {
             commit(types.SET_DADOS, resp.data)
         })
 )

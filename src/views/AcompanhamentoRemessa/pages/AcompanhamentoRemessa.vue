@@ -39,7 +39,7 @@
               &nbsp;   
                <b>Remessa:</b> &nbsp; <b-form-select class="select-selected" v-model="formdata.remessa" :options="formdata.remessas"> </b-form-select>
               &nbsp;   
-              <b-button @click="pesquisar" pill variant="success" size="sm"> Pesquisar </b-button> &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+              <b-button @click="pesquisarRemesssa" pill variant="success" size="sm"> Pesquisar </b-button> &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
         </p>
       </b-col>
 
@@ -282,13 +282,13 @@ export default {
             formdata:{
                exercicio: 2021,
                exercicios: [
-                            
+                            { value: '0', text: 'Todos' },
                             { value: '2021', text: '2021' }
                            ],
                remessa: 10,
                remessas: [
 
-                            
+                            { value: '0', text: 'Todos'},
                             { value: '10', text: '10'},
                             { value: '9', text: '9' },
                             { value: '8', text: '8' },
@@ -397,7 +397,7 @@ export default {
                   },
                   async pesquisar() {
                                   this.isBusy = !this.isBusy //loading
-                                  await this.ActionFind(this.formdata)
+                                  await this.ActionFind()
                                   this.isBusy = false
                   },
 
