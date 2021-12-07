@@ -50,6 +50,7 @@ public class AssinarRemessaRepository extends DefaultRepository<String, String> 
                             "         where upc.CodigoCargo in (:tipo)" +
                             "           and (dataInicio <= :date and (datafim is null or datafim >= :date))" +
                             "           and i.idUnidadeGestora = :unidade" +
+                            "           and pj.CNPJ = :unidade " +
                             "           and c.Exercicio = :exercicio" +
                             "           and c.Bimestre = :remessa" +
                             "           and ua.Aplicacao = 29" +
