@@ -308,6 +308,8 @@ export default {
             this.isBusy = false
             this.ActionFindExercicio().then() 
             this.pesquisar()
+            this.pesquisarExercicios()
+            this.pesquisarRemessas()
             //  this.ActionFind(),
             //  setTimeout(() =>{// aguarda com spinner antes da pesquisa aparecer na pesquisa inicial
             //       this.isBusy = false
@@ -325,7 +327,24 @@ export default {
                   ...mapActions('remessas', ['ActionFindByExercicio']),
                   ...mapActions('remessas', ['ActionFindExercicio']),
 
-
+                  pesquisarExercicios() {
+                    api.get("/exercicio").then(resp => {
+                      console.log("resp.data",resp.data)
+                      this.formdata.exercicios = resp.data.map(p =>{return {
+                         value: p ,
+                         text: ""+p 
+                      }});
+                    });
+                  },
+                  pesquisarRemessas() {
+                    api.get("/remessa/"+this.formdata.exercicio).then(resp => {
+                      console.log("resp.data remessa",resp.data)
+                      this.formdata.remessas = resp.data.map(p =>{return {
+                         value: p ,
+                         text: ""+p 
+                      }});
+                    });
+                  },
                   iconStatusTitle(item){
                       if(item.contAssinaturas > 2){
                               return 'Assinado'

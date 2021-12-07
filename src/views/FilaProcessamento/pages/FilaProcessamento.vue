@@ -164,22 +164,22 @@ export default {
                exercicio: 2021,
                exercicios: [
                            
-                            { value: 2021, text: '2021' },
+                            { value: '2021', text: '2021' },
                            ],
                remessa: 10,
                remessas: [
 
                             
-                            { value: 1, text: '1' },
-                            { value: 2, text: '2' },
-                            { value: 3, text: '3' },
-                            { value: 4, text: '4' },
-                            { value: 5, text: '5' },
-                            { value: 6, text: '6' },
-                            { value: 7, text: '7' },
-                            { value: 8, text: '8' },
-                            { value: 9, text: '9' },
-                            { value: 10, text: '10' }
+                            { value: '10', text: '10'},
+                            { value: '9', text: '9' },
+                            { value: '8', text: '8' },
+                            { value: '7', text: '7' },
+                            { value: '6', text: '6' },
+                            { value: '5', text: '5' },
+                            { value: '4', text: '4' },
+                            { value: '3', text: '3' },
+                            { value: '2', text: '2' },
+                            { value: '1', text: '1' },
                           ]
             },
       fila: [],
@@ -275,6 +275,8 @@ export default {
   mounted() {
     this.isBusy = true
     this.FindAll();
+    this.pesquisarExercicios()
+    this.pesquisarRemessas()
     //  setTimeout(() =>{// aguarda com spinner antes da pesquisa aparecer na pesquisa inicial
     //               this.isBusy = false
     //               }, 1.0*1000)
@@ -287,9 +289,26 @@ export default {
   
   },
   methods: {
-    
-    pesquisarRemesssa(exercicio, remessa) {
-      api.get("filaProcessamento/processos/"+exercicio+"/"+remessa).then((resp) => {
+    pesquisarExercicios() {
+      api.get("/exercicio").then(resp => {
+        console.log("resp.data",resp.data)
+        this.formdata.exercicios = resp.data.map(p =>{return {
+            value: p ,
+            text: ""+p 
+        }});
+      });
+    },
+    pesquisarRemessas() {
+      api.get("/remessa/"+this.formdata.exercicio).then(resp => {
+        console.log("resp.data remessa",resp.data)
+        this.formdata.remessas = resp.data.map(p =>{return {
+            value: p ,
+            text: ""+p 
+        }});
+      });
+    },
+    pesquisarRemesssa() {
+      api.get("filaProcessamento/processos").then((resp) => {
         
         this.processos = resp.data 
         });
