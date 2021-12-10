@@ -1,6 +1,8 @@
 package com.example.sicapweb.web.controller.ap.concurso;
 
 import br.gov.to.tce.model.ap.concurso.EditalVaga;
+
+import com.example.sicapweb.exception.InvalitInsert;
 import com.example.sicapweb.repository.concurso.EditalRepository;
 import com.example.sicapweb.repository.concurso.EditalVagaRepository;
 import com.example.sicapweb.repository.geral.CargoRepository;
@@ -22,7 +24,7 @@ import java.util.List;
 @RequestMapping({"/concursoVaga"})
 public class EditalVagaController extends DefaultController<EditalVaga> {
 
-    @Autowired
+    
     private EditalVagaRepository editalVagaRepository;
 
     @Autowired
@@ -37,6 +39,7 @@ public class EditalVagaController extends DefaultController<EditalVaga> {
     @CrossOrigin
     @GetMapping(path="/{searchParams}/{tipoParams}/pagination")
     public ResponseEntity<PaginacaoUtil<EditalVaga>> listVagas(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
+        
         PaginacaoUtil<EditalVaga> paginacaoUtil = editalVagaRepository.buscaPaginada(pageable,searchParams,tipoParams);
         return ResponseEntity.ok().body(paginacaoUtil);
     }
@@ -59,26 +62,38 @@ public class EditalVagaController extends DefaultController<EditalVaga> {
     @Transactional
     @PostMapping
     public ResponseEntity<EditalVaga> create(@RequestBody EditalVaga editalVaga) {
-        editalVaga.setChave(editalVagaRepository.buscarPrimeiraRemessa());
-        editalVaga.setEdital(editalRepository.buscarEditalPorNumero(editalVaga.getNumeroEdital()));
-        editalVaga.setUnidadeAdministrativa(unidadeAdministrativaRepository.buscarUnidadePorcodigo(editalVaga.codigoUnidadeAdministrativa));
-        editalVaga.setCargo(cargoRepository.buscarCargoPorcodigo(editalVaga.codigoCargo));
-        editalVagaRepository.save(editalVaga);
-        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(editalVaga.getId()).toUri();
-        return ResponseEntity.created(uri).body(editalVaga);
+        try {
+            
+            editalVaga.setChave(editalVagaRepository.buscarPrimeiraRemessa());
+            editalVaga.setEdital(editalRepository.buscarEditalPorNumero(editalVaga.getNumeroEdital()));
+            editalVaga.setUnidadeAdministrativa(unidadeAdministrativaRepository.buscarUnidadePorcodigo(editalVaga.codigoUnidadeAdministrativa));
+            editalVaga.setCargo(cargoRepository.buscarCargoPorcodigo(editalVaga.codigoCargo));
+            editalVagaRepository.save(editalVaga);
+            URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(editalVaga.getId()).toUri();
+            return ResponseEntity.created(uri).body(editalVaga);
+        } catch (Exception e) {
+            throw new InvalitInsert("Erro na insersao de dados, por favor cheque os canpos enviados ");
+            //TODO: handle exception
+        }
     }
 
     @CrossOrigin
     @Transactional
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.PUT)
     public ResponseEntity<EditalVaga> update(@RequestBody EditalVaga editalVaga, @PathVariable BigInteger id){
-        editalVaga.setId(id);
-        editalVaga.setChave(editalVagaRepository.buscarPrimeiraRemessa());
-        editalVaga.setEdital(editalRepository.buscarEditalPorNumero(editalVaga.getNumeroEdital()));
-        editalVaga.setUnidadeAdministrativa(unidadeAdministrativaRepository.buscarUnidadePorcodigo(editalVaga.codigoUnidadeAdministrativa));
-        editalVaga.setCargo(cargoRepository.buscarCargoPorcodigo(editalVaga.codigoCargo));
-        editalVagaRepository.update(editalVaga);
-        return ResponseEntity.noContent().build();
+        try {
+            
+            editalVaga.setId(id);
+            editalVaga.setChave(editalVagaRepository.buscarPrimeiraRemessa());
+            editalVaga.setEdital(editalRepository.buscarEditalPorNumero(editalVaga.getNumeroEdital()));
+            editalVaga.setUnidadeAdministrativa(unidadeAdministrativaRepository.buscarUnidadePorcodigo(editalVaga.codigoUnidadeAdministrativa));
+            editalVaga.setCargo(cargoRepository.buscarCargoPorcodigo(editalVaga.codigoCargo));
+            editalVagaRepository.update(editalVaga);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            throw new InvalitInsert("Erro na ATALIZACAO de dados, por favor cheque os canpos enviados ");
+            //TODO: handle exception
+        }
     }
 
     @CrossOrigin

@@ -2,6 +2,8 @@ package com.example.sicapweb.web.controller.ap.geral;
 
 import br.gov.to.tce.model.CastorFile;
 import br.gov.to.tce.model.ap.relacional.Lei;
+
+import com.example.sicapweb.exception.InvalitInsert;
 import com.example.sicapweb.repository.geral.AtoRepository;
 import com.example.sicapweb.repository.geral.LeiRepository;
 import com.example.sicapweb.util.PaginacaoUtil;
@@ -50,23 +52,35 @@ public class LeiController extends DefaultController<Lei> {
     @CrossOrigin
     @PostMapping
     public ResponseEntity<Lei> create(@RequestBody Lei lei) {
-        lei.setChave(leiRepository.buscarPrimeiraRemessa());
-
-        leiRepository.save(lei);
-        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(lei.getId()).toUri();
-        return ResponseEntity.created(uri).body(lei);
+        try {
+            
+            lei.setChave(leiRepository.buscarPrimeiraRemessa());
+            
+            leiRepository.save(lei);
+            URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(lei.getId()).toUri();
+            return ResponseEntity.created(uri).body(lei);
+        }  catch (Exception e) {
+            throw new InvalitInsert("Erro na insersao de dados, por favor cheque os canpos enviados ");
+            //TODO: handle exception
+        }
     }
-
+        
     @CrossOrigin
     @Transactional
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.PUT)
     public ResponseEntity<Lei> update(@RequestBody Lei lei, @PathVariable BigInteger id) {
-        lei.setChave(atoRepository.buscarPrimeiraRemessa());
-        lei.setAto(atoRepository.findById(lei.getAto().getId()));
-        lei.setId(id);
-
-        leiRepository.update(lei);
-        return ResponseEntity.noContent().build();
+        try {
+            
+            lei.setChave(atoRepository.buscarPrimeiraRemessa());
+            lei.setAto(atoRepository.findById(lei.getAto().getId()));
+            lei.setId(id);
+            
+            leiRepository.update(lei);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            throw new InvalitInsert("Erro na insersao de dados, por favor cheque os canpos enviados ");
+            //TODO: handle exception
+        }
     }
 
     @CrossOrigin
