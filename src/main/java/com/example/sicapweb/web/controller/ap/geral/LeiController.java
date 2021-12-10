@@ -78,7 +78,7 @@ public class LeiController extends DefaultController<Lei> {
             leiRepository.update(lei);
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
-            throw new InvalitInsert("Erro na insersao de dados, por favor cheque os canpos enviados ");
+            throw new InvalitInsert("Erro na insersao de dados, por favor cheque os campos enviados ");
             //TODO: handle exception
         }
     }

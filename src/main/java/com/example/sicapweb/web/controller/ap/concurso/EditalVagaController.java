@@ -72,7 +72,7 @@ public class EditalVagaController extends DefaultController<EditalVaga> {
             URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(editalVaga.getId()).toUri();
             return ResponseEntity.created(uri).body(editalVaga);
         } catch (Exception e) {
-            throw new InvalitInsert("Erro na insersao de dados, por favor cheque os canpos enviados ");
+            throw new InvalitInsert("Erro na insersao de dados, por favor cheque os campos enviados ");
             //TODO: handle exception
         }
     }
