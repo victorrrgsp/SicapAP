@@ -46,7 +46,7 @@
               <b-form-group
                 label-for="filter-input"
                 label-cols-sm="3"
-                label-align-sm="right"
+                label-align-sm="left"
                 label-size="sm"
                 class="mb-0"
               >
@@ -187,7 +187,7 @@ export default {
           key: "nome",
           label: "Unidade Gestora",
           sortable: true,
-          tdClass: 'fonteLinhasLeft'
+          tdClass: 'fonteLinhaLeft'
           // formatter: 'todasMaiusculas'
         },
 
@@ -195,13 +195,13 @@ export default {
           key: "exercicio",
           label: "Exercicio",
           sortable: true,
-          tdClass: 'fonteLinhas'
+          tdClass: 'fonteLinha'
         },
         {
           key: "remessa",
           label: "Remessa",
           sortable: true,
-          tdClass: 'fonteLinhas'
+          tdClass: 'fonteLinha'
         },
 
         {
@@ -209,20 +209,20 @@ export default {
           label: "Data Envio",
           formatter: "formatarData",
           sortable: false,
-          tdClass: 'fonteLinhas'
+          tdClass: 'fonteLinha'
         },
         {
           key: "dataProcessamento",
           label: "Data Procesamento",
           formatter: "formatarData",
           sortable: true,
-          tdClass: 'fonteLinhas'
+          tdClass: 'fonteLinha'
         },
         {
         key: 'status',
         label:'Status',
         sortable: false,
-        tdClass: 'fonteLinhas'
+        tdClass: 'fonteLinha'
 
         },
       ],
@@ -231,7 +231,7 @@ export default {
           key: "nome",
           label: "Unidade Gestora",
           sortable: true,
-          tdClass: 'fonteLinhasLeft'
+          tdClass: 'fonteLinhaLeft'
           // formatter: 'todasMaiusculas'
         },
 
@@ -239,13 +239,13 @@ export default {
           key: "exercicio",
           label: "Exercicio",
           sortable: true,
-          tdClass: 'fonteLinhas'
+          tdClass: 'fonteLinha'
         },
         {
           key: "remessa",
           label: "Remessa",
           sortable: true,
-          tdClass: 'fonteLinhas'
+          tdClass: 'fonteLinha'
         },
 
         {
@@ -253,19 +253,19 @@ export default {
           label: "Data Envio",
           sortable: false,
           formatter: "formatarData",
-          tdClass: 'fonteLinhas'
+          tdClass: 'fonteLinha'
         },
         {
           key: "posicao",
           label: "Posição",
           sortable: true,
-          tdClass: 'fonteLinhas'
+          tdClass: 'fonteLinha'
         },
         {
           key: "status",
           label: "Status",
           sortable: false,
-          tdClass: 'fonteLinhas'
+          tdClass: 'fonteLinha'
           //formatter: "rowClass"
         },
       ],
@@ -375,11 +375,11 @@ export default {
 </script>
 <style >
 
-.fonteLinhas {
+.fonteLinha {
    font-size:14px;
    text-align: left;
 }
-.fonteLinhasLeft {
+.fonteLinhaLeft {
    font-size:14px;
 
 }
