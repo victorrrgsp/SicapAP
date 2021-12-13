@@ -92,7 +92,6 @@
           id="my-table"
           :filter="filter"
           :items="processos"
-          
           :filter-included-fields="['nome']"
           :fields="items"
           :per-page="perPage"
@@ -378,7 +377,7 @@ export default {
 
 .fonteLinhas {
    font-size:14px;
-   text-align: center
+   text-align: left;
 }
 .fonteLinhasLeft {
    font-size:14px;
