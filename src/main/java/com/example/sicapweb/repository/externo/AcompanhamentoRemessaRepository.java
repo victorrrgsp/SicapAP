@@ -47,6 +47,7 @@ public class AcompanhamentoRemessaRepository extends DefaultRepository<String, S
                             "         where upc.CodigoCargo in (:tipo)" +
                             "           and (dataInicio <= :date and (datafim is null or datafim >= :date))" +
                             "           and i.idUnidadeGestora = :unidade" +
+                            "           and  pj.cnpj  = :unidade" +
                             "           and c.Exercicio = :exercicio" +
                             "           and c.Bimestre = :remessa" +
                             "           and ua.Aplicacao = 29" +
