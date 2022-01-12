@@ -1,7 +1,6 @@
 package com.example.sicapweb.web.controller.ap.concurso;
 
 import br.gov.to.tce.model.ap.concurso.EditalVaga;
-
 import com.example.sicapweb.exception.InvalitInsert;
 import com.example.sicapweb.repository.concurso.EditalRepository;
 import com.example.sicapweb.repository.concurso.EditalVagaRepository;
@@ -24,7 +23,7 @@ import java.util.List;
 @RequestMapping({"/concursoVaga"})
 public class EditalVagaController extends DefaultController<EditalVaga> {
 
-    
+    @Autowired
     private EditalVagaRepository editalVagaRepository;
 
     @Autowired
