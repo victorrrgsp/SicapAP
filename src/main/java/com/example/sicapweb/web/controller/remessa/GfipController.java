@@ -138,4 +138,6 @@ public class GfipController extends DefaultController<InfoRemessa> {
         Gfip list = gfipRepository.buscarDocumentoGfip(chave, tipo).get(0);
         return ResponseEntity.ok().body(list);
     }
+
+
 }
