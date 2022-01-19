@@ -1,5 +1,6 @@
 package com.example.sicapweb.repository.geral;
 
+import br.gov.to.tce.model.ap.estatico.CargoNome;
 import br.gov.to.tce.model.ap.relacional.Cargo;
 import com.example.sicapweb.repository.DefaultRepository;
 import org.springframework.stereotype.Repository;
@@ -29,6 +30,11 @@ public class CargoRepository extends DefaultRepository<Cargo, BigInteger> {
   public List<Cargo> buscaTodosCargo() {
     List<Cargo> list = entityManager.createNativeQuery("select * from Cargo ORDER BY nomeCargo ASC"
       , Cargo.class).getResultList();
+    return list;
+  }
+  public List<CargoNome> buscaTodosCargoNome() {
+    List<CargoNome> list = entityManager.createNativeQuery("select * from CargoNome "
+      , CargoNome.class).getResultList();
     return list;
   }
 }
