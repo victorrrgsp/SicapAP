@@ -1,12 +1,12 @@
 package com.example.sicapweb.web.controller.ap.geral;
 
-import br.gov.to.tce.model.ap.pessoal.Pensao;
 import br.gov.to.tce.model.ap.relacional.Ato;
 import com.example.sicapweb.repository.geral.AtoRepository;
 import com.example.sicapweb.util.PaginacaoUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
@@ -37,6 +37,17 @@ public class AtoController {
     public ResponseEntity<?> findById(@PathVariable BigInteger id) {
         Ato list = atoRepository.findById(id);
         return ResponseEntity.ok().body(list);
+    }
+
+    @CrossOrigin
+    @Transactional
+    @RequestMapping(value = {"/{id}"}, method = RequestMethod.PUT)
+    public ResponseEntity<Ato> update(@RequestBody Ato ato, @PathVariable BigInteger id) {
+        Ato atoBanco = atoRepository.findById(id);
+        ato.setId(id);
+        ato.setChave(atoBanco.getChave());
+        atoRepository.update(ato);
+        return ResponseEntity.noContent().build();
     }
 
 }
