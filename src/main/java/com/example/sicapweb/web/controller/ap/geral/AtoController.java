@@ -1,5 +1,6 @@
 package com.example.sicapweb.web.controller.ap.geral;
 
+import br.gov.to.tce.model.InfoRemessa;
 import br.gov.to.tce.model.ap.relacional.Ato;
 import com.example.sicapweb.repository.geral.AtoRepository;
 import com.example.sicapweb.util.PaginacaoUtil;
@@ -43,9 +44,11 @@ public class AtoController {
     @Transactional
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.PUT)
     public ResponseEntity<Ato> update(@RequestBody Ato ato, @PathVariable BigInteger id) {
-        Ato atoBanco = atoRepository.findById(id);
+        InfoRemessa chave = atoRepository.findById(id).getChave();
+        ato.setNumeroAto(ato.getNumeroAto().replace("/", ""));
+        ato.setCnpjUgPublicacao(ato.getCnpjUgPublicacao().replace(".", "").replace("-", "").replace("/", ""));
         ato.setId(id);
-        ato.setChave(atoBanco.getChave());
+        ato.setChave(chave);
         atoRepository.update(ato);
         return ResponseEntity.noContent().build();
     }
