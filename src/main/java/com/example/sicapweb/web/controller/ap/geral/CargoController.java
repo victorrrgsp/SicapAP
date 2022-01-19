@@ -37,6 +37,16 @@ public class CargoController {
     }
 
     @CrossOrigin
+    @RequestMapping(value = {"/{id}"}, method = RequestMethod.PUT)
+    public ResponseEntity<Cargo> update(@RequestBody Cargo cargo, @PathVariable BigInteger id) {
+        cargo.setChave(cargoRepository.buscarPrimeiraRemessa());
+        cargo.setId(id);
+        cargoRepository.update(cargo);
+        return ResponseEntity.noContent().build();
+    
+    }
+
+    @CrossOrigin
     @GetMapping(path = {"/todos"})
     public ResponseEntity<List<Cargo>> findTodos() {
         List<Cargo> list = cargoRepository.buscaTodosCargo();
