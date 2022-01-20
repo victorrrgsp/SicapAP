@@ -165,7 +165,8 @@ public class LoginController extends DefaultController<Login> {
 
             return ResponseEntity.ok().body(userLogado.getId());
         } catch (Exception e) {
-            // System.out.println("[falha]: " + e.toString());
+            System.out.println("[falha]: " + e.toString());
+            e.printStackTrace();
         }
 
         return ResponseEntity.ok().body("SemPermissao");
