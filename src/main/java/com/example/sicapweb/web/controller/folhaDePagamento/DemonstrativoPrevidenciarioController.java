@@ -3,6 +3,7 @@ package com.example.sicapweb.web.controller.folhaDePagamento;
 import br.gov.to.tce.model.ap.folha.DemonstrativoPrevidenciario;
 import com.example.sicapweb.repository.folhaDePagamento.DemonstrativoPrevidenciarioRepository;
 import com.example.sicapweb.util.PaginacaoUtil;
+import com.example.sicapweb.web.controller.DefaultController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -10,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
     @RestController
     @RequestMapping({"/folhaDePagamento/demonstrativoPrevidenciario"})
-    public class DemonstrativoPrevidenciarioController {
+    public class DemonstrativoPrevidenciarioController extends DefaultController<DemonstrativoPrevidenciario> {
 
         @Autowired
         private DemonstrativoPrevidenciarioRepository demonstrativoPrevidenciarioRepository;

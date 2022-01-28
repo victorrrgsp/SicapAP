@@ -37,11 +37,24 @@ import java.math.BigInteger;
     @Transactional
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.PUT)
     public ResponseEntity<Servidor> update(@RequestBody Servidor servidor, @PathVariable BigInteger id) {
-        InfoRemessa chave = servidorRepository.findById(id).getChave();
         servidor.setId(id);
+        InfoRemessa chave = servidorRepository.findById(id).getChave();
+        servidor.setCpfServidor(servidor.getCpfServidor().replace(".", "").replace("-", "").replace("/", ""));
+        if(servidor.getCpfConjuge() != null) {
+            servidor.setCpfConjuge(servidor.getCpfConjuge().replace(".", "").replace("-", "").replace("/", ""));
+        }
+        if(servidor.getCpfMae() != null) {
+            servidor.setCpfMae(servidor.getCpfMae().replace(".", "").replace("-", "").replace("/", ""));
+        }
         servidor.setChave(chave);
         servidorRepository.update(servidor);
         return ResponseEntity.noContent().build();
+    }
+    @CrossOrigin
+    @GetMapping(path = {"/findByCpf/{cpf}"})
+    public ResponseEntity<?> findByCpf(@PathVariable String cpf) {
+        Servidor list = servidorRepository.buscaServidorPorCpf(cpf);
+        return ResponseEntity.ok().body(list);
     }
 
     }

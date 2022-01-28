@@ -6,6 +6,7 @@ import br.gov.to.tce.model.ap.relacional.Lei;
 import br.gov.to.tce.model.ap.relacional.UnidadeAdministrativa;
 import com.example.sicapweb.repository.geral.UnidadeAdministrativaRepository;
 import com.example.sicapweb.util.PaginacaoUtil;
+import com.example.sicapweb.web.controller.DefaultController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +18,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping({"/unidadeAdministrativa"})
-public class UnidadeAdministrativaController {
+public class UnidadeAdministrativaController  extends DefaultController<UnidadeAdministrativa> {
 
     @Autowired
     private UnidadeAdministrativaRepository unidadeAdministrativaRepository;

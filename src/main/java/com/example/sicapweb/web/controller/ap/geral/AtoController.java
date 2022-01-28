@@ -2,8 +2,10 @@ package com.example.sicapweb.web.controller.ap.geral;
 
 import br.gov.to.tce.model.InfoRemessa;
 import br.gov.to.tce.model.ap.relacional.Ato;
+import br.gov.to.tce.model.ap.relacional.Cargo;
 import com.example.sicapweb.repository.geral.AtoRepository;
 import com.example.sicapweb.util.PaginacaoUtil;
+import com.example.sicapweb.web.controller.DefaultController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/ato")
-public class AtoController {
+public class AtoController extends DefaultController<Ato>  {
 
     @Autowired
     private AtoRepository atoRepository;
@@ -37,6 +39,12 @@ public class AtoController {
     @GetMapping(path = {"/{id}"})
     public ResponseEntity<?> findById(@PathVariable BigInteger id) {
         Ato list = atoRepository.findById(id);
+        return ResponseEntity.ok().body(list);
+    }
+    @CrossOrigin
+    @GetMapping(path = {"/{numero}/{tipo}"})
+    public ResponseEntity<?> findById(@PathVariable String numero, @PathVariable int tipo) {
+        Ato list = atoRepository.buscarAtoPorNumero(numero, tipo);
         return ResponseEntity.ok().body(list);
     }
 

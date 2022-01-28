@@ -2,6 +2,7 @@ package com.example.sicapweb.repository.geral;
 
 import br.gov.to.tce.model.ap.estatico.CargoNome;
 import br.gov.to.tce.model.ap.relacional.Cargo;
+import br.gov.to.tce.model.ap.relacional.UnidadeAdministrativa;
 import com.example.sicapweb.repository.DefaultRepository;
 import org.springframework.stereotype.Repository;
 
@@ -37,4 +38,6 @@ public class CargoRepository extends DefaultRepository<Cargo, BigInteger> {
       , CargoNome.class).getResultList();
     return list;
   }
+
+
 }

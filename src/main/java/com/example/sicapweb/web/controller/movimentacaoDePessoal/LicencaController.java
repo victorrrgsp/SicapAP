@@ -1,10 +1,12 @@
 package com.example.sicapweb.web.controller.movimentacaoDePessoal;
 
+import br.gov.to.tce.model.ap.pessoal.Cessao;
 import br.gov.to.tce.model.ap.pessoal.Desligamento;
 import br.gov.to.tce.model.ap.pessoal.Licenca;
 import com.example.sicapweb.repository.movimentacaoDePessoal.DesligamentoRepository;
 import com.example.sicapweb.repository.movimentacaoDePessoal.LicencaRepository;
 import com.example.sicapweb.util.PaginacaoUtil;
+import com.example.sicapweb.web.controller.DefaultController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
     @RestController
     @RequestMapping({"/movimentacaoDePessoal/licenca"})
-    public class LicencaController {
+    public class LicencaController extends DefaultController<Licenca> {
 
         @Autowired
         private LicencaRepository licencaRepository;

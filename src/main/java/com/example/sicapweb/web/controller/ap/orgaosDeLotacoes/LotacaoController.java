@@ -6,6 +6,7 @@ import br.gov.to.tce.model.ap.relacional.Lotacao;
 import com.example.sicapweb.repository.geral.UnidadeAdministrativaRepository;
 import com.example.sicapweb.repository.orgaosDeLotacoes.LotacaoRepository;
 import com.example.sicapweb.util.PaginacaoUtil;
+import com.example.sicapweb.web.controller.DefaultController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +17,7 @@ import java.math.BigInteger;
 
 @RestController
     @RequestMapping({"/orgaosDeLotacoes/lotacao"})
-    public class LotacaoController {
+    public class LotacaoController extends DefaultController<Lotacao> {
 
         @Autowired
         private LotacaoRepository lotacaoRepository;

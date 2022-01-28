@@ -1,8 +1,10 @@
 package com.example.sicapweb.web.controller.movimentacaoDePessoal;
 
+import br.gov.to.tce.model.ap.pessoal.Cessao;
 import br.gov.to.tce.model.ap.pessoal.Readaptacao;
 import com.example.sicapweb.repository.concessao.ReadaptacaoRepository;
 import com.example.sicapweb.util.PaginacaoUtil;
+import com.example.sicapweb.web.controller.DefaultController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -10,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
     @RestController
     @RequestMapping({"/movimentacaoDePessoal/readaptacao"})
-    public class ReadaptacaoController {
+    public class ReadaptacaoController extends DefaultController<Readaptacao> {
 
         @Autowired
         private ReadaptacaoRepository readaptacaoRepository;
