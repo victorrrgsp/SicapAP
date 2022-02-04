@@ -5,6 +5,8 @@ import br.gov.to.tce.model.ap.pessoal.Admissao;
 import br.gov.to.tce.model.ap.pessoal.Cessao;
 import br.gov.to.tce.model.ap.pessoal.Desligamento;
 import br.gov.to.tce.model.ap.relacional.Ato;
+
+import com.example.sicapweb.repository.geral.AtoRepository;
 import com.example.sicapweb.repository.movimentacaoDePessoal.AdmissaoRepository;
 import com.example.sicapweb.repository.movimentacaoDePessoal.DesligamentoRepository;
 import com.example.sicapweb.util.PaginacaoUtil;
@@ -21,15 +23,19 @@ import java.math.BigInteger;
     @RequestMapping({"/movimentacaoDePessoal/desligamento"})
     public class DesligamentoController extends DefaultController<Desligamento> {
 
-        @Autowired
-        private DesligamentoRepository desligamentoRepository;
+    @Autowired
+    private DesligamentoRepository desligamentoRepository;
+    @Autowired
+    private AtoRepository atoRepository;
+    @Autowired
+    private AdmissaoRepository admissaoRepository;
 
-        @CrossOrigin
-        @GetMapping(path="/{searchParams}/{tipoParams}/pagination")
-        public ResponseEntity<PaginacaoUtil<Desligamento>> listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
-            PaginacaoUtil<Desligamento> paginacaoUtil = desligamentoRepository.buscaPaginada(pageable,searchParams,tipoParams);
-            return ResponseEntity.ok().body(paginacaoUtil);
-        }
+    @CrossOrigin
+    @GetMapping(path="/{searchParams}/{tipoParams}/pagination")
+    public ResponseEntity<PaginacaoUtil<Desligamento>> listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
+        PaginacaoUtil<Desligamento> paginacaoUtil = desligamentoRepository.buscaPaginada(pageable,searchParams,tipoParams);
+        return ResponseEntity.ok().body(paginacaoUtil);
+    }
     @CrossOrigin
     @GetMapping(path = {"/{id}"})
     public ResponseEntity<?> findById(@PathVariable BigInteger id) {
@@ -41,9 +47,13 @@ import java.math.BigInteger;
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.PUT)
     public ResponseEntity<Desligamento> update(@RequestBody Desligamento desligamento, @PathVariable BigInteger id) {
         InfoRemessa chave = desligamentoRepository.findById(id).getChave();
-        desligamento.setNumeroAto(desligamento.getNumeroAto().replace("/", ""));
-        desligamento.setId(id);
+       // InfoRemessa chave = desligamentoRepository.findById(id).getAdmissao().getChave();
         desligamento.setChave(chave);
+        
+        //desligamento.setNumeroAto(desligamento.getNumeroAto().replace("/", ""));
+        desligamento.setId(id);
+        desligamento.setAto(atoRepository.findById(desligamento.getAto().getId()));
+        desligamento.setAdmissao(admissaoRepository.findById(desligamento.getAdmissao().getId()));
         desligamentoRepository.update(desligamento);
         return ResponseEntity.noContent().build();
     }
