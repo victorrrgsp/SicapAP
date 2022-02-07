@@ -1,15 +1,20 @@
 package com.example.sicapweb.web.controller.folhaDePagamento;
 
+import br.gov.to.tce.model.InfoRemessa;
 import br.gov.to.tce.model.ap.folha.DemonstrativoPrevidenciario;
+import br.gov.to.tce.model.ap.pessoal.Licenca;
 import com.example.sicapweb.repository.folhaDePagamento.DemonstrativoPrevidenciarioRepository;
 import com.example.sicapweb.util.PaginacaoUtil;
 import com.example.sicapweb.web.controller.DefaultController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-    @RestController
+import java.math.BigInteger;
+
+@RestController
     @RequestMapping({"/folhaDePagamento/demonstrativoPrevidenciario"})
     public class DemonstrativoPrevidenciarioController extends DefaultController<DemonstrativoPrevidenciario> {
 
@@ -22,5 +27,16 @@ import org.springframework.web.bind.annotation.*;
             PaginacaoUtil<DemonstrativoPrevidenciario> paginacaoUtil = demonstrativoPrevidenciarioRepository.buscaPaginada(pageable,searchParams,tipoParams);
             return ResponseEntity.ok().body(paginacaoUtil);
         }
+    @CrossOrigin
+    @Transactional
+    @RequestMapping(value = {"/{id}"}, method = RequestMethod.PUT)
+    public ResponseEntity<DemonstrativoPrevidenciario> update(@RequestBody DemonstrativoPrevidenciario demonstrativoPrevidenciario, @PathVariable BigInteger id) {
+
+        InfoRemessa chave = demonstrativoPrevidenciarioRepository.findById(id).getChave();
+        demonstrativoPrevidenciario.setChave(chave);
+        demonstrativoPrevidenciario.setId(id);
+        demonstrativoPrevidenciarioRepository.update(demonstrativoPrevidenciario);
+        return ResponseEntity.noContent().build();
+    }
 
     }
