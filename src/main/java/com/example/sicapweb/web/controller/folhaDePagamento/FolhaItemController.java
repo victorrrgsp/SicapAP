@@ -1,9 +1,12 @@
 package com.example.sicapweb.web.controller.folhaDePagamento;
 
 
+import br.gov.to.tce.model.InfoRemessa;
+import br.gov.to.tce.model.ap.folha.FolhaPagamento;
 import br.gov.to.tce.model.ap.relacional.FolhaItem;
 import br.gov.to.tce.model.ap.estatico.FolhaItemESocial;
 
+import java.math.BigInteger;
 import java.util.List;
 
 import com.example.sicapweb.repository.folhaDePagamento.FolhaItemRepository;
@@ -13,6 +16,7 @@ import com.example.sicapweb.web.controller.DefaultController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
     @RestController
@@ -32,10 +36,16 @@ import org.springframework.web.bind.annotation.*;
         }
 
         @CrossOrigin
-        @GetMapping(path="/FolhaItemESocial")
-        public ResponseEntity<List<FolhaItemESocial>> folhaItemESocial() {
-            List<FolhaItemESocial> list = folhaItemESocialRepository.findAll();
-            return ResponseEntity.ok().body(list);
+        @Transactional
+        @RequestMapping(value = {"/{id}"}, method = RequestMethod.PUT)
+        public ResponseEntity<FolhaItem> update(@RequestBody FolhaItem folhaItem, @PathVariable BigInteger id) {
+
+            InfoRemessa chave = folhaItemRepository.findById(id).getChave();
+            folhaItem.setChave(chave);
+            folhaItem.setId(id);
+            folhaItem.setFolhaItemESocial(folhaItemESocialRepository.findByCodigo(folhaItem.getCodigoFolhaItemESocial()));
+            folhaItemRepository.update(folhaItem);
+            return ResponseEntity.noContent().build();
         }
         @CrossOrigin
         @GetMapping(path="/all")
