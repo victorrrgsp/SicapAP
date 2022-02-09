@@ -2,7 +2,6 @@ package com.example.sicapweb.web.controller.ap.geral;
 
 import br.gov.to.tce.model.InfoRemessa;
 import br.gov.to.tce.model.ap.relacional.Ato;
-import br.gov.to.tce.model.ap.relacional.Cargo;
 import com.example.sicapweb.repository.geral.AtoRepository;
 import com.example.sicapweb.util.PaginacaoUtil;
 import com.example.sicapweb.web.controller.DefaultController;
@@ -58,6 +57,13 @@ public class AtoController extends DefaultController<Ato>  {
         ato.setId(id);
         ato.setChave(chave);
         atoRepository.update(ato);
+        return ResponseEntity.noContent().build();
+    }
+    @CrossOrigin
+    @Transactional
+    @DeleteMapping(value = {"/{id}"})
+    public ResponseEntity<?> delete(@PathVariable BigInteger id) {
+        atoRepository.deleteRestrito(id);
         return ResponseEntity.noContent().build();
     }
 

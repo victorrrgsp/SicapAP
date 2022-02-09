@@ -1,10 +1,7 @@
 package com.example.sicapweb.web.controller.movimentacaoDePessoal;
 
 import br.gov.to.tce.model.InfoRemessa;
-import br.gov.to.tce.model.ap.pessoal.Admissao;
-import br.gov.to.tce.model.ap.pessoal.Cessao;
 import br.gov.to.tce.model.ap.pessoal.Desligamento;
-import br.gov.to.tce.model.ap.relacional.Ato;
 
 import com.example.sicapweb.repository.geral.AtoRepository;
 import com.example.sicapweb.repository.movimentacaoDePessoal.AdmissaoRepository;
@@ -30,6 +27,13 @@ import java.math.BigInteger;
     @Autowired
     private AdmissaoRepository admissaoRepository;
 
+    @CrossOrigin
+    @Transactional
+    @DeleteMapping(value = {"/{id}"})
+    public ResponseEntity<?> delete(@PathVariable BigInteger id) {
+        desligamentoRepository.deleteRestrito(id);
+        return ResponseEntity.noContent().build();
+    }
     @CrossOrigin
     @GetMapping(path="/{searchParams}/{tipoParams}/pagination")
     public ResponseEntity<PaginacaoUtil<Desligamento>> listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {

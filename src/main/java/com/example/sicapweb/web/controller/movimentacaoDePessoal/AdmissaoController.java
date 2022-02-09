@@ -18,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.EntityManager;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
@@ -57,7 +56,13 @@ import java.util.List;
             List<Admissao> list = admissaoRepository.findAll();
             return ResponseEntity.ok().body(list);
         }
-
+        @CrossOrigin
+        @Transactional
+        @DeleteMapping(value = {"/{id}"})
+        public ResponseEntity<?> delete(@PathVariable BigInteger id) {
+            admissaoRepository.deleteRestrito(id);
+            return ResponseEntity.noContent().build();
+        }
         @CrossOrigin
         @Transactional
         @RequestMapping(value = {"/{id}"}, method = RequestMethod.PUT)

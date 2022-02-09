@@ -10,6 +10,7 @@ import com.example.sicapweb.web.controller.DefaultController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
@@ -35,22 +36,18 @@ public class CargoController  extends DefaultController<Cargo> {
         PaginacaoUtil<Cargo> paginacaoUtil = cargoRepository.buscaPaginada(pageable,searchParams,tipoParams);
         return ResponseEntity.ok().body(paginacaoUtil);
     }
-
-
     @CrossOrigin
     @GetMapping
     public ResponseEntity<List<Cargo>> findAll() {
         List<Cargo> list = cargoRepository.findAll();
         return ResponseEntity.ok().body(list);
     }
-
     @CrossOrigin
     @GetMapping(path = {"findByCodigo/{codigo}"})
     public ResponseEntity<?> findById(@PathVariable String codigo) {
         Cargo list = cargoRepository.buscarCargoPorcodigo(codigo);
         return ResponseEntity.ok().body(list);
     }
-
     @CrossOrigin
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.PUT)
     public ResponseEntity<Cargo> update(@RequestBody Cargo cargo, @PathVariable BigInteger id) {
@@ -64,11 +61,17 @@ public class CargoController  extends DefaultController<Cargo> {
         return ResponseEntity.noContent().build();
     
     }
-
     @CrossOrigin
     @GetMapping(path = {"/todos"})
     public ResponseEntity<List<Cargo>> findTodos() {
         List<Cargo> list = cargoRepository.buscaTodosCargo();
         return ResponseEntity.ok().body(list);
+    }
+    @CrossOrigin
+    @Transactional
+    @DeleteMapping(value = {"/{id}"})
+    public ResponseEntity<?> delete(@PathVariable BigInteger id) {
+        cargoRepository.deleteRestrito(id);
+        return ResponseEntity.noContent().build();
     }
 }

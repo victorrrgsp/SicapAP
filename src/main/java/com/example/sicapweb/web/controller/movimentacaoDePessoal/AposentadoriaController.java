@@ -26,7 +26,13 @@ import org.springframework.web.bind.annotation.*;
         private AtoRepository atoRepository;    
         @Autowired
         private AdmissaoRepository admissaoRepository;
-
+        @CrossOrigin
+        @Transactional
+        @DeleteMapping(value = {"/{id}"})
+        public ResponseEntity<?> delete(@PathVariable BigInteger id) {
+            aposentadoriaRepository.deleteRestrito(id);
+            return ResponseEntity.noContent().build();
+        }
         @CrossOrigin
         @GetMapping(path="/{searchParams}/{tipoParams}/pagination")
         public ResponseEntity<PaginacaoUtil<Aposentadoria>> listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {

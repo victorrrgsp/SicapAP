@@ -1,14 +1,12 @@
 package com.example.sicapweb.web.controller.movimentacaoDePessoal;
 
 import br.gov.to.tce.model.InfoRemessa;
-import br.gov.to.tce.model.ap.pessoal.Cessao;
 import br.gov.to.tce.model.ap.pessoal.Disponibilidade;
 
 import java.math.BigInteger;
 
 import com.example.sicapweb.repository.geral.AtoRepository;
 import com.example.sicapweb.repository.movimentacaoDePessoal.AdmissaoRepository;
-import com.example.sicapweb.repository.movimentacaoDePessoal.CessaoRepository;
 import com.example.sicapweb.repository.movimentacaoDePessoal.DisponibilidadeRepository;
 import com.example.sicapweb.util.PaginacaoUtil;
 import com.example.sicapweb.web.controller.DefaultController;
@@ -30,6 +28,13 @@ import org.springframework.web.bind.annotation.*;
         @Autowired
         private AdmissaoRepository admissaoRepository;
 
+        @CrossOrigin
+        @Transactional
+        @DeleteMapping(value = {"/{id}"})
+        public ResponseEntity<?> delete(@PathVariable BigInteger id) {
+            disponibilidadeRepository.deleteRestrito(id);
+            return ResponseEntity.noContent().build();
+        }
         @CrossOrigin
         @GetMapping(path="/{searchParams}/{tipoParams}/pagination")
         public ResponseEntity<PaginacaoUtil<Disponibilidade>> listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {

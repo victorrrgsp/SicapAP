@@ -1,8 +1,6 @@
 package com.example.sicapweb.web.controller.movimentacaoDePessoal;
 
 import br.gov.to.tce.model.InfoRemessa;
-import br.gov.to.tce.model.ap.pessoal.Cessao;
-import br.gov.to.tce.model.ap.pessoal.Desligamento;
 import br.gov.to.tce.model.ap.pessoal.Licenca;
 
 
@@ -10,7 +8,6 @@ import java.math.BigInteger;
 
 import com.example.sicapweb.repository.geral.AtoRepository;
 import com.example.sicapweb.repository.movimentacaoDePessoal.AdmissaoRepository;
-import com.example.sicapweb.repository.movimentacaoDePessoal.DesligamentoRepository;
 import com.example.sicapweb.repository.movimentacaoDePessoal.LicencaRepository;
 import com.example.sicapweb.util.PaginacaoUtil;
 import com.example.sicapweb.web.controller.DefaultController;
@@ -36,6 +33,14 @@ import org.springframework.web.bind.annotation.*;
         public ResponseEntity<PaginacaoUtil<Licenca>> listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
             PaginacaoUtil<Licenca> paginacaoUtil = licencaRepository.buscaPaginada(pageable,searchParams,tipoParams);
             return ResponseEntity.ok().body(paginacaoUtil);
+        }
+
+        @CrossOrigin
+        @Transactional
+        @DeleteMapping(value = {"/{id}"})
+        public ResponseEntity<?> delete(@PathVariable BigInteger id) {
+            licencaRepository.deleteRestrito(id);
+            return ResponseEntity.noContent().build();
         }
 
         @CrossOrigin

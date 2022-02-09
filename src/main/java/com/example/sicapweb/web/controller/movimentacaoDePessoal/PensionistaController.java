@@ -1,13 +1,10 @@
 package com.example.sicapweb.web.controller.movimentacaoDePessoal;
 
 import br.gov.to.tce.model.InfoRemessa;
-import br.gov.to.tce.model.ap.pessoal.Cessao;
-import br.gov.to.tce.model.ap.pessoal.Pensao;
 import br.gov.to.tce.model.ap.pessoal.Pensionista;
 
 import java.math.BigInteger;
 
-import com.example.sicapweb.repository.concessao.PensaoRepository;
 import com.example.sicapweb.repository.geral.AtoRepository;
 import com.example.sicapweb.repository.movimentacaoDePessoal.AdmissaoRepository;
 import com.example.sicapweb.repository.movimentacaoDePessoal.PensionistaRepository;
@@ -37,7 +34,15 @@ import org.springframework.web.bind.annotation.*;
             PaginacaoUtil<Pensionista> paginacaoUtil = pensionistaRepository.buscaPaginada(pageable,searchParams,tipoParams);
             return ResponseEntity.ok().body(paginacaoUtil);
         }
-        
+
+        @CrossOrigin
+        @Transactional
+        @DeleteMapping(value = {"/{id}"})
+        public ResponseEntity<?> delete(@PathVariable BigInteger id) {
+            pensionistaRepository.deleteRestrito(id);
+            return ResponseEntity.noContent().build();
+        }
+
         @CrossOrigin
         @Transactional
         @RequestMapping(value = {"/{id}"}, method = RequestMethod.PUT)

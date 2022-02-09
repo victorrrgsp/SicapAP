@@ -1,10 +1,7 @@
 package com.example.sicapweb.web.controller.folhaDePagamento;
 
 import br.gov.to.tce.model.InfoRemessa;
-import br.gov.to.tce.model.ap.folha.DemonstrativoPrevidenciario;
-import br.gov.to.tce.model.ap.folha.FolhaPagamento;
 import br.gov.to.tce.model.ap.folha.RecolhimentoPrevidenciario;
-import com.example.sicapweb.repository.folhaDePagamento.FolhaDePagamentoRepository;
 import com.example.sicapweb.repository.folhaDePagamento.RecolhimentoPrevidenciarioRepository;
 import com.example.sicapweb.util.PaginacaoUtil;
 import com.example.sicapweb.web.controller.DefaultController;
@@ -20,10 +17,16 @@ import java.math.BigInteger;
 @RestController
     @RequestMapping({"/folhaDePagamento/recolhimentoPrevidenciario"})
     public class RecolhimentoPrevidenciarioController extends DefaultController<RecolhimentoPrevidenciario> {
-
         @Autowired
         private RecolhimentoPrevidenciarioRepository recolhimentoPrevidenciarioRepository;
 
+        @CrossOrigin
+        @Transactional
+        @DeleteMapping(value = {"/{id}"})
+        public ResponseEntity<?> delete(@PathVariable BigInteger id) {
+            recolhimentoPrevidenciarioRepository.deleteRestrito(id);
+            return ResponseEntity.noContent().build();
+        }
         @CrossOrigin
         @GetMapping(path="/{searchParams}/{tipoParams}/pagination")
         public ResponseEntity<PaginacaoUtil<RecolhimentoPrevidenciario>> listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {

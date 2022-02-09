@@ -1,8 +1,6 @@
 package com.example.sicapweb.web.controller.ap.geral;
 
 import br.gov.to.tce.model.InfoRemessa;
-import br.gov.to.tce.model.ap.relacional.Ato;
-import br.gov.to.tce.model.ap.relacional.Lei;
 import br.gov.to.tce.model.ap.relacional.UnidadeAdministrativa;
 import com.example.sicapweb.repository.geral.UnidadeAdministrativaRepository;
 import com.example.sicapweb.util.PaginacaoUtil;
@@ -54,6 +52,13 @@ public class UnidadeAdministrativaController  extends DefaultController<UnidadeA
         unidadeAdministrativa.setId(id);
         unidadeAdministrativa.setChave(chave);
         unidadeAdministrativaRepository.update(unidadeAdministrativa);
+        return ResponseEntity.noContent().build();
+    }
+    @CrossOrigin
+    @Transactional
+    @DeleteMapping(value = {"/{id}"})
+    public ResponseEntity<?> delete(@PathVariable BigInteger id) {
+        unidadeAdministrativaRepository.deleteRestrito(id);
         return ResponseEntity.noContent().build();
     }
 }

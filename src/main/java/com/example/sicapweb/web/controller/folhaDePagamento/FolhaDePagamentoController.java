@@ -1,7 +1,6 @@
 package com.example.sicapweb.web.controller.folhaDePagamento;
 
 import br.gov.to.tce.model.InfoRemessa;
-import br.gov.to.tce.model.ap.folha.DemonstrativoPrevidenciario;
 import br.gov.to.tce.model.ap.folha.FolhaPagamento;
 import com.example.sicapweb.repository.folhaDePagamento.FolhaDePagamentoRepository;
 import com.example.sicapweb.repository.folhaDePagamento.FolhaItemRepository;
@@ -26,6 +25,14 @@ import java.math.BigInteger;
         private AdmissaoRepository admissaoRepository;
         @Autowired
         private FolhaItemRepository folhaItemRepository;
+    @CrossOrigin
+    @Transactional
+    @DeleteMapping(value = {"/{id}"})
+    public ResponseEntity<?> delete(@PathVariable BigInteger id) {
+        folhaDePagamentoRepository.deleteRestrito(id);
+        return ResponseEntity.noContent().build();
+    }
+
         @CrossOrigin
         @GetMapping(path="/{searchParams}/{tipoParams}/pagination")
         public ResponseEntity<PaginacaoUtil<FolhaPagamento>> listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {

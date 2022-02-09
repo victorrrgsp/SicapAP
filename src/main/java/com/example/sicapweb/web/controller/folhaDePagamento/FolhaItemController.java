@@ -2,9 +2,7 @@ package com.example.sicapweb.web.controller.folhaDePagamento;
 
 
 import br.gov.to.tce.model.InfoRemessa;
-import br.gov.to.tce.model.ap.folha.FolhaPagamento;
 import br.gov.to.tce.model.ap.relacional.FolhaItem;
-import br.gov.to.tce.model.ap.estatico.FolhaItemESocial;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -52,6 +50,13 @@ import org.springframework.web.bind.annotation.*;
         public ResponseEntity<List<FolhaItem>> folhaItem() {
             List<FolhaItem> list = folhaItemRepository.findAll();
             return ResponseEntity.ok().body(list);
+        }
+        @CrossOrigin
+        @Transactional
+        @DeleteMapping(value = {"/{id}"})
+        public ResponseEntity<?> delete(@PathVariable BigInteger id) {
+            folhaItemRepository.deleteRestrito(id);
+            return ResponseEntity.noContent().build();
         }
 
     }
