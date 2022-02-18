@@ -295,4 +295,25 @@ public class LoginController extends DefaultController<Login> {
     }
 
 
+
+    //############################################ API REINICIAR SEVER #####################################################
+    @GetMapping("/script")
+    public void executeCommand() {
+        String[] env = {"PATH=/bin:/usr/local/bin/"};
+
+        String cmd = "reiniciarSicapWeb.sh";  //e.g test.sh -dparam1 -oout.txt
+        //tratamento de erro e execução do script
+
+        try {
+            System.out.println(env);
+
+            Process process = Runtime.getRuntime().exec(cmd, env);
+            System.out.println("tste:"+process);
+
+        } catch (IOException ex) {
+            System.out.println(ex);
+            //  Logger.getLogger(TecMain.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
 }
