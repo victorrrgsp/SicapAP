@@ -4,11 +4,19 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.logging.Logger;
+import java.io.Closeable;
 
 @RestController
 @RequestMapping("/index")
 public class IndexController {
+
+    private static final Logger log = Logger.getLogger(IndexController.class.getName());
 
     @GetMapping("/")
     public String index() {
@@ -17,21 +25,52 @@ public class IndexController {
 
     //############################################ API REINICIAR SEVER #####################################################
     @GetMapping("/script")
-    public void executeCommand() {
-        String[] env = {"PATH=/bin:/usr/local/bin/"};
+    public void reiniciaSicapAP(final String command) throws IOException {
+        this.executeCommand("ls ~");
+    }
+    public void executeCommand(final String command) throws IOException {
 
-        String cmd = "reiniciarSicapWeb.sh";  //e.g test.sh -dparam1 -oout.txt
-        //tratamento de erro e execução do script
+        final ArrayList<String> commands = new ArrayList<String>();
+        commands.add("#!/bin/bash");
+        commands.add("ps -ef | grep -v grep | grep sicapweb-0.0.1-SNAPSHOT");
+        commands.add("echo 'Matando sicapapweb'");
+        commands.add("pkill -f sicapweb-0.0.1-SNAPSHOT.jar");
+        commands.add("sleep 5");
+        commands.add("echo 'Iniciando o sicapapweb'");
+        commands.add("/scripts/SicapApWeb.sh");
+        commands.add(command);
+
+        BufferedReader br = null;
 
         try {
-            System.out.println(env);
+            final ProcessBuilder p = new ProcessBuilder(commands);
+            final Process process = p.start();
+            final InputStream is = process.getInputStream();
+            final InputStreamReader isr = new InputStreamReader(is);
+            br = new BufferedReader(isr);
 
-            Process process = Runtime.getRuntime().exec(cmd, env);
-            System.out.println("tste:"+process);
-
-        } catch (IOException ex) {
-            System.out.println(ex);
-            //  Logger.getLogger(TecMain.class.getName()).log(Level.SEVERE, null, ex);
+            String line;
+            while((line = br.readLine()) != null) {
+                System.out.println("Retorno do comando = [" + line + "]");
+            }
+        } catch (IOException ioe) {
+            log.severe("Erro ao executar comando shell" + ioe.getMessage());
+            throw ioe;
+        } finally {
+            secureClose(br);
         }
     }
+
+
+
+    private void secureClose(final Closeable resource) {
+        try {
+            if (resource != null) {
+                resource.close();
+            }
+        } catch (IOException ex) {
+            log.severe("Erro = " + ex.getMessage());
+        }
+    }
+
 }
