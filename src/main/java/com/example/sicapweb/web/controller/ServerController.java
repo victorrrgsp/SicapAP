@@ -17,6 +17,11 @@ public class ServerController {
         String comando = "sh /usr/local/bin/reiniciarSicapWeb.sh";
         Runtime.getRuntime().exec(comando).waitFor();   //espera até que a tarefa esteja complera
         Runtime.getRuntime().exec(comando).destroy();
+
+        String comando2 = "sh /usr/local/bin/SicapApWeb.sh";
+        Runtime.getRuntime().exec(comando2).waitFor();   //espera até que a tarefa esteja complera
+        Runtime.getRuntime().exec(comando2).destroy();
+
     }
 
 
