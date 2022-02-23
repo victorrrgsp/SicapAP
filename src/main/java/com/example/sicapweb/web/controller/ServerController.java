@@ -11,9 +11,9 @@ import java.io.IOException;
 @RequestMapping("/script")
 public class ServerController {
 
-
     @GetMapping("/sicapap")
     public void reiniciaSicapAP() throws IOException, InterruptedException {
+
         String comando = "sh /usr/local/bin/reiniciarSicapWeb.sh";
         Runtime.getRuntime().exec(comando).waitFor();   //espera até que a tarefa esteja complera
         Runtime.getRuntime().exec(comando).destroy();
@@ -21,8 +21,25 @@ public class ServerController {
         String comando2 = "sh /usr/local/bin/SicapApWeb.sh";
         Runtime.getRuntime().exec(comando2).waitFor();   //espera até que a tarefa esteja complera
         Runtime.getRuntime().exec(comando2).destroy();
-
     }
 
+
+    @GetMapping("/sicapapanalisador")
+    public void reiniciaSicapApAnalisador() throws IOException, InterruptedException {
+
+        String comando = "sh /usr/local/bin/SicapApImportador.sh";
+        Runtime.getRuntime().exec(comando).waitFor();   //espera até que a tarefa esteja complera
+        Runtime.getRuntime().exec(comando).destroy();
+    }
+
+
+
+    @GetMapping("/sicapestadoanalisador")
+    public void reiniciaSicapEstado() throws IOException, InterruptedException {
+
+        String comando = "sh /usr/local/bin/SicapEstadoImportador.sh";
+        Runtime.getRuntime().exec(comando).waitFor();   //espera até que a tarefa esteja complera
+        Runtime.getRuntime().exec(comando).destroy();
+    }
 
 }
