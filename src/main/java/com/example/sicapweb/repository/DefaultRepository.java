@@ -69,11 +69,9 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
     public void deleteRestrito(BigInteger id) {
         try {
             DefaultEntity objeto = (DefaultEntity)getEntityManager().find(entityClass, id);
-
+            objeto.setId(id);
             if(objeto.getChave().getIdUnidadeGestora().equals(User.getUser(request).getUnidadeGestora().getId())){
-
                 getEntityManager().remove(objeto);
-
             }
         }catch (Exception e){
             e.printStackTrace();
