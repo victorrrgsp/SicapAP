@@ -5,10 +5,7 @@ import br.gov.to.tce.model.ap.relacional.Cargo;
 import com.example.sicapweb.repository.geral.CargoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -19,13 +16,19 @@ public class CargoController {
     @Autowired
     private CargoRepository cargoRepository;
 
+
     @CrossOrigin
     @GetMapping
     public ResponseEntity<List<Cargo>> findAll() {
         List<Cargo> list = cargoRepository.findAll();
         return ResponseEntity.ok().body(list);
     }
-
+    @CrossOrigin
+    @GetMapping("/{unidade}")
+    public ResponseEntity<List<Object>> findByunidade( @PathVariable String unidade ) {
+        List<Object> list = cargoRepository.buscarCargoPorUnidade(unidade);
+        return ResponseEntity.ok().body(list);
+    }
     @CrossOrigin
     @GetMapping(path = {"/todos"})
     public ResponseEntity<List<Cargo>> findTodos() {
