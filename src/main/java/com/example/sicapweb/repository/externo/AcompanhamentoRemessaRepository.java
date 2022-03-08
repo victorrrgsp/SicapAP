@@ -7,7 +7,10 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Repository
 public class AcompanhamentoRemessaRepository extends DefaultRepository<String, String> {
@@ -47,14 +50,14 @@ public class AcompanhamentoRemessaRepository extends DefaultRepository<String, S
                             "         where upc.CodigoCargo in (:tipo)" +
                             "           and (dataInicio <= :date and (datafim is null or datafim >= :date))" +
                             "           and i.idUnidadeGestora = :unidade" +
-                            "           and  pj.cnpj  = :unidade" +
+                            "           and pj.CNPJ  = :unidade" +
                             "           and c.Exercicio = :exercicio" +
                             "           and c.Bimestre = :remessa" +
                             "           and ua.Aplicacao = 29" +
                             "     ) as v " +
                             "group by nome, cpf, CodigoCargo;");
             query.setParameter("tipo", tipoCargo);
-            query.setParameter("date", new Date());
+            query.setParameter("date", infoRemessa.getData());
             query.setParameter("unidade", infoRemessa.getIdUnidadeGestora());
             query.setParameter("exercicio", infoRemessa.getExercicio());
             query.setParameter("remessa", infoRemessa.getRemessa());
