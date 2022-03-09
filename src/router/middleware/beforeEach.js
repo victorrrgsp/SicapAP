@@ -2,7 +2,7 @@
 //import jwt_decode from "jwt-decode";
 
 export default async (to, from, next) => {
-  document.title = `${to.name} - ${process.env.VUE_APP_SISTEMA}`
+  document.title = `${to.name} - Sicap Atos de Pessoal Público`
 
   if (to.name !== 'login') {
     
