@@ -26,7 +26,7 @@ public class CargoRepository extends DefaultRepository<Cargo, BigInteger> {
     public List<Object> buscarCargoPorUnidade(String cnpj) {
         List<Object> list = getEntityManager().createNativeQuery("SELECT DISTINCT wfp.cargo "+
                 "FROM vwFolhaPagamento wfp "+
-                "WHERE wfp.idUnidadeGestora = "+ cnpj ).getResultList();
+                "WHERE wfp.idUnidadeGestora = '"+ cnpj+"'" ).getResultList();
         /*
         List<Map<String,Object>> retorno = new ArrayList<Map<String,Object>>();
 
