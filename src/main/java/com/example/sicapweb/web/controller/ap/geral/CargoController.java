@@ -30,6 +30,12 @@ public class CargoController {
         return ResponseEntity.ok().body(list);
     }
     @CrossOrigin
+    @GetMapping("/{unidade}/{mes}/{ano}")
+    public ResponseEntity<List<Object>> findByunidade( @PathVariable String unidade,@PathVariable int mes,@PathVariable int ano ) {
+        List<Object> list = cargoRepository.buscarCargoPorRemessa(unidade,ano,mes);
+        return ResponseEntity.ok().body(list);
+    }
+    @CrossOrigin
     @GetMapping(path = {"/todos"})
     public ResponseEntity<List<Cargo>> findTodos() {
         List<Cargo> list = cargoRepository.buscaTodosCargo();

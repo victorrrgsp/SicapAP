@@ -24,9 +24,31 @@ public class CargoRepository extends DefaultRepository<Cargo, BigInteger> {
         return list.get(0);
     }
     public List<Object> buscarCargoPorUnidade(String cnpj) {
-        List<Object> list = getEntityManager().createNativeQuery("SELECT DISTINCT wfp.cargo "+
+
+        var query = getEntityManager().createNativeQuery(
+                "SELECT DISTINCT wfp.cargo "+
                 "FROM vwFolhaPagamento wfp "+
-                "WHERE wfp.idUnidadeGestora = '"+ cnpj+"'" ).getResultList();
+                "WHERE wfp.idUnidadeGestora = '"+cnpj+ "'" );
+        List<Object> list = query.getResultList();
+        /*
+        List<Map<String,Object>> retorno = new ArrayList<Map<String,Object>>();
+
+        list.forEach(obj -> {
+            Map<String,Object> aux = new HashMap<>();
+            aux.put()
+        });
+        */
+        return list;
+    }
+    public List<Object> buscarCargoPorRemessa(String cnpj,int ano,int mes ) {
+
+        var query = getEntityManager().createNativeQuery(
+                " SELECT DISTINCT wfp.cargo "+
+                " FROM vwFolhaPagamento wfp "+
+                " WHERE wfp.idUnidadeGestora = '"+cnpj+"'"+
+                " and wfp.remessa ="+mes+
+                " and wfp.exercicio ="+ano);
+        List<Object> list = query.getResultList();
         /*
         List<Map<String,Object>> retorno = new ArrayList<Map<String,Object>>();
 
