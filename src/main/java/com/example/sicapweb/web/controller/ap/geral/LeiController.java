@@ -19,6 +19,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.math.BigInteger;
 import java.net.URI;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/lei")
@@ -39,6 +40,20 @@ public class LeiController extends DefaultController<Lei> {
     @CrossOrigin
     @GetMapping
     public ResponseEntity<List<Lei>> findAll() {
+//        var teste = leiRepository.findAll();
+//        teste.addAll(leiRepository.findAll());
+//        paginacaoUtil =  paginacaoUtil.getRegistros().stream().filter(lei -> lei.getAto().getTipoAto() == 1);
+//        teste.removeIf(lei -> {
+//            boolean isRepitido = false;
+//            for (Lei lei1 :teste ) {
+//                boolean isIgual = lei1.getAto() == lei.getAto();
+//                isIgual = isIgual && lei1.getNumeroLei() == lei.getNumeroLei();
+//                isIgual = isIgual && lei1.getEmenta() == lei.getEmenta();
+//                isIgual = isIgual && lei1.getVeiculoPublicacao() == lei.getVeiculoPublicacao();
+//                isRepitido = isRepitido || isIgual;
+//            }
+//            return isRepitido;
+//        });
         return ResponseEntity.ok().body(leiRepository.findAll());
     }
 
