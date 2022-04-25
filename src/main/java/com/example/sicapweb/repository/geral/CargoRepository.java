@@ -28,7 +28,8 @@ public class CargoRepository extends DefaultRepository<Cargo, BigInteger> {
         var query = getEntityManager().createNativeQuery(
                 "SELECT DISTINCT wfp.cargo "+
                 "FROM vwFolhaPagamento wfp "+
-                "WHERE wfp.idUnidadeGestora = '"+cnpj+ "'" );
+                "WHERE wfp.idUnidadeGestora = '"+cnpj+ "'"+
+                "order by wfp.cargo");
         List<Object> list = query.getResultList();
         /*
         List<Map<String,Object>> retorno = new ArrayList<Map<String,Object>>();
@@ -47,7 +48,8 @@ public class CargoRepository extends DefaultRepository<Cargo, BigInteger> {
                 " FROM vwFolhaPagamento wfp "+
                 " WHERE wfp.idUnidadeGestora = '"+cnpj+"'"+
                 " and wfp.remessa ="+mes+
-                " and wfp.exercicio ="+ano);
+                " and wfp.exercicio ="+ano+
+                " order by wfp.cargo");
         List<Object> list = query.getResultList();
         /*
         List<Map<String,Object>> retorno = new ArrayList<Map<String,Object>>();
