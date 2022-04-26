@@ -36,6 +36,50 @@ public class UnidadeGestoraRepository extends DefaultRepository<UnidadeGestora, 
         return list;
     }
 
+    public List<Object[]> buscaugServidoresComsociedade() {
+        List<Object[]> list = entityManager.createNativeQuery("with servidores as(\n" +
+                        "\tselect\n" +
+                        "\t\t*\n" +
+                        "\tfrom sicapap..vwServidoresEmFolha2 s  --WITH (NOEXPAND)\n" +
+                        "\t\twhere s.ano = 2017 and mes = 9\n" +
+                        "),\n" +
+                        "quadro as(\n" +
+                        "\tselect\n" +
+                        "\t\t* ,SUBSTRING(q.CpfcnpjSocio,4,14) cpf\n" +
+                        "\tfrom cadun..vwQuadroSocietario  q\n" +
+                        "\t\twhere q.ehFisica =1\n" +
+                        "),\n" +
+                        "valoresLiquidacoes as(\n" +
+                        "\t\tselect i.idUnidadeGestora,c.idcredor, SUM(abs(valor)) valor\n" +
+                        "\t\tfrom Sicap_Contabil_NOVO..liquidacao l inner join\n" +
+                        "\t\t\tSicap_Contabil_NOVO..inforemessa i on l.chave = i.chave inner join\n" +
+                        "\t\t\tSicap_Contabil_NOVO..credor c on c.id = l.idcredor\n" +
+                        "\t\tgroup by i.idUnidadeGestora, c.idcredor\n" +
+                        "),\n" +
+                        "valoresLiquidacoesGeral as(\n" +
+                        "\t\tselect idcredor, SUM(abs(valor)) valor\n" +
+                        "\t\tfrom valoresLiquidacoes\n" +
+                        "\t\tgroup by idcredor\n" +
+                        ")\n" +
+                        "\n" +
+                        "select\n" +
+                        "distinct\n" +
+                        "\tug.nomeEntidade Entidade,\n" +
+                        "\tug.cnpj\n" +
+                        "\n" +
+                        "from  servidores s\n" +
+                        "\tleft join quadro q on q.cpf = s.cpf\n" +
+                        "\tleft join cadun..pessoafisica pf on pf.cpf = s.cpf\n" +
+                        "\tleft join cadun..vwUnidadeGestora empresa on empresa.cnpj = q.CnpjEmpresa\n" +
+                        "\tleft join cadun..vwUnidadeGestora ug on ug.cnpj = s.UG\n" +
+                        "\tleft join valoresLiquidacoes vl on vl.idCredor = q.CnpjEmpresa and vl.idUnidadeGestora = s.UG\n" +
+                        "\tleft join valoresLiquidacoesGeral vlgeral on vlgeral.idCredor = q.CnpjEmpresa\n" +
+                        "\tleft join cadun..SituacaoCadastralPessoaJuridica sc on sc.Codigo =cast(empresa.SituacaoCadastral as int)\n" +
+                        "where q.CnpjEmpresa is not null\n" +
+                        "order by entidade asc"
+                ).getResultList();
+        return list;
+    }
   public List<Object> buscaNomeCnpjUnidadeGestora() {
     List<Object> list = entityManager.createNativeQuery("select id , nome From UnidadeGestora  "
       ).getResultList();
