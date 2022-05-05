@@ -43,9 +43,10 @@ public class LeiRepository extends DefaultRepository<Lei, BigInteger> {
         String campo = String.valueOf(pageable.getSort()).replace(":", "");
 
         List<Lei> list = getEntityManager()
-                .createNativeQuery("select DISTINCT a.* from Lei a " +
+                .createNativeQuery("select DISTINCT a.* from   (select  id,idcastorfile,dataPublicacao,ementa, numerolei,veiculoPublicacao,idAto,chave  from Lei e" +
+                        "     where e.id =(select max(id) from lei where dataPublicacao = e.dataPublicacao and  ementa=e.ementa and  numeroLei = e.numeroLei and veiculoPublicacao = e.veiculoPublicacao and idAto = e.idAto ) ) a " +
                         " join InfoRemessa info on info.chave = a.chave and info.idUnidadeGestora = '"
-                        + User.getUser(request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, Lei.class)
+                        + User.getUser(request).getUnidadeGestora().getId() + "' "  + search + " ORDER BY " + campo, Lei.class)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();
