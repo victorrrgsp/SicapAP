@@ -21,6 +21,27 @@ public class GfipRepository extends DefaultRepository<Gfip, BigInteger> {
                         "l.idInfoRemessa = '" + chave + "' and l.tipo = '" + tipo + "'", Gfip.class)
                 .getResultList();
     }
+    public List<Gfip> buscarDocumentoAllGfip(String UG,int ano,int mes){
+        return getEntityManager().createNativeQuery(
+                "select l.id,\n" +
+                        "       l.idInfoRemessa,\n" +
+                        "       l.data,\n" +
+                        "       l.idCastorFile,\n" +
+                        "       l.tipo,\n" +
+                        "       info.*\n" +
+                        "from (select doc.*, ROW_NUMBER() OVER (PARTITION BY idInfoRemessa,tipo  ORDER BY data desc) as linha\n" +
+                        "                            from DocumentoGfip doc\n" +
+                        "                            ) l\n" +
+                        "join SICAPAP21.dbo.InfoRemessa info on l.idInfoRemessa = info.chave\n" +
+                        "join SICAPAP21.dbo.UnidadeGestora UG on UG.id = info.idUnidadeGestora\n" +
+                        "where l.linha = 1 and\n" +
+                        "      Ug.id = '"+UG+"'"
+                        //"and\n" +
+                        //"      info.exercicio = "+ano+" and\n" +
+                        //"      info.remessa = "+ mes
+                        , Gfip.class)
+                .getResultList();
+    }
 
     public String findSituacao(String chave, String tipo) {
         return (String) getEntityManager().createNativeQuery("select case when (count(*) > 0) then 'Informado'\n" +
