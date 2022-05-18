@@ -140,9 +140,9 @@ public class GfipController extends DefaultController<InfoRemessa> {
     }
 
     @CrossOrigin
-    @GetMapping(path = {"GetAll/{UG}/{mes}/{ano}"})
-    public ResponseEntity<?> findByDocumento(@PathVariable String UG,@PathVariable int mes,@PathVariable int ano) {
-        List<Gfip> list = gfipRepository.buscarDocumentoAllGfip(UG,ano,mes);
+    @GetMapping(path = {"GetAll/{UG}"})
+    public ResponseEntity<?> findByDocumento(@PathVariable String UG) {
+        List<Gfip> list = gfipRepository.buscarDocumentoAllGfip(UG);
         return ResponseEntity.ok().body(list);
     }
 }

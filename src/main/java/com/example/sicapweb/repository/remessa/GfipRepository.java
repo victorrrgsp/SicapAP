@@ -21,7 +21,7 @@ public class GfipRepository extends DefaultRepository<Gfip, BigInteger> {
                         "l.idInfoRemessa = '" + chave + "' and l.tipo = '" + tipo + "'", Gfip.class)
                 .getResultList();
     }
-    public List<Gfip> buscarDocumentoAllGfip(String UG,int ano,int mes){
+    public List<Gfip> buscarDocumentoAllGfip(String UG){
         return getEntityManager().createNativeQuery(
                 "select l.id,\n" +
                         "       l.idInfoRemessa,\n" +
