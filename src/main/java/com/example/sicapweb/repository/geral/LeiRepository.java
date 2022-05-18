@@ -22,6 +22,38 @@ public class LeiRepository extends DefaultRepository<Lei, BigInteger> {
                         "select * from lei l where l.id = " + id, Lei.class)
                 .getResultList();
     }
+
+    public List<Lei> findAllLei(String ug) {
+        return findAllLei(ug,2021,2 );
+    }
+    public List<Lei> findAllLei(String ug,Integer exercicio) {
+        return findAllLei(ug,exercicio,null );
+    }
+    public List<Lei> findAllLei(String ug,Integer exercicio,Integer mes ) {
+        var query = getEntityManager()
+                .createNativeQuery("select  " +
+                        "       l.id, " +
+                        "       l.dataPublicacao," +
+                        "       l.ementa," +
+                        "       l.numeroLei," +
+                        "       l.veiculoPublicacao," +
+                        "       l.idAto," +
+                        "       l.chave," +
+                        "       l.idCastorFile " +
+                        "from dbo.Lei l " +
+                        "join dbo.InfoRemessa info on info.chave = l.chave  " +
+                        //"where  info.idUnidadeGestora = :UG\n" +
+                        //"  and (:exercicio is null or info.exercicio = :exercicio)\n" +
+                        //"  and (:mes is null or info.remessa = :mes)" , Lei.class);
+                        "where  info.idUnidadeGestora = '"+ug+"'\n" +
+                        "  and ("+exercicio+" is null or info.exercicio = "+exercicio+")\n" +
+                        "  and ("+exercicio+" is null or info.remessa = "+mes+")" ,Lei.class) ;
+//                query.setParameter("UG", ug);
+//                query.setParameter("exercicio", exercicio);
+//                query.setParameter("mes", mes);
+
+                return query.getResultList();
+    }
     public PaginacaoUtil<Lei> buscaPaginada(Pageable pageable, String searchParams, Integer tipoParams) {
 
         int pagina = Integer.valueOf(pageable.getPageNumber());

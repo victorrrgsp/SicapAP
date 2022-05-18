@@ -24,10 +24,14 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/lei")
 public class LeiController extends DefaultController<Lei> {
+    @Autowired
+    LeiController(LeiRepository leiRepository,AtoRepository atoRepository){
+        this.leiRepository = leiRepository;
+        this.atoRepository = atoRepository;
+    }
 
-    @Autowired
     private LeiRepository leiRepository; 
-    @Autowired
+
     private AtoRepository atoRepository;
 
     @CrossOrigin
@@ -40,22 +44,9 @@ public class LeiController extends DefaultController<Lei> {
     @CrossOrigin
     @GetMapping
     public ResponseEntity<List<Lei>> findAll() {
-//        var teste = leiRepository.findAll();
-//        teste.addAll(leiRepository.findAll());
-//        paginacaoUtil =  paginacaoUtil.getRegistros().stream().filter(lei -> lei.getAto().getTipoAto() == 1);
-//        teste.removeIf(lei -> {
-//            boolean isRepitido = false;
-//            for (Lei lei1 :teste ) {
-//                boolean isIgual = lei1.getAto() == lei.getAto();
-//                isIgual = isIgual && lei1.getNumeroLei() == lei.getNumeroLei();
-//                isIgual = isIgual && lei1.getEmenta() == lei.getEmenta();
-//                isIgual = isIgual && lei1.getVeiculoPublicacao() == lei.getVeiculoPublicacao();
-//                isRepitido = isRepitido || isIgual;
-//            }
-//            return isRepitido;
-//        });
         return ResponseEntity.ok().body(leiRepository.findAll());
     }
+
 
     @CrossOrigin
     @GetMapping(path = {"/{id}"})
@@ -63,7 +54,12 @@ public class LeiController extends DefaultController<Lei> {
         Lei list = leiRepository.findById(id);
         return ResponseEntity.ok().body(list);
     }
-
+    @CrossOrigin
+    @GetMapping(path = {"/findallLei/{ug}"})
+    public ResponseEntity<?> findallLei(@PathVariable String ug) {
+        List<Lei> list = leiRepository.findAllLei(ug);
+        return ResponseEntity.ok().body(list);
+    }
     @CrossOrigin
     @PostMapping
     public ResponseEntity<Lei> create(@RequestBody Lei lei) {
