@@ -24,7 +24,7 @@ public class LeiRepository extends DefaultRepository<Lei, BigInteger> {
     }
 
     public List<Lei> findAllLei(String ug) {
-        return findAllLei(ug,2021,2 );
+        return findAllLei(ug,null,null );
     }
     public List<Lei> findAllLei(String ug,Integer exercicio) {
         return findAllLei(ug,exercicio,null );
@@ -42,15 +42,12 @@ public class LeiRepository extends DefaultRepository<Lei, BigInteger> {
                         "       l.idCastorFile " +
                         "from dbo.Lei l " +
                         "join dbo.InfoRemessa info on info.chave = l.chave  " +
-                        //"where  info.idUnidadeGestora = :UG\n" +
-                        //"  and (:exercicio is null or info.exercicio = :exercicio)\n" +
-                        //"  and (:mes is null or info.remessa = :mes)" , Lei.class);
-                        "where  info.idUnidadeGestora = '"+ug+"'\n" +
-                        "  and ("+exercicio+" is null or info.exercicio = "+exercicio+")\n" +
-                        "  and ("+exercicio+" is null or info.remessa = "+mes+")" ,Lei.class) ;
-//                query.setParameter("UG", ug);
-//                query.setParameter("exercicio", exercicio);
-//                query.setParameter("mes", mes);
+                        "where  info.idUnidadeGestora = :UG\n" +
+                        "  and (:exercicio is null or info.exercicio = :exercicio)\n" +
+                        "  and (:mes is null or info.remessa = :mes)" , Lei.class);
+                query.setParameter("UG", ug);
+                query.setParameter("exercicio", exercicio);
+                query.setParameter("mes", mes);
 
                 return query.getResultList();
     }
