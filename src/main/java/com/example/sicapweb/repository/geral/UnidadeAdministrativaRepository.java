@@ -21,6 +21,12 @@ public class UnidadeAdministrativaRepository extends DefaultRepository<UnidadeAd
         return list.get(0);
     }
 
+    public UnidadeAdministrativa buscarUnidadePorCnpj(String cnpj) {
+        List<UnidadeAdministrativa> list = getEntityManager().createNativeQuery("select * from UnidadeAdministrativa ed" +
+                " where cnpfEnpresaOrganizadora = '" + cnpj + "'    ", UnidadeAdministrativa.class).getResultList();
+        return list.get(0);
+    }
+
     public List<Object[]> buscarremessa(int ano, int mes) {
         List<Object[]> list = getEntityManager().createNativeQuery(
                 " select 'TODOS' cnpj, " +
