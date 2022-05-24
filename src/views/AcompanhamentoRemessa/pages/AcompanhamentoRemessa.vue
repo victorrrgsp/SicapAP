@@ -36,6 +36,7 @@
               class="select-selected"
               v-model="formdata.exercicio"
               :options="formdata.exercicios"
+              @change="pesquisarRemessas"
             >
             </b-form-select>
             &nbsp;
