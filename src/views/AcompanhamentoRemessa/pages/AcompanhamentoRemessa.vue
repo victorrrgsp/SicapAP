@@ -22,7 +22,7 @@
 
               <b-form-datalist id="unidadeGestora">
                 <option v-for="(item, index) in unidades" v-bind:key="index.id">
-                  {{ item.id }} - {{ item.nome }}
+                   {{ item.nome }}
                 </option>
               </b-form-datalist>
             </b-form-group>
@@ -455,6 +455,8 @@ export default {
       this.isBusy = !this.isBusy; //loading
       await this.ActionFindByExercicio(this.formdata).then({});
       this.isBusy = false;
+
+      this.filter = this.filterform;
     },
     async pesquisar() {
       this.isBusy = !this.isBusy; //loading
