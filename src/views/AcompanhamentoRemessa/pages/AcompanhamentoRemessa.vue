@@ -61,6 +61,10 @@
         </b-col>
       </b-row>
 
+      <span>
+        {{ tableData.length }} - Remessas enviadas    
+      </span>
+
       <b-table
         striped
         hover
