@@ -2,7 +2,7 @@
 //import jwt_decode from "jwt-decode";
 
 export default async (to, from, next) => {
-  document.title = `${to.name} - Sicap Atos de Pessoal Público`
+  document.title = `Sicap Atos de Pessoal Público - ${to.name.toUpperCase()}`
 
   if (to.name !== 'login') {
     
