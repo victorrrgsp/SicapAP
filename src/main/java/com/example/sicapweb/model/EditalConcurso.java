@@ -7,6 +7,7 @@ import java.util.Date;
 public class EditalConcurso{
 
         private BigInteger id;
+
     private Integer tipoEdital;
     private String numeroEdital;
     private Date dataPublicacao;
@@ -14,10 +15,7 @@ public class EditalConcurso{
     private Date dataFimInscricoes;
     private String prazoValidade;
     private String veiculoPublicacao;
-
-
     private String situacao;
-
     private String cnpjEmpresaOrganizadora;
     private String nomEmpresaOrganizadora;
     private BigDecimal valorContratacao;

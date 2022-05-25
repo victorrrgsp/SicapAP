@@ -1,6 +1,8 @@
 package com.example.sicapweb.web.controller.ap.concurso;
 
 
+import br.gov.to.tce.model.CastorFile;
+import br.gov.to.tce.model.ap.concessoes.DocumentoAposentadoria;
 import br.gov.to.tce.model.ap.concurso.EmpresaOrganizadora;
 import br.gov.to.tce.model.ap.concurso.documento.DocumentoEdital;
 import br.gov.to.tce.model.ap.concurso.Edital;
@@ -41,14 +43,15 @@ public class DocumentoConcursoEditalController extends DefaultController<Edital>
         PaginacaoUtil<EditalConcurso> paginacaoUtil = editalRepository.buscaPaginadaEditais(pageable,searchParams,tipoParams);
         List<EditalConcurso> listE = paginacaoUtil.getRegistros();
         for(Integer i= 0; i < listE.size(); i++){
-            Integer quantidadeDocumentos = documentoEditalRepository.findSituacao("documentoEdital","idEdital", listE.get(i).getId(), "'I','II','III','IV','V','VI','VII','VIII','IX','IX.I','X','XI'");
-            if (listE.get(i).getNumeroEdital().isEmpty() || listE.get(i).getDataPublicacao().toString().isEmpty() ||listE.get(i).getTipoEdital().toString().isEmpty()  ) {
-                listE.get(i).setSituacao("Dados Inconpletos");
+            Integer quantidadeDocumentos = documentoEditalRepository.findSituacao("documentoEdital","idEdital", listE.get(i).getId(), "'I','II','III','IV','V','VI','VII','VIII','IX','IX.I','X'");
+           if (listE.get(i).getVeiculoPublicacao()==null  || listE.get(i).getDataPublicacao()==null || listE.get(i).getDataInicioInscricoes()==null || listE.get(i).getDataFimInscricoes() == null  || listE.get(i).getPrazoValidade()==null || listE.get(i).getCnpjEmpresaOrganizadora()==null ) {
+                listE.get(i).setSituacao("Dados Incompletos");
             }
-            else if(quantidadeDocumentos <  0) {
+            else
+                if(quantidadeDocumentos <  11) {
                 listE.get(i).setSituacao("Pendente");
-            } else if(quantidadeDocumentos == 12){
-                listE.get(i).setSituacao("Aguardando assinatura");
+            } else if(quantidadeDocumentos == 11){
+                listE.get(i).setSituacao("Aguardando Assinatura");
             }
         }
 
@@ -58,7 +61,7 @@ public class DocumentoConcursoEditalController extends DefaultController<Edital>
     @CrossOrigin
     @GetMapping(path = {"getSituacao/{id}"})
     public ResponseEntity<?> findSituacao(@PathVariable BigInteger id) {
-        Integer situacao = documentoEditalRepository.findSituacao("DocumentoEdital","idEdital",id, "'I','II','III','IV','V','VI','VII','VIII','IX','IX.I','X','XI'");
+        Integer situacao = documentoEditalRepository.findSituacao("DocumentoEdital","idEdital",id, "'I','II','III','IV','V','VI','VII','VIII','IX','IX.I','X'");
         return ResponseEntity.ok().body(situacao);
     }
 
@@ -75,6 +78,7 @@ public class DocumentoConcursoEditalController extends DefaultController<Edital>
         documentoEditalRepository.save(documentoEdital);
         return ResponseEntity.ok().body(idCastor);
     }
+
 
     @CrossOrigin
     @GetMapping(path = {"getInciso/{id}"})

@@ -3,11 +3,15 @@ package com.example.sicapweb.web.controller.ap.concurso;
 
 import br.gov.to.tce.model.ap.concurso.EditalHomologacao;
 import br.gov.to.tce.model.ap.concurso.documento.DocumentoEditalHomologacao;
+import com.example.sicapweb.model.EditalConcurso;
+import com.example.sicapweb.model.EditalHomologaConcurso;
 import com.example.sicapweb.model.Inciso;
 import com.example.sicapweb.repository.concurso.DocumentoEditalHomologacaoRepository;
 import com.example.sicapweb.repository.concurso.EditalHomologacaoRepository;
+import com.example.sicapweb.util.PaginacaoUtil;
 import com.example.sicapweb.web.controller.DefaultController;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +36,33 @@ public class DocumentoConcursoHomologacaoController extends DefaultController<Ed
     public ResponseEntity<List<EditalHomologacao>> findAll() {
         List<EditalHomologacao> list = editalHomologacaoRepository.findAll();
         return ResponseEntity.ok().body(list);
+    }
+
+    @CrossOrigin
+    @GetMapping(path="/{searchParams}/{tipoParams}/pagination")
+    public ResponseEntity<PaginacaoUtil<EditalHomologaConcurso>> listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
+        PaginacaoUtil<EditalHomologaConcurso> paginacaoUtil = editalHomologacaoRepository.buscaPaginadaEditaisHomologa(pageable,searchParams,tipoParams);
+        List<EditalHomologaConcurso> listE = paginacaoUtil.getRegistros();
+        for(Integer i= 0; i < listE.size(); i++){
+            Integer quantidadeDocumentos = editalHomologacaoRepository.findSituacao("DocumentoEditalHomologacao","idEditalHomologacao", listE.get(i).getId(), "'XII','XIII','XIV','XV','XVI'");
+            if (listE.get(i).getVeiculoPublicacao()==null  || listE.get(i).getDataHomologacao()==null || listE.get(i).getAto()==null || listE.get(i).getEdital()==null  ) {
+                listE.get(i).setSituacao("Dados Incompletos");
+            }
+            else
+            if(quantidadeDocumentos <  5) {
+                listE.get(i).setSituacao("Pendente");
+            } else if(quantidadeDocumentos == 5){
+                listE.get(i).setSituacao("Aguardando Assinatura");
+            }
+        }
+        return ResponseEntity.ok().body(paginacaoUtil);
+    }
+
+    @CrossOrigin
+    @GetMapping(path = {"getSituacao/{id}"})
+    public ResponseEntity<?> findSituacao(@PathVariable BigInteger id) {
+        Integer situacao = documentoEditalHomologacaoRepository.findSituacao("DocumentoEditalHomologacao","idEditalHomologacao",id, "'XII','XIII','XIV','XV','XVI'");
+        return ResponseEntity.ok().body(situacao);
     }
 
     @CrossOrigin

@@ -78,6 +78,7 @@ public class EditalRepository extends DefaultRepository<Edital, BigInteger> {
             editalConcurso.setDataFimInscricoes(list.get(i).getDataFimInscricoes());
             editalConcurso.setPrazoValidade(list.get(i).getPrazoValidade());
             editalConcurso.setVeiculoPublicacao(list.get(i).getVeiculoPublicacao());
+            editalConcurso.setCnpjEmpresaOrganizadora(list.get(i).getCnpjEmpresaOrganizadora());
            if  (!list.get(i).getCnpjEmpresaOrganizadora().isEmpty()) {
                EmpresaOrganizadora eo = (EmpresaOrganizadora) getEntityManager()
                        .createNativeQuery("select a.* from empresaOrganizadora a where  cnpjEmpresaOrganizadora='" + list.get(i).getCnpjEmpresaOrganizadora() + "'", EmpresaOrganizadora.class)
