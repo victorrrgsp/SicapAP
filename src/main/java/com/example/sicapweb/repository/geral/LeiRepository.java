@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -42,8 +43,8 @@ public class LeiRepository extends DefaultRepository<Lei, BigInteger> {
                         "       l.idCastorFile " +
                         "from dbo.Lei l " +
                         "join dbo.InfoRemessa info on info.chave = l.chave  " +
-                        "where  info.idUnidadeGestora = :UG\n" +
-                        "  and (:exercicio is null or info.exercicio = :exercicio)\n" +
+                        "where  info.idUnidadeGestora = :UG " +
+                        "  and (:exercicio is null or info.exercicio = :exercicio) " +
                         "  and (:mes is null or info.remessa = :mes)" , Lei.class);
                 query.setParameter("UG", ug);
                 query.setParameter("exercicio", exercicio);
@@ -80,9 +81,32 @@ public class LeiRepository extends DefaultRepository<Lei, BigInteger> {
                 .setMaxResults(tamanho)
                 .getResultList();
 
-        long totalRegistros = count();
+        long totalRegistros = countLeis();
         long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
 
         return new PaginacaoUtil<Lei>(tamanho, pagina, totalPaginas, totalRegistros, list);
+    }
+
+    public Integer countLeis() {
+        Query query = getEntityManager()
+                .createNativeQuery("select COUNT(*) from (select DISTINCT a.* " +
+                        "from (select id, " +
+                        "             idcastorfile, " +
+                        "             dataPublicacao, " +
+                        "             ementa, " +
+                        "             numerolei, " +
+                        "             veiculoPublicacao, " +
+                        "             idAto, " +
+                        "             chave " +
+                        "      from Lei e " +
+                        "      where e.id = (select max(id) " +
+                        "                    from lei " +
+                        "                    where dataPublicacao = e.dataPublicacao " +
+                        "                      and ementa = e.ementa " +
+                        "                      and numeroLei = e.numeroLei " +
+                        "                      and veiculoPublicacao = e.veiculoPublicacao " +
+                        "                      and idAto = e.idAto)) a " +
+                        "         join InfoRemessa info on info.chave = a.chave and info.idUnidadeGestora = '" + User.getUser(request).getUnidadeGestora().getId() +"') as t");
+        return (Integer) query.getSingleResult();
     }
 }
