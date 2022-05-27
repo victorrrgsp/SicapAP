@@ -29,9 +29,8 @@
               <strong>Loading...</strong>
             </div>
           </template>
-          
         </b-table>
-       <p v-if="(fila.length == 0)" class="text-danger"> Sem processos!</p>
+        <p v-if="fila.length == 0" class="text-danger">Sem processos!</p>
       </b-card-body>
     </b-card>
     <b-card no-body>
@@ -41,50 +40,68 @@
         </b-nav>
       </b-card-header>
       <b-row>
-       &nbsp;&nbsp;&nbsp;<b-col  >
-         <p align="left" >
-              <b-form-group
-                label-for="filter-input"
-                label-cols-sm="3"
-                label-align-sm="left"
-                label-size="sm"
-                class="mb-0"
+        &nbsp;&nbsp;&nbsp;
+        <b-col>
+          <p align="left">
+            <b-form-group label="Unidade Gestora*	">
+              <b-form-input
+                list="unidadeGestora"
+                required
+                v-model="filterform"
+                name="unidadeGestora"
+                placeholder="Pesquise aqui..."
               >
-                <b-input-group size="sm">
-                        <b-form-input
-                          id="filter-input"
-                          v-model="filterForm"
-                          type="search"
-                          placeholder="Pesquise aqui..."
-                          @v-on:keyuo.13="filter = filterForm"
-                        >
-                        </b-form-input>
+              </b-form-input>
 
-                        <b-input-group-append>
-                          <b-button @click="filter = filterForm">pesquisar</b-button>
-                        </b-input-group-append>
-                </b-input-group>
-              </b-form-group>
+              <b-form-datalist id="unidadeGestora">
+                <option v-for="(item, index) in unidades" v-bind:key="index.id">
+                  {{ item.nome }}
+                </option>
+              </b-form-datalist>
+            </b-form-group>
           </p>
-      </b-col> 
+        </b-col>
 
-      <b-col >
-        <p align="right" class="pesquisa_select" >
-              <b>Exercicio:</b> &nbsp; <b-form-select class="select-selected" v-model="formdata.exercicio" :options="formdata.exercicios"> </b-form-select>
-              &nbsp;   
-               <b>Remessa:</b> &nbsp; <b-form-select class="select-selected" v-model="formdata.remessa" :options="formdata.remessas"> </b-form-select>
-              &nbsp;   
-              <b-button @click="pesquisarRemesssa(formdata.exercicio, formdata.remessa)" pill variant="success" size="sm"> Pesquisar </b-button> &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
-        </p>
-      </b-col>
-
-
-     </b-row>
-
+        <b-col>
+          <p align="right" class="pesquisa_select">
+            <b>Exercicio:</b> &nbsp;
+            <b-form-select
+              class="select-selected"
+              v-model="formdata.exercicio"
+              :options="formdata.exercicios"
+              @change="pesquisarRemessas"
+            >
+            </b-form-select>
+            &nbsp;
+            <b>Remessa:</b> &nbsp;
+            <b-form-select
+              class="select-selected"
+              v-model="formdata.remessa"
+              :options="formdata.remessas"
+            >
+            </b-form-select>
+            &nbsp;
+            <b-button
+              @click="pesquisarRemesssa(formdata.exercicio, formdata.remessa)"
+              pill
+              variant="success"
+              size="sm"
+            >
+              Pesquisar
+            </b-button>
+            &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+          </p>
+        </b-col>
+      </b-row>
 
       <b-card-body>
+
+        <span>
+        {{ processos.length }} - Processos finalizados    
+        </span>
+
         <b-table
-        :busy="isBusy"
+          :busy="isBusy"
           striped
           hover
           responsive
@@ -98,9 +115,8 @@
           :current-page="currentPage"
           aria-controls="my-table"
           :tbody-tr-class="rowClass"
-         small
+          small
         >
-
           <template #table-busy>
             <div class="text-center text-danger my-2">
               <b-spinner class="align-middle"></b-spinner>
@@ -109,31 +125,36 @@
           </template>
 
           <template #cell(status)="data">
-            <b-icon  v-if= "statusIcon( data.value ) == 'x-circle'" class="h6 mb-1"
-                :icon="statusIcon( data.value )" 
-               
-                 variant="danger"
-                cursor= "pointer" 
-                title="Assinaturas"
-                @click="info(data.item, data.index, $event.target)" pill 
-               
-                size="sm">
-            </b-icon> 
-            <b-icon  v-else class="h6 mb-1"
-                :icon="statusIcon( data.value )" 
-               
-                 variant="success"
-                cursor= "pointer" 
-                title="Assinaturas"
-                @click="info(data.item, data.index, $event.target)" pill 
-               
-                size="sm">
+            <b-icon
+              v-if="statusIcon(data.value) == 'x-circle'"
+              class="h6 mb-1"
+              :icon="statusIcon(data.value)"
+              variant="danger"
+              cursor="pointer"
+              title="Assinaturas"
+              @click="info(data.item, data.index, $event.target)"
+              pill
+              size="sm"
+            >
             </b-icon>
-    
+            <b-icon
+              v-else
+              class="h6 mb-1"
+              :icon="statusIcon(data.value)"
+              variant="success"
+              cursor="pointer"
+              title="Assinaturas"
+              @click="info(data.item, data.index, $event.target)"
+              pill
+              size="sm"
+            >
+            </b-icon>
           </template>
         </b-table>
-      <b-icon  class="h6 mb-1" icon="check-square"  variant="success"> </b-icon> &nbsp;    &nbsp;Enviado  &nbsp;   &nbsp;    &nbsp;
-      <b-icon  class="h6 mb-1" icon="x-circle"  variant="danger"> </b-icon> &nbsp;    &nbsp;Cancelado 
+        <b-icon class="h6 mb-1" icon="check-square" variant="success"> </b-icon>
+        &nbsp; &nbsp;Enviado &nbsp; &nbsp; &nbsp;
+        <b-icon class="h6 mb-1" icon="x-circle" variant="danger"> </b-icon>
+        &nbsp; &nbsp;Cancelado
       </b-card-body>
     </b-card>
     <!-- <b-pagination
@@ -152,42 +173,38 @@ import { api } from "@/plugins/axios";
 export default {
   data() {
     return {
+      unidades: [],
       aprovado: "aprovado",
       isBusy: true,
       perPage: 5000,
       currentPage: 1,
-      filter: null,
-      filterForm:null,
+      filter: "",
+      filterform: "",
       processos: [],
-      formdata:{
-               exercicio: 2021,
-               exercicios: [
-                           
-                            { value: '2021', text: '2021' },
-                           ],
-               remessa: 10,
-               remessas: [
-
-                            
-                            { value: '10', text: '10'},
-                            { value: '9', text: '9' },
-                            { value: '8', text: '8' },
-                            { value: '7', text: '7' },
-                            { value: '6', text: '6' },
-                            { value: '5', text: '5' },
-                            { value: '4', text: '4' },
-                            { value: '3', text: '3' },
-                            { value: '2', text: '2' },
-                            { value: '1', text: '1' },
-                          ]
-            },
+      formdata: {
+        exercicio: 2021,
+        exercicios: [{ value: "2021", text: "2021" }],
+        remessa: 10,
+        remessas: [
+          { value: "10", text: "10" },
+          { value: "9", text: "9" },
+          { value: "8", text: "8" },
+          { value: "7", text: "7" },
+          { value: "6", text: "6" },
+          { value: "5", text: "5" },
+          { value: "4", text: "4" },
+          { value: "3", text: "3" },
+          { value: "2", text: "2" },
+          { value: "1", text: "1" },
+        ],
+      },
       fila: [],
       items: [
         {
           key: "nome",
           label: "Unidade Gestora",
           sortable: true,
-          tdClass: 'fonteLinhaLeft'
+          tdClass: "fonteLinhaLeft",
           // formatter: 'todasMaiusculas'
         },
 
@@ -195,13 +212,13 @@ export default {
           key: "exercicio",
           label: "Exercicio",
           sortable: true,
-          tdClass: 'fonteLinha'
+          tdClass: "fonteLinha",
         },
         {
           key: "remessa",
           label: "Remessa",
           sortable: true,
-          tdClass: 'fonteLinha'
+          tdClass: "fonteLinha",
         },
 
         {
@@ -209,21 +226,20 @@ export default {
           label: "Data Envio",
           formatter: "formatarData",
           sortable: false,
-          tdClass: 'fonteLinha'
+          tdClass: "fonteLinha",
         },
         {
           key: "dataProcessamento",
           label: "Data Procesamento",
           formatter: "formatarData",
           sortable: true,
-          tdClass: 'fonteLinha'
+          tdClass: "fonteLinha",
         },
         {
-        key: 'status',
-        label:'Status',
-        sortable: false,
-        tdClass: 'fonteLinha'
-
+          key: "status",
+          label: "Status",
+          sortable: false,
+          tdClass: "fonteLinha",
         },
       ],
       items2: [
@@ -231,7 +247,7 @@ export default {
           key: "nome",
           label: "Unidade Gestora",
           sortable: true,
-          tdClass: 'fonteLinhaLeft'
+          tdClass: "fonteLinhaLeft",
           // formatter: 'todasMaiusculas'
         },
 
@@ -239,13 +255,13 @@ export default {
           key: "exercicio",
           label: "Exercicio",
           sortable: true,
-          tdClass: 'fonteLinha'
+          tdClass: "fonteLinha",
         },
         {
           key: "remessa",
           label: "Remessa",
           sortable: true,
-          tdClass: 'fonteLinha'
+          tdClass: "fonteLinha",
         },
 
         {
@@ -253,87 +269,98 @@ export default {
           label: "Data Envio",
           sortable: false,
           formatter: "formatarData",
-          tdClass: 'fonteLinha'
+          tdClass: "fonteLinha",
         },
         {
           key: "posicao",
           label: "Posição",
           sortable: true,
-          tdClass: 'fonteLinha'
+          tdClass: "fonteLinha",
         },
         {
           key: "status",
           label: "Status",
           sortable: false,
-          tdClass: 'fonteLinha'
+          tdClass: "fonteLinha",
           //formatter: "rowClass"
         },
       ],
     };
   },
   mounted() {
-    this.isBusy = true
+    this.isBusy = true;
     this.FindAll();
-    this.pesquisarExercicios()
-    this.pesquisarRemessas()
+    this.pesquisarExercicios();
+    this.pesquisarRemessas();
+    this.findAllUnidadeGestora().then((resp) => {
+      this.unidades = resp;
+    });
     //  setTimeout(() =>{// aguarda com spinner antes da pesquisa aparecer na pesquisa inicial
     //               this.isBusy = false
     //               }, 1.0*1000)
-    
-   // this.isBusy = false
-    
+
+    // this.isBusy = false
+
     //this.pesquisar()
-      
+
     setInterval(this.readForms, 1000);
-  
   },
   methods: {
     pesquisarExercicios() {
-      api.get("/exercicio").then(resp => {
-        console.log("resp.data",resp.data)
-        this.formdata.exercicios = resp.data.map(p =>{return {
-            value: p ,
-            text: ""+p 
-        }});
-     
-      });
-    },
-    pesquisarRemessas() {
-      api.get("/remessa/"+this.formdata.exercicio).then(resp => {
-
-        console.log("resp.data remessa",resp.data)
-        this.formdata.remessas = resp.data.map(p =>{return {
-            value: p ,
-            text: ""+p 
-        }}
-        );
-        
-
-      });
-    },
-    pesquisarRemesssa(exercicio, remessa) {
-      api.get("filaProcessamento/processos/"+exercicio+"/"+remessa).then((resp) => {
-        
-        this.processos = resp.data 
+      api.get("/exercicio").then((resp) => {
+        console.log("resp.data", resp.data);
+        this.formdata.exercicios = resp.data.map((p) => {
+          return {
+            value: p,
+            text: "" + p,
+          };
         });
+      });
+    },
+
+    pesquisarRemessas() {
+      api.get("/remessa/" + this.formdata.exercicio).then((resp) => {
+        console.log("resp.data remessa", resp.data);
+        this.formdata.remessas = resp.data.map((p) => {
+          return {
+            value: p,
+            text: "" + p,
+          };
+        });
+      });
+    },
+
+    findAllUnidadeGestora: () =>
+      api.get("/unidadeGestora/todos").then((resp) => {
+        //commit('getUnidades', resp.data)
+        return resp.data;
+      }),
+
+    pesquisarRemesssa(exercicio, remessa) {
+      api
+        .get("filaProcessamento/processos/" + exercicio + "/" + remessa)
+        .then((resp) => {
+          this.processos = resp.data;
+        });
+
+      this.filter = this.filterform;
     },
     FindAll() {
       api.get("filaProcessamento/processos").then((resp) => {
-        this.processos = resp.data;  
-        this.isBusy = false        
+        this.processos = resp.data;
+        this.isBusy = false;
       });
     },
     async pesquisar() {
-      this.isBusy = !this.isBusy //loading 
-      this.FindAll()
-      this.isBusy = false
+      this.isBusy = !this.isBusy; //loading
+      this.FindAll();
+      this.isBusy = false;
     },
 
     readForms() {
-      api.get("filaProcessamento/fila").then((resp) => { 
+      api.get("filaProcessamento/fila").then((resp) => {
         this.fila = resp.data;
       });
-      
     },
     formatarData: function (value) {
       if (value === null) {
@@ -354,16 +381,15 @@ export default {
     //     return;
     //   }
     // },
-    statusIcon(label){
-      
-        if(label === "ok") return 'check-square'
-        else if (label === 'mapear erro') return 'x-circle'
+    statusIcon(label) {
+      if (label === "ok") return "check-square";
+      else if (label === "mapear erro") return "x-circle";
     },
-     rowClass(item, type) {
-        if (!item || type !== 'row') return
-        if (item.status === 'mapear erro') return 'check'
-        else if (item.status === 'ok')  return 'x'
-      }
+    rowClass(item, type) {
+      if (!item || type !== "row") return;
+      if (item.status === "mapear erro") return "check";
+      else if (item.status === "ok") return "x";
+    },
   },
 
   computed: {
@@ -374,14 +400,12 @@ export default {
 };
 </script>
 <style >
-
 .fonteLinha {
-   font-size:14px;
-   text-align: left;
+  font-size: 14px;
+  text-align: left;
 }
 .fonteLinhaLeft {
-   font-size:14px;
-
+  font-size: 14px;
 }
 .select-selected {
   border-color: black;
@@ -413,11 +437,9 @@ export default {
 .select-hide {
   display: none;
 }
-.pesquisa_select{
-
+.pesquisa_select {
   position: relative;
   margin-top: 20px;
-
 }
 .select-items div:hover,
 .same-as-selected {
@@ -431,5 +453,4 @@ export default {
     flex-direction: column;
   }
 }
-
 </style>
