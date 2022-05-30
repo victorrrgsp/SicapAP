@@ -1,5 +1,6 @@
 package com.example.sicapweb.repository;
 
+import br.gov.to.tce.model.DefaultEntity;
 import br.gov.to.tce.model.InfoRemessa;
 import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
@@ -65,10 +66,20 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
     }
 
     //@Transactional(rollbackFor = { SQLException.class },  propagation = Propagation.NESTED )
+    public void deleteRestrito(BigInteger id) {
+        try {
+            DefaultEntity objeto = (DefaultEntity)getEntityManager().find(entityClass, id);
+            objeto.setId(id);
+            if(objeto.getChave().getIdUnidadeGestora().equals(User.getUser(request).getUnidadeGestora().getId())){
+                getEntityManager().remove(objeto);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
     public void delete(BigInteger id) {
         getEntityManager().remove(getEntityManager().find(entityClass, id));
     }
-
     //@Transactional(rollbackFor = { SQLException.class },  propagation = Propagation.NESTED )
     public void delete(String id) {
         entityManager = getEntityManager();
@@ -84,6 +95,7 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
 
     //@Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public List<T> findAll() {
+
         return getEntityManager()
                 .createQuery("select a from " + entityClass.getSimpleName() +
                         " a, InfoRemessa info where a.infoRemessa.chave = info.chave and info.idUnidadeGestora = '"

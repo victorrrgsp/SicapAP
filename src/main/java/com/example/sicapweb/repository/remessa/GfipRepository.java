@@ -1,11 +1,15 @@
 package com.example.sicapweb.repository.remessa;
 
+import br.gov.to.tce.model.InfoRemessa;
 import br.gov.to.tce.model.ap.folha.documento.Gfip;
 import com.example.sicapweb.repository.DefaultRepository;
+import com.example.sicapweb.security.User;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import java.math.BigInteger;
+import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -59,4 +63,7 @@ public class GfipRepository extends DefaultRepository<Gfip, BigInteger> {
                         "  and idInfoRemessa = '" + chave + "' " +
                         "group by tipo").getResultList();
     }
+
+
+
 }
