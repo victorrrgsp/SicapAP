@@ -15,7 +15,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.math.BigInteger;
 import java.net.URI;
 import java.util.List;
-
+import  com.example.sicapweb.exception.InvalitInsert;
 @RestController
 @RequestMapping({"/concursoEdital"})
 public class EditalController extends DefaultController<Edital> {
@@ -64,7 +64,7 @@ public class EditalController extends DefaultController<Edital> {
         return ResponseEntity.created(uri).body(edital);
         }
         else{
-           return ResponseEntity.status(HttpStatus.CONFLICT).body(edital);
+            throw new InvalitInsert("ja existe o edital!!");
 
         }
 
