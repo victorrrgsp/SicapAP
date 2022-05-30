@@ -44,14 +44,14 @@ public class DocumentoConcursoHomologacaoController extends DefaultController<Ed
         PaginacaoUtil<EditalHomologaConcurso> paginacaoUtil = editalHomologacaoRepository.buscaPaginadaEditaisHomologa(pageable,searchParams,tipoParams);
         List<EditalHomologaConcurso> listE = paginacaoUtil.getRegistros();
         for(Integer i= 0; i < listE.size(); i++){
-            Integer quantidadeDocumentos = editalHomologacaoRepository.findSituacao("DocumentoEditalHomologacao","idEditalHomologacao", listE.get(i).getId(), "'XII','XIII','XIV','XV','XVI'");
+            Integer quantidadeDocumentos = editalHomologacaoRepository.findSituacao("DocumentoEditalHomologacao","idEditalHomologacao", listE.get(i).getId(), "'XII','XIII','XIV','XV'");
             if (listE.get(i).getVeiculoPublicacao()==null  || listE.get(i).getDataHomologacao()==null || listE.get(i).getAto()==null || listE.get(i).getEdital()==null  ) {
                 listE.get(i).setSituacao("Dados Incompletos");
             }
             else
-            if(quantidadeDocumentos <  5) {
+            if(quantidadeDocumentos <  4) {
                 listE.get(i).setSituacao("Pendente");
-            } else if(quantidadeDocumentos == 5){
+            } else if(quantidadeDocumentos == 4){
                 listE.get(i).setSituacao("Aguardando Assinatura");
             }
         }
@@ -61,7 +61,7 @@ public class DocumentoConcursoHomologacaoController extends DefaultController<Ed
     @CrossOrigin
     @GetMapping(path = {"getSituacao/{id}"})
     public ResponseEntity<?> findSituacao(@PathVariable BigInteger id) {
-        Integer situacao = documentoEditalHomologacaoRepository.findSituacao("DocumentoEditalHomologacao","idEditalHomologacao",id, "'XII','XIII','XIV','XV','XVI'");
+        Integer situacao = documentoEditalHomologacaoRepository.findSituacao("DocumentoEditalHomologacao","idEditalHomologacao",id, "'XII','XIII','XIV','XV'");
         return ResponseEntity.ok().body(situacao);
     }
 
@@ -101,7 +101,7 @@ public class DocumentoConcursoHomologacaoController extends DefaultController<Ed
         list.add(new Inciso("XV", "Ato de homologação do resultado do concurso público e lista de aprovados",
                 "Ato de homologação do resultado do concurso público e lista de aprovados", "", "Sim"));
         list.add(new Inciso("XVI", "Demais documentos exigidos em legislação específica de concurso público",
-                "Demais documentos exigidos em legislação específica de concurso público", "", "Sim"));
+                "Demais documentos exigidos em legislação específica de concurso público", "", "Não"));
         list.add(new Inciso("", "Outros",
                 "Outros", "", "Não"));
 

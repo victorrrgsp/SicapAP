@@ -101,7 +101,12 @@ public class EditalRepository extends DefaultRepository<Edital, BigInteger> {
     public Edital buscarEditalPorNumero(String numeroEdital) {
         List<Edital> list = getEntityManager().createNativeQuery("select * from Edital ed" +
                 " where numeroEdital = '" + numeroEdital + "'", Edital.class).getResultList();
-        return list.get(0);
+        if (list.size()>0 ){
+            return list.get(0);
+        }
+        else {
+            return null;
+        }
     }
 
     public List<Edital> buscarEditaisNaoHomologados() {
