@@ -57,11 +57,17 @@ public class ChavesController {
                 remessa= autenticacao.getRemessa();
                 exercicio= autenticacao.getExercicio();
             }
-            Integer chavesRemessaAtual =admAutenticacaoRepository.getQtdAssinaturas(autenticacao.getUnidadeGestora().getId(), autenticacao.getExercicio(), autenticacao.getRemessa());
+            Integer chavesRemessaAtual =admAutenticacaoRepository.
+                    getQtdAssinaturas(
+                            autenticacao.getUnidadeGestora().getId(),
+                            autenticacao.getExercicio(),
+                            autenticacao.getRemessa()
+                    );
             Integer chavesRemessaAnterior =admAutenticacaoRepository.getQtdAssinaturas(autenticacao.getUnidadeGestora().getId(), exercicio, remessa );
             if (chavesRemessaAtual > 0   ){
                 throw new InvalitInsert("Já existe uma chave com assinatura !!");
-            } else if (chavesRemessaAnterior < 3) {
+            }
+            if (chavesRemessaAnterior < 3 ||chavesRemessaAnterior  == null) {
                 throw new InvalitInsert("Remessa anterior pendente de assinatura!!");
             }
             digest.reset();
