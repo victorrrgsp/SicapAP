@@ -13,41 +13,50 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
 import java.util.List;
-
+@CrossOrigin
 @RestController
 @RequestMapping("/ato")
 public class AtoController extends DefaultController<Ato>  {
 
     @Autowired
     private AtoRepository atoRepository;
-    @CrossOrigin
+
     @GetMapping(path="/{searchParams}/{tipoParams}/pagination")
     public ResponseEntity<PaginacaoUtil<Ato>> listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
         PaginacaoUtil<Ato> paginacaoUtil = atoRepository.buscaPaginada(pageable,searchParams,tipoParams);
         return ResponseEntity.ok().body(paginacaoUtil);
     }
 
-    @CrossOrigin
     @GetMapping
     public ResponseEntity<List<Ato>> findAll() {
         List<Ato> list = atoRepository.findAll();
         return ResponseEntity.ok().body(list);
     }
 
-    @CrossOrigin
     @GetMapping(path = {"/{id}"})
     public ResponseEntity<?> findById(@PathVariable BigInteger id) {
         Ato list = atoRepository.findById(id);
         return ResponseEntity.ok().body(list);
     }
-    @CrossOrigin
     @GetMapping(path = {"/{numero}/{tipo}"})
     public ResponseEntity<?> findById(@PathVariable String numero, @PathVariable int tipo) {
         Ato list = atoRepository.buscarAtoPorNumero(numero, tipo);
         return ResponseEntity.ok().body(list);
     }
 
-    @CrossOrigin
+
+
+    @Transactional
+    @PostMapping("/create")
+    public ResponseEntity<Ato> update(@RequestBody Ato ato) {
+        InfoRemessa chave = atoRepository.findAll().get(0).getChave();
+        ato.setNumeroAto(ato.getNumeroAto().replace("/", ""));
+        ato.setCnpjUgPublicacao(ato.getCnpjUgPublicacao().replace(".", "").replace("-", "").replace("/", ""));
+        ato.setChave(chave);
+        ato.setId(null);
+        atoRepository.save(ato);
+        return ResponseEntity.noContent().build();
+    }
     @Transactional
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.PUT)
     public ResponseEntity<Ato> update(@RequestBody Ato ato, @PathVariable BigInteger id) {
@@ -59,7 +68,6 @@ public class AtoController extends DefaultController<Ato>  {
         atoRepository.update(ato);
         return ResponseEntity.noContent().build();
     }
-    @CrossOrigin
     @Transactional
     @DeleteMapping(value = {"/{id}"})
     public ResponseEntity<?> delete(@PathVariable BigInteger id) {
