@@ -3,7 +3,7 @@ package com.example.sicapweb.model;
 import java.util.Date;
 
 public class ProcessoAdmissaoConcurso {
-    //terceira aba de dados de envio eletronica de documentos-> admissao
+    //primeira aba de dados de envio eletronica de documentos-> admissao
     private String numeroEdital;
 
     private Date dtcriacao;
