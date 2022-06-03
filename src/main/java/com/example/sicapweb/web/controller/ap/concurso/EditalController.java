@@ -65,7 +65,6 @@ public class EditalController extends DefaultController<Edital> {
         }
         else{
             throw new InvalitInsert("ja existe o edital!!");
-
         }
 
     }

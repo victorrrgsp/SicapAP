@@ -1,16 +1,26 @@
 package com.example.sicapweb.model;
 
+import br.gov.to.tce.model.ap.concurso.Edital;
+import br.gov.to.tce.model.ap.concurso.EditalAprovado;
+import br.gov.to.tce.model.ap.relacional.Ato;
+
 public class NomeacaoConcurso {
     //segunda aba de dados de envio eletronica de documentos-> admissao
     private String numeroAto;
+
+    private Ato ato;
     private String cpf;
     private String nome;
     private String numeroEdital;
+
+    private Edital edital;
     private String SitCadAprovado;
-    private Integer classificacao;
+    private String classificacao;
     private String vaga;
+
+    private EditalAprovado editalaprovado;
     private String ProcessoConcurso;
-    private String StuacaoNomeacao;
+    private String SituacaoNomeacao;
 
     public NomeacaoConcurso() {
     }
@@ -55,11 +65,11 @@ public class NomeacaoConcurso {
         SitCadAprovado = sitCadAprovado;
     }
 
-    public Integer getClassificacao() {
+    public String getClassificacao() {
         return classificacao;
     }
 
-    public void setClassificacao(Integer classificacao) {
+    public void setClassificacao(String classificacao) {
         this.classificacao = classificacao;
     }
 
@@ -79,11 +89,35 @@ public class NomeacaoConcurso {
         ProcessoConcurso = processoConcurso;
     }
 
-    public String getStuacaoNomeacao() {
-        return StuacaoNomeacao;
+    public String getSituacaoNomeacao() {
+        return SituacaoNomeacao;
     }
 
-    public void setStuacaoNomeacao(String stuacaoNomeacao) {
-        StuacaoNomeacao = stuacaoNomeacao;
+    public void setSituacaoNomeacao(String situacaoNomeacao) {
+        SituacaoNomeacao = situacaoNomeacao;
+    }
+
+    public Ato getAto() {
+        return ato;
+    }
+
+    public void setAto(Ato ato) {
+        this.ato = ato;
+    }
+
+    public Edital getEdital() {
+        return edital;
+    }
+
+    public void setEdital(Edital edital) {
+        this.edital = edital;
+    }
+
+    public EditalAprovado getEditalaprovado() {
+        return editalaprovado;
+    }
+
+    public void setEditalaprovado(EditalAprovado editalaprovado) {
+        this.editalaprovado = editalaprovado;
     }
 }

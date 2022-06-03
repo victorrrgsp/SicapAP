@@ -2,20 +2,16 @@ package com.example.sicapweb.repository.concurso;
 
 import br.gov.to.tce.model.ap.concurso.Edital;
 import br.gov.to.tce.model.ap.concurso.EmpresaOrganizadora;
-import br.gov.to.tce.model.ap.concurso.documento.DocumentoEdital;
-import br.gov.to.tce.model.ap.pessoal.Aposentadoria;
+import com.example.sicapweb.model.EditalFinalizado;
 import com.example.sicapweb.model.EditalConcurso;
 import com.example.sicapweb.repository.DefaultRepository;
 import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
-import com.example.sicapweb.web.controller.ap.concessao.ConcessaoAposentadoriaController;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -65,7 +61,7 @@ public class EditalRepository extends DefaultRepository<Edital, BigInteger> {
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();
-        long totalRegistros = countEditais();
+        long totalRegistros = this.countEditais();
         long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
         List<EditalConcurso> listc= new ArrayList<EditalConcurso>() ;
         for(Integer i= 0; i < list.size(); i++){
@@ -113,6 +109,38 @@ public class EditalRepository extends DefaultRepository<Edital, BigInteger> {
         List<Edital> list = getEntityManager().createNativeQuery("select * from Edital ed where " +
                 "not exists (select * from EditalHomologacao eh where ed.id = eh.idEdital)", Edital.class).getResultList();
         return list;
+    }
+
+
+
+    public PaginacaoUtil<EditalFinalizado> buscarEditaiFinalizados(Pageable pageable, String searchParams, Integer tipoParams) {
+        int pagina = Integer.valueOf(pageable.getPageNumber());
+        int tamanho = Integer.valueOf(pageable.getPageSize());
+        String search = "";
+        search = getSearch(searchParams, tipoParams);
+        String campo = String.valueOf(pageable.getSort()).replace(":", "");
+
+        List<Edital> list = getEntityManager()
+                .createNativeQuery("select a.* from Edital a " +
+                        "join InfoRemessa i on a.chave = i.chave " +
+                        "where  a.tipoEdital =1  and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, Edital.class)
+                .setFirstResult(pagina)
+                .setMaxResults(tamanho)
+                .getResultList();
+
+
+        long totalRegistros = list.size();
+        long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
+        List<EditalFinalizado> listc= new ArrayList<EditalFinalizado>() ;
+        for(Integer i= 0; i < list.size(); i++){
+            EditalFinalizado edf =new EditalFinalizado();
+            edf.setNumeroEdital(list.get(i).getNumeroEdital());
+            edf.setProcesso(null);
+            edf.setData(list.get(i).getDataPublicacao());
+            edf.setEdital((Edital)list.get(i));
+            listc.add(edf);
+        }
+        return new PaginacaoUtil<EditalFinalizado>(tamanho, pagina, totalPaginas, totalRegistros, listc);
     }
 
 }

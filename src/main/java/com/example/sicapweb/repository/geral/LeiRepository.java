@@ -22,6 +22,7 @@ public class LeiRepository extends DefaultRepository<Lei, BigInteger> {
                         "select * from lei l where l.id = " + id, Lei.class)
                 .getResultList();
     }
+
     public PaginacaoUtil<Lei> buscaPaginada(Pageable pageable, String searchParams, Integer tipoParams) {
 
         int pagina = Integer.valueOf(pageable.getPageNumber());
