@@ -2,6 +2,7 @@ package com.example.sicapweb.repository.concurso;
 
 import br.gov.to.tce.model.ap.concurso.EditalVaga;
 import com.example.sicapweb.repository.DefaultRepository;
+import com.example.sicapweb.security.User;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -13,6 +14,14 @@ public class EditalVagaRepository extends DefaultRepository<EditalVaga, BigInteg
 
     public EditalVagaRepository(EntityManager em) {
         super(em);
+    }
+
+    public List<EditalVaga> buscarVagas() {
+        return  getEntityManager().createNativeQuery(
+                        "select a.* from EditalVaga a"+
+                        " join InfoRemessa i on a.chave = i.chave " +
+                                "where  i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' ", EditalVaga.class)
+                .getResultList();
     }
 
     public List<EditalVaga> buscarVagasPorEdital(Integer idEdital) {

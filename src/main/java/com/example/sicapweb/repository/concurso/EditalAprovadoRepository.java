@@ -35,7 +35,7 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
         List<EditalAprovado> list = getEntityManager()
                 .createNativeQuery("select a.* from EditalAprovado a " +
                         "join InfoRemessa i on a.chave = i.chave " +
-                        "where   i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' "  + " ORDER BY " + campo, EditalAprovado.class)
+                        "where not exists(select 1 from Admissao ad  where ad.numeroInscricao=a.numeroInscricao)  and  i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' "  + " ORDER BY " + campo, EditalAprovado.class)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();
@@ -50,6 +50,7 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
             editalAprovadoConcurso.setClassificacao(list.get(i).getClassificacao());
             editalAprovadoConcurso.setCodigoVaga(list.get(i).getCodigoVaga());
             editalAprovadoConcurso.setCpf(list.get(i).getCpf());
+            editalAprovadoConcurso.setEditalaprovado(list.get(i));
             editalAprovadoConcurso.setSituacao("não definido ainda");
             listc.add(editalAprovadoConcurso);
         }
@@ -59,7 +60,7 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
     public Integer countAprovados() {
         Query query = getEntityManager().createNativeQuery("select count(*) from EditalAprovado a " +
                 "join InfoRemessa i on a.chave = i.chave " +
-                "where  i.idUnidadeGestora= '"+ User.getUser(super.request).getUnidadeGestora().getId()+ "'");
+                "where not exists(select 1 from Admissao ad  where ad.numeroInscricao=a.numeroInscricao)  and  i.idUnidadeGestora= '"+ User.getUser(super.request).getUnidadeGestora().getId()+ "'");
         return (Integer) query.getSingleResult();
     }
 

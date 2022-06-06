@@ -1,5 +1,6 @@
 package com.example.sicapweb.model;
 
+import br.gov.to.tce.model.ap.concurso.EditalAprovado;
 import br.gov.to.tce.model.ap.concurso.EditalVaga;
 
 public class EditalAprovadoConcurso {
@@ -7,6 +8,8 @@ public class EditalAprovadoConcurso {
     //terceira aba de dados de envio eletronica de documentos-> admissao
     private String numeroEdital;
     private String codigoVaga;
+
+    private EditalAprovado editalaprovado;
     private EditalVaga editalVaga;
     private String cpf;
     private String nome;
@@ -90,5 +93,13 @@ public class EditalAprovadoConcurso {
 
     public void setSituacao(String situacao) {
         this.Situacao = situacao;
+    }
+
+    public EditalAprovado getEditalaprovado() {
+        return editalaprovado;
+    }
+
+    public void setEditalaprovado(EditalAprovado editalaprovado) {
+        this.editalaprovado = editalaprovado;
     }
 }

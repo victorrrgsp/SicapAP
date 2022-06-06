@@ -2,15 +2,14 @@ package com.example.sicapweb.web.controller.ap.concurso;
 
 import br.gov.to.tce.model.ap.concurso.Edital;
 import br.gov.to.tce.model.ap.concurso.ProcessoAdmissao;
+import br.gov.to.tce.model.ap.concurso.documento.DocumentoAdmissao;
 import com.example.sicapweb.exception.InvalitInsert;
 import com.example.sicapweb.model.EditalFinalizado;
 import com.example.sicapweb.model.NomeacaoConcurso;
-import com.example.sicapweb.repository.concurso.EditalRepository;
-import com.example.sicapweb.repository.concurso.ProcessoAdmissaoRepository;
+import com.example.sicapweb.repository.concurso.*;
 import com.example.sicapweb.repository.geral.admissaoRepository;
 import com.example.sicapweb.model.EditalAprovadoConcurso;
-import com.example.sicapweb.repository.concurso.EditalAprovadoRepository;
-import com.example.sicapweb.repository.concurso.EditalVagaRepository;
+import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +20,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.math.BigInteger;
 import java.net.URI;
+import java.util.List;
 
 
 @RestController
@@ -38,6 +38,7 @@ public class EditalAdmissaoController {
 
     @Autowired
     private EditalRepository editalRepository;
+
 
     @CrossOrigin
     @GetMapping(path="/aprovados/{searchParams}/{tipoParams}/pagination")
@@ -79,10 +80,14 @@ public class EditalAdmissaoController {
     @Transactional
     @PostMapping(path = "/processos")
     public ResponseEntity<ProcessoAdmissao> create(@RequestBody ProcessoAdmissao processoAdmissao) {
+
+        processoAdmissao.setCnpjEmpresaOrganizadora(User.getUser(processoAdmissaoRepository.getRequest()).getUnidadeGestora().getId());
         processoAdmissaoRepository.save(processoAdmissao);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(processoAdmissao.getClass()).toUri();
         return ResponseEntity.created(uri).body(processoAdmissao);
     }
+
+
 
 
 }
