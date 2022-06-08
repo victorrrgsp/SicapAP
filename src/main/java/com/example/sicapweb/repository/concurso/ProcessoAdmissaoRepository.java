@@ -1,9 +1,12 @@
 package com.example.sicapweb.repository.concurso;
 
+import br.gov.to.tce.model.ap.concurso.Edital;
 import br.gov.to.tce.model.ap.concurso.EditalAprovado;
 import br.gov.to.tce.model.ap.concurso.ProcessoAdmissao;
 import br.gov.to.tce.model.ap.pessoal.Admissao;
+import com.example.sicapweb.model.EditalFinalizado;
 import com.example.sicapweb.model.NomeacaoConcurso;
+import com.example.sicapweb.model.ProcessoAdmissaoConcurso;
 import com.example.sicapweb.repository.DefaultRepository;
 import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
@@ -45,7 +48,7 @@ public class ProcessoAdmissaoRepository  extends DefaultRepository<ProcessoAdmis
         return search;
     }
 
-    public PaginacaoUtil<ProcessoAdmissao> buscarProcessos(Pageable pageable, String searchParams, Integer tipoParams) {
+    public PaginacaoUtil<ProcessoAdmissaoConcurso> buscarProcessos(Pageable pageable, String searchParams, Integer tipoParams) {
         int pagina = Integer.valueOf(pageable.getPageNumber());
         int tamanho = Integer.valueOf(pageable.getPageSize());
         String search = "";
@@ -63,7 +66,20 @@ public class ProcessoAdmissaoRepository  extends DefaultRepository<ProcessoAdmis
         long totalRegistros = countProcessos();
         long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
 
-        return new PaginacaoUtil<ProcessoAdmissao>(tamanho, pagina, totalPaginas, totalRegistros, list);
+        List<ProcessoAdmissaoConcurso> listc= new ArrayList<ProcessoAdmissaoConcurso>() ;
+        for(Integer i= 0; i < list.size(); i++){
+            ProcessoAdmissaoConcurso pac =new ProcessoAdmissaoConcurso();
+            pac.setNumeroEdital(list.get(i).getEdital().getNumeroEdital());
+            pac.setId(list.get(i).getId());
+            pac.setDtcriacao(list.get(i).getDataCriacao());
+            pac.setStatus(list.get(i).getStatus());
+            Integer qt = (Integer)  getEntityManager().createNativeQuery("select count(*) from DocumentoAdmissao a " +
+                    "where   a.idProcessoAdmissao = "+ pac.getId()+ "").getSingleResult();
+            pac.setQuantidade(qt);
+            listc.add(pac);
+        }
+
+        return new PaginacaoUtil<ProcessoAdmissaoConcurso>(tamanho, pagina, totalPaginas, totalRegistros, listc);
     }
 
     public Integer countProcessos() {

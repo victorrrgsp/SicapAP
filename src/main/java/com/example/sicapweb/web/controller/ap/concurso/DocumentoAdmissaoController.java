@@ -4,6 +4,9 @@ package com.example.sicapweb.web.controller.ap.concurso;
 import br.gov.to.tce.model.ap.concurso.EditalHomologacao;
 import br.gov.to.tce.model.ap.concurso.documento.DocumentoAdmissao;
 import br.gov.to.tce.model.ap.concurso.documento.DocumentoEditalHomologacao;
+import com.example.sicapweb.model.EditalConcurso;
+import com.example.sicapweb.model.Inciso;
+import com.example.sicapweb.model.ProcessoAdmissaoConcurso;
 import com.example.sicapweb.repository.concurso.DocumentoAdmissaoRepository;
 import com.example.sicapweb.repository.concurso.EditalAprovadoRepository;
 import com.example.sicapweb.repository.concurso.EditalVagaRepository;
@@ -11,6 +14,7 @@ import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
 import com.example.sicapweb.web.controller.DefaultController;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -19,11 +23,12 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.math.BigInteger;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 @RestController
-@RequestMapping({"/documentoConcursoAdmissão"})
+@RequestMapping({"/documentoConcursoAdmissao"})
 public class DocumentoAdmissaoController extends DefaultController<DocumentoAdmissao> {
 
     @Autowired
@@ -53,16 +58,52 @@ public class DocumentoAdmissaoController extends DefaultController<DocumentoAdmi
 
 
     @CrossOrigin
+    @GetMapping(path = {"/getOocumentosAprovados/{idproc}/pagination"})
+    public ResponseEntity<PaginacaoUtil<DocumentoAdmissao>> getOocumentosAprovados(Pageable pageable, @PathVariable BigInteger idproc) {
+        PaginacaoUtil<DocumentoAdmissao> paginacaoUtil = documentoAdmissaoRepository.buscaPaginadaApr(pageable,idproc) ;
+        return ResponseEntity.ok().body(paginacaoUtil);
+    }
+
+
+    @CrossOrigin
     @Transactional
-    @PostMapping("/upload/{id}" )
+    @PutMapping("/upload/{id}" )
     public ResponseEntity<?> uploadDocumentoAdmissao(@RequestParam("file") MultipartFile file, @PathVariable BigInteger id) {
         DocumentoAdmissao documentoAdmissao = documentoAdmissaoRepository.findById(id);
-        String idCastor = super.setCastorFile(file, "documentoAdmissao");
-        documentoAdmissao.setDocumentoCastorId(idCastor);
-        documentoAdmissao.setStatus(DocumentoAdmissao.Status.Informado.getValor());
-        documentoAdmissao.setDataAnexouDocumento(new Date());
-        documentoAdmissao.setUsuarioAnexouDocumento(User.getUser(documentoAdmissaoRepository.getRequest()).getUnidadeGestora().getId());
-        documentoAdmissaoRepository.update(documentoAdmissao);
+        String idCastor=null;
+        if (documentoAdmissao != null ){
+             idCastor = super.setCastorFile(file, "documentoAdmissao");
+            documentoAdmissao.setDocumentoCastorId(idCastor);
+            documentoAdmissao.setStatus(DocumentoAdmissao.Status.Informado.getValor());
+            documentoAdmissao.setDataAnexouDocumento(new Date());
+            documentoAdmissao.setUsuarioAnexouDocumento(User.getUser(documentoAdmissaoRepository.getRequest()).getUnidadeGestora().getId());
+            documentoAdmissaoRepository.update(documentoAdmissao);
+        }
         return ResponseEntity.ok().body(idCastor);
     }
+
+    @CrossOrigin
+    @Transactional
+    @PutMapping("/upload/excluir/{id}" )
+    public ResponseEntity<?> uploadDocumentoAdmissao( @PathVariable BigInteger id) {
+        DocumentoAdmissao documentoAdmissao = documentoAdmissaoRepository.findById(id);
+        String idCastor=null;
+        if (documentoAdmissao != null ){
+            documentoAdmissao.setDocumentoCastorId(idCastor);
+            documentoAdmissao.setStatus(DocumentoAdmissao.Status.NaoInformado.getValor());
+            documentoAdmissao.setDataAnexouDocumento(null);
+            documentoAdmissao.setUsuarioAnexouDocumento(null);
+            documentoAdmissaoRepository.update(documentoAdmissao);
+        }
+        return ResponseEntity.ok().body(null);
+    }
+
+    @CrossOrigin
+    @Transactional
+    @DeleteMapping(value = {"/{id}"})
+    public ResponseEntity<?> delete(@PathVariable BigInteger id) {
+        documentoAdmissaoRepository.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }

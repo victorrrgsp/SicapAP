@@ -6,6 +6,7 @@ import br.gov.to.tce.model.ap.concurso.documento.DocumentoAdmissao;
 import com.example.sicapweb.exception.InvalitInsert;
 import com.example.sicapweb.model.EditalFinalizado;
 import com.example.sicapweb.model.NomeacaoConcurso;
+import com.example.sicapweb.model.ProcessoAdmissaoConcurso;
 import com.example.sicapweb.repository.concurso.*;
 import com.example.sicapweb.repository.geral.admissaoRepository;
 import com.example.sicapweb.model.EditalAprovadoConcurso;
@@ -63,8 +64,8 @@ public class EditalAdmissaoController {
 
     @CrossOrigin
     @GetMapping(path="/processos/{searchParams}/{tipoParams}/pagination")
-    public ResponseEntity<PaginacaoUtil<ProcessoAdmissao>> listaAProcessos(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
-        PaginacaoUtil<ProcessoAdmissao> paginacaoUtil = processoAdmissaoRepository.buscarProcessos(pageable,searchParams,tipoParams);
+    public ResponseEntity<PaginacaoUtil<ProcessoAdmissaoConcurso>> listaAProcessos(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
+        PaginacaoUtil<ProcessoAdmissaoConcurso> paginacaoUtil = processoAdmissaoRepository.buscarProcessos(pageable,searchParams,tipoParams);
         return ResponseEntity.ok().body(paginacaoUtil);
     }
 

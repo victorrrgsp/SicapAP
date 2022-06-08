@@ -1,16 +1,22 @@
 package com.example.sicapweb.model;
 
+import java.math.BigInteger;
 import java.util.Date;
 
 public class ProcessoAdmissaoConcurso {
     //primeira aba de dados de envio eletronica de documentos-> admissao
+
+    private BigInteger id;
     private String numeroEdital;
 
     private Date dtcriacao;
 
+
+    private String  Processo;
+
     private Integer quantidade;
 
-    private  String  Situacao;
+    private Integer status;
 
     public ProcessoAdmissaoConcurso() {
     }
@@ -39,11 +45,27 @@ public class ProcessoAdmissaoConcurso {
         this.quantidade = quantidade;
     }
 
-    public String getSituacao() {
-        return Situacao;
+    public BigInteger getId() {
+        return id;
     }
 
-    public void setSituacao(String situacao) {
-        Situacao = situacao;
+    public void setId(BigInteger id) {
+        this.id = id;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public String getProcesso() {
+        return Processo;
+    }
+
+    public void setProcesso(String processo) {
+        Processo = processo;
     }
 }

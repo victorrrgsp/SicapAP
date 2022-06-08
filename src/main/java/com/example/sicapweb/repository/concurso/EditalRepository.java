@@ -76,11 +76,19 @@ public class EditalRepository extends DefaultRepository<Edital, BigInteger> {
             editalConcurso.setVeiculoPublicacao(list.get(i).getVeiculoPublicacao());
             editalConcurso.setCnpjEmpresaOrganizadora(list.get(i).getCnpjEmpresaOrganizadora());
            if  (!list.get(i).getCnpjEmpresaOrganizadora().isEmpty()) {
-               EmpresaOrganizadora eo = (EmpresaOrganizadora) getEntityManager()
-                       .createNativeQuery("select a.* from empresaOrganizadora a where  cnpjEmpresaOrganizadora='" + list.get(i).getCnpjEmpresaOrganizadora() + "'", EmpresaOrganizadora.class)
-                       .getResultList().get(0);
-               editalConcurso.setNomEmpresaOrganizadora(eo.getNome() );
-               editalConcurso.setValorContratacao(eo.getValor());
+               try {
+                   List<EmpresaOrganizadora> leo =  getEntityManager()
+                           .createNativeQuery("select a.* from empresaOrganizadora a where  cnpjEmpresaOrganizadora='" + list.get(i).getCnpjEmpresaOrganizadora() + "'", EmpresaOrganizadora.class)
+                           .getResultList();
+
+                   if (leo.size()>0){
+                       EmpresaOrganizadora eo =(EmpresaOrganizadora) leo.get(0);
+                   editalConcurso.setNomEmpresaOrganizadora(eo.getNome());
+                   editalConcurso.setValorContratacao(eo.getValor());
+                   }
+               }catch (IndexOutOfBoundsException e ){
+
+               }
 
            }
             listc.add(editalConcurso);

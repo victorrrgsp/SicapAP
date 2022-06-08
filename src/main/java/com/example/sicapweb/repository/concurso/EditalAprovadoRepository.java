@@ -35,7 +35,7 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
         List<EditalAprovado> list = getEntityManager()
                 .createNativeQuery("select a.* from EditalAprovado a " +
                         "join InfoRemessa i on a.chave = i.chave " +
-                        "where not exists(select 1 from Admissao ad  where ad.numeroInscricao=a.numeroInscricao)  and  i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' "  + " ORDER BY " + campo, EditalAprovado.class)
+                        "where not exists(select 1 from Admissao ad  where ad.numeroInscricao=a.numeroInscricao)   and  i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' "  + " ORDER BY " + campo, EditalAprovado.class)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();
@@ -51,7 +51,16 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
             editalAprovadoConcurso.setCodigoVaga(list.get(i).getCodigoVaga());
             editalAprovadoConcurso.setCpf(list.get(i).getCpf());
             editalAprovadoConcurso.setEditalaprovado(list.get(i));
-            editalAprovadoConcurso.setSituacao("não definido ainda");
+            Integer enviado = (Integer) getEntityManager().createNativeQuery("select count(*) from DocumentoAdmissao a " +
+                    "where  a.idAprovado = "+list.get(i).getId()+ "").getSingleResult();
+            if (enviado > 0 ){
+                editalAprovadoConcurso.setSituacao("Aprovado Anexado");
+            }
+            else
+            {
+                editalAprovadoConcurso.setSituacao("Apto para Envio!!");
+            }
+
             listc.add(editalAprovadoConcurso);
         }
         return new PaginacaoUtil<EditalAprovadoConcurso>(tamanho, pagina, totalPaginas, totalRegistros, listc);

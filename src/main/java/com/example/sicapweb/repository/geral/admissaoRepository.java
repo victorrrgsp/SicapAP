@@ -76,16 +76,25 @@ public class admissaoRepository extends DefaultRepository<Admissao, BigInteger> 
                     .getResultList();
             if (ea.size()>0 ){
                 nc.setEditalaprovado((EditalAprovado) ea.get(0) );
+
                 nc.setClassificacao(ea.get(0).getClassificacao());
                 nc.setSitCadAprovado("Aprovado Cadastrado");
                 nc.setVaga(ea.get(0).getEditalVaga().getCargo().getCargoNome().getNome());
+                Integer enviado = (Integer) getEntityManager().createNativeQuery("select count(*) from DocumentoAdmissao a " +
+                        "where  a.idAdmissao = "+list.get(i).getId()+ "").getSingleResult();
+                if (enviado > 0 ){
+                    nc.setSitCadAprovado("Aprovado Anexado");
+                }
+                else
+                {
+                    nc.setSituacaoNomeacao("Apto para envio!");
+                }
             }
             else
             {
                 nc.setSitCadAprovado("Aprovado não Cadastrado!");
                 nc.setSituacaoNomeacao("inapto para envio!");
             }
-            nc.setSituacaoNomeacao("Processo de concurso não enviado!");
 
           listc.add(nc);
         }
