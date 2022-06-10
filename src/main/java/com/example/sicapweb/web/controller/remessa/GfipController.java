@@ -17,7 +17,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
-
+@CrossOrigin
 @RestController
 @RequestMapping("/cadastrarGfip")
 public class GfipController extends DefaultController<InfoRemessa> {
@@ -80,14 +80,13 @@ public class GfipController extends DefaultController<InfoRemessa> {
         return ResponseEntity.ok().body(situacao);
     }
 
-    @CrossOrigin
+
     @GetMapping
     public ResponseEntity<List<InfoRemessa>> findAll() {
         List<InfoRemessa> list = infoRemessaRepository.findAll();
         return ResponseEntity.ok().body(list);
     }
 
-    @CrossOrigin
     @GetMapping(path = {"/getDocumentos"})
     public ResponseEntity<?> findAllDocumentos() {
         InfoRemessa infoRemessa = assinarRemessaRepository.buscarRemessaAberta();
@@ -110,14 +109,12 @@ public class GfipController extends DefaultController<InfoRemessa> {
         return ResponseEntity.ok().body(Objects.requireNonNullElse(gfip, "semRemessa"));
     }
 
-    @CrossOrigin
     @GetMapping(path = {"/find/{chave}"})
     public ResponseEntity<InfoRemessa> findById(@PathVariable String chave) {
         InfoRemessa list = infoRemessaRepository.findById(chave);
         return ResponseEntity.ok().body(list);
     }
 
-    @CrossOrigin
     @Transactional
     @PostMapping("/upload/{chave}/{tipo}")
     public ResponseEntity<?> addFile(@RequestParam("file") MultipartFile file, @PathVariable String chave, @PathVariable String tipo) {
@@ -132,17 +129,20 @@ public class GfipController extends DefaultController<InfoRemessa> {
         return ResponseEntity.ok().body(idCastor);
     }
 
-    @CrossOrigin
     @GetMapping(path = {"anexos/{chave}/{tipo}"})
     public ResponseEntity<?> findByDocumento(@PathVariable String chave, @PathVariable String tipo) {
         Gfip list = gfipRepository.buscarDocumentoGfip(chave, tipo).get(0);
         return ResponseEntity.ok().body(list);
     }
 
-    @CrossOrigin
     @GetMapping(path = {"GetAll/{UG}"})
-    public ResponseEntity<?> findByDocumento(@PathVariable String UG) {
+    public ResponseEntity<?> findAll(@PathVariable String UG) {
         List<Gfip> list = gfipRepository.buscarDocumentoAllGfip(UG);
+        return ResponseEntity.ok().body(list);
+    }
+    @GetMapping(path = {"GetByUgUsuario"})
+    public ResponseEntity<?> findByUgUsuario() {
+        List<Gfip> list = gfipRepository.buscarDocumentoByUgUsuario();
         return ResponseEntity.ok().body(list);
     }
 }
