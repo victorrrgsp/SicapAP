@@ -129,18 +129,18 @@ public class GfipController extends DefaultController<InfoRemessa> {
         return ResponseEntity.ok().body(idCastor);
     }
 
-    @GetMapping(path = {"anexos/{chave}/{tipo}"})
+    @GetMapping(path = {"/anexos/{chave}/{tipo}"})
     public ResponseEntity<?> findByDocumento(@PathVariable String chave, @PathVariable String tipo) {
         Gfip list = gfipRepository.buscarDocumentoGfip(chave, tipo).get(0);
         return ResponseEntity.ok().body(list);
     }
 
-    @GetMapping(path = {"GetAll/{UG}"})
+    @GetMapping(path = {"/GetAll/{UG}"})
     public ResponseEntity<?> findAll(@PathVariable String UG) {
         List<Gfip> list = gfipRepository.buscarDocumentoAllGfip(UG);
         return ResponseEntity.ok().body(list);
     }
-    @GetMapping(path = {"GetByUgUsuario"})
+    @GetMapping(path = {"/GetByUgUsuario"})
     public ResponseEntity<?> findByUgUsuario() {
         List<Gfip> list = gfipRepository.buscarDocumentoByUgUsuario();
         return ResponseEntity.ok().body(list);

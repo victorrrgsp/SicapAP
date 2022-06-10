@@ -47,7 +47,7 @@ public class GfipRepository extends DefaultRepository<Gfip, BigInteger> {
                 .getResultList();
     }
     public List<Gfip> buscarDocumentoByUgUsuario(){
-        return getEntityManager().createNativeQuery(
+        var query = getEntityManager().createNativeQuery(
                 "select l.id,\n" +
                         "       l.idInfoRemessa,\n" +
                         "       l.data,\n" +
@@ -60,13 +60,15 @@ public class GfipRepository extends DefaultRepository<Gfip, BigInteger> {
                         "join SICAPAP21.dbo.InfoRemessa info on l.idInfoRemessa = info.chave\n" +
                         "join SICAPAP21.dbo.UnidadeGestora UG on UG.id = info.idUnidadeGestora\n" +
                         "where l.linha = 1 and\n" +
-                        "      Ug.id = '?'"
+                        "      Ug.id = :UG"
                         //"and\n" +
                         //"      info.exercicio = "+ano+" and\n" +
                         //"      info.remessa = "+ mes
-                        , Gfip.class)
-                .setParameter(1,User.getUser(request).getUnidadeGestora().getId())
-                .getResultList();
+                        , Gfip.class);
+        var ug =User.getUser(request).getUnidadeGestora().getId().toString();
+        query.setParameter("UG",ug);
+        var result = query.getResultList();
+        return result;
     }
 
     public String findSituacao(String chave, String tipo) {
