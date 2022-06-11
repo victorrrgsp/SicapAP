@@ -73,6 +73,43 @@ public class ProcessoAdmissaoRepository  extends DefaultRepository<ProcessoAdmis
             pac.setId(list.get(i).getId());
             pac.setDtcriacao(list.get(i).getDataCriacao());
             pac.setStatus(list.get(i).getStatus());
+            pac.setEdital(list.get(i).getEdital());
+            Integer qt = (Integer)  getEntityManager().createNativeQuery("select count(*) from DocumentoAdmissao a " +
+                    "where   a.idProcessoAdmissao = "+ pac.getId()+ "").getSingleResult();
+            pac.setQuantidade(qt);
+            listc.add(pac);
+        }
+
+        return new PaginacaoUtil<ProcessoAdmissaoConcurso>(tamanho, pagina, totalPaginas, totalRegistros, listc);
+    }
+
+
+    public PaginacaoUtil<ProcessoAdmissaoConcurso> buscarProcessosAguardandoAss(Pageable pageable, String searchParams, Integer tipoParams) {
+        int pagina = Integer.valueOf(pageable.getPageNumber());
+        int tamanho = Integer.valueOf(pageable.getPageSize());
+        String search = "";
+        search = getSearch(searchParams, tipoParams);
+        String campo = String.valueOf(pageable.getSort()).replace(":", "");
+
+        List<ProcessoAdmissao> list = getEntityManager()
+                .createNativeQuery("select a.* from ProcessoAdmissao a " +
+                        "where a.status=2 and  a.cnpjEmpresaOrganizadora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, ProcessoAdmissao.class)
+                .setFirstResult(pagina)
+                .setMaxResults(tamanho)
+                .getResultList();
+
+
+        long totalRegistros = countProcessos();
+        long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
+
+        List<ProcessoAdmissaoConcurso> listc= new ArrayList<ProcessoAdmissaoConcurso>() ;
+        for(Integer i= 0; i < list.size(); i++){
+            ProcessoAdmissaoConcurso pac =new ProcessoAdmissaoConcurso();
+            pac.setNumeroEdital(list.get(i).getEdital().getNumeroEdital());
+            pac.setId(list.get(i).getId());
+            pac.setDtcriacao(list.get(i).getDataCriacao());
+            pac.setStatus(list.get(i).getStatus());
+            pac.setEdital(list.get(i).getEdital());
             Integer qt = (Integer)  getEntityManager().createNativeQuery("select count(*) from DocumentoAdmissao a " +
                     "where   a.idProcessoAdmissao = "+ pac.getId()+ "").getSingleResult();
             pac.setQuantidade(qt);
@@ -87,4 +124,12 @@ public class ProcessoAdmissaoRepository  extends DefaultRepository<ProcessoAdmis
                 "where   a.cnpjEmpresaOrganizadora = '"+ User.getUser(super.request).getUnidadeGestora().getId()+ "'");
         return (Integer) query.getSingleResult();
     }
+
+
+    public Integer countProcessosAguardandoAss() {
+        Query query = getEntityManager().createNativeQuery("select count(*) from ProcessoAdmissao a " +
+                "where a.status=2 and   a.cnpjEmpresaOrganizadora = '"+ User.getUser(super.request).getUnidadeGestora().getId()+ "'");
+        return (Integer) query.getSingleResult();
+    }
+
 }

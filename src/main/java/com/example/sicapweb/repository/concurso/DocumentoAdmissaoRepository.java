@@ -73,4 +73,6 @@ public class DocumentoAdmissaoRepository extends DefaultRepository<DocumentoAdmi
                 "where idAdmissao is not  null  and a.idProcessoAdmissao = "+ id+ "");
         return (Integer) query.getSingleResult();
     }
+
+
 }

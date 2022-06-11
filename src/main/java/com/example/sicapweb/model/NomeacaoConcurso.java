@@ -2,6 +2,7 @@ package com.example.sicapweb.model;
 
 import br.gov.to.tce.model.ap.concurso.Edital;
 import br.gov.to.tce.model.ap.concurso.EditalAprovado;
+import br.gov.to.tce.model.ap.pessoal.Admissao;
 import br.gov.to.tce.model.ap.relacional.Ato;
 
 public class NomeacaoConcurso {
@@ -18,7 +19,9 @@ public class NomeacaoConcurso {
     private String classificacao;
     private String vaga;
 
-    private EditalAprovado editalaprovado;
+    private EditalAprovado editalAprovado;
+
+    private Admissao admissao;
     private String ProcessoConcurso;
     private String SituacaoNomeacao;
 
@@ -113,11 +116,20 @@ public class NomeacaoConcurso {
         this.edital = edital;
     }
 
-    public EditalAprovado getEditalaprovado() {
-        return editalaprovado;
+    public EditalAprovado getEditalAprovado() {
+        return editalAprovado;
     }
 
-    public void setEditalaprovado(EditalAprovado editalaprovado) {
-        this.editalaprovado = editalaprovado;
+    public void setEditalAprovado(EditalAprovado editalAprovado) {
+        this.editalAprovado = editalAprovado;
     }
+
+    public Admissao getAdmissao() {
+        return admissao;
+    }
+
+    public void setAdmissao(Admissao admissao) {
+        this.admissao = admissao;
+    }
+
 }

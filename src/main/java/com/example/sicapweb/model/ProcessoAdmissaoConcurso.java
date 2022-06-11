@@ -1,5 +1,7 @@
 package com.example.sicapweb.model;
 
+import br.gov.to.tce.model.ap.concurso.Edital;
+
 import java.math.BigInteger;
 import java.util.Date;
 
@@ -10,6 +12,8 @@ public class ProcessoAdmissaoConcurso {
     private String numeroEdital;
 
     private Date dtcriacao;
+
+    private Edital edital;
 
 
     private String  Processo;
@@ -67,5 +71,13 @@ public class ProcessoAdmissaoConcurso {
 
     public void setProcesso(String processo) {
         Processo = processo;
+    }
+
+    public Edital getEdital() {
+        return edital;
+    }
+
+    public void setEdital(Edital edital) {
+        this.edital = edital;
     }
 }

@@ -68,6 +68,7 @@ public class admissaoRepository extends DefaultRepository<Admissao, BigInteger> 
             nc.setCpf(list.get(i).getServidor().getCpfServidor());
             nc.setAto(list.get(i).getAto());
             nc.setNumeroEdital(list.get(i).getNumeroEdital());
+            nc.setAdmissao(list.get(i));
             List<EditalAprovado> ea =  getEntityManager()
                     .createNativeQuery("select a.* from EditalAprovado a " +
                             "join InfoRemessa i on a.chave = i.chave " +
@@ -75,7 +76,7 @@ public class admissaoRepository extends DefaultRepository<Admissao, BigInteger> 
                             " where    cpf='" + nc.getCpf()  +  "'" + " and a.numeroInscricao='"+ list.get(i).getNumeroInscricao() +"' " + " and  i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId()+"'", EditalAprovado.class)
                     .getResultList();
             if (ea.size()>0 ){
-                nc.setEditalaprovado((EditalAprovado) ea.get(0) );
+                nc.setEditalAprovado((EditalAprovado) ea.get(0) );
 
                 nc.setClassificacao(ea.get(0).getClassificacao());
                 nc.setSitCadAprovado("Aprovado Cadastrado");
@@ -83,7 +84,8 @@ public class admissaoRepository extends DefaultRepository<Admissao, BigInteger> 
                 Integer enviado = (Integer) getEntityManager().createNativeQuery("select count(*) from DocumentoAdmissao a " +
                         "where  a.idAdmissao = "+list.get(i).getId()+ "").getSingleResult();
                 if (enviado > 0 ){
-                    nc.setSitCadAprovado("Aprovado Anexado");
+
+                    nc.setSituacaoNomeacao("Aprovado anexado");
                 }
                 else
                 {

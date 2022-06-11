@@ -45,13 +45,23 @@ public class DocumentoAdmissaoController extends DefaultController<DocumentoAdmi
     @CrossOrigin
     @Transactional
     @PostMapping("/AddAprovadosSemNomeacao" )
-    public ResponseEntity<List<DocumentoAdmissao>> AddDocumentoAdmissao(@RequestBody List<DocumentoAdmissao> lstdocumentoAdmissao) {
-
+    public ResponseEntity<List<DocumentoAdmissao>> AddDocumentoAprovado(@RequestBody List<DocumentoAdmissao> lstdocumentoAdmissao) {
         for(Integer i= 0; i < lstdocumentoAdmissao.size(); i++){
             DocumentoAdmissao a = (DocumentoAdmissao) lstdocumentoAdmissao.get(i);
             documentoAdmissaoRepository.save(a);
         }
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(lstdocumentoAdmissao.getClass()).toUri();
+        return ResponseEntity.created(uri).body(lstdocumentoAdmissao);
+    }
 
+    @CrossOrigin
+    @Transactional
+    @PostMapping("/AddNomeacoes" )
+    public ResponseEntity<List<DocumentoAdmissao>> AddDocumentoAdmissao(@RequestBody List<DocumentoAdmissao> lstdocumentoAdmissao) {
+        for(Integer i= 0; i < lstdocumentoAdmissao.size(); i++){
+            DocumentoAdmissao a = (DocumentoAdmissao) lstdocumentoAdmissao.get(i);
+            documentoAdmissaoRepository.save(a);
+        }
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(lstdocumentoAdmissao.getClass()).toUri();
         return ResponseEntity.created(uri).body(lstdocumentoAdmissao);
     }
@@ -59,8 +69,16 @@ public class DocumentoAdmissaoController extends DefaultController<DocumentoAdmi
 
     @CrossOrigin
     @GetMapping(path = {"/getOocumentosAprovados/{idproc}/pagination"})
-    public ResponseEntity<PaginacaoUtil<DocumentoAdmissao>> getOocumentosAprovados(Pageable pageable, @PathVariable BigInteger idproc) {
+    public ResponseEntity<PaginacaoUtil<DocumentoAdmissao>> getOocumentosAmissoes(Pageable pageable, @PathVariable BigInteger idproc) {
         PaginacaoUtil<DocumentoAdmissao> paginacaoUtil = documentoAdmissaoRepository.buscaPaginadaApr(pageable,idproc) ;
+        return ResponseEntity.ok().body(paginacaoUtil);
+    }
+
+
+    @CrossOrigin
+    @GetMapping(path = {"/getOocumentosAdmissoes/{idproc}/pagination"})
+    public ResponseEntity<PaginacaoUtil<DocumentoAdmissao>> getOocumentosAprovados(Pageable pageable, @PathVariable BigInteger idproc) {
+        PaginacaoUtil<DocumentoAdmissao> paginacaoUtil = documentoAdmissaoRepository.buscaPaginadaAdm(pageable,idproc) ;
         return ResponseEntity.ok().body(paginacaoUtil);
     }
 

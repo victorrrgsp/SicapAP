@@ -48,6 +48,7 @@ public class EditalAdmissaoController {
         return ResponseEntity.ok().body(paginacaoUtil);
     }
 
+
     @CrossOrigin
     @GetMapping(path="/editaisfinalizados/{searchParams}/{tipoParams}/pagination")
     public ResponseEntity<PaginacaoUtil<EditalFinalizado>> listaEditaisFinalizados(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
@@ -66,6 +67,13 @@ public class EditalAdmissaoController {
     @GetMapping(path="/processos/{searchParams}/{tipoParams}/pagination")
     public ResponseEntity<PaginacaoUtil<ProcessoAdmissaoConcurso>> listaAProcessos(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
         PaginacaoUtil<ProcessoAdmissaoConcurso> paginacaoUtil = processoAdmissaoRepository.buscarProcessos(pageable,searchParams,tipoParams);
+        return ResponseEntity.ok().body(paginacaoUtil);
+    }
+
+    @CrossOrigin
+    @GetMapping(path="/processosAguardandoAss/{searchParams}/{tipoParams}/pagination")
+    public ResponseEntity<PaginacaoUtil<ProcessoAdmissaoConcurso>> listaAProcessosAguardandoAss(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
+        PaginacaoUtil<ProcessoAdmissaoConcurso> paginacaoUtil = processoAdmissaoRepository.buscarProcessosAguardandoAss(pageable,searchParams,tipoParams);
         return ResponseEntity.ok().body(paginacaoUtil);
     }
 
@@ -88,7 +96,29 @@ public class EditalAdmissaoController {
         return ResponseEntity.created(uri).body(processoAdmissao);
     }
 
+    @CrossOrigin
+    @Transactional
+    @PutMapping(path = {"/processos/enviar/{id}"})
+    public ResponseEntity<ProcessoAdmissao> Enviar(@PathVariable BigInteger id) {
+        ProcessoAdmissao processoAdmissao = processoAdmissaoRepository.findById(id);
+        if (processoAdmissao!= null) {
+            processoAdmissao.setStatus(2);
+            processoAdmissaoRepository.update(processoAdmissao);
+        }
+        return ResponseEntity.ok().body(processoAdmissao);
+    }
 
 
-
+    @CrossOrigin
+    @Transactional
+    @DeleteMapping(value = {"/processos/{id}"})
+    public ResponseEntity<?> delete(@PathVariable BigInteger id) {
+        ProcessoAdmissao processoAdmissao = processoAdmissaoRepository.findById(id);
+        if (processoAdmissao!= null) {
+            if(processoAdmissao.getStatus()==1){
+                processoAdmissaoRepository.delete(id);
+            }
+        }
+        return ResponseEntity.noContent().build();
+    }
 }

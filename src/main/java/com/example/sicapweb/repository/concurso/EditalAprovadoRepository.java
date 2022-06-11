@@ -58,7 +58,7 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
             }
             else
             {
-                editalAprovadoConcurso.setSituacao("Apto para Envio!!");
+                editalAprovadoConcurso.setSituacao("Apto para Envio!");
             }
 
             listc.add(editalAprovadoConcurso);
