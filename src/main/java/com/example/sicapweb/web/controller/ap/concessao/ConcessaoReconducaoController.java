@@ -1,8 +1,10 @@
 package com.example.sicapweb.web.controller.ap.concessao;
 
+import br.gov.to.tce.model.adm.AdmEnvio;
 import br.gov.to.tce.model.ap.concessoes.DocumentoReconducao;
 import br.gov.to.tce.model.ap.pessoal.Reconducao;
 import com.example.sicapweb.model.Inciso;
+import com.example.sicapweb.repository.AdmEnvioRepository;
 import com.example.sicapweb.repository.concessao.DocumentoReconducaoRepository;
 import com.example.sicapweb.repository.concessao.ReconducaoRepository;
 import com.example.sicapweb.util.PaginacaoUtil;
@@ -28,6 +30,9 @@ public class ConcessaoReconducaoController extends DefaultController<DocumentoRe
 
     @Autowired
     private DocumentoReconducaoRepository documentoReconducaoRepository;
+
+    @Autowired
+    private AdmEnvioRepository admEnvioRepository;
 
     HashMap<String, Object> reconducao = new HashMap<String, Object>();
 
@@ -143,5 +148,34 @@ public class ConcessaoReconducaoController extends DefaultController<DocumentoRe
     public ResponseEntity<?> findByDocumento(@PathVariable String inciso, @PathVariable BigInteger id) {
         DocumentoReconducao list = documentoReconducaoRepository.buscarDocumentooReconducao(inciso, id).get(0);
         return ResponseEntity.ok().body(list);
+    }
+
+    @CrossOrigin
+    @Transactional
+    @DeleteMapping(value = {"/{id}"})
+    public ResponseEntity<?> delete(@PathVariable BigInteger id) {
+        documentoReconducaoRepository.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @CrossOrigin
+    @PostMapping("/enviarGestor/{id}")
+    public ResponseEntity<?> enviarGestorAssinar(@PathVariable BigInteger id) {
+        AdmEnvio admEnvio = preencherEnvio(id);
+        admEnvioRepository.save(admEnvio);
+        return ResponseEntity.ok().body("Ok");
+    }
+
+    private AdmEnvio preencherEnvio(BigInteger id) {
+        Reconducao reconducao = reconducaoRepository.findById(id);
+        AdmEnvio admEnvio = new AdmEnvio();
+        admEnvio.setTipoRegistro(AdmEnvio.TipoRegistro.RECONDUCAO.getValor());
+        admEnvio.setUnidadeGestora(reconducao.getChave().getIdUnidadeGestora());
+        admEnvio.setStatus(AdmEnvio.Status.AGUARDANDOASSINATURA.getValor());
+//        admEnvio.setOrgaoOrigem(reconducao.getCnpjUnidadeGestoraOrigem());
+        admEnvio.setIdMovimentacao(id);
+        admEnvio.setComplemento("Conforme PORTARIA: " + reconducao.getAto().getNumeroAto() + " De: " + reconducao.getAto().getDataPublicacao());
+        admEnvio.setAdmissao(reconducao.getAdmissao());
+        return admEnvio;
     }
 }

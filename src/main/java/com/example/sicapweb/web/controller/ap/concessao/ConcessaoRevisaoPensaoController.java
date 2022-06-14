@@ -1,8 +1,10 @@
 package com.example.sicapweb.web.controller.ap.concessao;
 
+import br.gov.to.tce.model.adm.AdmEnvio;
 import br.gov.to.tce.model.ap.concessoes.DocumentoPensao;
 import br.gov.to.tce.model.ap.pessoal.Pensao;
 import com.example.sicapweb.model.Inciso;
+import com.example.sicapweb.repository.AdmEnvioRepository;
 import com.example.sicapweb.repository.concessao.DocumentoPensaoRepository;
 import com.example.sicapweb.repository.concessao.PensaoRepository;
 import com.example.sicapweb.util.PaginacaoUtil;
@@ -28,6 +30,9 @@ public class ConcessaoRevisaoPensaoController extends DefaultController<Document
 
     @Autowired
     private DocumentoPensaoRepository documentoPensaoRepository;
+
+    @Autowired
+    private AdmEnvioRepository admEnvioRepository;
 
     HashMap<String, Object> pensao = new HashMap<String, Object>();
 
@@ -149,5 +154,34 @@ public class ConcessaoRevisaoPensaoController extends DefaultController<Document
     public ResponseEntity<?> findByDocumento(@PathVariable String inciso, @PathVariable BigInteger id) {
         DocumentoPensao list = documentoPensaoRepository.buscarDocumentoPensaoRevisao(inciso, id).get(0);
         return ResponseEntity.ok().body(list);
+    }
+
+    @CrossOrigin
+    @Transactional
+    @DeleteMapping(value = {"/{id}"})
+    public ResponseEntity<?> delete(@PathVariable BigInteger id) {
+        documentoPensaoRepository.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @CrossOrigin
+    @PostMapping("/enviarGestor/{id}")
+    public ResponseEntity<?> enviarGestorAssinar(@PathVariable BigInteger id) {
+        AdmEnvio admEnvio = preencherEnvio(id);
+        admEnvioRepository.save(admEnvio);
+        return ResponseEntity.ok().body("Ok");
+    }
+
+    private AdmEnvio preencherEnvio(BigInteger id) {
+        Pensao pensao = pensaoRepository.findById(id);
+        AdmEnvio admEnvio = new AdmEnvio();
+        admEnvio.setTipoRegistro(AdmEnvio.TipoRegistro.REVISAOPENSAO.getValor());
+        admEnvio.setUnidadeGestora(pensao.getChave().getIdUnidadeGestora());
+        admEnvio.setStatus(AdmEnvio.Status.AGUARDANDOASSINATURA.getValor());
+        admEnvio.setOrgaoOrigem(pensao.getCnpjUnidadeGestoraOrigem());
+        admEnvio.setIdMovimentacao(id);
+        admEnvio.setComplemento("Conforme PORTARIA: " + pensao.getAto().getNumeroAto() + " De: " + pensao.getAto().getDataPublicacao());
+        admEnvio.setAdmissao(pensao.getAdmissao());
+        return admEnvio;
     }
 }

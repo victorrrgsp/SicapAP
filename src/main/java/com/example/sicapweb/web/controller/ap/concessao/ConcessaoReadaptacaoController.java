@@ -1,8 +1,10 @@
 package com.example.sicapweb.web.controller.ap.concessao;
 
+import br.gov.to.tce.model.adm.AdmEnvio;
 import br.gov.to.tce.model.ap.concessoes.DocumentoReadaptacao;
 import br.gov.to.tce.model.ap.pessoal.Readaptacao;
 import com.example.sicapweb.model.Inciso;
+import com.example.sicapweb.repository.AdmEnvioRepository;
 import com.example.sicapweb.repository.concessao.DocumentoReadaptacaoRepository;
 import com.example.sicapweb.repository.concessao.ReadaptacaoRepository;
 import com.example.sicapweb.util.PaginacaoUtil;
@@ -28,6 +30,9 @@ public class ConcessaoReadaptacaoController extends DefaultController<DocumentoR
 
     @Autowired
     private DocumentoReadaptacaoRepository documentoReadaptacaoRepository;
+
+    @Autowired
+    private AdmEnvioRepository admEnvioRepository;
 
     HashMap<String, Object> readaptacao = new HashMap<String, Object>();
 
@@ -119,8 +124,6 @@ public class ConcessaoReadaptacaoController extends DefaultController<DocumentoR
         list.add(new Inciso("II - Seção V", "Ato da concessão acompanhado da respectiva publicação",
                 "Ato da concessão acompanhado da respectiva publicação", "", "Sim"));
         list.add(new Inciso("VI - Seção V", "Parecer jurídico atestando a legalidade do ato",
-                "Parecer jurídico atestando a legalidade do ato", "", "Não"));
-        list.add(new Inciso("VI - Seção V", "Parecer jurídico atestando a legalidade do ato",
                 "Parecer jurídico atestando a legalidade do ato", "", "Sim"));
         list.add(new Inciso("Outros", "Outros",
                 "Outros", "", "Não"));
@@ -141,5 +144,34 @@ public class ConcessaoReadaptacaoController extends DefaultController<DocumentoR
     public ResponseEntity<?> findByDocumento(@PathVariable String inciso, @PathVariable BigInteger id) {
         DocumentoReadaptacao list = documentoReadaptacaoRepository.buscarDocumentoReadaptacao(inciso, id).get(0);
         return ResponseEntity.ok().body(list);
+    }
+
+    @CrossOrigin
+    @Transactional
+    @DeleteMapping(value = {"/{id}"})
+    public ResponseEntity<?> delete(@PathVariable BigInteger id) {
+        documentoReadaptacaoRepository.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @CrossOrigin
+    @PostMapping("/enviarGestor/{id}")
+    public ResponseEntity<?> enviarGestorAssinar(@PathVariable BigInteger id) {
+        AdmEnvio admEnvio = preencherEnvio(id);
+        admEnvioRepository.save(admEnvio);
+        return ResponseEntity.ok().body("Ok");
+    }
+
+    private AdmEnvio preencherEnvio(BigInteger id) {
+        Readaptacao readaptacao = readaptacaoRepository.findById(id);
+        AdmEnvio admEnvio = new AdmEnvio();
+        admEnvio.setTipoRegistro(AdmEnvio.TipoRegistro.READAPTACAO.getValor());
+        admEnvio.setUnidadeGestora(readaptacao.getChave().getIdUnidadeGestora());
+        admEnvio.setStatus(AdmEnvio.Status.AGUARDANDOASSINATURA.getValor());
+//        admEnvio.setOrgaoOrigem(readaptacao.getCnpjUnidadeGestoraOrigem());
+        admEnvio.setIdMovimentacao(id);
+        admEnvio.setComplemento("Conforme PORTARIA: " + readaptacao.getAto().getNumeroAto() + " De: " + readaptacao.getAto().getDataPublicacao());
+        admEnvio.setAdmissao(readaptacao.getAdmissao());
+        return admEnvio;
     }
 }

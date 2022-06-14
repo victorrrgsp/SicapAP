@@ -1,8 +1,10 @@
 package com.example.sicapweb.web.controller.ap.concessao;
 
+import br.gov.to.tce.model.adm.AdmEnvio;
 import br.gov.to.tce.model.ap.concessoes.DocumentoAproveitamento;
 import br.gov.to.tce.model.ap.pessoal.Aproveitamento;
 import com.example.sicapweb.model.Inciso;
+import com.example.sicapweb.repository.AdmEnvioRepository;
 import com.example.sicapweb.repository.concessao.AproveitamentoRepository;
 import com.example.sicapweb.repository.concessao.DocumentoAproveitamentoRepository;
 import com.example.sicapweb.util.PaginacaoUtil;
@@ -28,6 +30,9 @@ public class ConcessaoAproveitamentoController extends DefaultController<Documen
 
     @Autowired
     private DocumentoAproveitamentoRepository documentoAproveitamentoRepository;
+
+    @Autowired
+    private AdmEnvioRepository admEnvioRepository;
 
     HashMap<String, Object> aproveitamento = new HashMap<String, Object>();
 
@@ -146,5 +151,34 @@ public class ConcessaoAproveitamentoController extends DefaultController<Documen
     public ResponseEntity<?> findByDocumento(@PathVariable String inciso, @PathVariable BigInteger id) {
         DocumentoAproveitamento list = documentoAproveitamentoRepository.buscarDocumentoAproveitamento(inciso, id).get(0);
         return ResponseEntity.ok().body(list);
+    }
+
+    @CrossOrigin
+    @Transactional
+    @DeleteMapping(value = {"/{id}"})
+    public ResponseEntity<?> delete(@PathVariable BigInteger id) {
+        documentoAproveitamentoRepository.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @CrossOrigin
+    @PostMapping("/enviarGestor/{id}")
+    public ResponseEntity<?> enviarGestorAssinar(@PathVariable BigInteger id) {
+        AdmEnvio admEnvio = preencherEnvio(id);
+        admEnvioRepository.save(admEnvio);
+        return ResponseEntity.ok().body("Ok");
+    }
+
+    private AdmEnvio preencherEnvio(BigInteger id) {
+        Aproveitamento aproveitamento = aproveitamentoRepository.findById(id);
+        AdmEnvio admEnvio = new AdmEnvio();
+        admEnvio.setTipoRegistro(AdmEnvio.TipoRegistro.APROVEITAMENTO.getValor());
+        admEnvio.setUnidadeGestora(aproveitamento.getChave().getIdUnidadeGestora());
+        admEnvio.setStatus(AdmEnvio.Status.AGUARDANDOASSINATURA.getValor());
+//        admEnvio.setOrgaoOrigem(aproveitamento.getCnpjUnidadeGestoraOrigem());
+        admEnvio.setIdMovimentacao(id);
+        admEnvio.setComplemento("Conforme PORTARIA: " + aproveitamento.getAto().getNumeroAto() + " De: " + aproveitamento.getAto().getDataPublicacao());
+        admEnvio.setAdmissao(aproveitamento.getAdmissao());
+        return admEnvio;
     }
 }

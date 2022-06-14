@@ -1,8 +1,10 @@
 package com.example.sicapweb.web.controller.ap.concessao;
 
+import br.gov.to.tce.model.adm.AdmEnvio;
 import br.gov.to.tce.model.ap.concessoes.DocumentoAposentadoria;
 import br.gov.to.tce.model.ap.pessoal.Aposentadoria;
 import com.example.sicapweb.model.Inciso;
+import com.example.sicapweb.repository.AdmEnvioRepository;
 import com.example.sicapweb.repository.concessao.AposentadoriaRepository;
 import com.example.sicapweb.repository.concessao.DocumentoAposentadoriaRepository;
 import com.example.sicapweb.util.PaginacaoUtil;
@@ -28,6 +30,9 @@ public class ConcessaoReformaController  extends DefaultController<DocumentoApos
 
     @Autowired
     private DocumentoAposentadoriaRepository documentoAposentadoriaRepository;
+
+    @Autowired
+    private AdmEnvioRepository admEnvioRepository;
 
     HashMap<String, Object> aposentadoria = new HashMap<String, Object>();
 
@@ -158,5 +163,34 @@ public class ConcessaoReformaController  extends DefaultController<DocumentoApos
     public ResponseEntity<?> findByDocumento(@PathVariable String inciso, @PathVariable BigInteger id) {
         DocumentoAposentadoria list = documentoAposentadoriaRepository.buscarDocumentoAposentadoriaReforma(inciso, id).get(0);
         return ResponseEntity.ok().body(list);
+    }
+
+    @CrossOrigin
+    @Transactional
+    @DeleteMapping(value = {"/{id}"})
+    public ResponseEntity<?> delete(@PathVariable BigInteger id) {
+        documentoAposentadoriaRepository.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @CrossOrigin
+    @PostMapping("/enviarGestor/{id}")
+    public ResponseEntity<?> enviarGestorAssinar(@PathVariable BigInteger id) {
+        AdmEnvio admEnvio = preencherEnvio(id);
+        admEnvioRepository.save(admEnvio);
+        return ResponseEntity.ok().body("Ok");
+    }
+
+    private AdmEnvio preencherEnvio(BigInteger id) {
+        Aposentadoria aposentadoria = aposentadoriaRepository.findById(id);
+        AdmEnvio admEnvio = new AdmEnvio();
+        admEnvio.setTipoRegistro(AdmEnvio.TipoRegistro.REFORMA.getValor());
+        admEnvio.setUnidadeGestora(aposentadoria.getChave().getIdUnidadeGestora());
+        admEnvio.setStatus(AdmEnvio.Status.AGUARDANDOASSINATURA.getValor());
+        admEnvio.setOrgaoOrigem(aposentadoria.getCnpjUnidadeGestoraOrigem());
+        admEnvio.setIdMovimentacao(id);
+        admEnvio.setComplemento("Conforme PORTARIA: " + aposentadoria.getAto().getNumeroAto() + " De: " + aposentadoria.getAto().getDataPublicacao());
+        admEnvio.setAdmissao(aposentadoria.getAdmissao());
+        return admEnvio;
     }
 }
