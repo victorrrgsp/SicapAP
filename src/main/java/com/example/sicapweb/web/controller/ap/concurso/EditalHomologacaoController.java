@@ -1,6 +1,8 @@
 package com.example.sicapweb.web.controller.ap.concurso;
 
+import br.gov.to.tce.model.ap.concurso.ConcursoEnvio;
 import br.gov.to.tce.model.ap.concurso.EditalHomologacao;
+import com.example.sicapweb.repository.concurso.ConcursoEnvioRepository;
 import com.example.sicapweb.repository.concurso.EditalHomologacaoRepository;
 import com.example.sicapweb.repository.concurso.EditalRepository;
 import com.example.sicapweb.util.PaginacaoUtil;
@@ -24,6 +26,9 @@ public class EditalHomologacaoController extends DefaultController<EditalHomolog
 
     @Autowired
     private EditalRepository editalRepository;
+
+    @Autowired
+    private ConcursoEnvioRepository concursoEnvioRepository;
 
     @CrossOrigin
     @GetMapping(path = "/{searchParams}/{tipoParams}/pagination")
@@ -60,6 +65,25 @@ public class EditalHomologacaoController extends DefaultController<EditalHomolog
         //edital.setEmpresaOrganizadora(empresaOrganizadoraRepository.buscaEmpresaPorCnpj(edital.getCnpjEmpresaOrganizadora()));
         editalHomologacaoRepository.update(editalHomologacao);
         return ResponseEntity.noContent().build();
+    }
+
+
+    @CrossOrigin
+    @GetMapping(path = {"/envio/{id}"})
+    public ResponseEntity<?> findEnvioById(@PathVariable BigInteger id) {
+        ConcursoEnvio list = concursoEnvioRepository.findById(id);
+        return ResponseEntity.ok().body(list);
+    }
+
+    @CrossOrigin
+    @Transactional
+    @PostMapping(path = {"/envio"})
+    public ResponseEntity<ConcursoEnvio>Enviar(@RequestBody ConcursoEnvio concursoEnvio){
+        concursoEnvio.setFase(ConcursoEnvio.Fase.Homologacao.getValor());
+        concursoEnvio.setStatus(ConcursoEnvio.Status.Enviado.getValor());
+        concursoEnvioRepository.save(concursoEnvio);
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(concursoEnvio.getId()).toUri();
+        return ResponseEntity.created(uri).body(concursoEnvio);
     }
 
     @CrossOrigin

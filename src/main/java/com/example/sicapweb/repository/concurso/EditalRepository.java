@@ -103,8 +103,9 @@ public class EditalRepository extends DefaultRepository<Edital, BigInteger> {
         return (Integer) query.getSingleResult();
     }
     public Edital buscarEditalPorNumero(String numeroEdital) {
-        List<Edital> list = getEntityManager().createNativeQuery("select * from Edital ed" +
-                " where numeroEdital = '" + numeroEdital + "'", Edital.class).getResultList();
+        List<Edital> list = getEntityManager().createNativeQuery("select ed.* from Edital ed" +
+                "join InfoRemessa i on ed.chave = i.chave " +
+                " where numeroEdital = '" + numeroEdital + "' and  i.idUnidadeGestobra= '"+ User.getUser(super.request).getUnidadeGestora().getId()+ "'", Edital.class).getResultList();
         if (list.size()>0 ){
             return list.get(0);
         }

@@ -83,6 +83,12 @@ public class ProcessoAdmissaoRepository  extends DefaultRepository<ProcessoAdmis
         return new PaginacaoUtil<ProcessoAdmissaoConcurso>(tamanho, pagina, totalPaginas, totalRegistros, listc);
     }
 
+    public Integer countProcessos() {
+        Query query = getEntityManager().createNativeQuery("select count(*) from ProcessoAdmissao a " +
+                "where   a.cnpjEmpresaOrganizadora = '"+ User.getUser(super.request).getUnidadeGestora().getId()+ "'");
+        return (Integer) query.getSingleResult();
+    }
+
 
     public PaginacaoUtil<ProcessoAdmissaoConcurso> buscarProcessosAguardandoAss(Pageable pageable, String searchParams, Integer tipoParams) {
         int pagina = Integer.valueOf(pageable.getPageNumber());
@@ -99,7 +105,7 @@ public class ProcessoAdmissaoRepository  extends DefaultRepository<ProcessoAdmis
                 .getResultList();
 
 
-        long totalRegistros = countProcessos();
+        long totalRegistros = countProcessosAguardandoAss();
         long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
 
         List<ProcessoAdmissaoConcurso> listc= new ArrayList<ProcessoAdmissaoConcurso>() ;
@@ -119,11 +125,6 @@ public class ProcessoAdmissaoRepository  extends DefaultRepository<ProcessoAdmis
         return new PaginacaoUtil<ProcessoAdmissaoConcurso>(tamanho, pagina, totalPaginas, totalRegistros, listc);
     }
 
-    public Integer countProcessos() {
-        Query query = getEntityManager().createNativeQuery("select count(*) from ProcessoAdmissao a " +
-                "where   a.cnpjEmpresaOrganizadora = '"+ User.getUser(super.request).getUnidadeGestora().getId()+ "'");
-        return (Integer) query.getSingleResult();
-    }
 
 
     public Integer countProcessosAguardandoAss() {
