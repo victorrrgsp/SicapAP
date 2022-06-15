@@ -43,6 +43,31 @@ public class ChavesController {
         Date strToDate = df.parse(dataString);
         String value = ""+autenticacao.getExercicio()+"-"+autenticacao.getRemessa()+"-"+autenticacao.getUnidadeGestora().getId()+"-"+dataString+"WRF";
         String sha1 = "";
+        Integer remessa;
+        Integer exercicio;
+        if(!(autenticacao.getRemessa() == 1 && autenticacao.getExercicio()==2021)){        
+            if (autenticacao.getRemessa()==1 ) {
+                remessa=12;
+                exercicio= autenticacao.getExercicio()-1;
+            }
+            else{
+                remessa= autenticacao.getRemessa();
+                exercicio= autenticacao.getExercicio();
+            }
+            Integer chavesRemessaAtual =admAutenticacaoRepository.
+                    getQtdAssinaturas(
+                            autenticacao.getUnidadeGestora().getId(),
+                            autenticacao.getExercicio(),
+                            autenticacao.getRemessa()
+                    );
+            Integer chavesRemessaAnterior =admAutenticacaoRepository.getQtdAssinaturas(autenticacao.getUnidadeGestora().getId(), exercicio, remessa );
+            if (chavesRemessaAtual > 0   ){
+                throw new InvalitInsert("Já existe uma chave com assinatura !!");
+            }
+            if (chavesRemessaAnterior < 3 ||chavesRemessaAnterior  == null) {
+                throw new InvalitInsert("Remessa anterior pendente de assinatura!!");
+            }
+        }
         try {
             //cria a chave hash SHA-1
             MessageDigest digest = MessageDigest.getInstance("SHA-1");
