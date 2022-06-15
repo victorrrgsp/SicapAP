@@ -123,4 +123,13 @@ public class DocumentoConcursoHomologacaoController extends DefaultController<Ed
         DocumentoEditalHomologacao list = documentoEditalHomologacaoRepository.buscarDocumentoEditalHomologacao(inciso, id).get(0);
         return ResponseEntity.ok().body(list);
     }
+
+
+    @CrossOrigin
+    @Transactional
+    @DeleteMapping(value = {"/{id}"})
+    public ResponseEntity<?> delete(@PathVariable BigInteger id) {
+        documentoEditalHomologacaoRepository.delete(id);
+        return ResponseEntity.noContent().build();
+    }
 }

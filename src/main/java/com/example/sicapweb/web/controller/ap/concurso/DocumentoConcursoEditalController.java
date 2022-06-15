@@ -26,7 +26,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/documentoConcursoEdital")
-public class DocumentoConcursoEditalController extends DefaultController<Edital> {
+public class DocumentoConcursoEditalController extends DefaultController<DocumentoEdital> {
 
     @Autowired
     private EditalRepository editalRepository;
@@ -156,5 +156,14 @@ public class DocumentoConcursoEditalController extends DefaultController<Edital>
     public ResponseEntity<?> findByDocumento(@PathVariable String inciso, @PathVariable BigInteger id) {
         DocumentoEdital list = documentoEditalRepository.buscarDocumentoEdital(inciso, id).get(0);
         return ResponseEntity.ok().body(list);
+    }
+
+
+    @CrossOrigin
+    @Transactional
+    @DeleteMapping(value = {"/{id}"})
+    public ResponseEntity<?> delete(@PathVariable BigInteger id) {
+        documentoEditalRepository.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }
