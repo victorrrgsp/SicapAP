@@ -55,10 +55,10 @@ public class GfipRepository extends DefaultRepository<Gfip, BigInteger> {
                         "       l.tipo,\n" +
                         "       info.*\n" +
                         "from (select doc.*, ROW_NUMBER() OVER (PARTITION BY idInfoRemessa,tipo  ORDER BY data desc) as linha\n" +
-                        "                            from DocumentoGfip doc\n" +
+                        "                            from SICAPAP21W.dbo.DocumentoGfip doc\n" +
                         "                            ) l\n" +
-                        "join SICAPAP21.dbo.InfoRemessa info on l.idInfoRemessa = info.chave\n" +
-                        "join SICAPAP21.dbo.UnidadeGestora UG on UG.id = info.idUnidadeGestora\n" +
+                        "join SICAPAP21W.dbo.InfoRemessa info on l.idInfoRemessa = info.chave\n" +
+                        "join SICAPAP21W.dbo.UnidadeGestora UG on UG.id = info.idUnidadeGestora\n" +
                         "where l.linha = 1 and\n" +
                         "      Ug.id = :UG"
                         //"and\n" +
