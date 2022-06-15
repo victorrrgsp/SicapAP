@@ -37,7 +37,7 @@ public class AdmAutenticacaoRepository extends DefaultRepository<AdmAutenticacao
 
     public Integer getQtdAssinaturas(String Cnpj, Integer Exercicio, Integer Remessa){
 
-        var retorno =  entityManager.createNativeQuery("select COUNT(*) from SICAPAP21..AdmAssinatura ass " +
+        var retorno =  entityManager.createNativeQuery("select COUNT(DISTINCT ass.idCargo) from SICAPAP21..AdmAssinatura ass " +
                 "inner join SICAPAP21..Inforemessa inf ON ass.chave=inf.chave " +
                 "where idunidadegestora= '"+Cnpj+"' " +
                 "AND exercicio="+Exercicio+" " + " AND remessa="+Remessa+" " ).getResultList();
