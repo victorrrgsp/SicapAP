@@ -1,9 +1,11 @@
 package com.example.sicapweb.web.controller.ap.concessao;
 
 
+import br.gov.to.tce.model.adm.AdmEnvio;
 import br.gov.to.tce.model.ap.concessoes.DocumentoReintegracao;
 import br.gov.to.tce.model.ap.pessoal.Reintegracao;
 import com.example.sicapweb.model.Inciso;
+import com.example.sicapweb.repository.AdmEnvioRepository;
 import com.example.sicapweb.repository.concessao.DocumentoReintegracaoRepository;
 import com.example.sicapweb.repository.concessao.ReintegracaoRepository;
 import com.example.sicapweb.util.PaginacaoUtil;
@@ -29,6 +31,9 @@ public class ConcessaoReintegracaoController extends DefaultController<Documento
 
     @Autowired
     private DocumentoReintegracaoRepository documentoReintegracaoRepository;
+
+    @Autowired
+    private AdmEnvioRepository admEnvioRepository;
 
     HashMap<String, Object> reintegracao = new HashMap<String, Object>();
 
@@ -126,7 +131,7 @@ public class ConcessaoReintegracaoController extends DefaultController<Documento
                 "Justificativa para a reintegração que se der em razão de processo administrativo", "", "Não"));
         list.add(new Inciso("V - Seção V", "Declaração do órgão competente da existência de vaga no cargo em que se der a reintegração",
                 "Declaração do órgão competente da existência de vaga no cargo em que se der a reintegração", "", "Sim"));
-        list.add(new Inciso("VI -  Seção V", "Parecer jurídico atestando a legalidade do ato",
+        list.add(new Inciso("VI - Seção V", "Parecer jurídico atestando a legalidade do ato",
                 "Parecer jurídico atestando a legalidade do ato", "", "Sim"));
         list.add(new Inciso("Outros", "Outros",
                 "Outros", "", "Não"));
@@ -147,5 +152,34 @@ public class ConcessaoReintegracaoController extends DefaultController<Documento
     public ResponseEntity<?> findByDocumento(@PathVariable String inciso, @PathVariable BigInteger id) {
         DocumentoReintegracao list = documentoReintegracaoRepository.buscarDocumentoReintegracao(inciso, id).get(0);
         return ResponseEntity.ok().body(list);
+    }
+
+    @CrossOrigin
+    @Transactional
+    @DeleteMapping(value = {"/{id}"})
+    public ResponseEntity<?> delete(@PathVariable BigInteger id) {
+        documentoReintegracaoRepository.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @CrossOrigin
+    @PostMapping("/enviarGestor/{id}")
+    public ResponseEntity<?> enviarGestorAssinar(@PathVariable BigInteger id) {
+        AdmEnvio admEnvio = preencherEnvio(id);
+        admEnvioRepository.save(admEnvio);
+        return ResponseEntity.ok().body("Ok");
+    }
+
+    private AdmEnvio preencherEnvio(BigInteger id) {
+        Reintegracao reintegracao = reintegracaoRepository.findById(id);
+        AdmEnvio admEnvio = new AdmEnvio();
+        admEnvio.setTipoRegistro(AdmEnvio.TipoRegistro.REINTEGRACAO.getValor());
+        admEnvio.setUnidadeGestora(reintegracao.getChave().getIdUnidadeGestora());
+        admEnvio.setStatus(AdmEnvio.Status.AGUARDANDOASSINATURA.getValor());
+//        admEnvio.setOrgaoOrigem(reintegracao.getCnpjUnidadeGestoraOrigem());
+        admEnvio.setIdMovimentacao(id);
+        admEnvio.setComplemento("Conforme PORTARIA: " + reintegracao.getAto().getNumeroAto() + " De: " + reintegracao.getAto().getDataPublicacao());
+        admEnvio.setAdmissao(reintegracao.getAdmissao());
+        return admEnvio;
     }
 }

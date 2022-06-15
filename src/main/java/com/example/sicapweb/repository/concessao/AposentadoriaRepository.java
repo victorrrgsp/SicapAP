@@ -52,10 +52,6 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
         List<Aposentadoria> list = getEntityManager()
                 .createNativeQuery("select a.* from Aposentadoria a " +
                         "join InfoRemessa i on a.chave = i.chave " +
-                        "join Admissao ad on ad.id = a.id " +
-                        "join Cargo c on c.id = ad.idCargo " +
-                        "join Servidor s on s.cpfServidor = a.cpfServidor " +
-                        "join Ato ato on ato.id = a.idAto " +
                         "where a.reversao = 0 and a.revisao = 0 and a.tipoAposentadoria not in (6,7) " +
                         "and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, Aposentadoria.class)
                 .setFirstResult(pagina)
@@ -70,16 +66,16 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
         Query query = getEntityManager().createNativeQuery("select count(*) from Aposentadoria a " +
                 "join InfoRemessa i on a.chave = i.chave " +
                 "where a.reversao = 0 and a.revisao = 0 and a.tipoAposentadoria not in (6,7) " +
-                "and i.idUnidadeGestora= '"+ User.getUser(super.request).getUnidadeGestora().getId()+ "'");
+                "and i.idUnidadeGestora= '" + User.getUser(super.request).getUnidadeGestora().getId() + "'");
         return (Integer) query.getSingleResult();
     }
 
     public List<Aposentadoria> buscarAposentadorias() {
         return getEntityManager().createNativeQuery(
-                "select a.* from Aposentadoria a " +
-                        "join InfoRemessa i on a.chave = i.chave " +
-                        "where a.reversao = 0 and a.revisao = 0 and a.tipoAposentadoria not in (6,7) " +
-                        "and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "'", Aposentadoria.class)
+                        "select a.* from Aposentadoria a " +
+                                "join InfoRemessa i on a.chave = i.chave " +
+                                "where a.reversao = 0 and a.revisao = 0 and a.tipoAposentadoria not in (6,7) " +
+                                "and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "'", Aposentadoria.class)
                 .getResultList();
     }
 
@@ -95,10 +91,6 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
         List<Aposentadoria> list = getEntityManager()
                 .createNativeQuery("select a.* from Aposentadoria a " +
                         "join InfoRemessa i on a.chave = i.chave " +
-                        "join Admissao ad on ad.id = a.id " +
-                        "join Cargo c on c.id = ad.idCargo " +
-                        "join Servidor s on s.cpfServidor = a.cpfServidor " +
-                        "join Ato ato on ato.id = a.idAto " +
                         "where a.reversao = 0 and a.revisao = 0 and a.tipoAposentadoria = " + tipoAposentadoria +
                         " and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, Aposentadoria.class)
                 .setFirstResult(pagina)
@@ -113,16 +105,16 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
         Query query = getEntityManager().createNativeQuery("select count(*) from Aposentadoria a " +
                 "join InfoRemessa i on a.chave = i.chave " +
                 "where a.reversao = 0 and a.revisao = 0 and a.tipoAposentadoria = " + tipoAposentadoria +
-                " and i.idUnidadeGestora= '"+ User.getUser(super.request).getUnidadeGestora().getId()+ "'");
+                " and i.idUnidadeGestora= '" + User.getUser(super.request).getUnidadeGestora().getId() + "'");
         return (Integer) query.getSingleResult();
     }
 
     public List<Aposentadoria> buscarAposentadoriaPorTipo(Integer tipoAposentadoria) {
         return getEntityManager().createNativeQuery(
-                "select a.* from Aposentadoria a " +
-                        "join InfoRemessa i on a.chave = i.chave " +
-                        "where a.reversao = 0 and a.revisao = 0 and a.tipoAposentadoria = " + tipoAposentadoria +
-                        " and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "'", Aposentadoria.class)
+                        "select a.* from Aposentadoria a " +
+                                "join InfoRemessa i on a.chave = i.chave " +
+                                "where a.reversao = 0 and a.revisao = 0 and a.tipoAposentadoria = " + tipoAposentadoria +
+                                " and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "'", Aposentadoria.class)
                 .getResultList();
     }
 
@@ -138,10 +130,6 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
         List<Aposentadoria> list = getEntityManager()
                 .createNativeQuery("select a.* from Aposentadoria a " +
                         "join InfoRemessa i on a.chave = i.chave " +
-                        "join Admissao ad on ad.id = a.id " +
-                        "join Cargo c on c.id = ad.idCargo " +
-                        "join Servidor s on s.cpfServidor = a.cpfServidor " +
-                        "join Ato ato on ato.id = a.idAto " +
                         "where a.reversao = 0 and a.revisao = 1 and a.tipoAposentadoria not in (6,7) " +
                         "and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, Aposentadoria.class)
                 .setFirstResult(pagina)
@@ -156,16 +144,16 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
         Query query = getEntityManager().createNativeQuery("select count(*) from Aposentadoria a " +
                 "join InfoRemessa i on a.chave = i.chave " +
                 "where a.reversao = 0 and revisao = 1 and tipoAposentadoria not in (6,7) " +
-                "and i.idUnidadeGestora= '"+ User.getUser(super.request).getUnidadeGestora().getId()+ "'");
+                "and i.idUnidadeGestora= '" + User.getUser(super.request).getUnidadeGestora().getId() + "'");
         return (Integer) query.getSingleResult();
     }
 
     public List<Aposentadoria> buscarAposentadoriaRevisao() {
         return getEntityManager().createNativeQuery(
-                "select a.* from Aposentadoria a " +
-                        "join InfoRemessa i on a.chave = i.chave " +
-                        "where a.reversao = 0 and revisao = 1 and tipoAposentadoria not in (6,7) " +
-                        "and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "'", Aposentadoria.class)
+                        "select a.* from Aposentadoria a " +
+                                "join InfoRemessa i on a.chave = i.chave " +
+                                "where a.reversao = 0 and revisao = 1 and tipoAposentadoria not in (6,7) " +
+                                "and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "'", Aposentadoria.class)
                 .getResultList();
     }
 
@@ -181,11 +169,7 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
         List<Aposentadoria> list = getEntityManager()
                 .createNativeQuery("select a.* from Aposentadoria a " +
                         "join InfoRemessa i on a.chave = i.chave " +
-                        "join Admissao ad on ad.id = a.id " +
-                        "join Cargo c on c.id = ad.idCargo " +
-                        "join Servidor s on s.cpfServidor = a.cpfServidor " +
-                        "join Ato ato on ato.id = a.idAto " +
-                        "where a.reversao = 0 and a.revisao = 1 and a.tipoAposentadoria = "+ Aposentadoria.TipoAposentadoria.Reserva.getValor() +
+                        "where a.reversao = 0 and a.revisao = 1 and a.tipoAposentadoria = " + Aposentadoria.TipoAposentadoria.Reserva.getValor() +
                         " and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, Aposentadoria.class)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
@@ -199,16 +183,16 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
         Query query = getEntityManager().createNativeQuery("select count(*) from Aposentadoria a " +
                 "join InfoRemessa i on a.chave = i.chave " +
                 "where revisao = 1 and tipoAposentadoria = " + Aposentadoria.TipoAposentadoria.Reserva.getValor() +
-                " and i.idUnidadeGestora= '"+ User.getUser(super.request).getUnidadeGestora().getId()+ "'");
+                " and i.idUnidadeGestora= '" + User.getUser(super.request).getUnidadeGestora().getId() + "'");
         return (Integer) query.getSingleResult();
     }
 
     public List<Aposentadoria> buscarAposentadoriaRevisaoReserva() {
         return getEntityManager().createNativeQuery(
-                "select a.* from Aposentadoria a " +
-                        "join InfoRemessa i on a.chave = i.chave " +
-                        "where revisao = 1 and tipoAposentadoria = " + Aposentadoria.TipoAposentadoria.Reserva.getValor() +
-                        " and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "'", Aposentadoria.class)
+                        "select a.* from Aposentadoria a " +
+                                "join InfoRemessa i on a.chave = i.chave " +
+                                "where revisao = 1 and tipoAposentadoria = " + Aposentadoria.TipoAposentadoria.Reserva.getValor() +
+                                " and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "'", Aposentadoria.class)
                 .getResultList();
     }
 
@@ -224,11 +208,7 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
         List<Aposentadoria> list = getEntityManager()
                 .createNativeQuery("select a.* from Aposentadoria a " +
                         "join InfoRemessa i on a.chave = i.chave " +
-                        "join Admissao ad on ad.id = a.id " +
-                        "join Cargo c on c.id = ad.idCargo " +
-                        "join Servidor s on s.cpfServidor = a.cpfServidor " +
-                        "join Ato ato on ato.id = a.idAto " +
-                        "where a.reversao = 0 and a.revisao = 1 and a.tipoAposentadoria = "+ Aposentadoria.TipoAposentadoria.Reforma.getValor() +
+                        "where a.reversao = 0 and a.revisao = 1 and a.tipoAposentadoria = " + Aposentadoria.TipoAposentadoria.Reforma.getValor() +
                         " and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, Aposentadoria.class)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
@@ -242,16 +222,16 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
         Query query = getEntityManager().createNativeQuery("select count(*) from Aposentadoria a " +
                 "join InfoRemessa i on a.chave = i.chave " +
                 "where revisao = 1 and tipoAposentadoria = " + Aposentadoria.TipoAposentadoria.Reforma.getValor() +
-                " and i.idUnidadeGestora= '"+ User.getUser(super.request).getUnidadeGestora().getId()+ "'");
+                " and i.idUnidadeGestora= '" + User.getUser(super.request).getUnidadeGestora().getId() + "'");
         return (Integer) query.getSingleResult();
     }
 
     public List<Aposentadoria> buscarAposentadoriaRevisaoReforma() {
         return getEntityManager().createNativeQuery(
-                "select a.* from Aposentadoria a " +
-                        "join InfoRemessa i on a.chave = i.chave " +
-                        "where revisao = 1 and tipoAposentadoria = " + Aposentadoria.TipoAposentadoria.Reforma.getValor() +
-                        " and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "'", Aposentadoria.class)
+                        "select a.* from Aposentadoria a " +
+                                "join InfoRemessa i on a.chave = i.chave " +
+                                "where revisao = 1 and tipoAposentadoria = " + Aposentadoria.TipoAposentadoria.Reforma.getValor() +
+                                " and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "'", Aposentadoria.class)
                 .getResultList();
     }
 
@@ -267,11 +247,7 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
         List<Aposentadoria> list = getEntityManager()
                 .createNativeQuery("select a.* from Aposentadoria a " +
                         "join InfoRemessa i on a.chave = i.chave " +
-                        "join Admissao ad on ad.id = a.id " +
-                        "join Cargo c on c.id = ad.idCargo " +
-                        "join Servidor s on s.cpfServidor = a.cpfServidor " +
-                        "join Ato ato on ato.id = a.idAto " +
-                        "where a.reversao = 1 and a.revisao = 0 and a.tipoAposentadoria != "+ Aposentadoria.TipoAposentadoria.Reforma.getValor() +
+                        "where a.reversao = 1 and a.revisao = 0 and a.tipoAposentadoria != " + Aposentadoria.TipoAposentadoria.Reforma.getValor() +
                         " and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, Aposentadoria.class)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
@@ -284,17 +260,17 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
     public Integer countReversaoAposentadoriaReserva() {
         Query query = getEntityManager().createNativeQuery("select count(*) from Aposentadoria a " +
                 "join InfoRemessa i on a.chave = i.chave " +
-                "where reversao = 1 and tipoAposentadoria != "+ Aposentadoria.TipoAposentadoria.Reforma.getValor() +
-                " and i.idUnidadeGestora= '"+ User.getUser(super.request).getUnidadeGestora().getId()+ "'");
+                "where reversao = 1 and tipoAposentadoria != " + Aposentadoria.TipoAposentadoria.Reforma.getValor() +
+                " and i.idUnidadeGestora= '" + User.getUser(super.request).getUnidadeGestora().getId() + "'");
         return (Integer) query.getSingleResult();
     }
 
     public List<Aposentadoria> buscarReversaoAposentadoriaReserva() {
         return getEntityManager().createNativeQuery(
-                "select * from Aposentadoria a " +
-                        "join InfoRemessa i on a.chave = i.chave " +
-                        "where reversao = 1 and tipoAposentadoria != "+ Aposentadoria.TipoAposentadoria.Reforma.getValor() +
-                        " and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "'", Aposentadoria.class)
+                        "select * from Aposentadoria a " +
+                                "join InfoRemessa i on a.chave = i.chave " +
+                                "where reversao = 1 and tipoAposentadoria != " + Aposentadoria.TipoAposentadoria.Reforma.getValor() +
+                                " and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "'", Aposentadoria.class)
                 .getResultList();
     }
 }

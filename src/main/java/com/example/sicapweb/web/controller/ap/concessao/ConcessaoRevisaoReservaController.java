@@ -1,8 +1,10 @@
 package com.example.sicapweb.web.controller.ap.concessao;
 
+import br.gov.to.tce.model.adm.AdmEnvio;
 import br.gov.to.tce.model.ap.concessoes.DocumentoAposentadoria;
 import br.gov.to.tce.model.ap.pessoal.Aposentadoria;
 import com.example.sicapweb.model.Inciso;
+import com.example.sicapweb.repository.AdmEnvioRepository;
 import com.example.sicapweb.repository.concessao.AposentadoriaRepository;
 import com.example.sicapweb.repository.concessao.DocumentoAposentadoriaRepository;
 import com.example.sicapweb.util.PaginacaoUtil;
@@ -21,7 +23,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/documentoConcessaoRevisaoReserva")
-public class ConcessaoRevisaoReservaController  extends DefaultController<DocumentoAposentadoria> {
+public class ConcessaoRevisaoReservaController extends DefaultController<DocumentoAposentadoria> {
 
     @Autowired
     private AposentadoriaRepository aposentadoriaRepository;
@@ -29,9 +31,12 @@ public class ConcessaoRevisaoReservaController  extends DefaultController<Docume
     @Autowired
     private DocumentoAposentadoriaRepository documentoAposentadoriaRepository;
 
+    @Autowired
+    private AdmEnvioRepository admEnvioRepository;
+
     HashMap<String, Object> aposentadoria = new HashMap<String, Object>();
 
-    public class AposentadoriaDocumento{
+    public class AposentadoriaDocumento {
         private Aposentadoria aposentadoria;
 
         private String situacao;
@@ -54,9 +59,9 @@ public class ConcessaoRevisaoReservaController  extends DefaultController<Docume
     }
 
     @CrossOrigin
-    @GetMapping(path="/{searchParams}/{tipoParams}/pagination")
+    @GetMapping(path = "/{searchParams}/{tipoParams}/pagination")
     public ResponseEntity<PaginacaoUtil<Aposentadoria>> listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
-        PaginacaoUtil<Aposentadoria> paginacaoUtil = aposentadoriaRepository.buscaPaginadaRevisaoReserva(pageable,searchParams,tipoParams);
+        PaginacaoUtil<Aposentadoria> paginacaoUtil = aposentadoriaRepository.buscaPaginadaRevisaoReserva(pageable, searchParams, tipoParams);
         return ResponseEntity.ok().body(paginacaoUtil);
     }
 
@@ -88,15 +93,15 @@ public class ConcessaoRevisaoReservaController  extends DefaultController<Docume
     public ResponseEntity<?> findAllDocumentos() {
         List<Aposentadoria> list = aposentadoriaRepository.buscarAposentadoriaRevisaoReserva();
         AposentadoriaDocumento situacao = new AposentadoriaDocumento();
-        for(Integer i= 0; i < list.size(); i++){
-            Integer quantidadeDocumentos = documentoAposentadoriaRepository.findSituacao("documentoAposentadoria","idAposentadoria", list.get(i).getId(), "'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'", "S", "N", "N", "S");
-            if(quantidadeDocumentos == 0) {
+        for (Integer i = 0; i < list.size(); i++) {
+            Integer quantidadeDocumentos = documentoAposentadoriaRepository.findSituacao("documentoAposentadoria", "idAposentadoria", list.get(i).getId(), "'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'", "S", "N", "N", "S");
+            if (quantidadeDocumentos == 0) {
                 situacao.setAposentadoria(list.get(i));
                 situacao.setSituacao("Pendente");
-            } else if(quantidadeDocumentos == 10){
+            } else if (quantidadeDocumentos == 10) {
                 situacao.setAposentadoria(list.get(i));
                 situacao.setSituacao("Concluído");
-            } else{
+            } else {
                 situacao.setAposentadoria(list.get(i));
                 situacao.setSituacao("Aguardando verificação");
             }
@@ -110,7 +115,7 @@ public class ConcessaoRevisaoReservaController  extends DefaultController<Docume
     @CrossOrigin
     @GetMapping(path = {"getSituacao/{id}"})
     public ResponseEntity<?> findSituacao(@PathVariable BigInteger id) {
-        Integer situacao = documentoAposentadoriaRepository.findSituacao("documentoAposentadoria","idAposentadoria",id, "'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'", "S", "N", "N", "S");
+        Integer situacao = documentoAposentadoriaRepository.findSituacao("documentoAposentadoria", "idAposentadoria", id, "'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'", "S", "N", "N", "S");
         return ResponseEntity.ok().body(situacao);
     }
 
@@ -143,11 +148,11 @@ public class ConcessaoRevisaoReservaController  extends DefaultController<Docume
         list.add(new Inciso("Outros", "Outros",
                 "Outros", "", "Não"));
 
-        for (int i = 0; i < list.size(); i++){
-            Integer existeArquivo = documentoAposentadoriaRepository.findAllInciso("documentoAposentadoria","idAposentadoria",id, list.get(i).getInciso());
-            if (existeArquivo > 0){
+        for (int i = 0; i < list.size(); i++) {
+            Integer existeArquivo = documentoAposentadoriaRepository.findAllInciso("documentoAposentadoria", "idAposentadoria", id, list.get(i).getInciso());
+            if (existeArquivo > 0) {
                 list.get(i).setStatus("Informado");
-            }else{
+            } else {
                 list.get(i).setStatus("Não informado");
             }
         }
@@ -160,5 +165,34 @@ public class ConcessaoRevisaoReservaController  extends DefaultController<Docume
     public ResponseEntity<?> findByDocumento(@PathVariable String inciso, @PathVariable BigInteger id) {
         DocumentoAposentadoria list = documentoAposentadoriaRepository.buscarDocumentoRevisaoReserva(inciso, id).get(0);
         return ResponseEntity.ok().body(list);
+    }
+
+    @CrossOrigin
+    @Transactional
+    @DeleteMapping(value = {"/{id}"})
+    public ResponseEntity<?> delete(@PathVariable BigInteger id) {
+        documentoAposentadoriaRepository.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @CrossOrigin
+    @PostMapping("/enviarGestor/{id}")
+    public ResponseEntity<?> enviarGestorAssinar(@PathVariable BigInteger id) {
+        AdmEnvio admEnvio = preencherEnvio(id);
+        admEnvioRepository.save(admEnvio);
+        return ResponseEntity.ok().body("Ok");
+    }
+
+    private AdmEnvio preencherEnvio(BigInteger id) {
+        Aposentadoria aposentadoria = aposentadoriaRepository.findById(id);
+        AdmEnvio admEnvio = new AdmEnvio();
+        admEnvio.setTipoRegistro(AdmEnvio.TipoRegistro.REVISAORESERVA.getValor());
+        admEnvio.setUnidadeGestora(aposentadoria.getChave().getIdUnidadeGestora());
+        admEnvio.setStatus(AdmEnvio.Status.AGUARDANDOASSINATURA.getValor());
+        admEnvio.setOrgaoOrigem(aposentadoria.getCnpjUnidadeGestoraOrigem());
+        admEnvio.setIdMovimentacao(id);
+        admEnvio.setComplemento("Conforme PORTARIA: " + aposentadoria.getAto().getNumeroAto() + " De: " + aposentadoria.getAto().getDataPublicacao());
+        admEnvio.setAdmissao(aposentadoria.getAdmissao());
+        return admEnvio;
     }
 }

@@ -45,10 +45,6 @@ public class PensaoRepository extends DefaultRepository<Pensao, BigInteger> {
         List<Pensao> list = getEntityManager()
                 .createNativeQuery("select a.* from Pensao a " +
                         "join InfoRemessa i on a.chave = i.chave " +
-                        "join Admissao ad on ad.id = a.id " +
-                        "join Cargo c on c.id = ad.idCargo " +
-                        "join Servidor s on s.cpfServidor = a.cpfServidor " +
-                        "join Ato ato on ato.id = a.idAto " +
                         "where a.revisao = 0 " +
                         "and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, Pensao.class)
                 .setFirstResult(pagina)
@@ -98,10 +94,6 @@ public class PensaoRepository extends DefaultRepository<Pensao, BigInteger> {
         List<Pensao> list = getEntityManager()
                 .createNativeQuery("select a.* from Pensao a " +
                         "join InfoRemessa i on a.chave = i.chave " +
-                        "join Admissao ad on ad.id = a.id " +
-                        "join Cargo c on c.id = ad.idCargo " +
-                        "join Servidor s on s.cpfServidor = a.cpfServidor " +
-                        "join Ato ato on ato.id = a.idAto " +
                         "where a.revisao = 1 " +
                         "and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, Pensao.class)
                 .setFirstResult(pagina)
