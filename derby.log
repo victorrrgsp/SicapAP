@@ -1,0 +1,16 @@
+----------------------------------------------------------------
+Mon Jun 13 18:52:53 GMT 2022:
+ Inicializando o Derby versão The Apache Software Foundation - Apache Derby - 10.14.2.0 - (1828579): instância a816c00e-0181-5e69-5e98-0000063291c8
+no diretório de banco de dados memory:C:\Users\guilhermehsl\Documents\projetos tce\sicapweb\a043d1b0-ba44-43a3-817f-2e8adf2bc870 
+
+java.vendor=Eclipse Adoptium
+java.runtime.version=11.0.15+10
+user.dir=C:\Users\guilhermehsl\Documents\projetos tce\sicapweb
+os.name=Windows 11
+os.arch=amd64
+os.version=10.0
+derby.system.home=null
+Carregador de classe do banco de dados iniciado - derby.database.classpath=''
+----------------------------------------------------------------
+Mon Jun 13 18:53:08 GMT 2022:
+Encerrando a instância a816c00e-0181-5e69-5e98-0000063291c8
