@@ -10,6 +10,7 @@ import com.example.sicapweb.util.PaginacaoUtil;
 import com.example.sicapweb.web.controller.DefaultController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -64,12 +65,17 @@ public class LeiController extends DefaultController<Lei> {
     @PostMapping
     public ResponseEntity<Lei> create(@RequestBody Lei lei) {
         try {
-            
+
             lei.setChave(leiRepository.buscarPrimeiraRemessa());
-            
-            leiRepository.save(lei);
-            URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(lei.getId()).toUri();
-            return ResponseEntity.created(uri).body(lei);
+            if (leiRepository.ExistLeiIqual(lei.getNumeroLei(),lei.getNumeroAto(),lei.getTipoAto(),lei.getVeiculoPublicacao(),lei.getDataPublicacao()) )  {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(lei);
+              //  throw new InvalitInsert(" já existe registro da lei gravado");
+            }
+            else {
+             //   leiRepository.save(lei);
+                URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(lei.getId()).toUri();
+                return ResponseEntity.created(uri).body(lei);
+            }
         }  catch (Exception e) {
             throw new InvalitInsert("Erro na insersao de dados, por favor cheque os canpos enviados ");
             //TODO: handle exception
