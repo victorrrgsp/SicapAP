@@ -61,7 +61,7 @@ public class AcompanhamentoDeRemessasRepository extends DefaultRepository<String
                             "     ) as v " +
                             "group by nome, cpf, CodigoCargo;");
             query.setParameter("tipo", tipoCargo);
-            query.setParameter("date", infoRemessa.getData());
+            query.setParameter("date", infoRemessa.getAdmFilaRecebimento().getDataProcessamento());
             query.setParameter("unidade", User.getUser(super.request).getUnidadeGestora().getId());
             query.setParameter("exercicio", infoRemessa.getExercicio());
             query.setParameter("remessa", infoRemessa.getRemessa());
