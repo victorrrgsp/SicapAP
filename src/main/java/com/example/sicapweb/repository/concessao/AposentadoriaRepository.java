@@ -1,6 +1,7 @@
 package com.example.sicapweb.repository.concessao;
 
 import br.gov.to.tce.model.ap.pessoal.Aposentadoria;
+import com.example.sicapweb.model.dto.AposentadoriaDTO;
 import com.example.sicapweb.repository.DefaultRepository;
 import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
@@ -10,6 +11,9 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 @Repository
@@ -17,6 +21,30 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
 
     public AposentadoriaRepository(EntityManager em) {
         super(em);
+    }
+
+    HashMap<String, Object> aposentadoria = new HashMap<String, Object>();
+
+    public class AposentadoriaRegistros{
+        private Aposentadoria aposentadoria;
+
+        private String situacao;
+
+        public Aposentadoria getAposentadoria() {
+            return aposentadoria;
+        }
+
+        public void setAposentadoria(Aposentadoria aposentadoria) {
+            this.aposentadoria = aposentadoria;
+        }
+
+        public String getSituacao() {
+            return situacao;
+        }
+
+        public void setSituacao(String situacao) {
+            this.situacao = situacao;
+        }
     }
 
     public String getSearch(String searchParams, Integer tipoParams) {
@@ -40,7 +68,7 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
         return search;
     }
 
-    public PaginacaoUtil<Aposentadoria> buscaPaginadaAposentadorias(Pageable pageable, String searchParams, Integer tipoParams) {
+    public PaginacaoUtil<AposentadoriaDTO> buscaPaginadaAposentadorias(Pageable pageable, String searchParams, Integer tipoParams) {
         int pagina = Integer.valueOf(pageable.getPageNumber());
         int tamanho = Integer.valueOf(pageable.getPageSize());
         String search = "";
@@ -49,17 +77,39 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
         //retirar os : do Sort pageable
         String campo = String.valueOf(pageable.getSort()).replace(":", "");
 
-        List<Aposentadoria> list = getEntityManager()
-                .createNativeQuery("select a.* from Aposentadoria a " +
+        Query query = getEntityManager()
+                .createNativeQuery("select a.cpfServidor, ser.nome, car.nomeCargo, a.tipoAposentadoria, ato.numeroAto, " +
+                        " (CASE WHEN ae.status IS NULL THEN 1 ELSE ae.status END) as status, a.id from Aposentadoria a " +
+                        "join Admissao ad on ad.id = a.id " +
+                        "join Servidor ser on ser.id = ad.idServidor " +
+                        "join Cargo car on car.id = ad.idCargo " +
+                        "join Ato ato on ato.id = a.idAto " +
+                        "left join AdmEnvio ae on ae.idMovimentacao = a.id " +
                         "join InfoRemessa i on a.chave = i.chave " +
                         "where a.reversao = 0 and a.revisao = 0 and a.tipoAposentadoria not in (6,7) " +
-                        "and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, Aposentadoria.class)
+                        "and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' " + search + " ORDER BY a." + campo)
                 .setFirstResult(pagina)
-                .setMaxResults(tamanho)
-                .getResultList();
+                .setMaxResults(tamanho);
+
+        List<Object> list = (List<Object>) query.getResultList();
+        Iterator result = list.iterator();
+        List<AposentadoriaDTO> aposentadoriaDTOList = new ArrayList<>();
+        while (result.hasNext()) {
+            Object[] obj = (Object[]) result.next();
+            AposentadoriaDTO dto = new AposentadoriaDTO();
+            dto.setCpfServidor(String.valueOf(obj[0]));
+            dto.setNome(String.valueOf(obj[1]));
+            dto.setCargo(String.valueOf(obj[2]));
+            dto.setTipoAposentadoria(Integer.valueOf(String.valueOf(obj[3])));
+            dto.setNumeroAto(String.valueOf(obj[4]));
+            dto.setStatus(Integer.valueOf(String.valueOf(obj[5])));
+            dto.setId(BigInteger.valueOf(Long.parseLong(String.valueOf(obj[6]))));
+            aposentadoriaDTOList.add(dto);
+        }
+
         long totalRegistros = countAposentadoria();
         long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
-        return new PaginacaoUtil<Aposentadoria>(tamanho, pagina, totalPaginas, totalRegistros, list);
+        return new PaginacaoUtil<AposentadoriaDTO>(tamanho, pagina, totalPaginas, totalRegistros, aposentadoriaDTOList);
     }
 
     public Integer countAposentadoria() {
