@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.math.BigInteger;
+import java.sql.Date;
 import java.util.List;
 
 @Repository
@@ -52,6 +53,19 @@ public class LeiRepository extends DefaultRepository<Lei, BigInteger> {
 
                 return query.getResultList();
     }
+
+    public Boolean ExistLeiIqual(String numeroLei, String numeroAto, Integer tipoAto, String veiculoPublicacao, Date dataPublicacao) {
+        Query query = getEntityManager()
+               .createNativeQuery("select DISTINCT a.* from    Lei   a " +
+                       " join InfoRemessa info on info.chave = a.chave and info.idUnidadeGestora = '"
+                       + User.getUser(request).getUnidadeGestora().getId()+"'   and  numeroLei = '"+numeroLei+"'  and numeroAto =  '"+ numeroAto+"' and  tipoAto = "+tipoAto+" ",Lei.class );
+       Integer ctlei = (Integer) query.getSingleResult();
+       if (ctlei > 0) {
+           return true;
+       }
+        return false;
+    }
+
     public PaginacaoUtil<Lei> buscaPaginada(Pageable pageable, String searchParams, Integer tipoParams) {
 
         int pagina = Integer.valueOf(pageable.getPageNumber());
