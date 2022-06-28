@@ -1,13 +1,12 @@
 package com.example.sicapweb.repository.remessa;
 
+import br.gov.to.tce.application.ApplicationException;
 import br.gov.to.tce.model.InfoRemessa;
 import com.example.sicapweb.repository.DefaultRepository;
 import com.example.sicapweb.security.User;
 import org.springframework.stereotype.Repository;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -86,6 +85,25 @@ public class AssinarRemessaRepository extends DefaultRepository<String, String> 
                             " and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "'", InfoRemessa.class).getSingleResult();
         } catch (Exception e) {
             return null;
+        }
+    }
+
+    public boolean remessaValida(InfoRemessa infoRemessa) {
+        Query query = getEntityManager().createNativeQuery("" +
+                "select 1 podeAssinar " +
+                "from SICAPAP21..InfoRemessa a " +
+                "         join SICAPAP21..AdmFilaRecebimento b on a.idFilaRecebimento = b.id " +
+                "where b.status = 2 " +
+                "  and a.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "'" +
+                "  and a.exercicio = " + infoRemessa.getExercicio() +
+                "  and a.remessa = " + infoRemessa.getRemessa());
+        try {
+            query.getSingleResult();
+            return true;
+        } catch (NoResultException e) {
+            return false;
+        } catch (Exception e) {
+            return false;
         }
     }
 

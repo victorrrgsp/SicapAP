@@ -87,11 +87,17 @@ public class AssinarRemessaController {
     @GetMapping(path = {"/insertDados"})
     public ResponseEntity<?> insertDados() {
         InfoRemessa infoRemessa = assinarRemessaRepository.buscarRemessaAberta();
-        assinarRemessaRepository.insertArquivo();
-        assinarRemessaRepository.insertAssinatura();
-        assinarRemessaRepository.insertInfoAssinatura(infoRemessa);
-        assinarRemessaRepository.insertAdmAssinatura(infoRemessa.getChave());
-        return ResponseEntity.ok().body("Ok");
+        boolean isValido = assinarRemessaRepository.remessaValida(infoRemessa);
+
+        if (isValido) {
+            assinarRemessaRepository.insertArquivo();
+            assinarRemessaRepository.insertAssinatura();
+            assinarRemessaRepository.insertInfoAssinatura(infoRemessa);
+            assinarRemessaRepository.insertAdmAssinatura(infoRemessa.getChave());
+            return ResponseEntity.ok().body("Ok");
+        } else {
+            return ResponseEntity.ok().body("Falha");
+        }
     }
 
     @CrossOrigin
