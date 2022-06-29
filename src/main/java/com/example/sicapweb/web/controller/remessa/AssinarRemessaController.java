@@ -27,6 +27,7 @@ public class AssinarRemessaController {
 
     @Autowired
     private ApplicationContext applicationContext;
+
     @Autowired
     private HttpSession httpSession;
 
