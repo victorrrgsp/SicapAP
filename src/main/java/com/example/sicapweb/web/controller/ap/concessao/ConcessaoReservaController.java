@@ -4,6 +4,7 @@ import br.gov.to.tce.model.adm.AdmEnvio;
 import br.gov.to.tce.model.ap.concessoes.DocumentoAposentadoria;
 import br.gov.to.tce.model.ap.pessoal.Aposentadoria;
 import com.example.sicapweb.model.Inciso;
+import com.example.sicapweb.model.dto.AposentadoriaDTO;
 import com.example.sicapweb.repository.AdmEnvioRepository;
 import com.example.sicapweb.repository.concessao.AposentadoriaRepository;
 import com.example.sicapweb.repository.concessao.DocumentoAposentadoriaRepository;
@@ -60,8 +61,8 @@ public class ConcessaoReservaController extends DefaultController<DocumentoApose
 
     @CrossOrigin
     @GetMapping(path = "/{searchParams}/{tipoParams}/pagination")
-    public ResponseEntity<PaginacaoUtil<Aposentadoria>> listReservas(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
-        PaginacaoUtil<Aposentadoria> paginacaoUtil = aposentadoriaRepository.buscaPaginadaPorTipo(pageable, searchParams, tipoParams, Aposentadoria.TipoAposentadoria.Reserva.getValor());
+    public ResponseEntity<PaginacaoUtil<AposentadoriaDTO>> listReservas(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
+        PaginacaoUtil<AposentadoriaDTO> paginacaoUtil = aposentadoriaRepository.buscaPaginadaPorTipo(pageable, searchParams, tipoParams, Aposentadoria.TipoAposentadoria.Reserva.getValor());
         return ResponseEntity.ok().body(paginacaoUtil);
     }
 
