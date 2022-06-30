@@ -17,7 +17,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.math.BigInteger;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,7 +40,7 @@ public class ConcessaoAposentadoriaController extends DefaultController<Document
 
     HashMap<String, Object> aposentadoria = new HashMap<String, Object>();
 
-    public class AposentadoriaDocumento{
+    public class AposentadoriaDocumento {
         private Aposentadoria aposentadoria;
 
         private String situacao;
@@ -60,9 +63,9 @@ public class ConcessaoAposentadoriaController extends DefaultController<Document
     }
 
     @CrossOrigin
-    @GetMapping(path="/{searchParams}/{tipoParams}/pagination")
+    @GetMapping(path = "/{searchParams}/{tipoParams}/pagination")
     public ResponseEntity<PaginacaoUtil<AposentadoriaDTO>> listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
-        PaginacaoUtil<AposentadoriaDTO> paginacaoUtil = aposentadoriaRepository.buscaPaginadaAposentadorias(pageable,searchParams,tipoParams);
+        PaginacaoUtil<AposentadoriaDTO> paginacaoUtil = aposentadoriaRepository.buscaPaginadaAposentadorias(pageable, searchParams, tipoParams);
         return ResponseEntity.ok().body(paginacaoUtil);
     }
 
@@ -92,15 +95,15 @@ public class ConcessaoAposentadoriaController extends DefaultController<Document
     public ResponseEntity<?> findAllDocumentos() {
         List<Aposentadoria> list = aposentadoriaRepository.buscarAposentadorias();
         AposentadoriaDocumento situacao = new AposentadoriaDocumento();
-        for(Integer i= 0; i < list.size(); i++){
-            Integer quantidadeDocumentos = documentoAposentadoriaRepository.findSituacao("documentoAposentadoria","idAposentadoria", list.get(i).getId(), "'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'XII', 'XIII'", "N", "N", "N", "N");
-            if(quantidadeDocumentos == 0) {
+        for (Integer i = 0; i < list.size(); i++) {
+            Integer quantidadeDocumentos = documentoAposentadoriaRepository.findSituacao("documentoAposentadoria", "idAposentadoria", list.get(i).getId(), "'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'XII', 'XIII'", "N", "N", "N", "N");
+            if (quantidadeDocumentos == 0) {
                 situacao.setAposentadoria(list.get(i));
                 situacao.setSituacao("Pendente");
-            } else if(quantidadeDocumentos == 10){
+            } else if (quantidadeDocumentos == 10) {
                 situacao.setAposentadoria(list.get(i));
                 situacao.setSituacao("Concluído");
-            } else{
+            } else {
                 situacao.setAposentadoria(list.get(i));
                 situacao.setSituacao("Aguardando verificação");
             }
@@ -114,7 +117,7 @@ public class ConcessaoAposentadoriaController extends DefaultController<Document
     @CrossOrigin
     @GetMapping(path = {"getSituacao/{id}"})
     public ResponseEntity<?> findSituacao(@PathVariable BigInteger id) {
-        Integer situacao = documentoAposentadoriaRepository.findSituacao("documentoAposentadoria","idAposentadoria",id, "'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'XII', 'XIII'", "N", "N", "N", "N");
+        Integer situacao = documentoAposentadoriaRepository.findSituacao("documentoAposentadoria", "idAposentadoria", id, "'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'XII', 'XIII'", "N", "N", "N", "N");
         return ResponseEntity.ok().body(situacao);
     }
 
@@ -151,11 +154,11 @@ public class ConcessaoAposentadoriaController extends DefaultController<Document
         list.add(new Inciso("Outros", "Outros",
                 "Outros", "", "Não"));
 
-        for (int i = 0; i < list.size(); i++){
-            Integer existeArquivo = documentoAposentadoriaRepository.findAllInciso("documentoAposentadoria","idAposentadoria",id, list.get(i).getInciso());
-            if (existeArquivo > 0){
+        for (int i = 0; i < list.size(); i++) {
+            Integer existeArquivo = documentoAposentadoriaRepository.findAllInciso("documentoAposentadoria", "idAposentadoria", id, list.get(i).getInciso());
+            if (existeArquivo > 0) {
                 list.get(i).setStatus("Informado");
-            }else{
+            } else {
                 list.get(i).setStatus("Não informado");
             }
         }
@@ -197,5 +200,12 @@ public class ConcessaoAposentadoriaController extends DefaultController<Document
         admEnvio.setComplemento("Conforme PORTARIA: " + aposentadoria.getAto().getNumeroAto() + " De: " + aposentadoria.getAto().getDataPublicacao());
         admEnvio.setAdmissao(aposentadoria.getAdmissao());
         return admEnvio;
+    }
+
+    // Método de teste para pegar o IP da máquina do usuário que está acessando o sistema
+    @GetMapping(path = {"/contato"})
+    public String getIp(HttpServletRequest request) throws UnknownHostException {
+        System.out.println(InetAddress.getLocalHost().getHostAddress());
+        return "page";
     }
 }

@@ -23,30 +23,9 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
         super(em);
     }
 
-    HashMap<String, Object> aposentadoria = new HashMap<String, Object>();
-
-    public class AposentadoriaRegistros{
-        private Aposentadoria aposentadoria;
-
-        private String situacao;
-
-        public Aposentadoria getAposentadoria() {
-            return aposentadoria;
-        }
-
-        public void setAposentadoria(Aposentadoria aposentadoria) {
-            this.aposentadoria = aposentadoria;
-        }
-
-        public String getSituacao() {
-            return situacao;
-        }
-
-        public void setSituacao(String situacao) {
-            this.situacao = situacao;
-        }
-    }
-
+    // -------------------------------------------------------------------------------------------------------------- //
+    // ---------------------------------- Search utilizado por todas as funções ------------------------------------- //
+    // -------------------------------------------------------------------------------------------------------------- //
     public String getSearch(String searchParams, Integer tipoParams) {
         String search = "";
         //monta pesquisa search
@@ -67,7 +46,12 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
         }
         return search;
     }
+    // -------------------------------------------------------------------------------------------------------------- //
 
+
+    // -------------------------------------------------------------------------------------------------------------- //
+    // ----------------------------------------- Concessão Aposentadoria -------------------------------------------- //
+    // -------------------------------------------------------------------------------------------------------------- //
     public PaginacaoUtil<AposentadoriaDTO> buscaPaginadaAposentadorias(Pageable pageable, String searchParams, Integer tipoParams) {
         int pagina = Integer.valueOf(pageable.getPageNumber());
         int tamanho = Integer.valueOf(pageable.getPageSize());
@@ -87,26 +71,15 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
                         "left join AdmEnvio ae on ae.idMovimentacao = a.id " +
                         "join InfoRemessa i on a.chave = i.chave " +
                         "where a.reversao = 0 and a.revisao = 0 and a.tipoAposentadoria not in (6,7) " +
-                        "and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' " + search + " ORDER BY a." + campo)
+                        "and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' "
+                        + search + " ORDER BY a." + campo)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho);
 
         List<Object> list = (List<Object>) query.getResultList();
         Iterator result = list.iterator();
         List<AposentadoriaDTO> aposentadoriaDTOList = new ArrayList<>();
-        while (result.hasNext()) {
-            Object[] obj = (Object[]) result.next();
-            AposentadoriaDTO dto = new AposentadoriaDTO();
-            dto.setCpfServidor(String.valueOf(obj[0]));
-            dto.setNome(String.valueOf(obj[1]));
-            dto.setCargo(String.valueOf(obj[2]));
-            dto.setTipoAposentadoria(Integer.valueOf(String.valueOf(obj[3])));
-            dto.setNumeroAto(String.valueOf(obj[4]));
-            dto.setStatus(Integer.valueOf(String.valueOf(obj[5])));
-            dto.setId(BigInteger.valueOf(Long.parseLong(String.valueOf(obj[6]))));
-            aposentadoriaDTOList.add(dto);
-        }
-
+        convertResult(result, aposentadoriaDTOList);
         long totalRegistros = countAposentadoria();
         long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
         return new PaginacaoUtil<AposentadoriaDTO>(tamanho, pagina, totalPaginas, totalRegistros, aposentadoriaDTOList);
@@ -128,7 +101,12 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
                                 "and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "'", Aposentadoria.class)
                 .getResultList();
     }
+    // -------------------------------------------------------------------------------------------------------------- //
 
+
+    // -------------------------------------------------------------------------------------------------------------- //
+    // ----------------------------------------- Concessão Reforma / Reserva----------------------------------------- //
+    // -------------------------------------------------------------------------------------------------------------- //
     public PaginacaoUtil<Aposentadoria> buscaPaginadaPorTipo(Pageable pageable, String searchParams, Integer tipoParams, Integer tipoAposentadoria) {
         int pagina = Integer.valueOf(pageable.getPageNumber());
         int tamanho = Integer.valueOf(pageable.getPageSize());
@@ -142,7 +120,8 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
                 .createNativeQuery("select a.* from Aposentadoria a " +
                         "join InfoRemessa i on a.chave = i.chave " +
                         "where a.reversao = 0 and a.revisao = 0 and a.tipoAposentadoria = " + tipoAposentadoria +
-                        " and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, Aposentadoria.class)
+                        " and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' "
+                        + search + " ORDER BY " + campo, Aposentadoria.class)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();
@@ -159,6 +138,7 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
         return (Integer) query.getSingleResult();
     }
 
+
     public List<Aposentadoria> buscarAposentadoriaPorTipo(Integer tipoAposentadoria) {
         return getEntityManager().createNativeQuery(
                         "select a.* from Aposentadoria a " +
@@ -167,7 +147,12 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
                                 " and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "'", Aposentadoria.class)
                 .getResultList();
     }
+    // -------------------------------------------------------------------------------------------------------------- //
 
+
+    // -------------------------------------------------------------------------------------------------------------- //
+    // --------------------------------------- Concessão Revisão Aposentadoria -------------------------------------- //
+    // -------------------------------------------------------------------------------------------------------------- //
     public PaginacaoUtil<Aposentadoria> buscaPaginadaAposentadoriaRevisao(Pageable pageable, String searchParams, Integer tipoParams) {
         int pagina = Integer.valueOf(pageable.getPageNumber());
         int tamanho = Integer.valueOf(pageable.getPageSize());
@@ -206,7 +191,12 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
                                 "and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "'", Aposentadoria.class)
                 .getResultList();
     }
+    // -------------------------------------------------------------------------------------------------------------- //
 
+
+    // -------------------------------------------------------------------------------------------------------------- //
+    // ----------------------------------------- Concessão Revisão Reserva ------------------------------------------ //
+    // -------------------------------------------------------------------------------------------------------------- //
     public PaginacaoUtil<Aposentadoria> buscaPaginadaRevisaoReserva(Pageable pageable, String searchParams, Integer tipoParams) {
         int pagina = Integer.valueOf(pageable.getPageNumber());
         int tamanho = Integer.valueOf(pageable.getPageSize());
@@ -245,7 +235,12 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
                                 " and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "'", Aposentadoria.class)
                 .getResultList();
     }
+    // -------------------------------------------------------------------------------------------------------------- //
 
+
+    // -------------------------------------------------------------------------------------------------------------- //
+    // ----------------------------------------- Concessão Revisão Reforma ------------------------------------------ //
+    // -------------------------------------------------------------------------------------------------------------- //
     public PaginacaoUtil<Aposentadoria> buscaPaginadaRevisaoReforma(Pageable pageable, String searchParams, Integer tipoParams) {
         int pagina = Integer.valueOf(pageable.getPageNumber());
         int tamanho = Integer.valueOf(pageable.getPageSize());
@@ -284,7 +279,12 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
                                 " and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "'", Aposentadoria.class)
                 .getResultList();
     }
+    // -------------------------------------------------------------------------------------------------------------- //
 
+
+    // -------------------------------------------------------------------------------------------------------------- //
+    // --------------------------------- Concessão Reversão Aposentadoria / Reserva --------------------------------- //
+    // -------------------------------------------------------------------------------------------------------------- //
     public PaginacaoUtil<Aposentadoria> buscaPaginadaReversaoAposentadoriaReserva(Pageable pageable, String searchParams, Integer tipoParams) {
         int pagina = Integer.valueOf(pageable.getPageNumber());
         int tamanho = Integer.valueOf(pageable.getPageSize());
@@ -322,5 +322,26 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
                                 "where reversao = 1 and tipoAposentadoria != " + Aposentadoria.TipoAposentadoria.Reforma.getValor() +
                                 " and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "'", Aposentadoria.class)
                 .getResultList();
+    }
+    // -------------------------------------------------------------------------------------------------------------- //
+
+
+    // -------------------------------------------------------------------------------------------------------------- //
+    // ------------------------------ Converte resultado para a classe AposentadoriaDTO ----------------------------- //
+    // -------------------------------------------------------------------------------------------------------------- //
+    private List<AposentadoriaDTO> convertResult(Iterator result, List<AposentadoriaDTO> aposentadoriaDTOList) {
+        while (result.hasNext()) {
+            Object[] obj = (Object[]) result.next();
+            AposentadoriaDTO dto = new AposentadoriaDTO();
+            dto.setCpfServidor(String.valueOf(obj[0]));
+            dto.setNome(String.valueOf(obj[1]));
+            dto.setCargo(String.valueOf(obj[2]));
+            dto.setTipoAposentadoria(Integer.valueOf(String.valueOf(obj[3])));
+            dto.setNumeroAto(String.valueOf(obj[4]));
+            dto.setStatus(Integer.valueOf(String.valueOf(obj[5])));
+            dto.setId(BigInteger.valueOf(Long.parseLong(String.valueOf(obj[6]))));
+            aposentadoriaDTOList.add(dto);
+        }
+        return aposentadoriaDTOList;
     }
 }
