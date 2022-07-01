@@ -1,6 +1,7 @@
 package com.example.sicapweb.repository.concessao;
 
 import br.gov.to.tce.model.ap.pessoal.Aproveitamento;
+import com.example.sicapweb.model.dto.AproveitamentoDTO;
 import com.example.sicapweb.repository.DefaultRepository;
 import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
@@ -8,7 +9,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -17,7 +20,7 @@ public class AproveitamentoRepository extends DefaultRepository<Aproveitamento, 
         super(em);
     }
 
-    public PaginacaoUtil<Aproveitamento> buscaPaginadaAproveitamento(Pageable pageable, String searchParams, Integer tipoParams) {
+    public PaginacaoUtil<AproveitamentoDTO> buscaPaginadaAproveitamento(Pageable pageable, String searchParams, Integer tipoParams) {
         int pagina = Integer.valueOf(pageable.getPageNumber());
         int tamanho = Integer.valueOf(pageable.getPageSize());
         String search = "";
@@ -40,19 +43,39 @@ public class AproveitamentoRepository extends DefaultRepository<Aproveitamento, 
         //retirar os : do Sort pageable
         String campo = String.valueOf(pageable.getSort()).replace(":", "");
 
-        List<Aproveitamento> list = getEntityManager()
-                .createNativeQuery("select a.* from Aproveitamento a " +
-                        "join InfoRemessa i on a.chave = i.chave " +
-                        "join Admissao ad on ad.id = a.id " +
-                        "join Cargo c on c.id = a.idCargo " +
-                        "join Servidor s on s.id = ad.idServidor " +
-                        "join Ato ato on ato.id = a.idAto " +
-                        "where i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, Aproveitamento.class)
+        List<Object[]> list = getEntityManager()
+                .createNativeQuery("select ser.cpfServidor,\n" +
+                                "       ser.nome,\n" +
+                                "       car.nomeCargo,\n" +
+                                "       ato.numeroAto,\n" +
+                                "       (CASE WHEN ae.status IS NULL THEN 1 ELSE ae.status END) as status,\n" +
+                                "       a.id\n" +
+                                "from Aproveitamento a\n" +
+                                "    join Admissao ad on ad.id = a.id\n" +
+                                "    join Servidor ser on ser.id = ad.idServidor\n" +
+                                "    join Cargo car on car.id = ad.idCargo\n" +
+                                "    join Ato ato on ato.id = a.idAto\n" +
+                                "    left join AdmEnvio ae on ae.idMovimentacao = a.id\n" +
+                                "    join InfoRemessa i on a.chave = i.chave "+
+                        " where i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();
+        // mapeando a lista
+        List<AproveitamentoDTO> aposentadoriaDTOList = new ArrayList<>();
+        list.forEach(a -> {
+            var aux = new AproveitamentoDTO();
+            aux.setCpfServidor((String) a[0]);
+            aux.setNome((String)a[1]);
+            aux.setCargo((String)a[2]);
+            aux.setNumeroAto((String)a[3]);
+            aux.setStatus((Integer)a[4]);
+            aux.setId((BigDecimal) a[5]);
+            aposentadoriaDTOList.add(aux);
+        });
+
         long totalRegistros = count();
         long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
-        return new PaginacaoUtil<Aproveitamento>(tamanho, pagina, totalPaginas, totalRegistros, list);
+        return new PaginacaoUtil<AproveitamentoDTO>(tamanho,pagina,totalPaginas,totalRegistros,aposentadoriaDTOList);
     }
 }

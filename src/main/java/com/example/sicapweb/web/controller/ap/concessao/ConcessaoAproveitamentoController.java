@@ -4,6 +4,7 @@ import br.gov.to.tce.model.adm.AdmEnvio;
 import br.gov.to.tce.model.ap.concessoes.DocumentoAproveitamento;
 import br.gov.to.tce.model.ap.pessoal.Aproveitamento;
 import com.example.sicapweb.model.Inciso;
+import com.example.sicapweb.model.dto.AproveitamentoDTO;
 import com.example.sicapweb.repository.AdmEnvioRepository;
 import com.example.sicapweb.repository.concessao.AproveitamentoRepository;
 import com.example.sicapweb.repository.concessao.DocumentoAproveitamentoRepository;
@@ -60,8 +61,8 @@ public class ConcessaoAproveitamentoController extends DefaultController<Documen
 
     @CrossOrigin
     @GetMapping(path = "/{searchParams}/{tipoParams}/pagination")
-    public ResponseEntity<PaginacaoUtil<Aproveitamento>> listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
-        PaginacaoUtil<Aproveitamento> paginacaoUtil = aproveitamentoRepository.buscaPaginadaAproveitamento(pageable, searchParams, tipoParams);
+    public ResponseEntity<PaginacaoUtil<AproveitamentoDTO>> listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
+        PaginacaoUtil<AproveitamentoDTO> paginacaoUtil = aproveitamentoRepository.buscaPaginadaAproveitamento(pageable, searchParams, tipoParams);
         return ResponseEntity.ok().body(paginacaoUtil);
     }
 
