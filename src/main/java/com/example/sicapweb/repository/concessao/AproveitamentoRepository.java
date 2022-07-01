@@ -62,7 +62,7 @@ public class AproveitamentoRepository extends DefaultRepository<Aproveitamento, 
                 .setMaxResults(tamanho)
                 .getResultList();
         // mapeando a lista
-        List<AproveitamentoDTO> aposentadoriaDTOList = new ArrayList<>();
+        List<AproveitamentoDTO> aproveitamentoDTOArrayList = new ArrayList<>();
         list.forEach(a -> {
             var aux = new AproveitamentoDTO();
             aux.setCpfServidor((String) a[0]);
@@ -71,11 +71,11 @@ public class AproveitamentoRepository extends DefaultRepository<Aproveitamento, 
             aux.setNumeroAto((String)a[3]);
             aux.setStatus((Integer)a[4]);
             aux.setId((BigDecimal) a[5]);
-            aposentadoriaDTOList.add(aux);
+            aproveitamentoDTOArrayList.add(aux);
         });
 
         long totalRegistros = count();
         long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
-        return new PaginacaoUtil<AproveitamentoDTO>(tamanho,pagina,totalPaginas,totalRegistros,aposentadoriaDTOList);
+        return new PaginacaoUtil<AproveitamentoDTO>(tamanho,pagina,totalPaginas,totalRegistros,aproveitamentoDTOArrayList);
     }
 }

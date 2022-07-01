@@ -5,6 +5,7 @@ import br.gov.to.tce.model.adm.AdmEnvio;
 import br.gov.to.tce.model.ap.concessoes.DocumentoReintegracao;
 import br.gov.to.tce.model.ap.pessoal.Reintegracao;
 import com.example.sicapweb.model.Inciso;
+import com.example.sicapweb.model.dto.ReitegracaoDTO;
 import com.example.sicapweb.repository.AdmEnvioRepository;
 import com.example.sicapweb.repository.concessao.DocumentoReintegracaoRepository;
 import com.example.sicapweb.repository.concessao.ReintegracaoRepository;
@@ -61,8 +62,8 @@ public class ConcessaoReintegracaoController extends DefaultController<Documento
 
     @CrossOrigin
     @GetMapping(path="/{searchParams}/{tipoParams}/pagination")
-    public ResponseEntity<PaginacaoUtil<Reintegracao>> listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
-        PaginacaoUtil<Reintegracao> paginacaoUtil = reintegracaoRepository.buscaPaginadaReintegracao(pageable,searchParams,tipoParams);
+    public ResponseEntity<PaginacaoUtil<ReitegracaoDTO>> listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
+        PaginacaoUtil<ReitegracaoDTO> paginacaoUtil = reintegracaoRepository.buscaPaginadaReintegracao(pageable,searchParams,tipoParams);
         return ResponseEntity.ok().body(paginacaoUtil);
     }
 
