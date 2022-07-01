@@ -223,8 +223,8 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
     // -------------------------------------------------------------------------------------------------------------- //
     // ----------------------------------------- Concessão Revisão Reserva ------------------------------------------ //
     // -------------------------------------------------------------------------------------------------------------- //
-    public PaginacaoUtil<Aposentadoria> buscaPaginadaRevisaoReserva(Pageable pageable, String searchParams, Integer tipoParams) {
-        int pagina = Integer.valueOf(pageable.getPageNumber());
+    public PaginacaoUtil<AposentadoriaDTO> buscaPaginadaRevisaoReserva(Pageable pageable, String searchParams, Integer tipoParams) {
+        int pagina =  Integer.valueOf(pageable.getPageNumber());
         int tamanho = Integer.valueOf(pageable.getPageSize());
         String search = "";
         //monta pesquisa search
@@ -232,17 +232,29 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
         //retirar os : do Sort pageable
         String campo = String.valueOf(pageable.getSort()).replace(":", "");
 
-        List<Aposentadoria> list = getEntityManager()
-                .createNativeQuery("select a.* from Aposentadoria a " +
-                        "join InfoRemessa i on a.chave = i.chave " +
-                        "where a.reversao = 0 and a.revisao = 1 and a.tipoAposentadoria = " + Aposentadoria.TipoAposentadoria.Reserva.getValor() +
-                        " and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, Aposentadoria.class)
+        List<Object[]> list = getEntityManager()
+                .createNativeQuery("select a.cpfServidor, ser.nome, car.nomeCargo, a.tipoAposentadoria, ato.numeroAto, " +
+                        " (CASE WHEN ae.status IS NULL THEN 1 ELSE ae.status END) as status, a.id " +
+                                " from Aposentadoria a " +
+                                " join Admissao ad on ad.id = a.id " +
+                                " join Servidor ser on ser.id = ad.idServidor " +
+                                " join Cargo car on car.id = ad.idCargo " +
+                                " join Ato ato on ato.id = a.idAto " +
+                                " left join AdmEnvio ae on ae.idMovimentacao = a.id " +
+                                " join InfoRemessa i on a.chave = i.chave " +
+                        " where a.reversao = 0 and a.revisao = 1 and a.tipoAposentadoria = " + Aposentadoria.TipoAposentadoria.Reserva.getValor() +
+                        " and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo )
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();
+
+        Iterator result = list.iterator();
+        List<AposentadoriaDTO> aposentadoriaDTOList = new ArrayList<>();
+        convertResult(result, aposentadoriaDTOList);
+
         long totalRegistros = countAposentadoriaRevisaoReserva();
         long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
-        return new PaginacaoUtil<Aposentadoria>(tamanho, pagina, totalPaginas, totalRegistros, list);
+        return new PaginacaoUtil<AposentadoriaDTO>( tamanho , pagina , totalPaginas , totalRegistros , aposentadoriaDTOList );
     }
 
     public Integer countAposentadoriaRevisaoReserva() {
@@ -277,9 +289,16 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
         String campo = String.valueOf(pageable.getSort()).replace(":", "");
 
         List<Aposentadoria> list = getEntityManager()
-                .createNativeQuery("select a.* from Aposentadoria a " +
-                        "join InfoRemessa i on a.chave = i.chave " +
-                        "where a.reversao = 0 and a.revisao = 1 and a.tipoAposentadoria = " + Aposentadoria.TipoAposentadoria.Reforma.getValor() +
+                .createNativeQuery("select a.cpfServidor, ser.nome, car.nomeCargo, a.tipoAposentadoria, ato.numeroAto, " +
+                        " (CASE WHEN ae.status IS NULL THEN 1 ELSE ae.status END) as status, a.id " +
+                                " from Aposentadoria a " +
+                                " join Admissao ad on ad.id = a.id " +
+                                " join Servidor ser on ser.id = ad.idServidor " +
+                                " join Cargo car on car.id = ad.idCargo " +
+                                " join Ato ato on ato.id = a.idAto " +
+                                " left join AdmEnvio ae on ae.idMovimentacao = a.id " +
+                                " join InfoRemessa i on a.chave = i.chave " +
+                        " where a.reversao = 0 and a.revisao = 1 and a.tipoAposentadoria = " + Aposentadoria.TipoAposentadoria.Reforma.getValor() +
                         " and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, Aposentadoria.class)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
