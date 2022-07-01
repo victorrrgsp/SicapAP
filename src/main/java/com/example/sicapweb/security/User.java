@@ -21,10 +21,13 @@ public class User implements Serializable {
     public String userName = "01277824193";
     public String id = "";
     public String certificado = "teste";
+
+    public String hashCertificado = "teste";
+
     public String nome = "CELSO SOARES REGO MORAIS";
     public String cpf = "01277824193";
-    public Cargo cargo  = Cargo.Gestor; ///
-    public Date dateStart = new Date();
+    public Cargo cargo  = Cargo.Gestor;
+    public Date dateStart = new Date() ;
     public Date dateEnd = new Date();
     public Integer sistema = null;
     public List<String> systems = new ArrayList<>();
@@ -42,6 +45,14 @@ public class User implements Serializable {
 
     public String getId() {
         return id;
+    }
+
+    public String getHashCertificado() {
+        return hashCertificado;
+    }
+
+    public void setHashCertificado(String hashCertificado) {
+        this.hashCertificado = hashCertificado;
     }
 
     public void setId(String id) {

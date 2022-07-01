@@ -150,6 +150,7 @@ public class LoginController extends DefaultController<Login> {
                 userLogado.setUserName(userLogado.getCpf());
                 userLogado.setNome(respostaJson.get("validacaoAssinatura").get("dados").get("nome").toString());
                 userLogado.setCertificado(resposta);
+                userLogado.setHashCertificado(user.getHashCertificado());
                 userLogado.getDateEnd().addHours(2);
                 userLogado.setUnidadeGestora(new UnidadeGestora(((Object[]) res)[1].toString(), ((Object[]) res)[2].toString(),
                         Integer.parseInt(((Object[]) res)[3].toString())));
