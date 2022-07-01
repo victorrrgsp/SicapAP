@@ -10,45 +10,18 @@ public class AssinarCertificadoDigital {
     public static String inicializarAssinatura(String certificado, String original) throws IOException {
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
-        System.out.println("certificado encodado: "+certificado);
-        byte[] decodedBytes = Base64.getDecoder().decode(certificado);
-        String decodedcertificado = new String(decodedBytes);
-        System.out.println("certificado decodificado: "+decodedcertificado);
 
-        System.out.println("original encodado: "+original);
-        byte[] decodedBytes2 = Base64.getDecoder().decode(original);
-        String decodedoriginal = new String(decodedBytes2);
-        System.out.println("original decodificado: "+decodedoriginal);
-
-        String decodedString1= new String("texto pra encondar");
-        byte[] decodedBytes1 =decodedString1.getBytes();
-        System.out.println("certificado 1 decoded: "+decodedString1);
-        String  enconder = Base64.getEncoder().encodeToString(decodedBytes1);
-        System.out.println("certificado 1 encoded: "+enconder);
-
-
-        System.out.println("certificado 1 encodado: "+certificado);
-        byte[] encoderBytes1 = Base64.getDecoder().decode(enconder);
-        String encoderString1 = new String(encoderBytes1);
-        System.out.println("certificado 1 decodificado: "+encoderString1);
-
-
-        MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded; charset=UTF-8");
-        RequestBody body = RequestBody.create(mediaType, "certificado=" + certificado + "&original=" + decodedoriginal);
+        MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
+        RequestBody body = RequestBody.create(mediaType, "certificado=" + certificado + "&original=" + original);
 
        // System.out.println("body: "+body.toString());
         Request request = new Request.Builder()
                 .url("https://dev2.tce.to.gov.br/assinador/app/controllers/?&c=TCE_Assinador_AssinadorWeb&m=inicializarAssinatura")
                 .method("POST", body)
                 .addHeader("Accept", "application/json")
-                .addHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
+                .addHeader("Content-Type", "application/x-www-form-urlencoded")
                 .addHeader("Referer", "https://app.tce.to.gov.br/")
                 .build();
-
-        //     .addHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
-    //  .addHeader("Accept", "application/json")
-
-        //   RequestBody body = RequestBody.create(mediaType, "certificado=" + certificado + "&original=" + decodedoriginal);
 
         Response response = client.newCall(request).execute();
         String resposta = response.body().string();
@@ -58,13 +31,13 @@ public class AssinarCertificadoDigital {
     public static String FinalizarAssinatura(String desafio, String assinatura, String original) throws IOException {
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
-        MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded; charset=UTF-8");
+        MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
         RequestBody body = RequestBody.create(mediaType, "desafio=" + desafio + "&assinatura=" + assinatura + "&original=" + original);
         Request request = new Request.Builder()
-                .url("https://dev2.tce.to.gov.br/sicapap/app/controllers/?&c=TCE_SicapAp_ApiProcessoEletronico&m=finalizaAssinatura")
+                .url("https://dev2.tce.to.gov.br/assinador/app/controllers/?&c=TCE_Assinador_AssinadorWeb&m=finalizarAssinatura")
                 .method("POST", body)
                 .addHeader("Accept", "application/json")
-                .addHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
+                .addHeader("Content-Type", "application/x-www-form-urlencoded")
                 .addHeader("Referer", "https://app.tce.to.gov.br/")
                 .build();
 
@@ -85,15 +58,6 @@ public class AssinarCertificadoDigital {
 
         //=========================================================
 
-        String desafio = "123";
-        //tem que pegar via websocket
 
-        String assinatura = "456456456";
-        //tem que pegar via websocket
-
-        original = "W3siaWQiOiIxMjAzNiIsIm5vbWUiOiJTRUJBU1RJQU5BIENPU1RBIFNBTlRBTkEiLCJ0aXBvIjoiQVBPU0VOVEFET1JJQSIsIkNhcmdvTm9tZSI6IkFVWElMSUFSIEFETUlOSVNUUkFUSVZPIiwibWV1Q2FyZ28iOiI0IiwiYXRvIjoiMDAwNjA4MjAyMCJ9LHsiaWQiOiIxMjAzNyIsIm5vbWUiOiJGRVJOQU5ETyBERSBBTE1FSURBIE1BQ0hBRE8iLCJ0aXBvIjoiQVBPU0VOVEFET1JJQSIsIkNhcmdvTm9tZSI6Ik1FRElDTyIsIm1ldUNhcmdvIjoiNCIsImF0byI6IjAwMDczNzIwMjAifV0=";
-        //[{"id":"12036","nome":"SEBASTIANA COSTA SANTANA","tipo":"APOSENTADORIA","CargoNome":"AUXILIAR ADMINISTRATIVO","meuCargo":"4","ato":"0006082020"},{"id":"12037","nome":"FERNANDO DE ALMEIDA MACHADO","tipo":"APOSENTADORIA","CargoNome":"MEDICO","meuCargo":"4","ato":"0007372020"}]
-
-        System.out.println("[+] resposta do assinadorWebfinalizarAssinatura(): " + FinalizarAssinatura(desafio, assinatura, original));
     }
 }
