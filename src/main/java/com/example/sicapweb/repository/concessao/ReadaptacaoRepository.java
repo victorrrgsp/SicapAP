@@ -1,6 +1,9 @@
 package com.example.sicapweb.repository.concessao;
 
 import br.gov.to.tce.model.ap.pessoal.Readaptacao;
+import com.example.sicapweb.model.dto.AproveitamentoDTO;
+import com.example.sicapweb.model.dto.ReadaptacaoDTO;
+import com.example.sicapweb.model.dto.ReitegracaoDTO;
 import com.example.sicapweb.repository.DefaultRepository;
 import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
@@ -8,7 +11,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.sql.Date;
+import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -17,7 +24,7 @@ public class ReadaptacaoRepository extends DefaultRepository<Readaptacao, BigInt
         super(em);
     }
 
-    public PaginacaoUtil<Readaptacao> buscaPaginadaReadaptacao(Pageable pageable, String searchParams, Integer tipoParams) {
+    public PaginacaoUtil<ReadaptacaoDTO> buscaPaginadaReadaptacao(Pageable pageable, String searchParams, Integer tipoParams) {
         int pagina = Integer.valueOf(pageable.getPageNumber());
         int tamanho = Integer.valueOf(pageable.getPageSize());
         String search = "";
@@ -40,20 +47,41 @@ public class ReadaptacaoRepository extends DefaultRepository<Readaptacao, BigInt
         //retirar os : do Sort pageable
         String campo = String.valueOf(pageable.getSort()).replace(":", "");
 
-        List<Readaptacao> list = getEntityManager()
-                .createNativeQuery("select a.* from Readaptacao a " +
-                        "join InfoRemessa i on a.chave = i.chave " +
-                        "join Admissao ad on ad.id = a.id " +
-                        "join Cargo c on c.id = ad.idCargo " +
-                        "join Servidor s on s.id = ad.idServidor " +
-                        "join Ato ato on ato.id = a.idAto " +
-                        "where i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, Readaptacao.class)
+        List<Object[]> list = getEntityManager()
+                .createNativeQuery(
+                        "select s.cpfServidor,\n" +
+                                "       s.nome,\n" +
+                                "       c.nomeCargo,\n" +
+                                "       ato.numeroAto,\n" +
+                                "       (CASE WHEN ae.status IS NULL THEN 1 ELSE ae.status END) as status,\n" +
+                                "       a.id," +
+                                "       a.dataInicio\n" +
+                                "    from Readaptacao a\n" +
+                                "        join InfoRemessa i on a.chave = i.chave\n" +
+                                "        join Admissao ad on ad.id = a.id\n" +
+                                "        join Cargo c on c.id = ad.idCargo\n" +
+                                "        join Servidor s on s.id = ad.idServidor\n" +
+                                "        join Ato ato on ato.id = a.idAto\n" +
+                                "        left join AdmEnvio ae on ae.idMovimentacao = a.id\n" +
+                                "where i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();
+        List<ReadaptacaoDTO> ReadaptacaoDTOList = new ArrayList<>();
+        list.forEach(a -> {
+            var aux = new ReadaptacaoDTO();
+            aux.setCpfServidor((String) a[0]);
+            aux.setNome((String)a[1]);
+            aux.setCargo((String)a[2]);
+            aux.setNumeroAto((String)a[3]);
+            aux.setStatus((Integer)a[4]);
+            aux.setId((BigDecimal) a[5]);
+            aux.setDataInicial(new Date(((Timestamp)a[6]).getTime()));
+            ReadaptacaoDTOList.add(aux);
+        });
         long totalRegistros = count();
         long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
-        return new PaginacaoUtil<Readaptacao>(tamanho, pagina, totalPaginas, totalRegistros, list);
+        return new PaginacaoUtil<ReadaptacaoDTO>(tamanho, pagina, totalPaginas, totalRegistros, ReadaptacaoDTOList );
     }
 
     public List<Readaptacao> buscarReadaptacao() {
