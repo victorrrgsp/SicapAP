@@ -1,8 +1,7 @@
 package com.example.sicapweb.repository.concessao;
 
 import br.gov.to.tce.model.ap.pessoal.Reintegracao;
-import com.example.sicapweb.model.dto.AproveitamentoDTO;
-import com.example.sicapweb.model.dto.ReitegracaoDTO;
+import com.example.sicapweb.model.dto.ReintegracaoDTO;
 import com.example.sicapweb.repository.DefaultRepository;
 import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
@@ -13,7 +12,6 @@ import javax.persistence.EntityManager;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.sql.Date;
@@ -23,7 +21,7 @@ public class ReintegracaoRepository extends DefaultRepository<Reintegracao, BigI
         super(em);
     }
 
-    public PaginacaoUtil<ReitegracaoDTO> buscaPaginadaReintegracao(Pageable pageable, String searchParams, Integer tipoParams) {
+    public PaginacaoUtil<ReintegracaoDTO> buscaPaginadaReintegracao(Pageable pageable, String searchParams, Integer tipoParams) {
         int pagina = Integer.valueOf(pageable.getPageNumber());
         int tamanho = Integer.valueOf(pageable.getPageSize());
         String search = "";
@@ -66,9 +64,9 @@ public class ReintegracaoRepository extends DefaultRepository<Reintegracao, BigI
                 .setMaxResults(tamanho)
                 .getResultList();
 
-        List<ReitegracaoDTO> ReitegracaoDTOList = new ArrayList<>();
+        List<ReintegracaoDTO> ReitegracaoDTOList = new ArrayList<>();
         list.forEach(a -> {
-            var aux = new ReitegracaoDTO();
+            var aux = new ReintegracaoDTO();
             aux.setCpfServidor((String) a[0]);
             aux.setNome((String)a[1]);
             aux.setCargo((String)a[2]);
@@ -81,7 +79,7 @@ public class ReintegracaoRepository extends DefaultRepository<Reintegracao, BigI
 
         long totalRegistros = count();
         long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
-        return new PaginacaoUtil<ReitegracaoDTO>(tamanho, pagina, totalPaginas, totalRegistros, ReitegracaoDTOList);
+        return new PaginacaoUtil<ReintegracaoDTO>(tamanho, pagina, totalPaginas, totalRegistros, ReitegracaoDTOList);
     }
 
     public List<Reintegracao> buscarReintegracao() {

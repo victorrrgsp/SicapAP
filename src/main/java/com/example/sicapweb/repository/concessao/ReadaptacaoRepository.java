@@ -1,9 +1,7 @@
 package com.example.sicapweb.repository.concessao;
 
 import br.gov.to.tce.model.ap.pessoal.Readaptacao;
-import com.example.sicapweb.model.dto.AproveitamentoDTO;
 import com.example.sicapweb.model.dto.ReadaptacaoDTO;
-import com.example.sicapweb.model.dto.ReitegracaoDTO;
 import com.example.sicapweb.repository.DefaultRepository;
 import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
@@ -49,20 +47,20 @@ public class ReadaptacaoRepository extends DefaultRepository<Readaptacao, BigInt
 
         List<Object[]> list = getEntityManager()
                 .createNativeQuery(
-                        "select s.cpfServidor,\n" +
-                                "       s.nome,\n" +
-                                "       c.nomeCargo,\n" +
-                                "       ato.numeroAto,\n" +
-                                "       (CASE WHEN ae.status IS NULL THEN 1 ELSE ae.status END) as status,\n" +
+                        "select s.cpfServidor, " +
+                                "       s.nome, " +
+                                "       c.nomeCargo, " +
+                                "       ato.numeroAto, " +
+                                "       (CASE WHEN ae.status IS NULL THEN 1 ELSE ae.status END) as status, " +
                                 "       a.id," +
-                                "       a.dataInicio\n" +
-                                "    from Readaptacao a\n" +
-                                "        join InfoRemessa i on a.chave = i.chave\n" +
-                                "        join Admissao ad on ad.id = a.id\n" +
-                                "        join Cargo c on c.id = ad.idCargo\n" +
-                                "        join Servidor s on s.id = ad.idServidor\n" +
-                                "        join Ato ato on ato.id = a.idAto\n" +
-                                "        left join AdmEnvio ae on ae.idMovimentacao = a.id\n" +
+                                "       a.dataInicio " +
+                                "    from Readaptacao a " +
+                                "        join InfoRemessa i on a.chave = i.chave " +
+                                "        join Admissao ad on ad.id = a.id " +
+                                "        join Cargo c on c.id = ad.idCargo " +
+                                "        join Servidor s on s.id = ad.idServidor " +
+                                "        join Ato ato on ato.id = a.idAto " +
+                                "        left join AdmEnvio ae on ae.idMovimentacao = a.id " +
                                 "where i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
