@@ -160,19 +160,24 @@ public class ConcessaoReconducaoController extends DefaultController<DocumentoRe
 
     @CrossOrigin
     @PostMapping("/enviarGestor/{id}")
-    public ResponseEntity<?> enviarGestorAssinar(@PathVariable BigInteger id) {
-        AdmEnvio admEnvio = preencherEnvio(id);
+    public ResponseEntity<?> enviarGestorAssinar(@PathVariable BigInteger id,@RequestParam(value = "Ug", required = false) String ug) {
+        AdmEnvio admEnvio = preencherEnvio(id,ug);
         admEnvioRepository.save(admEnvio);
         return ResponseEntity.ok().body("Ok");
     }
 
     private AdmEnvio preencherEnvio(BigInteger id) {
+        return preencherEnvio(id,null);
+    }
+    private AdmEnvio preencherEnvio(BigInteger id,String ug) {
         Reconducao reconducao = reconducaoRepository.findById(id);
         AdmEnvio admEnvio = new AdmEnvio();
         admEnvio.setTipoRegistro(AdmEnvio.TipoRegistro.RECONDUCAO.getValor());
         admEnvio.setUnidadeGestora(reconducao.getChave().getIdUnidadeGestora());
-        admEnvio.setStatus(AdmEnvio.Status.AGUARDANDOASSINATURA.getValor());
-//        admEnvio.setOrgaoOrigem(reconducao.getCnpjUnidadeGestoraOrigem());
+        admEnvio.setStatus(AdmEnvio.Status.AGUARDANDOASSINATURA.getValor());   
+        if(ug != null && !ug.equals("")){
+            admEnvio.setOrgaoOrigem(ug);
+        }
         admEnvio.setIdMovimentacao(id);
         admEnvio.setComplemento("Conforme PORTARIA: " + reconducao.getAto().getNumeroAto() + " De: " + reconducao.getAto().getDataPublicacao());
         admEnvio.setAdmissao(reconducao.getAdmissao());

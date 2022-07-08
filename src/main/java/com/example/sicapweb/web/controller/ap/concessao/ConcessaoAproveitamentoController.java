@@ -164,19 +164,24 @@ public class ConcessaoAproveitamentoController extends DefaultController<Documen
 
     @CrossOrigin
     @PostMapping("/enviarGestor/{id}")
-    public ResponseEntity<?> enviarGestorAssinar(@PathVariable BigInteger id) {
-        AdmEnvio admEnvio = preencherEnvio(id);
+    public ResponseEntity<?> enviarGestorAssinar(@PathVariable BigInteger id,@RequestParam(value = "Ug", required = false) String ug) {
+        AdmEnvio admEnvio = preencherEnvio(id,ug);
         admEnvioRepository.save(admEnvio);
         return ResponseEntity.ok().body("Ok");
     }
 
     private AdmEnvio preencherEnvio(BigInteger id) {
+        return preencherEnvio(id,null);
+    }
+    private AdmEnvio preencherEnvio(BigInteger id,String ug) {
         Aproveitamento aproveitamento = aproveitamentoRepository.findById(id);
         AdmEnvio admEnvio = new AdmEnvio();
         admEnvio.setTipoRegistro(AdmEnvio.TipoRegistro.APROVEITAMENTO.getValor());
         admEnvio.setUnidadeGestora(aproveitamento.getChave().getIdUnidadeGestora());
         admEnvio.setStatus(AdmEnvio.Status.AGUARDANDOASSINATURA.getValor());
-//        admEnvio.setOrgaoOrigem(aproveitamento.getCnpjUnidadeGestoraOrigem());
+        if(ug != null && !ug.equals("")){
+            admEnvio.setOrgaoOrigem(ug);
+        }
         admEnvio.setIdMovimentacao(id);
         admEnvio.setComplemento("Conforme PORTARIA: " + aproveitamento.getAto().getNumeroAto() + " De: " + aproveitamento.getAto().getDataPublicacao());
         admEnvio.setAdmissao(aproveitamento.getAdmissao());
