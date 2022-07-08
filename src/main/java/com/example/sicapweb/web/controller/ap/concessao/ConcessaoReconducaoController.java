@@ -4,6 +4,7 @@ import br.gov.to.tce.model.adm.AdmEnvio;
 import br.gov.to.tce.model.ap.concessoes.DocumentoReconducao;
 import br.gov.to.tce.model.ap.pessoal.Reconducao;
 import com.example.sicapweb.model.Inciso;
+import com.example.sicapweb.model.dto.ReconducaoDTO;
 import com.example.sicapweb.repository.AdmEnvioRepository;
 import com.example.sicapweb.repository.concessao.DocumentoReconducaoRepository;
 import com.example.sicapweb.repository.concessao.ReconducaoRepository;
@@ -60,8 +61,8 @@ public class ConcessaoReconducaoController extends DefaultController<DocumentoRe
 
     @CrossOrigin
     @GetMapping(path = "/{searchParams}/{tipoParams}/pagination")
-    public ResponseEntity<PaginacaoUtil<Reconducao>> listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
-        PaginacaoUtil<Reconducao> paginacaoUtil = reconducaoRepository.buscaPaginadaReconducao(pageable, searchParams, tipoParams);
+    public ResponseEntity<PaginacaoUtil<ReconducaoDTO>> listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
+        PaginacaoUtil<ReconducaoDTO> paginacaoUtil = reconducaoRepository.buscaPaginadaReconducao(pageable, searchParams, tipoParams);
         return ResponseEntity.ok().body(paginacaoUtil);
     }
 

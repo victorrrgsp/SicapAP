@@ -4,6 +4,7 @@ import br.gov.to.tce.model.adm.AdmEnvio;
 import br.gov.to.tce.model.ap.concessoes.DocumentoPensao;
 import br.gov.to.tce.model.ap.pessoal.Pensao;
 import com.example.sicapweb.model.Inciso;
+import com.example.sicapweb.model.dto.PensaoDTO;
 import com.example.sicapweb.repository.AdmEnvioRepository;
 import com.example.sicapweb.repository.concessao.DocumentoPensaoRepository;
 import com.example.sicapweb.repository.concessao.PensaoRepository;
@@ -60,8 +61,8 @@ public class ConcessaoPensaoController extends DefaultController<DocumentoPensao
 
     @CrossOrigin
     @GetMapping(path="/{searchParams}/{tipoParams}/pagination")
-    public ResponseEntity<PaginacaoUtil<Pensao>> listPensoes(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
-        PaginacaoUtil<Pensao> paginacaoUtil = pensaoRepository.buscaPaginadaPensao(pageable,searchParams,tipoParams);
+    public ResponseEntity<PaginacaoUtil<PensaoDTO>> listPensoes(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
+        PaginacaoUtil<PensaoDTO> paginacaoUtil = pensaoRepository.buscaPaginadaPensao(pageable,searchParams,tipoParams);
         return ResponseEntity.ok().body(paginacaoUtil);
     }
 

@@ -41,9 +41,10 @@ public class AdmEnvioRepository extends DefaultRepository<AdmEnvio, BigInteger> 
         String campo = String.valueOf(pageable.getSort()).replace(":", "");
 
         List<AdmEnvio> list = getEntityManager().createNativeQuery("" +
-                            "select * from SICAPAP21..AdmEnvio " +
-                            "where status = 3 and unidadeGestora = '"
-                            + User.getUser(request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, AdmEnvio.class)
+                        "select * from SICAPAP21..AdmEnvio " +
+                        "where status = 3 and unidadeGestora = '"
+                        + User.getUser(request).getUnidadeGestora().getId() + "' " + search + " ORDER BY "
+                        + campo, AdmEnvio.class)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();
@@ -54,7 +55,7 @@ public class AdmEnvioRepository extends DefaultRepository<AdmEnvio, BigInteger> 
         return new PaginacaoUtil<AdmEnvio>(tamanho, pagina, totalPaginas, totalRegistros, list);
     }
 
-    public List<HashMap<String,Object>> infoByRecibo(long idAdmissao) {
+    public List<HashMap<String, Object>> infoByRecibo(long idAdmissao) {
         List<Object[]> list = getEntityManager().createNativeQuery("select top 1  env.processo,env.unidadeGestora ,ug.nome as nomeEntidade ,CAST(se.nome AS varchar(500)) as nomeServidor ,env.tipoRegistro\n" +
                         "    from SICAPAP21w.dbo.AdmEnvio env\n" +
                         "    join SICAPAP21w.dbo.unidadegestora ug on env.unidadeGestora = ug.id\n" +
@@ -62,18 +63,18 @@ public class AdmEnvioRepository extends DefaultRepository<AdmEnvio, BigInteger> 
                         "    join SICAPAP21w.dbo.Servidor se on ad.idServidor = se.id\n" +
                         "      where status = 3 and\n" +
                         "        env.idAdmissao = ?")
-                .setParameter(1,idAdmissao)
+                .setParameter(1, idAdmissao)
                 .getResultList();
 
-        List<HashMap<String,Object>> resutSet = new ArrayList<>();
-        list.forEach(admEnvio ->{
-            var aux = new HashMap<String,Object>();
-            aux.put("processo",      (String)admEnvio[0]);
-            aux.put("UnidadeGestora",(String)admEnvio[1]);
-            aux.put("nomeEntidade",  (String)admEnvio[2]);
-            aux.put("nomeServidor",  (String)admEnvio[3]);
-            var tipoLabel = Arrays.stream(AdmEnvio.TipoRegistro.values()).filter(a -> a.getValor() == (int)admEnvio[4] ).findFirst().get().getLabel();
-            aux.put("tipoRegistro",  tipoLabel.toUpperCase());
+        List<HashMap<String, Object>> resutSet = new ArrayList<>();
+        list.forEach(admEnvio -> {
+            var aux = new HashMap<String, Object>();
+            aux.put("processo", (String) admEnvio[0]);
+            aux.put("UnidadeGestora", (String) admEnvio[1]);
+            aux.put("nomeEntidade", (String) admEnvio[2]);
+            aux.put("nomeServidor", (String) admEnvio[3]);
+            var tipoLabel = Arrays.stream(AdmEnvio.TipoRegistro.values()).filter(a -> a.getValor() == (int) admEnvio[4]).findFirst().get().getLabel();
+            aux.put("tipoRegistro", tipoLabel.toUpperCase());
             resutSet.add(aux);
         });
         return resutSet;

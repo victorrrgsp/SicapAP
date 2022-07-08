@@ -1,18 +1,20 @@
 package com.example.sicapweb.model.dto;
+
 import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.time.LocalDate;
 import java.sql.Date;
-@Getter @Setter
-public class ReitegracaoDTO {
-    private BigDecimal id;
+
+@Getter
+@Setter
+public class PensaoDTO {
+
+    private BigInteger id;
     private String cpfServidor;
     private String nome;
     private String cargo;
     private String numeroAto;
     private Integer status;
-    private Date DataExertcio;
 }
