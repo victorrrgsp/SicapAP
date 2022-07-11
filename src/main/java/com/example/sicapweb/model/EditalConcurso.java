@@ -10,6 +10,17 @@ public class EditalConcurso{
 
     private Integer tipoEdital;
     private String numeroEdital;
+
+    private String processo;
+
+    public String getProcesso() {
+        return processo;
+    }
+
+    public void setProcesso(String processo) {
+        this.processo = processo;
+    }
+
     private Date dataPublicacao;
     private Date dataInicioInscricoes;
     private Date dataFimInscricoes;

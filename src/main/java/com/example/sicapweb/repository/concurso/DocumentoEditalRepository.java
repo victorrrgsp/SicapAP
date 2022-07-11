@@ -21,6 +21,14 @@ public class DocumentoEditalRepository extends DefaultRepository<DocumentoEdital
                         + coluna + "' and idEdital = " + idEdital, DocumentoEdital.class)
                 .getResultList();
     }
+
+    public List<DocumentoEdital> buscarDocumentosEdital(String coluna, BigInteger idEdital) {
+        return  getEntityManager().createNativeQuery(
+                        "select * from DocumentoEdital where inciso in ("
+                                + coluna + ") and idEdital = " + idEdital, DocumentoEdital.class)
+                .getResultList();
+    }
+
     public Integer findSituacao(String entidade, String pk ,BigInteger id, String incisos) {
         return (Integer) getEntityManager().createNativeQuery("select count(*) \n" +
                 " Situacao from "+ entidade +

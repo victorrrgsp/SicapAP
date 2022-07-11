@@ -1,11 +1,13 @@
 package com.example.sicapweb.web.controller.ap.concurso;
 
 
+import br.gov.to.tce.model.ap.concurso.ConcursoEnvio;
 import br.gov.to.tce.model.ap.concurso.EditalHomologacao;
 import br.gov.to.tce.model.ap.concurso.documento.DocumentoEditalHomologacao;
 import com.example.sicapweb.model.EditalConcurso;
 import com.example.sicapweb.model.EditalHomologaConcurso;
 import com.example.sicapweb.model.Inciso;
+import com.example.sicapweb.repository.concurso.ConcursoEnvioRepository;
 import com.example.sicapweb.repository.concurso.DocumentoEditalHomologacaoRepository;
 import com.example.sicapweb.repository.concurso.EditalHomologacaoRepository;
 import com.example.sicapweb.util.PaginacaoUtil;
@@ -16,8 +18,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.math.BigInteger;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +34,9 @@ public class DocumentoConcursoHomologacaoController extends DefaultController<Ed
 
     @Autowired
     private DocumentoEditalHomologacaoRepository documentoEditalHomologacaoRepository;
+
+    @Autowired
+    private ConcursoEnvioRepository concursoEnvioRepository;
 
     @CrossOrigin
     @GetMapping
@@ -45,11 +52,21 @@ public class DocumentoConcursoHomologacaoController extends DefaultController<Ed
         List<EditalHomologaConcurso> listE = paginacaoUtil.getRegistros();
         for(Integer i= 0; i < listE.size(); i++){
             Integer quantidadeDocumentos = editalHomologacaoRepository.findSituacao("DocumentoEditalHomologacao","idEditalHomologacao", listE.get(i).getId(), "'XII','XIII','XIV','XV'");
+            List<ConcursoEnvio> Lenvio= concursoEnvioRepository.buscarEnvioFAse2PorEdital(listE.get(i).getEdital().getId());
             if (listE.get(i).getVeiculoPublicacao()==null  || listE.get(i).getDataHomologacao()==null || listE.get(i).getAto()==null || listE.get(i).getEdital()==null  ) {
                 listE.get(i).setSituacao("Dados Incompletos");
             }
-            else
-            if(quantidadeDocumentos <  4) {
+            else if( Lenvio.size()>0 ){
+                ConcursoEnvio envio  = Lenvio.get(0);
+                if (envio.getStatus() == ConcursoEnvio.Status.Enviado.getValor() ){
+                    listE.get(i).setSituacao("Aguardando Assinatura");
+                }
+                else if (envio.getStatus() == ConcursoEnvio.Status.Finalizado.getValor() ){
+                    listE.get(i).setSituacao("Concluido");
+                    listE.get(i).setProcesso(envio.getProcesso());
+                }
+            }
+            else  if(quantidadeDocumentos <  4) {
                 listE.get(i).setSituacao("Pendente");
             } else if(quantidadeDocumentos == 4){
                 listE.get(i).setSituacao("Aguardando Assinatura");
@@ -124,6 +141,16 @@ public class DocumentoConcursoHomologacaoController extends DefaultController<Ed
         return ResponseEntity.ok().body(list);
     }
 
+    @CrossOrigin
+    @Transactional
+    @PostMapping(path = {"/envio"})
+    public ResponseEntity<ConcursoEnvio>Enviar(@RequestBody ConcursoEnvio concursoEnvio){
+        concursoEnvio.setFase(ConcursoEnvio.Fase.Homologacao.getValor());
+        concursoEnvio.setStatus(ConcursoEnvio.Status.Enviado.getValor());
+        concursoEnvioRepository.save(concursoEnvio);
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(concursoEnvio.getId()).toUri();
+        return ResponseEntity.created(uri).body(concursoEnvio);
+    }
 
     @CrossOrigin
     @Transactional

@@ -1,5 +1,6 @@
 package com.example.sicapweb.repository.concurso;
 
+import br.gov.to.tce.model.ap.concurso.ConcursoEnvio;
 import br.gov.to.tce.model.ap.concurso.Edital;
 import br.gov.to.tce.model.ap.concurso.EmpresaOrganizadora;
 import com.example.sicapweb.model.EditalFinalizado;
@@ -132,7 +133,8 @@ public class EditalRepository extends DefaultRepository<Edital, BigInteger> {
         List<Edital> list = getEntityManager()
                 .createNativeQuery("select a.* from Edital a " +
                         "join InfoRemessa i on a.chave = i.chave " +
-                        "where  a.tipoEdital =1  and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, Edital.class)
+                        "join ConcursoEnvio e on a.id = e.idEdital and e.fase=2 and e.Status=3 " +
+                        "where  a.tipoEdital =1   and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, Edital.class)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();
@@ -147,6 +149,14 @@ public class EditalRepository extends DefaultRepository<Edital, BigInteger> {
             edf.setProcesso(null);
             edf.setData(list.get(i).getDataPublicacao());
             edf.setEdital((Edital)list.get(i));
+            List<ConcursoEnvio> leo =  getEntityManager()
+                    .createNativeQuery("select E.* from ConcursoEnvio E where  e.fase=2 and e.Status=3 and  idEdital=" + list.get(i).getId() + "", ConcursoEnvio.class)
+                    .getResultList();
+
+            if (leo.size()>0){
+                ConcursoEnvio eo = leo.get(0);
+                edf.setProcesso(eo.getProcesso());
+            }
             listc.add(edf);
         }
         return new PaginacaoUtil<EditalFinalizado>(tamanho, pagina, totalPaginas, totalRegistros, listc);

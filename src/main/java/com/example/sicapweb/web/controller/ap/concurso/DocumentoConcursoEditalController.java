@@ -56,6 +56,7 @@ public class DocumentoConcursoEditalController extends DefaultController<Documen
                }
                else if (envio.getStatus() == ConcursoEnvio.Status.Finalizado.getValor() ){
                    listE.get(i).setSituacao("Concluido");
+                   listE.get(i).setProcesso(envio.getProcesso());
                }
            }
             else  if(quantidadeDocumentos <  11) {

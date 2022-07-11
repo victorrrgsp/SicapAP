@@ -12,6 +12,16 @@ public class EditalHomologaConcurso {
 
     private String numeroEdital;
 
+    public String getProcesso() {
+        return processo;
+    }
+
+    public void setProcesso(String processo) {
+        this.processo = processo;
+    }
+
+    private String processo;
+
     private Edital edital;
 
     public String numeroAto;

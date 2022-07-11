@@ -6,13 +6,28 @@ import br.gov.to.tce.model.ap.concurso.ConcursoEnvio;
 import java.math.BigInteger;
 
 public class ConcursoEnvioAssRetorno {
-    private BigInteger id;
 
     private ConcursoEnvio concursoEnvio;
 
-    @JayValEnum
-    private Integer status;
+    private Integer statusAssinatura;
 
-    private String mensagem;
+    public ConcursoEnvioAssRetorno() {
+    }
+
+    public ConcursoEnvio getConcursoEnvio() {
+        return concursoEnvio;
+    }
+
+    public void setConcursoEnvio(ConcursoEnvio concursoEnvio) {
+        this.concursoEnvio = concursoEnvio;
+    }
+
+    public Integer getStatusAssinatura() {
+        return statusAssinatura;
+    }
+
+    public void setStatusAssinatura(Integer statusAssinatura) {
+        this.statusAssinatura = statusAssinatura;
+    }
 
 }

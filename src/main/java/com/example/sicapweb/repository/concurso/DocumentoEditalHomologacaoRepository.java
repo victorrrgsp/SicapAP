@@ -1,5 +1,6 @@
 package com.example.sicapweb.repository.concurso;
 
+import br.gov.to.tce.model.ap.concurso.documento.DocumentoEdital;
 import br.gov.to.tce.model.ap.concurso.documento.DocumentoEditalHomologacao;
 import com.example.sicapweb.repository.DefaultRepository;
 import org.springframework.stereotype.Repository;
@@ -18,6 +19,13 @@ public class DocumentoEditalHomologacaoRepository extends DefaultRepository<Docu
         return getEntityManager().createNativeQuery(
                 "select * from DocumentoEditalHomologacao where inciso = '"
                         + coluna + "' and idEditalHomologacao = " + idEditalHomologacao, DocumentoEditalHomologacao.class)
+                .getResultList();
+    }
+
+    public List<DocumentoEditalHomologacao> buscarDocumentosEditalHomologacao(String coluna, BigInteger idEdital) {
+        return  getEntityManager().createNativeQuery(
+                        "select * from DocumentoEditalHomologacao h join EditalHomologacao EH on H.idEditalHomologacao= EH.id   where H.inciso in ("
+                                + coluna + ") and EH.idEdital = " + idEdital, DocumentoEditalHomologacao.class)
                 .getResultList();
     }
 
