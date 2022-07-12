@@ -210,7 +210,7 @@ public class AssinarConcursoController {
 //
                     }
                 }
-              //  throw new SQLException("Test erro handling");
+                //throw new SQLException("Test erro handling");
             } else {
                 System.out.println("erro:não encontrou usuario logado!!");
             }
