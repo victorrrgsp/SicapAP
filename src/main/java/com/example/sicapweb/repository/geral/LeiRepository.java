@@ -95,7 +95,7 @@ public class LeiRepository extends DefaultRepository<Lei, BigInteger> {
                 .setMaxResults(tamanho)
                 .getResultList();
 
-        long totalRegistros = countLeis();
+        long totalRegistros = count();
         long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
 
         return new PaginacaoUtil<Lei>(tamanho, pagina, totalPaginas, totalRegistros, list);

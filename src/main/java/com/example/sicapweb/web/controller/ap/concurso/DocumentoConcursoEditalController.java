@@ -1,26 +1,32 @@
 package com.example.sicapweb.web.controller.ap.concurso;
 
 
+import br.gov.to.tce.model.ap.concurso.ConcursoEnvio;
 import br.gov.to.tce.model.ap.concurso.documento.DocumentoEdital;
 import br.gov.to.tce.model.ap.concurso.Edital;
+import com.example.sicapweb.model.EditalConcurso;
 import com.example.sicapweb.model.Inciso;
+import com.example.sicapweb.repository.concurso.ConcursoEnvioRepository;
 import com.example.sicapweb.repository.concurso.DocumentoEditalRepository;
 import com.example.sicapweb.repository.concurso.EditalRepository;
+import com.example.sicapweb.util.PaginacaoUtil;
 import com.example.sicapweb.web.controller.DefaultController;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.math.BigInteger;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 @RequestMapping("/documentoConcursoEdital")
-public class DocumentoConcursoEditalController extends DefaultController<Edital> {
+public class DocumentoConcursoEditalController extends DefaultController<DocumentoEdital> {
 
     @Autowired
     private EditalRepository editalRepository;
@@ -28,10 +34,46 @@ public class DocumentoConcursoEditalController extends DefaultController<Edital>
     @Autowired
     private DocumentoEditalRepository documentoEditalRepository;
 
-    @GetMapping("/")
-    public String lista(ModelMap model) {
-        model.addAttribute("editais", editalRepository.findAll());
-        return "documentoConcursoEdital";
+    @Autowired
+    private ConcursoEnvioRepository concursoEnvioRepository;
+
+
+    @CrossOrigin
+    @GetMapping(path="/{searchParams}/{tipoParams}/pagination")
+    public ResponseEntity<PaginacaoUtil<EditalConcurso>> listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
+        PaginacaoUtil<EditalConcurso> paginacaoUtil = editalRepository.buscaPaginadaEditais(pageable,searchParams,tipoParams);
+        List<EditalConcurso> listE = paginacaoUtil.getRegistros();
+        for(Integer i= 0; i < listE.size(); i++){
+            Integer quantidadeDocumentos = documentoEditalRepository.findSituacao("documentoEdital","idEdital", listE.get(i).getId(), "'I','II','III','IV','V','VI','VII','VIII','IX','IX.I','X'");
+            List<ConcursoEnvio> Lenvio= concursoEnvioRepository.buscarEnvioFAse1PorEdital(listE.get(i).getId());
+           if (listE.get(i).getVeiculoPublicacao()==null  || listE.get(i).getDataPublicacao()==null || listE.get(i).getDataInicioInscricoes()==null || listE.get(i).getDataFimInscricoes() == null  || listE.get(i).getPrazoValidade()==null || listE.get(i).getCnpjEmpresaOrganizadora()==null ) {
+                listE.get(i).setSituacao("Dados Incompletos");
+            }
+           else if( Lenvio.size()>0 ){
+               ConcursoEnvio envio  = Lenvio.get(0);
+               if (envio.getStatus() == ConcursoEnvio.Status.Enviado.getValor() ){
+                   listE.get(i).setSituacao("Aguardando Assinatura");
+               }
+               else if (envio.getStatus() == ConcursoEnvio.Status.Finalizado.getValor() ){
+                   listE.get(i).setSituacao("Concluido");
+                   listE.get(i).setProcesso(envio.getProcesso());
+               }
+           }
+            else  if(quantidadeDocumentos <  11) {
+                listE.get(i).setSituacao("Pendente");
+            } else if(quantidadeDocumentos >= 11){
+                listE.get(i).setSituacao("Pendente");
+            }
+        }
+
+        return ResponseEntity.ok().body(paginacaoUtil);
+    }
+
+    @CrossOrigin
+    @GetMapping(path = {"getSituacao/{id}"})
+    public ResponseEntity<?> findSituacao(@PathVariable BigInteger id) {
+        Integer situacao = documentoEditalRepository.findSituacao("DocumentoEdital","idEdital",id, "'I','II','III','IV','V','VI','VII','VIII','IX','IX.I','X'");
+        return ResponseEntity.ok().body(situacao);
     }
 
     @CrossOrigin
@@ -48,13 +90,14 @@ public class DocumentoConcursoEditalController extends DefaultController<Edital>
         return ResponseEntity.ok().body(idCastor);
     }
 
+
     @CrossOrigin
     @GetMapping(path = {"getInciso/{id}"})
     public ResponseEntity<?> findInciso(@PathVariable BigInteger id) {
         List<Inciso> list = new ArrayList<>();
         list.add(new Inciso("I", "Ofício subscrito pela autoridade competente",
                 "Ofício subscrito pela autoridade competente", "", "Sim"));
-        list.add(new Inciso("II ", "Justificativa para a abertura do concurso público",
+        list.add(new Inciso("II", "Justificativa para a abertura do concurso público",
                 "Justificativa para a abertura do concurso público", "", "Sim"));
         list.add(new Inciso("III", "Demonstrativo de despesa do impacto orçamentário-financeiro",
                 "Demonstrativo de despesa do impacto orçamentário-financeiro", "", "Sim"));
@@ -92,9 +135,36 @@ public class DocumentoConcursoEditalController extends DefaultController<Edital>
     }
 
     @CrossOrigin
+    @GetMapping(path = {"/envio/{id}"})
+    public ResponseEntity<?> findById(@PathVariable BigInteger id) {
+        ConcursoEnvio list = concursoEnvioRepository.findById(id);
+        return ResponseEntity.ok().body(list);
+    }
+
+    @CrossOrigin
+    @Transactional
+    @PostMapping(path = {"/envio"})
+    public ResponseEntity<ConcursoEnvio>Enviar(@RequestBody ConcursoEnvio concursoEnvio){
+        concursoEnvio.setFase(ConcursoEnvio.Fase.Edital.getValor());
+        concursoEnvio.setStatus(ConcursoEnvio.Status.Enviado.getValor());
+        concursoEnvioRepository.save(concursoEnvio);
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(concursoEnvio.getId()).toUri();
+        return ResponseEntity.created(uri).body(concursoEnvio);
+    }
+
+    @CrossOrigin
     @GetMapping(path = {"anexos/{inciso}/{id}"})
     public ResponseEntity<?> findByDocumento(@PathVariable String inciso, @PathVariable BigInteger id) {
         DocumentoEdital list = documentoEditalRepository.buscarDocumentoEdital(inciso, id).get(0);
         return ResponseEntity.ok().body(list);
+    }
+
+
+    @CrossOrigin
+    @Transactional
+    @DeleteMapping(value = {"/{id}"})
+    public ResponseEntity<?> delete(@PathVariable BigInteger id) {
+        documentoEditalRepository.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

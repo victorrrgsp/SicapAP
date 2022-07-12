@@ -1,6 +1,6 @@
 package com.example.sicapweb.web.controller;
-
 import br.gov.to.tce.model.adm.AdmAutenticacao;
+import com.example.sicapweb.exception.InvalitInsert;
 import com.example.sicapweb.repository.AdmAutenticacaoRepository;
 import com.example.sicapweb.util.PaginacaoUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
 import java.math.BigInteger;
 import java.net.URI;
 import java.security.MessageDigest;

@@ -1,6 +1,8 @@
 package com.example.sicapweb.web.controller.ap.concurso;
 
+import br.gov.to.tce.model.ap.concurso.Edital;
 import br.gov.to.tce.model.ap.concurso.EditalAprovado;
+import br.gov.to.tce.model.ap.concurso.EditalVaga;
 import com.example.sicapweb.repository.concurso.EditalAprovadoRepository;
 import com.example.sicapweb.repository.concurso.EditalVagaRepository;
 import com.example.sicapweb.util.PaginacaoUtil;
@@ -14,6 +16,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.math.BigInteger;
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping({"/concursoAprovado"})
@@ -38,6 +41,7 @@ public class EditalAprovadoController extends DefaultController<EditalAprovado> 
         EditalAprovado list = editalAprovadoRepository.findById(id);
         return ResponseEntity.ok().body(list);
     }
+
 
     @CrossOrigin
     @Transactional

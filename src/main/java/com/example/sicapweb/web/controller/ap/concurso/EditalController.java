@@ -6,6 +6,7 @@ import com.example.sicapweb.util.PaginacaoUtil;
 import com.example.sicapweb.web.controller.DefaultController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +15,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.math.BigInteger;
 import java.net.URI;
 import java.util.List;
-
+import  com.example.sicapweb.exception.InvalitInsert;
 @RestController
 @RequestMapping({"/concursoEdital"})
 public class EditalController extends DefaultController<Edital> {
@@ -55,9 +56,17 @@ public class EditalController extends DefaultController<Edital> {
     @PostMapping
     public ResponseEntity<Edital> create(@RequestBody Edital edital) {
         edital.setInfoRemessa(editalRepository.buscarPrimeiraRemessa());
+        Edital e =editalRepository.buscarEditalPorNumero(edital.getNumeroEdital());
+        if (e == null) {
         editalRepository.save(edital);
+
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(edital.getId()).toUri();
         return ResponseEntity.created(uri).body(edital);
+        }
+        else{
+            throw new InvalitInsert("ja existe o edital!!");
+        }
+
     }
 
     @CrossOrigin
