@@ -1,15 +1,12 @@
 package com.example.sicapweb.web.controller.ap.concurso;
 
-import br.gov.to.tce.model.ap.concurso.Edital;
 import br.gov.to.tce.model.ap.concurso.ProcessoAdmissao;
-import br.gov.to.tce.model.ap.concurso.documento.DocumentoAdmissao;
-import com.example.sicapweb.exception.InvalitInsert;
 import com.example.sicapweb.model.EditalFinalizado;
 import com.example.sicapweb.model.NomeacaoConcurso;
-import com.example.sicapweb.model.ProcessoAdmissaoConcurso;
+import com.example.sicapweb.model.AdmissaoEnvioAssRetorno;
 import com.example.sicapweb.repository.concurso.*;
-import com.example.sicapweb.repository.geral.admissaoRepository;
 import com.example.sicapweb.model.EditalAprovadoConcurso;
+import com.example.sicapweb.repository.movimentacaoDePessoal.AdmissaoRepository;
 import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +18,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.math.BigInteger;
 import java.net.URI;
-import java.util.List;
 
 
 @RestController
@@ -35,7 +31,7 @@ public class EditalAdmissaoController {
     private ProcessoAdmissaoRepository processoAdmissaoRepository;
 
     @Autowired
-    private admissaoRepository admissaoRepository;
+    private AdmissaoRepository admissaoRepository;
 
     @Autowired
     private EditalRepository editalRepository;
@@ -65,15 +61,15 @@ public class EditalAdmissaoController {
 
     @CrossOrigin
     @GetMapping(path="/processos/{searchParams}/{tipoParams}/pagination")
-    public ResponseEntity<PaginacaoUtil<ProcessoAdmissaoConcurso>> listaAProcessos(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
-        PaginacaoUtil<ProcessoAdmissaoConcurso> paginacaoUtil = processoAdmissaoRepository.buscarProcessos(pageable,searchParams,tipoParams);
+    public ResponseEntity<PaginacaoUtil<AdmissaoEnvioAssRetorno>> listaAProcessos(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
+        PaginacaoUtil<AdmissaoEnvioAssRetorno> paginacaoUtil = processoAdmissaoRepository.buscarProcessos(pageable,searchParams,tipoParams);
         return ResponseEntity.ok().body(paginacaoUtil);
     }
 
     @CrossOrigin
     @GetMapping(path="/processosAguardandoAss/{searchParams}/{tipoParams}/pagination")
-    public ResponseEntity<PaginacaoUtil<ProcessoAdmissaoConcurso>> listaAProcessosAguardandoAss(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
-        PaginacaoUtil<ProcessoAdmissaoConcurso> paginacaoUtil = processoAdmissaoRepository.buscarProcessosAguardandoAss(pageable,searchParams,tipoParams);
+    public ResponseEntity<PaginacaoUtil<AdmissaoEnvioAssRetorno>> listaAProcessosAguardandoAss(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
+        PaginacaoUtil<AdmissaoEnvioAssRetorno> paginacaoUtil = processoAdmissaoRepository.buscarProcessosAguardandoAss(pageable,searchParams,tipoParams);
         return ResponseEntity.ok().body(paginacaoUtil);
     }
 

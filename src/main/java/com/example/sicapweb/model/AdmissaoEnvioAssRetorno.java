@@ -5,7 +5,7 @@ import br.gov.to.tce.model.ap.concurso.Edital;
 import java.math.BigInteger;
 import java.util.Date;
 
-public class ProcessoAdmissaoConcurso {
+public class AdmissaoEnvioAssRetorno {
     //primeira aba de dados de envio eletronica de documentos-> admissao
 
     private BigInteger id;
@@ -22,7 +22,17 @@ public class ProcessoAdmissaoConcurso {
 
     private Integer status;
 
-    public ProcessoAdmissaoConcurso() {
+    private String justificativaCastorId;
+
+    public String getJustificativaCastorId() {
+        return justificativaCastorId;
+    }
+
+    public void setJustificativaCastorId(String justificativaCastorId) {
+        this.justificativaCastorId = justificativaCastorId;
+    }
+
+    public AdmissaoEnvioAssRetorno() {
     }
 
     public String getNumeroEdital() {

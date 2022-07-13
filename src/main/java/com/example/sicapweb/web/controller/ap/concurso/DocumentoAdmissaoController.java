@@ -1,15 +1,8 @@
 package com.example.sicapweb.web.controller.ap.concurso;
 
 
-import br.gov.to.tce.model.ap.concurso.EditalHomologacao;
 import br.gov.to.tce.model.ap.concurso.documento.DocumentoAdmissao;
-import br.gov.to.tce.model.ap.concurso.documento.DocumentoEditalHomologacao;
-import com.example.sicapweb.model.EditalConcurso;
-import com.example.sicapweb.model.Inciso;
-import com.example.sicapweb.model.ProcessoAdmissaoConcurso;
 import com.example.sicapweb.repository.concurso.DocumentoAdmissaoRepository;
-import com.example.sicapweb.repository.concurso.EditalAprovadoRepository;
-import com.example.sicapweb.repository.concurso.EditalVagaRepository;
 import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
 import com.example.sicapweb.web.controller.DefaultController;
@@ -23,7 +16,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.math.BigInteger;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 

@@ -1,12 +1,7 @@
 package com.example.sicapweb.repository.concurso;
 
-import br.gov.to.tce.model.ap.concurso.Edital;
-import br.gov.to.tce.model.ap.concurso.EditalAprovado;
 import br.gov.to.tce.model.ap.concurso.ProcessoAdmissao;
-import br.gov.to.tce.model.ap.pessoal.Admissao;
-import com.example.sicapweb.model.EditalFinalizado;
-import com.example.sicapweb.model.NomeacaoConcurso;
-import com.example.sicapweb.model.ProcessoAdmissaoConcurso;
+import com.example.sicapweb.model.AdmissaoEnvioAssRetorno;
 import com.example.sicapweb.repository.DefaultRepository;
 import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
@@ -48,7 +43,7 @@ public class ProcessoAdmissaoRepository  extends DefaultRepository<ProcessoAdmis
         return search;
     }
 
-    public PaginacaoUtil<ProcessoAdmissaoConcurso> buscarProcessos(Pageable pageable, String searchParams, Integer tipoParams) {
+    public PaginacaoUtil<AdmissaoEnvioAssRetorno> buscarProcessos(Pageable pageable, String searchParams, Integer tipoParams) {
         int pagina = Integer.valueOf(pageable.getPageNumber());
         int tamanho = Integer.valueOf(pageable.getPageSize());
         String search = "";
@@ -66,9 +61,9 @@ public class ProcessoAdmissaoRepository  extends DefaultRepository<ProcessoAdmis
         long totalRegistros = countProcessos();
         long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
 
-        List<ProcessoAdmissaoConcurso> listc= new ArrayList<ProcessoAdmissaoConcurso>() ;
+        List<AdmissaoEnvioAssRetorno> listc= new ArrayList<AdmissaoEnvioAssRetorno>() ;
         for(Integer i= 0; i < list.size(); i++){
-            ProcessoAdmissaoConcurso pac =new ProcessoAdmissaoConcurso();
+            AdmissaoEnvioAssRetorno pac =new AdmissaoEnvioAssRetorno();
             pac.setNumeroEdital(list.get(i).getEdital().getNumeroEdital());
             pac.setId(list.get(i).getId());
             pac.setDtcriacao(list.get(i).getDataCriacao());
@@ -80,7 +75,7 @@ public class ProcessoAdmissaoRepository  extends DefaultRepository<ProcessoAdmis
             listc.add(pac);
         }
 
-        return new PaginacaoUtil<ProcessoAdmissaoConcurso>(tamanho, pagina, totalPaginas, totalRegistros, listc);
+        return new PaginacaoUtil<AdmissaoEnvioAssRetorno>(tamanho, pagina, totalPaginas, totalRegistros, listc);
     }
 
     public Integer countProcessos() {
@@ -90,7 +85,7 @@ public class ProcessoAdmissaoRepository  extends DefaultRepository<ProcessoAdmis
     }
 
 
-    public PaginacaoUtil<ProcessoAdmissaoConcurso> buscarProcessosAguardandoAss(Pageable pageable, String searchParams, Integer tipoParams) {
+    public PaginacaoUtil<AdmissaoEnvioAssRetorno> buscarProcessosAguardandoAss(Pageable pageable, String searchParams, Integer tipoParams) {
         int pagina = Integer.valueOf(pageable.getPageNumber());
         int tamanho = Integer.valueOf(pageable.getPageSize());
         String search = "";
@@ -99,7 +94,7 @@ public class ProcessoAdmissaoRepository  extends DefaultRepository<ProcessoAdmis
 
         List<ProcessoAdmissao> list = getEntityManager()
                 .createNativeQuery("select a.* from ProcessoAdmissao a " +
-                        "where a.status=2 and  a.cnpjEmpresaOrganizadora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, ProcessoAdmissao.class)
+                        "where not exists(select 1 from AdmissaoEnvioAssinatura ass  where  ass.idProcesso=a.id)  and a.status=2 and  a.cnpjEmpresaOrganizadora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, ProcessoAdmissao.class)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();
@@ -108,9 +103,9 @@ public class ProcessoAdmissaoRepository  extends DefaultRepository<ProcessoAdmis
         long totalRegistros = countProcessosAguardandoAss();
         long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
 
-        List<ProcessoAdmissaoConcurso> listc= new ArrayList<ProcessoAdmissaoConcurso>() ;
+        List<AdmissaoEnvioAssRetorno> listc= new ArrayList<AdmissaoEnvioAssRetorno>() ;
         for(Integer i= 0; i < list.size(); i++){
-            ProcessoAdmissaoConcurso pac =new ProcessoAdmissaoConcurso();
+            AdmissaoEnvioAssRetorno pac =new AdmissaoEnvioAssRetorno();
             pac.setNumeroEdital(list.get(i).getEdital().getNumeroEdital());
             pac.setId(list.get(i).getId());
             pac.setDtcriacao(list.get(i).getDataCriacao());
@@ -122,7 +117,7 @@ public class ProcessoAdmissaoRepository  extends DefaultRepository<ProcessoAdmis
             listc.add(pac);
         }
 
-        return new PaginacaoUtil<ProcessoAdmissaoConcurso>(tamanho, pagina, totalPaginas, totalRegistros, listc);
+        return new PaginacaoUtil<AdmissaoEnvioAssRetorno>(tamanho, pagina, totalPaginas, totalRegistros, listc);
     }
 
 

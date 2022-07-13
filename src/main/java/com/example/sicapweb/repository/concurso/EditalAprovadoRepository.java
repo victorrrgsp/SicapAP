@@ -33,9 +33,11 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
         String campo = String.valueOf(pageable.getSort()).replace(":", "");
 
         List<EditalAprovado> list = getEntityManager()
-                .createNativeQuery("select a.* from EditalAprovado a " +
-                        "join InfoRemessa i on a.chave = i.chave " +
-                        "where not exists(select 1 from Admissao ad  where ad.numeroInscricao=a.numeroInscricao)   and  i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' "  + " ORDER BY " + campo, EditalAprovado.class)
+                .createNativeQuery("select a.* from EditalAprovado  a" +
+                        " join  EditalVaga b on a.idEditalVaga = b.id" +
+                        "    join InfoRemessa i on a.chave = i.chave and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' " +
+                        "     left join   Servidor se on a.cpf = se.cpfServidor" +
+                        "    left join Admissao ad on se.id = ad.idServidor and   b.idCargo = ad.idCargo  and  i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' "  + " ORDER BY " + campo, EditalAprovado.class)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();

@@ -1,12 +1,8 @@
 package com.example.sicapweb.repository.concurso;
 
 import br.gov.to.tce.model.ap.concurso.ConcursoEnvio;
-import br.gov.to.tce.model.ap.concurso.ProcessoAdmissao;
-import br.gov.to.tce.model.ap.concurso.documento.DocumentoEdital;
 import com.example.sicapweb.model.ConcursoEnvioAssRetorno;
-import com.example.sicapweb.model.ProcessoAdmissaoConcurso;
 import com.example.sicapweb.repository.DefaultRepository;
-import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;

@@ -76,7 +76,7 @@ public class EditalRepository extends DefaultRepository<Edital, BigInteger> {
             editalConcurso.setPrazoValidade(list.get(i).getPrazoValidade());
             editalConcurso.setVeiculoPublicacao(list.get(i).getVeiculoPublicacao());
             editalConcurso.setCnpjEmpresaOrganizadora(list.get(i).getCnpjEmpresaOrganizadora());
-           if  (!list.get(i).getCnpjEmpresaOrganizadora().isEmpty()) {
+           if  ( list.get(i).getCnpjEmpresaOrganizadora()!=null ) {
                try {
                    List<EmpresaOrganizadora> leo =  getEntityManager()
                            .createNativeQuery("select a.* from empresaOrganizadora a where  cnpjEmpresaOrganizadora='" + list.get(i).getCnpjEmpresaOrganizadora() + "'", EmpresaOrganizadora.class)
@@ -87,7 +87,7 @@ public class EditalRepository extends DefaultRepository<Edital, BigInteger> {
                    editalConcurso.setNomEmpresaOrganizadora(eo.getNome());
                    editalConcurso.setValorContratacao(eo.getValor());
                    }
-               }catch (IndexOutOfBoundsException e ){
+               }catch (Exception e ){
 
                }
 
@@ -133,7 +133,7 @@ public class EditalRepository extends DefaultRepository<Edital, BigInteger> {
         List<Edital> list = getEntityManager()
                 .createNativeQuery("select a.* from Edital a " +
                         "join InfoRemessa i on a.chave = i.chave " +
-                        "join ConcursoEnvio e on a.id = e.idEdital and e.fase=2 and e.Status=3 " +
+                        "join ConcursoEnvio e on a.id = e.idEdital and e.fase=1 and e.Status=3 " +
                         "where  a.tipoEdital =1   and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, Edital.class)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
@@ -150,7 +150,7 @@ public class EditalRepository extends DefaultRepository<Edital, BigInteger> {
             edf.setData(list.get(i).getDataPublicacao());
             edf.setEdital((Edital)list.get(i));
             List<ConcursoEnvio> leo =  getEntityManager()
-                    .createNativeQuery("select E.* from ConcursoEnvio E where  e.fase=2 and e.Status=3 and  idEdital=" + list.get(i).getId() + "", ConcursoEnvio.class)
+                    .createNativeQuery("select E.* from ConcursoEnvio E where  e.fase=1 and e.Status=3 and  idEdital=" + list.get(i).getId() + "", ConcursoEnvio.class)
                     .getResultList();
 
             if (leo.size()>0){
