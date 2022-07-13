@@ -46,7 +46,7 @@ public class ReconducaoRepository extends DefaultRepository<Reconducao, BigInteg
         String campo = String.valueOf(pageable.getSort()).replace(":", "");
 
         Query query = getEntityManager()
-                .createNativeQuery("select s.cpfServidor, s.nome, c.nomeCargo, ato.numeroAto, " +
+                .createNativeQuery("select distinct s.cpfServidor, s.nome, c.nomeCargo, ato.numeroAto, " +
                         " (CASE WHEN ae.status IS NULL THEN 1 ELSE ae.status END) as status, a.id from Reconducao a " +
                         "join InfoRemessa i on a.chave = i.chave " +
                         "join Admissao ad on ad.id = a.id " +

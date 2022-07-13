@@ -5,7 +5,7 @@ import br.gov.to.tce.model.ap.concessoes.DocumentoReadaptacao;
 import br.gov.to.tce.model.ap.pessoal.Readaptacao;
 import com.example.sicapweb.model.Inciso;
 import com.example.sicapweb.model.dto.ReadaptacaoDTO;
-import com.example.sicapweb.repository.AdmEnvioRepository;
+import com.example.sicapweb.repository.concessao.AdmEnvioRepository;
 import com.example.sicapweb.repository.concessao.DocumentoReadaptacaoRepository;
 import com.example.sicapweb.repository.concessao.ReadaptacaoRepository;
 import com.example.sicapweb.util.PaginacaoUtil;

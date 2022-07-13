@@ -5,7 +5,7 @@ import br.gov.to.tce.model.ap.concessoes.DocumentoPensao;
 import br.gov.to.tce.model.ap.pessoal.Pensao;
 import com.example.sicapweb.model.Inciso;
 import com.example.sicapweb.model.dto.PensaoDTO;
-import com.example.sicapweb.repository.AdmEnvioRepository;
+import com.example.sicapweb.repository.concessao.AdmEnvioRepository;
 import com.example.sicapweb.repository.concessao.DocumentoPensaoRepository;
 import com.example.sicapweb.repository.concessao.PensaoRepository;
 import com.example.sicapweb.util.PaginacaoUtil;
