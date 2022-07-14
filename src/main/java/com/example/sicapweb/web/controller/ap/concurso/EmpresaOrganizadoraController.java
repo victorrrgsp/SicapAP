@@ -1,6 +1,7 @@
 package com.example.sicapweb.web.controller.ap.concurso;
 
 import br.gov.to.tce.model.ap.concurso.EmpresaOrganizadora;
+import com.example.sicapweb.exception.InvalitInsert;
 import com.example.sicapweb.repository.concurso.EmpresaOrganizadoraRepository;
 import com.example.sicapweb.util.PaginacaoUtil;
 import com.example.sicapweb.web.controller.DefaultController;
@@ -55,6 +56,10 @@ public class EmpresaOrganizadoraController extends DefaultController<EmpresaOrga
         empresaOrganizadora.setId(id);
         empresaOrganizadora.setCnpjEmpresaOrganizadora(empresaOrganizadora.getCnpjEmpresaOrganizadora().replace(".", "").replace("-", "").replace("/", ""));
         empresaOrganizadora.setChave(empresaOrganizadoraRepository.buscarPrimeiraRemessa());
+        EmpresaOrganizadora e =   empresaOrganizadoraRepository.buscaEmpresaPorCnpj(empresaOrganizadora.getCnpjEmpresaOrganizadora());
+        if (e != null) {
+             throw new InvalitInsert("ja existe uma empresa organizadora com esse cnpj!!");
+        }
         empresaOrganizadoraRepository.update(empresaOrganizadora);
         return ResponseEntity.noContent().build();
     }

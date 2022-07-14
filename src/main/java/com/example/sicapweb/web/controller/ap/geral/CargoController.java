@@ -5,6 +5,7 @@ import br.gov.to.tce.model.ap.relacional.Cargo;
 import com.example.sicapweb.repository.geral.CargoNomeRepository;
 import com.example.sicapweb.repository.geral.CargoRepository;
 import com.example.sicapweb.repository.geral.LeiRepository;
+import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
 import com.example.sicapweb.web.controller.DefaultController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +50,13 @@ public class CargoController  extends DefaultController<Cargo> {
     @GetMapping("/{unidade}")
     public ResponseEntity<List<Object>> findByunidade( @PathVariable String unidade ) {
         List<Object> list = cargoRepository.buscarCargoPorUnidade(unidade);
+        return ResponseEntity.ok().body(list);
+    }
+
+    @CrossOrigin
+    @GetMapping("/ug")
+    public ResponseEntity<List<Object>> findByug( ) {
+        List<Object> list = cargoRepository.buscarCargoPorUG(User.getUser(cargoRepository.getRequest()).unidadeGestora.getId() );
         return ResponseEntity.ok().body(list);
     }
     @CrossOrigin

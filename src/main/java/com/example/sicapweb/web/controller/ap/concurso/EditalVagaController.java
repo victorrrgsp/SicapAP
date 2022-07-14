@@ -58,6 +58,13 @@ public class EditalVagaController extends DefaultController<EditalVaga> {
     }
 
     @CrossOrigin
+    @GetMapping("/todos")
+    public ResponseEntity<List<EditalVaga>> findVagas(){
+        List<EditalVaga> list = editalVagaRepository.findAll();
+        return ResponseEntity.ok().body(list);
+    }
+
+    @CrossOrigin
     @Transactional
     @PostMapping
     public ResponseEntity<EditalVaga> create(@RequestBody EditalVaga editalVaga) {

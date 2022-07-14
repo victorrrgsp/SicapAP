@@ -14,6 +14,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.math.BigInteger;
 import java.net.URI;
+import java.time.LocalDateTime;
 import java.util.List;
 import  com.example.sicapweb.exception.InvalitInsert;
 @RestController
@@ -58,13 +59,18 @@ public class EditalController extends DefaultController<Edital> {
         edital.setInfoRemessa(editalRepository.buscarPrimeiraRemessa());
         Edital e =editalRepository.buscarEditalPorNumero(edital.getNumeroEdital());
         if (e == null) {
-        editalRepository.save(edital);
+            if  ( Integer.valueOf(edital.getNumeroEdital().substring(edital.getNumeroEdital().length()-4)) <1990 ||  Integer.valueOf(edital.getNumeroEdital().substring(edital.getNumeroEdital().length()-4)) > (LocalDateTime.now().getYear() +5) ) {
+                throw new InvalitInsert("não é um numero de Edital valido. Os ultinmos 4 digitos correspondem ao ano do edital !!");
+            }
+            editalRepository.save(edital);
 
-        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(edital.getId()).toUri();
-        return ResponseEntity.created(uri).body(edital);
-        }
-        else{
-            throw new InvalitInsert("ja existe o edital!!");
+            URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(edital.getId()).toUri();
+            return ResponseEntity.created(uri).body(edital);
+
+        } else {
+
+        throw new InvalitInsert("ja existe o edital!!");
+
         }
 
     }
