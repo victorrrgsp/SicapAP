@@ -134,6 +134,11 @@ public class GfipController extends DefaultController<InfoRemessa> {
         Gfip list = gfipRepository.buscarDocumentoGfip(chave, tipo).get(0);
         return ResponseEntity.ok().body(list);
     }
+    @GetMapping(path = {"/anexosanteriores/{chave}/{tipo}"})
+    public ResponseEntity<?> findByDocumentoanteriores(@PathVariable String chave, @PathVariable String tipo) {
+        var result = gfipRepository.buscarDocumentoAnteriorGfip(chave, tipo).get(0);
+        return ResponseEntity.ok().body(result);
+    }
 
     @GetMapping(path = {"/GetAll/{UG}"})
     public ResponseEntity<?> findAll(@PathVariable String UG) {
