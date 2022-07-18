@@ -1,6 +1,7 @@
-package com.example.sicapweb.repository;
+package com.example.sicapweb.repository.concessao;
 
 import br.gov.to.tce.model.adm.AdmEnvio;
+import com.example.sicapweb.repository.DefaultRepository;
 import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
 import org.springframework.data.domain.Pageable;

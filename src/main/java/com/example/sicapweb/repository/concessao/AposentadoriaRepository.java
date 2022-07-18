@@ -62,7 +62,7 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
         String campo = String.valueOf(pageable.getSort()).replace(":", "");
 
         Query query = getEntityManager()
-                .createNativeQuery("select a.cpfServidor, ser.nome, car.nomeCargo, a.tipoAposentadoria, ato.numeroAto, " +
+                .createNativeQuery("select distinct a.cpfServidor, ser.nome, car.nomeCargo, a.tipoAposentadoria, ato.numeroAto, " +
                         " (CASE WHEN ae.status IS NULL THEN 1 ELSE ae.status END) as status, a.id from Aposentadoria a " +
                         "join Admissao ad on ad.id = a.id " +
                         "join Servidor ser on ser.id = ad.idServidor " +
@@ -117,7 +117,7 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
         String campo = String.valueOf(pageable.getSort()).replace(":", "");
 
         List<Object[]> list = getEntityManager()
-                .createNativeQuery("select a.cpfServidor, ser.nome, car.nomeCargo, a.tipoAposentadoria, ato.numeroAto, " +
+                .createNativeQuery("select distinct a.cpfServidor, ser.nome, car.nomeCargo, a.tipoAposentadoria, ato.numeroAto, " +
                         " (CASE WHEN ae.status IS NULL THEN 1 ELSE ae.status END) as status, a.id " +
                         " from Aposentadoria a " +
                         " join Admissao ad on ad.id = a.id " +
@@ -175,7 +175,7 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
         String campo = String.valueOf(pageable.getSort()).replace(":", "");
 
         List<Object[]> list = getEntityManager()
-                .createNativeQuery("select a.cpfServidor, ser.nome, car.nomeCargo, a.tipoAposentadoria, ato.numeroAto, " +
+                .createNativeQuery("select distinct a.cpfServidor, ser.nome, car.nomeCargo, a.tipoAposentadoria, ato.numeroAto, " +
                         " (CASE WHEN ae.status IS NULL THEN 1 ELSE ae.status END) as status, a.id " +
                         " from Aposentadoria a " +
                         " join Admissao ad on ad.id = a.id " +
@@ -233,7 +233,7 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
         String campo = String.valueOf(pageable.getSort()).replace(":", "");
 
         List<Object[]> list = getEntityManager()
-                .createNativeQuery("select a.cpfServidor, ser.nome, car.nomeCargo, a.tipoAposentadoria, ato.numeroAto, " +
+                .createNativeQuery("select distinct a.cpfServidor, ser.nome, car.nomeCargo, a.tipoAposentadoria, ato.numeroAto, " +
                         " (CASE WHEN ae.status IS NULL THEN 1 ELSE ae.status END) as status, a.id " +
                                 " from Aposentadoria a " +
                                 " join Admissao ad on ad.id = a.id " +
@@ -289,7 +289,7 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
         String campo = String.valueOf(pageable.getSort()).replace(":", "");
         // Object test = new Integer[]{1,2,3,4,5};
         List<Object[]> list = getEntityManager()
-                .createNativeQuery("select a.cpfServidor, ser.nome, car.nomeCargo, a.tipoAposentadoria, ato.numeroAto, " +
+                .createNativeQuery("select distinct a.cpfServidor, ser.nome, car.nomeCargo, a.tipoAposentadoria, ato.numeroAto, " +
                         " (CASE WHEN ae.status IS NULL THEN 1 ELSE ae.status END) as status, a.id " +
                                 " from Aposentadoria a " +
                                 " join Admissao ad on ad.id = a.id " +
@@ -345,7 +345,7 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
         String campo = String.valueOf(pageable.getSort()).replace(":", "");
 
         List<AposentadoriaDTO> list = getEntityManager()
-                .createNativeQuery("select a.cpfServidor, ser.nome, car.nomeCargo, a.tipoAposentadoria, ato.numeroAto, " +
+                .createNativeQuery("select distinct a.cpfServidor, ser.nome, car.nomeCargo, a.tipoAposentadoria, ato.numeroAto, " +
                         " (CASE WHEN ae.status IS NULL THEN 1 ELSE ae.status END) as status, a.id " +
                         " from Aposentadoria a " +
                         " join Admissao ad on ad.id = a.id " +

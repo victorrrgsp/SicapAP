@@ -47,7 +47,7 @@ public class ReadaptacaoRepository extends DefaultRepository<Readaptacao, BigInt
 
         List<Object[]> list = getEntityManager()
                 .createNativeQuery(
-                        "select s.cpfServidor, " +
+                        "select distinct s.cpfServidor, " +
                                 "       s.nome, " +
                                 "       c.nomeCargo, " +
                                 "       ato.numeroAto, " +

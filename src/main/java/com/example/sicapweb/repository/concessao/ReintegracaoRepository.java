@@ -45,7 +45,7 @@ public class ReintegracaoRepository extends DefaultRepository<Reintegracao, BigI
         String campo = String.valueOf(pageable.getSort()).replace(":", "");
 
         List<Object[]> list = getEntityManager()
-                .createNativeQuery("select s.cpfServidor," +
+                .createNativeQuery("select distinct s.cpfServidor," +
                         "       s.nome, "+
                         "       c.nomeCargo, "+
                         "       ato.numeroAto,  " +

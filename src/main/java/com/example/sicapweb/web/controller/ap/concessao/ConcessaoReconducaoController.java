@@ -5,7 +5,7 @@ import br.gov.to.tce.model.ap.concessoes.DocumentoReconducao;
 import br.gov.to.tce.model.ap.pessoal.Reconducao;
 import com.example.sicapweb.model.Inciso;
 import com.example.sicapweb.model.dto.ReconducaoDTO;
-import com.example.sicapweb.repository.AdmEnvioRepository;
+import com.example.sicapweb.repository.concessao.AdmEnvioRepository;
 import com.example.sicapweb.repository.concessao.DocumentoReconducaoRepository;
 import com.example.sicapweb.repository.concessao.ReconducaoRepository;
 import com.example.sicapweb.util.PaginacaoUtil;

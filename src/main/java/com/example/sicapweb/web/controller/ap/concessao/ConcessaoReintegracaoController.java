@@ -6,7 +6,7 @@ import br.gov.to.tce.model.ap.concessoes.DocumentoReintegracao;
 import br.gov.to.tce.model.ap.pessoal.Reintegracao;
 import com.example.sicapweb.model.Inciso;
 import com.example.sicapweb.model.dto.ReintegracaoDTO;
-import com.example.sicapweb.repository.AdmEnvioRepository;
+import com.example.sicapweb.repository.concessao.AdmEnvioRepository;
 import com.example.sicapweb.repository.concessao.DocumentoReintegracaoRepository;
 import com.example.sicapweb.repository.concessao.ReintegracaoRepository;
 import com.example.sicapweb.util.PaginacaoUtil;

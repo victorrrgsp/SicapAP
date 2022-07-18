@@ -5,7 +5,7 @@ import br.gov.to.tce.model.ap.concessoes.DocumentoAposentadoria;
 import br.gov.to.tce.model.ap.pessoal.Aposentadoria;
 import com.example.sicapweb.model.Inciso;
 import com.example.sicapweb.model.dto.AposentadoriaDTO;
-import com.example.sicapweb.repository.AdmEnvioRepository;
+import com.example.sicapweb.repository.concessao.AdmEnvioRepository;
 import com.example.sicapweb.repository.concessao.AposentadoriaRepository;
 import com.example.sicapweb.repository.concessao.DocumentoAposentadoriaRepository;
 import com.example.sicapweb.util.PaginacaoUtil;

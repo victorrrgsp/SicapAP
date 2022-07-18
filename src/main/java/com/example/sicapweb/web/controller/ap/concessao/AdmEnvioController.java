@@ -1,7 +1,7 @@
 package com.example.sicapweb.web.controller.ap.concessao;
 
 import br.gov.to.tce.model.adm.AdmEnvio;
-import com.example.sicapweb.repository.AdmEnvioRepository;
+import com.example.sicapweb.repository.concessao.AdmEnvioRepository;
 import com.example.sicapweb.web.controller.DefaultController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

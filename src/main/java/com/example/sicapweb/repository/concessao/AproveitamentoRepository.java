@@ -44,18 +44,18 @@ public class AproveitamentoRepository extends DefaultRepository<Aproveitamento, 
         String campo = String.valueOf(pageable.getSort()).replace(":", "");
 
         List<Object[]> list = getEntityManager()
-                .createNativeQuery("select ser.cpfServidor,\n" +
-                                "       ser.nome,\n" +
-                                "       car.nomeCargo,\n" +
-                                "       ato.numeroAto,\n" +
-                                "       (CASE WHEN ae.status IS NULL THEN 1 ELSE ae.status END) as status,\n" +
-                                "       a.id\n" +
-                                "from Aproveitamento a\n" +
-                                "    join Admissao ad on ad.id = a.id\n" +
-                                "    join Servidor ser on ser.id = ad.idServidor\n" +
-                                "    join Cargo car on car.id = ad.idCargo\n" +
-                                "    join Ato ato on ato.id = a.idAto\n" +
-                                "    left join AdmEnvio ae on ae.idMovimentacao = a.id\n" +
+                .createNativeQuery("select distinct ser.cpfServidor, " +
+                                "       ser.nome, " +
+                                "       car.nomeCargo, " +
+                                "       ato.numeroAto, " +
+                                "       (CASE WHEN ae.status IS NULL THEN 1 ELSE ae.status END) as status, " +
+                                "       a.id " +
+                                "from Aproveitamento a " +
+                                "    join Admissao ad on ad.id = a.id " +
+                                "    join Servidor ser on ser.id = ad.idServidor " +
+                                "    join Cargo car on car.id = ad.idCargo " +
+                                "    join Ato ato on ato.id = a.idAto " +
+                                "    left join AdmEnvio ae on ae.idMovimentacao = a.id " +
                                 "    join InfoRemessa i on a.chave = i.chave "+
                         " where i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo)
                 .setFirstResult(pagina)
