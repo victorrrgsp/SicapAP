@@ -5,7 +5,7 @@ import br.gov.to.tce.model.ap.concessoes.DocumentoAproveitamento;
 import br.gov.to.tce.model.ap.pessoal.Aproveitamento;
 import com.example.sicapweb.model.Inciso;
 import com.example.sicapweb.model.dto.AproveitamentoDTO;
-import com.example.sicapweb.repository.AdmEnvioRepository;
+import com.example.sicapweb.repository.concessao.AdmEnvioRepository;
 import com.example.sicapweb.repository.concessao.AproveitamentoRepository;
 import com.example.sicapweb.repository.concessao.DocumentoAproveitamentoRepository;
 import com.example.sicapweb.util.PaginacaoUtil;
