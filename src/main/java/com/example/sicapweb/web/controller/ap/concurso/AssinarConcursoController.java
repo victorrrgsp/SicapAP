@@ -35,6 +35,7 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 
 
@@ -97,11 +98,10 @@ public class AssinarConcursoController {
                                 novo.setIdCargo(User.getUser(concursoEnvioAssinaturaRepository.getRequest()).getCargo().getValor());
                                 novo.setCpf(User.getUser(concursoEnvioAssinaturaRepository.getRequest()).getCpf());
                                 ServletRequestAttributes getIp = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
-                               // getIp.getRequest().getRemoteAddr();
-                                //InetAddress.getLocalHost().getHostAddress()
                                 novo.setIp(getIp.getRequest().getRemoteAddr());
                                 novo.setConcursoEnvio(envio);
-                                novo.setData_Assinatura(new Date());
+                                LocalDateTime dt =LocalDateTime.now();
+                                novo.setData_Assinatura(Date.from(dt.atZone(ZoneId.systemDefault()).toInstant()));
                                 novo.setHashAssinante(hashassinante);
                                 novo.setHashAssinado(hashassinado);
                                 concursoEnvioAssinaturaRepository.save(novo);
@@ -124,7 +124,7 @@ public class AssinarConcursoController {
                                 if (envio.getOrgaoorigem() != null) {
                                     id_entidade_vinculada = concursoEnvioAssinaturaRepository.getidCADUNPJ(envio.getOrgaoorigem());
                                 }
-                                switch (envio.getFase()){
+                                switch (envio.getFase().intValue()){
                                     case 1:// fase edital
                                          idassunto = 64;
                                          assuntocodigo = 6;
@@ -132,11 +132,10 @@ public class AssinarConcursoController {
                                         deptoAutuacao = "COCAP";
                                         tipodocumento = "TA";
                                         break;
-
                                     case 2: // fase homologacao
-                                         idassunto = 64;
-                                         assuntocodigo = 6;
-                                         classeassunto = 8;
+                                         idassunto = 161;
+                                         assuntocodigo = 1;
+                                         classeassunto = 15;
                                          deptoAutuacao = "COREA";
                                         tipodocumento = "HOMOL";
                                         break;

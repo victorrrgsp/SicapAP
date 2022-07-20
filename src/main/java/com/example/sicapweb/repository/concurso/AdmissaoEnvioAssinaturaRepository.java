@@ -1,6 +1,8 @@
 package com.example.sicapweb.repository.concurso;
 
 import br.gov.to.tce.model.ap.concurso.AdmissaoEnvioAssinatura;
+import br.gov.to.tce.model.ap.concurso.EditalAprovado;
+import br.gov.to.tce.model.ap.concurso.documento.DocumentoAdmissao;
 import br.gov.to.tce.util.Date;
 import com.example.sicapweb.repository.DefaultRepository;
 import org.springframework.stereotype.Repository;
@@ -16,6 +18,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Repository
 public class AdmissaoEnvioAssinaturaRepository  extends DefaultRepository<AdmissaoEnvioAssinatura, BigInteger>
@@ -26,6 +29,7 @@ public class AdmissaoEnvioAssinaturaRepository  extends DefaultRepository<Admiss
 
     Integer idProtocolo;
     public Integer insertProtocolo(String matricula, Integer ano, LocalDateTime dh_protocolo, Integer id_end_origem) throws NoSuchAlgorithmException {
+        idProtocolo=null;
         Query query = entityManager.createNativeQuery(
                 "INSERT INTO SICAPAP21W..PROTOCOLOS(ID_PROTOCOLO, ANO, DH_PROTOCOLO,MATRICULA,ID_ENT_ORIGEM,HASH) " +
                         "VALUES (:ID_PROTOCOLO, :ANO, CONVERT(datetime2, '"+ dh_protocolo+"' ),:MATRICULA,:ID_ENT_ORIGEM,:HASH)");
@@ -169,11 +173,14 @@ public class AdmissaoEnvioAssinaturaRepository  extends DefaultRepository<Admiss
 
     BigDecimal idDocument;
     public BigDecimal insertDocument(String tipodocumento,Integer procnumero, Integer ano, Integer evento ){
+        idDocument=null;
         Query query = entityManager.createNativeQuery("INSERT INTO SICAPAP21W..document(docmt_tipo,dcnproc_pnumero,dcnproc_pano,docmt_numero,docmt_ano,docmt_depto,docmt_excluido" +
                 ",docmt_data,docmt_hora,login_usr,docmt_is_assinado,docmt_depto_doc,sigiloso, num_evento)" +
-                "     VALUES (:tipodocumento,:procnumero,:ano,:procnumero,:ano,'COPRO','',getdate(),getdate(),'000003','S','COPRO','N', :evento)");
+                "     VALUES (:tipodocumento,:procnumero,:ano,:numero,:ano,'COPRO','',getdate(),getdate(),'000003','S','COPRO','N', :evento)");
         query.setParameter("tipodocumento",tipodocumento);
         query.setParameter("procnumero",procnumero);
+        //vai  precisar usar SolicitarNumeroSND para gerar o numero
+        query.setParameter("numero",procnumero+evento);
         query.setParameter("ano",ano);
         query.setParameter("evento",evento);
         query.executeUpdate();
@@ -185,6 +192,12 @@ public class AdmissaoEnvioAssinaturaRepository  extends DefaultRepository<Admiss
         idDocument = (BigDecimal) query2.getSingleResult();
 
         return idDocument;
+    }
+
+    public BigDecimal SolicitarNumeroSND(String tipo_doc, String CodDepartamento, Integer ano,String Emissor,String Assunto,String Sistema) {
+        Query query = entityManager.createNativeQuery("select ");
+
+        return (BigDecimal.valueOf(0));
     }
 
 
@@ -206,6 +219,57 @@ public class AdmissaoEnvioAssinaturaRepository  extends DefaultRepository<Admiss
         return (Integer) query.getSingleResult();
     }
 
+    Integer idPessoa;
+    public Integer insertCadunPessoaInterressada(String cpf , String nome,String ip,String usuario){
+        idPessoa=null;
+        Integer idpessoacad = null;
+            List<Integer> lp = entityManager.createNativeQuery(" Select Codigo from SICAPAP21W..PessoaFisica d where cpf = :cpf " ).setParameter("cpf",cpf).getResultList();
+            if (lp.size()>0) {
+                 idpessoacad=lp.get(0);
+            }
+        if ( idpessoacad ==null){
+                Query query1 = entityManager.createNativeQuery(" Select coalesce(MAX(Codigo), 0)+1 from SICAPAP21W..PessoaFisica d ");
+                idPessoa =  (Integer)query1.getSingleResult() ;
+
+                Query query = entityManager.createNativeQuery(" insert into SICAPAP21W..PessoaFisica (Codigo,cpf,Nome,data_cr,ip_cr,usuario_cr)" +
+                        "Values (:Codigo,:cpf,:nome,GETDATE(),:ip , :usuario)");
+                query.setParameter("Codigo",idPessoa);
+                query.setParameter("cpf",cpf);
+                query.setParameter("nome",nome);
+                query.setParameter("ip",ip);
+                query.setParameter("usuario",usuario);
+                query.executeUpdate();
+            }
+            else{
+                idPessoa = (idpessoacad);
+            }
+            return idPessoa;
+
+    }
+
+
+    public Integer getidCADUNPF(String Cnpj){
+        List<Integer> cadunL = entityManager.createNativeQuery("SELECT  up.idPessoaFisica FROM Cadun..PessoaJuridica pj " +
+                "                LEFT JOIN cadun..vwUnidadesPessoasCargos up on pj.cnpj = up.codunidadegestora and idCargo = 4 and dataFim is null " +
+                "                   WHERE pj.CNPJ ='"+Cnpj+ "' or pj.CodigoUnidadeGestora = '"+Cnpj+"' ").getResultList();
+        if (cadunL.size()>0) {
+            return    cadunL.get(0);
+        }
+        return null;
+    }
+
+    public Integer getidCADUNPJ(String Cnpj){
+        Query query= entityManager.createNativeQuery("SELECT  up.idPessoaJuridica FROM Cadun..PessoaJuridica pj " +
+                "                LEFT JOIN cadun..vwUnidadesPessoasCargos up on pj.cnpj = up.codunidadegestora and idCargo = 4 and dataFim is null " +
+                "                   WHERE pj.CNPJ ='"+Cnpj+ "' or pj.CodigoUnidadeGestora = '"+Cnpj+"' ");
+        List<Integer> cadunL = query.getResultList();
+        if (cadunL.size()>0) {
+
+                return    cadunL.get(0);
+
+        }
+        return null;
+    }
 
 
 

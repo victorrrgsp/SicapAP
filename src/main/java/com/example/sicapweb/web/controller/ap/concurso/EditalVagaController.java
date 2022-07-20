@@ -68,19 +68,15 @@ public class EditalVagaController extends DefaultController<EditalVaga> {
     @Transactional
     @PostMapping
     public ResponseEntity<EditalVaga> create(@RequestBody EditalVaga editalVaga) {
-        try {
-            
             editalVaga.setChave(editalVagaRepository.buscarPrimeiraRemessa());
             editalVaga.setEdital(editalRepository.buscarEditalPorNumero(editalVaga.getNumeroEdital()));
             editalVaga.setUnidadeAdministrativa(unidadeAdministrativaRepository.buscarUnidadePorcodigo(editalVaga.codigoUnidadeAdministrativa));
             editalVaga.setCargo(cargoRepository.buscarCargoPorcodigo(editalVaga.codigoCargo));
+            EditalVaga e = editalVagaRepository.buscarVagasPorCodigo(editalVaga.getCodigoVaga());
+            if (e!=null) throw  new InvalitInsert("Ja existe vaga com esse codigo!!");
             editalVagaRepository.save(editalVaga);
             URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(editalVaga.getId()).toUri();
             return ResponseEntity.created(uri).body(editalVaga);
-        } catch (Exception e) {
-            throw new InvalitInsert("Erro na insersao de dados, por favor cheque os campos enviados ");
-            //TODO: handle exception
-        }
     }
 
     @CrossOrigin
@@ -94,6 +90,8 @@ public class EditalVagaController extends DefaultController<EditalVaga> {
             editalVaga.setEdital(editalRepository.buscarEditalPorNumero(editalVaga.getNumeroEdital()));
             editalVaga.setUnidadeAdministrativa(unidadeAdministrativaRepository.buscarUnidadePorcodigo(editalVaga.codigoUnidadeAdministrativa));
             editalVaga.setCargo(cargoRepository.buscarCargoPorcodigo(editalVaga.codigoCargo));
+            EditalVaga mesmocodigo = editalVagaRepository.buscarVagasPorCodigo(editalVaga.getCodigoVaga());
+            if (mesmocodigo!=null) throw  new InvalitInsert("Ja existe vaga com esse codigo!!");
             editalVagaRepository.update(editalVaga);
             return ResponseEntity.noContent().build();
         } catch (Exception e) {

@@ -2,6 +2,7 @@ package com.example.sicapweb.repository.geral;
 
 import br.gov.to.tce.model.ap.relacional.UnidadeAdministrativa;
 import com.example.sicapweb.repository.DefaultRepository;
+import com.example.sicapweb.security.User;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -43,4 +44,15 @@ public class UnidadeAdministrativaRepository extends DefaultRepository<UnidadeAd
         "order by nomeentidade asc").getResultList();
         return list;
     }
+
+    public List<UnidadeAdministrativa> findbyUg(){
+        List<UnidadeAdministrativa> list = getEntityManager().createNativeQuery(
+
+                        " select ad.* from UnidadeAdministrativa ad join InfoRemessa i on ad.chave= i.chave " +
+                                "where i.idUnidadeGestora = '"+ User.getUser(super.request).getUnidadeGestora().getId()+"' ",UnidadeAdministrativa.class).getResultList();
+
+        return list;
+
+    }
+
 }

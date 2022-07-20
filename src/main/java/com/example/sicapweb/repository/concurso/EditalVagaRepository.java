@@ -26,14 +26,25 @@ public class EditalVagaRepository extends DefaultRepository<EditalVaga, BigInteg
 
     public List<EditalVaga> buscarVagasPorEdital(Integer idEdital) {
         return getEntityManager().createNativeQuery(
-                "select * from EditalVaga where idEdital = "
-                        + idEdital, EditalVaga.class)
+                "select e.* from EditalVaga e " +
+                        " join InfoRemessa i on a.chave = i.chave " +
+                        "where  i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' "+
+                        " and  e.idEdital = " + idEdital, EditalVaga.class)
                 .getResultList();
     }
 
     public EditalVaga buscarVagasPorCodigo(String codigo) {
-        List<EditalVaga> list = getEntityManager().createNativeQuery("select * from EditalVaga ed" +
-                " where codigoVaga = '" + codigo + "'    ", EditalVaga.class).getResultList();
-        return list.get(0);
+        List<EditalVaga> list = getEntityManager().createNativeQuery(
+                "select e.* from EditalVaga e " +
+                        " join InfoRemessa i on e.chave = i.chave " +
+                        "where  i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' "+
+                " and e.codigoVaga = '" + codigo + "'    ", EditalVaga.class).getResultList();
+        if (list.size()>0 ){
+            return list.get(0);
+        }
+        else{
+            return null;
+        }
     }
+
 }

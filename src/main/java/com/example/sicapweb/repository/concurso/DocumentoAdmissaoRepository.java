@@ -74,5 +74,21 @@ public class DocumentoAdmissaoRepository extends DefaultRepository<DocumentoAdmi
         return (Integer) query.getSingleResult();
     }
 
+    public List<DocumentoAdmissao> getAprovadosSemAdmissao(BigInteger id){
+        return getEntityManager()
+                .createNativeQuery("select a.* from DocumentoAdmissao a " +
+                        "where idAdmissao is  null  and a.idProcessoAdmissao = " + id + " " + " ORDER BY id " , DocumentoAdmissao.class)
+                .getResultList();
+
+    }
+
+
+    public List<DocumentoAdmissao> getAprovadosComAdmissao(BigInteger id){
+        return getEntityManager()
+                .createNativeQuery("select a.* from DocumentoAdmissao a " +
+                        "where idAdmissao is not  null  and a.idProcessoAdmissao = " + id + " " + " ORDER BY id " , DocumentoAdmissao.class)
+                .getResultList();
+
+    }
 
 }

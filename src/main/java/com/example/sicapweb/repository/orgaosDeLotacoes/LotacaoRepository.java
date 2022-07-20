@@ -22,6 +22,12 @@ import java.util.List;
         return list.get(0);
     }
 
+    public List<Lotacao> buscarLotacaoPorUA(BigInteger idUa) {
+        List<Lotacao> list = getEntityManager().createNativeQuery("select l.* from Lotacao l" +
+                " where idUnidadeAdministrativa = " + idUa + "    ", Lotacao.class).getResultList();
+        return list;
+    }
+
     }
 
 

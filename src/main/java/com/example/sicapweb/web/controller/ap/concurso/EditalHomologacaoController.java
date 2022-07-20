@@ -16,6 +16,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.math.BigInteger;
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping({"/concursoHomologacao"})
@@ -81,6 +82,11 @@ public class EditalHomologacaoController extends DefaultController<EditalHomolog
     public ResponseEntity<ConcursoEnvio>Enviar(@RequestBody ConcursoEnvio concursoEnvio){
         concursoEnvio.setFase(ConcursoEnvio.Fase.Homologacao.getValor());
         concursoEnvio.setStatus(ConcursoEnvio.Status.Enviado.getValor());
+        List<ConcursoEnvio> le = concursoEnvioRepository.buscarEnvioFAse1PorEdital(concursoEnvio.getEdital().getId());
+        if (le.size()>0 ){
+            ConcursoEnvio c = le.get(0);
+            concursoEnvio.setProcessoPai(c.getProcessoPai());
+        }
         concursoEnvioRepository.save(concursoEnvio);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(concursoEnvio.getId()).toUri();
         return ResponseEntity.created(uri).body(concursoEnvio);

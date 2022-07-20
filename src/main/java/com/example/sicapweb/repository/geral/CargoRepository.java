@@ -80,15 +80,15 @@ public class CargoRepository extends DefaultRepository<Cargo, BigInteger> {
     return list;
   }
 
-    public List<Object> buscarCargoPorUG(String cnpj) {
+    public List<Cargo> buscarCargoPorUG(String cnpj) {
 
         var query = getEntityManager().createNativeQuery(
-                "SELECT DISTINCT c.nomeCargo "+
+                "SELECT DISTINCT c.* "+
                         "FROM Cargo c "+
                         " join InfoRemessa  i on c.chave=i.chave " +
                         "WHERE i.idUnidadeGestora = '"+cnpj+ "'"+
-                        "order by c.nomeCargo");
-        List<Object> list = query.getResultList();
+                        "order by c.nomeCargo",Cargo.class);
+        List<Cargo> list = query.getResultList();
         /*
         List<Map<String,Object>> retorno = new ArrayList<Map<String,Object>>();
 

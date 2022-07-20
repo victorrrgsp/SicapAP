@@ -33,11 +33,11 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
         String campo = String.valueOf(pageable.getSort()).replace(":", "");
 
         List<EditalAprovado> list = getEntityManager()
-                .createNativeQuery("select a.* from EditalAprovado  a" +
+                .createNativeQuery("select distinct a.* from EditalAprovado  a" +
                         " join  EditalVaga b on a.idEditalVaga = b.id" +
                         "    join InfoRemessa i on a.chave = i.chave and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' " +
                         "     left join   Servidor se on a.cpf = se.cpfServidor" +
-                        "    left join Admissao ad on se.id = ad.idServidor and   b.idCargo = ad.idCargo  and  i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' "  + " ORDER BY " + campo, EditalAprovado.class)
+                        "    left join Admissao ad on se.id = ad.idServidor and   b.idCargo = ad.idCargo  where  i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' "  + " ORDER BY " + campo, EditalAprovado.class)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();
@@ -73,6 +73,58 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
                 "join InfoRemessa i on a.chave = i.chave " +
                 "where not exists(select 1 from Admissao ad  where ad.numeroInscricao=a.numeroInscricao)  and  i.idUnidadeGestora= '"+ User.getUser(super.request).getUnidadeGestora().getId()+ "'");
         return (Integer) query.getSingleResult();
+    }
+
+
+    public EditalAprovado buscarAprovadoPorCpf(String cpf) {
+
+        var query = getEntityManager().createNativeQuery(
+                "SELECT DISTINCT c.* "+
+                        "FROM EditalAprovado c "+
+                        " join InfoRemessa  i on c.chave=i.chave " +
+                        " WHERE i.idUnidadeGestora = '"+User.getUser(super.request).getUnidadeGestora().getId()+ "'  and  c.cpf = '"+cpf+"' "
+                        ,EditalAprovado.class);
+        List<EditalAprovado> list = query.getResultList();
+        if (list.size()>0 ){
+            return list.get(0);
+        }
+        else{
+            return null;
+        }
+    }
+
+    public EditalAprovado buscarAprovadoPorInscricao(String inscricao) {
+
+        var query = getEntityManager().createNativeQuery(
+                "SELECT DISTINCT c.* "+
+                        "FROM EditalAprovado c "+
+                        " join InfoRemessa  i on c.chave=i.chave " +
+                        " WHERE i.idUnidadeGestora = '"+User.getUser(super.request).getUnidadeGestora().getId()+ "'  and  c.numeroInscricao = '"+inscricao+"' "
+                ,EditalAprovado.class);
+        List<EditalAprovado> list = query.getResultList();
+        if (list.size()>0 ){
+            return list.get(0);
+        }
+        else{
+            return null;
+        }
+    }
+
+    public EditalAprovado buscarAprovadoPorClassificacaoConc(BigInteger idvaga, String Classificacao  ) {
+
+        var query = getEntityManager().createNativeQuery(
+                "SELECT DISTINCT c.* "+
+                        "FROM EditalAprovado c "+
+                        " join InfoRemessa  i on c.chave=i.chave " +
+                        " WHERE idEditalVaga= "+idvaga+" and  c.classificacao =  '"+Classificacao+"' and i.idUnidadeGestora = '"+User.getUser(super.request).getUnidadeGestora().getId()+ "'   "
+                ,EditalAprovado.class);
+        List<EditalAprovado> list = query.getResultList();
+        if (list.size()>0 ){
+            return list.get(0);
+        }
+        else{
+            return null;
+        }
     }
 
 }

@@ -16,7 +16,7 @@ public class AdmissaoEnvioAssRetorno {
     private Edital edital;
 
 
-    private String  Processo;
+    private String processo;
 
     private Integer quantidade;
 
@@ -76,11 +76,11 @@ public class AdmissaoEnvioAssRetorno {
     }
 
     public String getProcesso() {
-        return Processo;
+        return processo;
     }
 
     public void setProcesso(String processo) {
-        Processo = processo;
+        this.processo = processo;
     }
 
     public Edital getEdital() {

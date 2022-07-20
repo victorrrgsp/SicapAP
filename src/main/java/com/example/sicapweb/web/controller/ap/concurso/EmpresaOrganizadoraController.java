@@ -1,5 +1,6 @@
 package com.example.sicapweb.web.controller.ap.concurso;
 
+import br.gov.to.tce.model.ap.concurso.EditalVaga;
 import br.gov.to.tce.model.ap.concurso.EmpresaOrganizadora;
 import com.example.sicapweb.exception.InvalitInsert;
 import com.example.sicapweb.repository.concurso.EmpresaOrganizadoraRepository;
@@ -39,6 +40,13 @@ public class EmpresaOrganizadoraController extends DefaultController<EmpresaOrga
     }
 
     @CrossOrigin
+    @GetMapping(path = {"/{id}"})
+    public ResponseEntity<?> findById(@PathVariable BigInteger id) {
+        EmpresaOrganizadora list = empresaOrganizadoraRepository.findById(id);
+        return ResponseEntity.ok().body(list);
+    }
+
+    @CrossOrigin
     @Transactional
     @PostMapping
     public ResponseEntity<EmpresaOrganizadora> create(@RequestBody EmpresaOrganizadora empresaOrganizadora) {
@@ -48,6 +56,8 @@ public class EmpresaOrganizadoraController extends DefaultController<EmpresaOrga
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(empresaOrganizadora.getId()).toUri();
         return ResponseEntity.created(uri).body(empresaOrganizadora);
     }
+
+
 
     @CrossOrigin
     @Transactional

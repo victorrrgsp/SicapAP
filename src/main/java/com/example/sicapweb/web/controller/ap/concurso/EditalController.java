@@ -6,7 +6,6 @@ import com.example.sicapweb.util.PaginacaoUtil;
 import com.example.sicapweb.web.controller.DefaultController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +15,9 @@ import java.math.BigInteger;
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
 import  com.example.sicapweb.exception.InvalitInsert;
 @RestController
 @RequestMapping({"/concursoEdital"})
@@ -81,8 +83,30 @@ public class EditalController extends DefaultController<Edital> {
     public ResponseEntity<Edital> update(@RequestBody Edital edital, @PathVariable BigInteger id) {
         edital.setInfoRemessa(editalRepository.buscarPrimeiraRemessa());
         edital.setId(id);
-        editalRepository.update(edital);
-        return ResponseEntity.noContent().build();
+        Edital e =editalRepository.buscarEditalPorNumero(edital.getNumeroEdital());
+
+        if (e == null) {
+            if  ( Integer.valueOf(edital.getNumeroEdital().substring(edital.getNumeroEdital().length()-4)) <1990 ||  Integer.valueOf(edital.getNumeroEdital().substring(edital.getNumeroEdital().length()-4)) > (LocalDateTime.now().getYear() +5) ) {
+                throw new InvalitInsert("não é um numero de Edital valido. Os ultinmos 4 digitos correspondem ao ano do edital !!");
+            }
+            editalRepository.update(edital);
+            return ResponseEntity.noContent().build();
+
+        } else {
+
+            throw new InvalitInsert("ja existe o edital!!");
+
+        }
+
+
+    }
+
+
+    @CrossOrigin
+    @GetMapping(path = {"/getInfoReciboEdital/{numproc}/{anoproc}"})
+    public ResponseEntity<?> findInfoReciboEdital(@PathVariable Integer numproc, @PathVariable Integer anoproc) {
+        List<Map<String, Object>> infoRecibo = editalRepository.buscarInfoReciboEdital(numproc,anoproc);
+        return ResponseEntity.ok().body(Objects.requireNonNullElse(infoRecibo, "seminfo"));
     }
 
     @CrossOrigin
@@ -92,4 +116,6 @@ public class EditalController extends DefaultController<Edital> {
         editalRepository.delete(id);
         return ResponseEntity.noContent().build();
     }
+
+
 }

@@ -69,6 +69,7 @@ public class ProcessoAdmissaoRepository  extends DefaultRepository<ProcessoAdmis
             pac.setDtcriacao(list.get(i).getDataCriacao());
             pac.setStatus(list.get(i).getStatus());
             pac.setEdital(list.get(i).getEdital());
+            pac.setProcesso(list.get(i).getProcesso());
             Integer qt = (Integer)  getEntityManager().createNativeQuery("select count(*) from DocumentoAdmissao a " +
                     "where   a.idProcessoAdmissao = "+ pac.getId()+ "").getSingleResult();
             pac.setQuantidade(qt);

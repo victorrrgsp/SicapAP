@@ -152,7 +152,6 @@ public class EditalRepository extends DefaultRepository<Edital, BigInteger> {
             List<ConcursoEnvio> leo =  getEntityManager()
                     .createNativeQuery("select E.* from ConcursoEnvio E where  e.fase=1 and e.Status=3 and  idEdital=" + list.get(i).getId() + "", ConcursoEnvio.class)
                     .getResultList();
-
             if (leo.size()>0){
                 ConcursoEnvio eo = leo.get(0);
                 edf.setProcesso(eo.getProcesso());
@@ -160,6 +159,44 @@ public class EditalRepository extends DefaultRepository<Edital, BigInteger> {
             listc.add(edf);
         }
         return new PaginacaoUtil<EditalFinalizado>(tamanho, pagina, totalPaginas, totalRegistros, listc);
+    }
+
+
+    public List<Map<String,Object>> buscarInfoReciboEdital(Integer procnumero,Integer procano) {
+
+        List<Map<String, Object>> retorno = new ArrayList<Map<String, Object>>();
+
+        try {
+
+            List<Object[]> list = entityManager.createNativeQuery(
+
+                    "select p.nome NomeResponsavel,p.cpf CpfResponsavel,a.data_assinatura DataAssinatura, ed.numeroEdital NumeroEdital from " +
+                            "     ConcursoEnvioAssinatura a " +
+                            "     inner join ConcursoEnvio env on a.idEnvio= env.id " +
+                            "     inner join Edital ed on ed.id = env.idEdital " +
+                            "inner join cadun..vwPessoa p on a.cpf=p.cpf " +
+                    " where env.processo='"+procnumero+"/"+procano+ "'").getResultList();
+
+
+            for (Object[] obj : list) {
+
+                Map<String, Object> mapa = new HashMap<String, Object>();
+
+                mapa.put("NomeResponsavel", (String) obj[0]);
+                mapa.put("CpfResponsavel", (String) obj[1]);
+                mapa.put("DataAssinatura", (Date) obj[2]);
+                mapa.put("NumeroEdital", (String) obj[3]);
+                retorno.add(mapa);
+
+            }
+            ;
+
+            return retorno;
+
+
+        } catch (Exception e) {
+            return null;
+        }
     }
 
 }

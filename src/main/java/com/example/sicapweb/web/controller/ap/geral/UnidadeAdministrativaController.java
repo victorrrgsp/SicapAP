@@ -1,8 +1,11 @@
 package com.example.sicapweb.web.controller.ap.geral;
 
 import br.gov.to.tce.model.InfoRemessa;
+import br.gov.to.tce.model.ap.relacional.Lotacao;
 import br.gov.to.tce.model.ap.relacional.UnidadeAdministrativa;
+import com.example.sicapweb.exception.InvalitInsert;
 import com.example.sicapweb.repository.geral.UnidadeAdministrativaRepository;
+import com.example.sicapweb.repository.orgaosDeLotacoes.LotacaoRepository;
 import com.example.sicapweb.util.PaginacaoUtil;
 import com.example.sicapweb.web.controller.DefaultController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +24,9 @@ public class UnidadeAdministrativaController  extends DefaultController<UnidadeA
     @Autowired
     private UnidadeAdministrativaRepository unidadeAdministrativaRepository;
 
+    @Autowired
+    private LotacaoRepository  lotacaoRepository;
+
     @CrossOrigin
     @GetMapping(path="/{searchParams}/{tipoParams}/pagination")
     public ResponseEntity<PaginacaoUtil<UnidadeAdministrativa>> listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
@@ -32,7 +38,7 @@ public class UnidadeAdministrativaController  extends DefaultController<UnidadeA
     @CrossOrigin
     @GetMapping
     public ResponseEntity<List<UnidadeAdministrativa>> findAll() {
-        List<UnidadeAdministrativa> list = unidadeAdministrativaRepository.findAll();
+        List<UnidadeAdministrativa> list = unidadeAdministrativaRepository.findbyUg();
         return ResponseEntity.ok().body(list);
     }
     @CrossOrigin
@@ -65,6 +71,8 @@ public class UnidadeAdministrativaController  extends DefaultController<UnidadeA
     @Transactional
     @DeleteMapping(value = {"/{id}"})
     public ResponseEntity<?> delete(@PathVariable BigInteger id) {
+        List<Lotacao> list=lotacaoRepository.buscarLotacaoPorUA(id);
+        if (list!=null) throw new InvalitInsert("Existem lotaçoes pertencentes a essa unidade administrativa!");
         unidadeAdministrativaRepository.deleteRestrito(id);
         return ResponseEntity.noContent().build();
     }
