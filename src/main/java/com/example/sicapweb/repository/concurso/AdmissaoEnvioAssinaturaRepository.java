@@ -4,6 +4,7 @@ import br.gov.to.tce.model.ap.concurso.AdmissaoEnvioAssinatura;
 import br.gov.to.tce.model.ap.concurso.EditalAprovado;
 import br.gov.to.tce.model.ap.concurso.documento.DocumentoAdmissao;
 import br.gov.to.tce.util.Date;
+import com.example.sicapweb.exception.InvalitInsert;
 import com.example.sicapweb.repository.DefaultRepository;
 import org.springframework.stereotype.Repository;
 
@@ -180,7 +181,9 @@ public class AdmissaoEnvioAssinaturaRepository  extends DefaultRepository<Admiss
         query.setParameter("tipodocumento",tipodocumento);
         query.setParameter("procnumero",procnumero);
         //vai  precisar usar SolicitarNumeroSND para gerar o numero
-        query.setParameter("numero",procnumero+evento);
+        Integer idDocsnd = this.SolicitarNumeroSND(5,"COCAP",ano,"000003",null,"SICAP-AP");
+        if (idDocsnd == null) throw  new InvalitInsert("numero do documento nao gerado!");
+        query.setParameter("numero",idDocsnd);
         query.setParameter("ano",ano);
         query.setParameter("evento",evento);
         query.executeUpdate();
@@ -194,10 +197,39 @@ public class AdmissaoEnvioAssinaturaRepository  extends DefaultRepository<Admiss
         return idDocument;
     }
 
-    public BigDecimal SolicitarNumeroSND(String tipo_doc, String CodDepartamento, Integer ano,String Emissor,String Assunto,String Sistema) {
-        Query query = entityManager.createNativeQuery("select ");
+    Integer idDoc;
+    public Integer SolicitarNumeroSND(Integer tipo_doc, String CodDepartamento, Integer ano,String Emissor,String Assunto,String Sistema) {
+        idDoc=null;
+        Query query = entityManager.createNativeQuery("select coalesce(MAX(numero), 0)+1   as numero from Snd..documento where cod_tipo_documento = :tipo_doc  and cod_departamento = :CodDepartamento and ano= :ano ");
+        query.setParameter("tipo_doc",tipo_doc);
+        query.setParameter("CodDepartamento",CodDepartamento);
+        query.setParameter("ano",ano);
+        idDoc = (Integer) query.getSingleResult();
 
-        return (BigDecimal.valueOf(0));
+        if (idDoc != null ){
+            Query query1 =entityManager.createNativeQuery(" insert into Snd..documento " +
+                    " (cod_tipo_documento, cod_departamento, numero , data_documento , data_gravacao , ano" +
+                    "  , matricula_emissor, assunto,  status ,  elaboradoPor )" +
+                    " values ( :tipo_doc,:CodDepartamento,:numero ,:data_documento , :data_gravacao, :ano" +
+                    " , :emissor, :assunto , :status,  :elaboradoPor   ) ");
+            query1.setParameter("tipo_doc",tipo_doc);
+            query1.setParameter("CodDepartamento",CodDepartamento);
+            query1.setParameter("numero",idDoc);
+            LocalDateTime dt =LocalDateTime.now();
+            query1.setParameter("data_documento",dt);
+            query1.setParameter("data_gravacao",dt);
+            query1.setParameter("ano",ano);
+            query1.setParameter("emissor",Emissor);
+            query1.setParameter("assunto",Assunto);
+            query1.setParameter("status","CONFIRMADO");
+            query1.setParameter("elaboradoPor","Automatizado por Sistema de "+Sistema+"");
+            //descomentar para por em produção
+            //query1.executeUpdate();
+            return idDoc;
+        }
+        else {
+            return null;
+        }
     }
 
 

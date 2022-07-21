@@ -15,8 +15,7 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Repository
 public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, BigInteger> {
@@ -123,6 +122,52 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
             return list.get(0);
         }
         else{
+            return null;
+        }
+    }
+
+
+    public List<Map<String,Object>> buscarInfoReciboAdmissao(Integer procnumero, Integer procano) {
+
+        List<Map<String, Object>> retorno = new ArrayList<Map<String, Object>>();
+
+        try {
+
+            List<Object[]> list = entityManager.createNativeQuery(
+
+                    "select p.nome NomeResponsavel,p.cpf CpfResponsavel,a.data_assinatura DataAssinatura, null NumeroEdital, i.nomeUnidade , i.idUnidadeGestora , pj.nomeMunicipio  , ed.nome , ed.cpf from " +
+                            " AdmissaoEnvioAssinatura a" +
+                            "  inner join SICAPAP21..ProcessoAdmissao env on a.idProcesso= env.id" +
+                            "  inner join SICAPAP21..DocumentoAdmissao docenv on env.id= docenv.idProcessoAdmissao" +
+                            "  inner join SICAPAP21..EditalAprovado ed on docenv.idAprovado = ed.id " +
+                            "  inner join cadun..vwPessoa p on a.cpf=p.cpf " +
+                            "  inner join InfoRemessa i on ed.chave=i.chave  and env.cnpjEmpresaOrganizadora = i.idUnidadeGestora " +
+                            " inner join cadun..vwPessoaJuridica pj on i.idUnidadeGestora=pj.cnpj"+
+                            " where env.processo='"+procnumero+"/"+procano+ "'").getResultList();
+
+
+            for (Object[] obj : list) {
+
+                Map<String, Object> mapa = new HashMap<String, Object>();
+
+                mapa.put("NomeResponsavel", (String) obj[0]);
+                mapa.put("CpfResponsavel", (String) obj[1]);
+                mapa.put("DataAssinatura", (Date) obj[2]);
+                mapa.put("NumeroEdital", (String) obj[3]);
+                mapa.put("nomeUnidade", (String) obj[4]);
+                mapa.put("idUnidadeGestora", (String) obj[5]);
+                mapa.put("nomeMunicipio", (String) obj[6]);
+                mapa.put("nomeInteressado", (String) obj[7]);
+                mapa.put("cpfInteressado", (String) obj[8]);
+                retorno.add(mapa);
+
+            }
+            ;
+
+            return retorno;
+
+
+        } catch (Exception e) {
             return null;
         }
     }

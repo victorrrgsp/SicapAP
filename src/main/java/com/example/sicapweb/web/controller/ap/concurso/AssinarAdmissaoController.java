@@ -2,18 +2,15 @@ package com.example.sicapweb.web.controller.ap.concurso;
 
 import br.gov.to.tce.model.ap.concurso.*;
 import br.gov.to.tce.model.ap.concurso.documento.DocumentoAdmissao;
-import br.gov.to.tce.model.ap.concurso.documento.DocumentoEdital;
-import br.gov.to.tce.model.ap.concurso.documento.DocumentoEditalHomologacao;
 import br.gov.to.tce.util.Date;
 import com.example.sicapweb.exception.InvalitInsert;
 import com.example.sicapweb.model.AdmissaoEnvioAssRetorno;
 import com.example.sicapweb.repository.concurso.AdmissaoEnvioAssinaturaRepository;
 import com.example.sicapweb.repository.concurso.DocumentoAdmissaoRepository;
-import com.example.sicapweb.repository.concurso.EditalAprovadoRepository;
 import com.example.sicapweb.repository.concurso.ProcessoAdmissaoRepository;
 import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
-import com.example.sicapweb.web.controller.AssinarCertificadoDigital;
+import com.example.sicapweb.service.AssinarCertificadoDigital;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -48,7 +45,6 @@ public class AssinarAdmissaoController {
     @Autowired
     private AdmissaoEnvioAssinaturaRepository admissaoEnvioAssinaturaRepository;
 
-    @Autowired
     private DocumentoAdmissaoRepository documentoAdmissaoRepository;
 
 
@@ -317,13 +313,14 @@ public class AssinarAdmissaoController {
         return ResponseEntity.ok().body("OK");
     }
 
-
-    public static String getPessoaBycpf(String cpf, String Sistema) throws IOException {
+    @CrossOrigin
+    @PostMapping(path="/getPessoaByCPF")
+    public static String getPessoaBycpf(@RequestBody String cpf) throws IOException {
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
 
         MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
-        okhttp3.RequestBody body = okhttp3.RequestBody.create(mediaType,"cpf="+cpf+"&sistema="+Sistema);
+        okhttp3.RequestBody body = okhttp3.RequestBody.create(mediaType,"cpf="+cpf);
         Request request = new Request.Builder()
                 .url("https://dev2.tce.to.gov.br/cadun/app/controllers/?&c=TCE_CADUN_PessoaFisica&m=getPessoaByCPF")
                 .method("POST", body)
@@ -335,8 +332,6 @@ public class AssinarAdmissaoController {
         String resposta = response.body().string();
         return resposta;
     }
-
-
 
 
 }

@@ -6,21 +6,17 @@ import br.gov.to.tce.util.Date;
 import com.example.sicapweb.repository.concessao.AdmEnvioAssinaturaRepository;
 import com.example.sicapweb.repository.concessao.AdmEnvioRepository;
 import com.example.sicapweb.security.User;
-import com.example.sicapweb.service.AssinarCertificado;
 import com.example.sicapweb.util.PaginacaoUtil;
+import com.example.sicapweb.service.AssinarCertificadoDigital;
 import com.example.sicapweb.web.controller.DefaultController;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import org.eclipse.persistence.jpa.jpql.parser.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
-import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -101,7 +97,7 @@ public class AssinarConcessaoController extends DefaultController<AdmEnvio> {
             } else if (!userlogado.getCpf().equals(hash)) {
                 throw new Exception("nao é o mesmo  certificado que esta logado!!");
             } else {
-                respostaIniciarAssinatura = AssinarCertificado.inicializarAssinatura(certificado, Original);
+                respostaIniciarAssinatura = AssinarCertificadoDigital.inicializarAssinatura(certificado, Original);
             }
             //decodigica a mensagem
             byte[] decodedBytes2 = Base64.getDecoder().decode(Original);
@@ -127,7 +123,7 @@ public class AssinarConcessaoController extends DefaultController<AdmEnvio> {
             String desafio = respostaJson.get("desafio").asText();
             String assinatura = respostaJson.get("assinatura").asText();
             String mensagem = respostaJson.get("original").asText();
-            respostaFinalizarAssinatura = AssinarCertificado.FinalizarAssinatura(desafio, assinatura, mensagem);
+            respostaFinalizarAssinatura = AssinarCertificadoDigital.FinalizarAssinatura(desafio, assinatura, mensagem);
         } catch (Exception e) {
             System.out.println("[falha]: " + e.toString());
             e.printStackTrace();

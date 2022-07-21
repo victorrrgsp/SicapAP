@@ -18,6 +18,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.math.BigInteger;
 import java.net.URI;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 
 @RestController
@@ -102,6 +105,13 @@ public class EditalAdmissaoController {
             processoAdmissaoRepository.update(processoAdmissao);
         }
         return ResponseEntity.ok().body(processoAdmissao);
+    }
+
+    @CrossOrigin
+    @GetMapping(path = {"/getInfoReciboAdmissao/{numproc}/{anoproc}"})
+    public ResponseEntity<?> findInfoReciboAdmissao(@PathVariable Integer numproc, @PathVariable Integer anoproc) {
+        List<Map<String, Object>> infoRecibo = editalAprovadoRepository.buscarInfoReciboAdmissao(numproc,anoproc);
+        return ResponseEntity.ok().body(Objects.requireNonNullElse(infoRecibo, "seminfo"));
     }
 
 

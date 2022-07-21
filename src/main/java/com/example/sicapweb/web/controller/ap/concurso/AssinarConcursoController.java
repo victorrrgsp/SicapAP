@@ -11,10 +11,9 @@ import com.example.sicapweb.repository.concurso.ConcursoEnvioAssinaturaRepositor
 import com.example.sicapweb.repository.concurso.ConcursoEnvioRepository;
 import com.example.sicapweb.repository.concurso.DocumentoEditalHomologacaoRepository;
 import com.example.sicapweb.repository.concurso.DocumentoEditalRepository;
-import com.example.sicapweb.repository.geral.UsuarioRepository;
 import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
-import com.example.sicapweb.web.controller.AssinarCertificadoDigital;
+import com.example.sicapweb.service.AssinarCertificadoDigital;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,10 +29,8 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.net.InetAddress;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
@@ -169,7 +166,7 @@ public class AssinarConcursoController {
                                     BigDecimal idDocument =  concursoEnvioAssinaturaRepository.insertDocument(tipodocumento,procnumero,ano,evento);
                                     String Arquivo=null;
                                     if (envio.getFase()==1){
-                                        List<DocumentoEdital> ldocs =  documentoEditalRepository.buscarDocumentosEdital("'I','II','III','IV','V','VI','VII','VIII','IX','IX.I','X'",envio.getEdital().getId());
+                                        List<DocumentoEdital> ldocs =  documentoEditalRepository.buscarDocumentosEdital("'I','II','III','IV','V','VI','VII','VIII','IX','IX.I','X',''",envio.getEdital().getId());
                                         if(ldocs.size()>0){
                                             for(DocumentoEdital  doc: ldocs){
                                                 Arquivo = concursoEnvioAssinaturaRepository.GetDescricaoArquivoEdital(doc.getInciso(),envio.getFase());
@@ -183,7 +180,7 @@ public class AssinarConcursoController {
                                         }
 
                                     } else if (envio.getFase()==2) {
-                                        List<DocumentoEditalHomologacao> ldocs =  documentoEditalHomologacaoRepository.buscarDocumentosEditalHomologacao("'XII','XIII','XIV','XV'",envio.getEdital().getId());
+                                        List<DocumentoEditalHomologacao> ldocs =  documentoEditalHomologacaoRepository.buscarDocumentosEditalHomologacao("'XI','XII','XIII','XIV','XV',''",envio.getEdital().getId());
                                         if(ldocs.size()>0){
                                             for(DocumentoEditalHomologacao  doc: ldocs){
                                                 Arquivo = concursoEnvioAssinaturaRepository.GetDescricaoArquivoEdital(doc.getInciso(),envio.getFase());

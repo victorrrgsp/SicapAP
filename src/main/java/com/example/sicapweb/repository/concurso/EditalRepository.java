@@ -170,11 +170,13 @@ public class EditalRepository extends DefaultRepository<Edital, BigInteger> {
 
             List<Object[]> list = entityManager.createNativeQuery(
 
-                    "select p.nome NomeResponsavel,p.cpf CpfResponsavel,a.data_assinatura DataAssinatura, ed.numeroEdital NumeroEdital from " +
+                    "select p.nome NomeResponsavel,p.cpf CpfResponsavel,a.data_assinatura DataAssinatura, ed.numeroEdital NumeroEdital, i.nomeUnidade , i.idUnidadeGestora , pj.nomeMunicipio from " +
                             "     ConcursoEnvioAssinatura a " +
                             "     inner join ConcursoEnvio env on a.idEnvio= env.id " +
                             "     inner join Edital ed on ed.id = env.idEdital " +
                             "inner join cadun..vwPessoa p on a.cpf=p.cpf " +
+                            "     inner join InfoRemessa i on ed.chave=i.chave  " +
+                            " inner join cadun..vwPessoaJuridica pj on i.idUnidadeGestora=pj.cnpj"+
                     " where env.processo='"+procnumero+"/"+procano+ "'").getResultList();
 
 
@@ -186,6 +188,9 @@ public class EditalRepository extends DefaultRepository<Edital, BigInteger> {
                 mapa.put("CpfResponsavel", (String) obj[1]);
                 mapa.put("DataAssinatura", (Date) obj[2]);
                 mapa.put("NumeroEdital", (String) obj[3]);
+                mapa.put("nomeUnidade", (String) obj[4]);
+                mapa.put("idUnidadeGestora", (String) obj[5]);
+                mapa.put("nomeMunicipio", (String) obj[6]);
                 retorno.add(mapa);
 
             }
