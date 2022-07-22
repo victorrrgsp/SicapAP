@@ -62,7 +62,7 @@ public class EditalController extends DefaultController<Edital> {
         Edital e =editalRepository.buscarEditalPorNumero(edital.getNumeroEdital());
         if (e == null) {
             if  ( Integer.valueOf(edital.getNumeroEdital().substring(edital.getNumeroEdital().length()-4)) <1990 ||  Integer.valueOf(edital.getNumeroEdital().substring(edital.getNumeroEdital().length()-4)) > (LocalDateTime.now().getYear() +5) ) {
-                throw new InvalitInsert("não é um numero de Edital valido. Os ultinmos 4 digitos correspondem ao ano do edital !!");
+                throw new InvalitInsert("não é um número de Edital valido. Os ultinmos 4 digitos correspondem ao ano do edital !!");
             }
             editalRepository.save(edital);
 

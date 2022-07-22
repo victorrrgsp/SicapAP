@@ -21,6 +21,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.math.BigInteger;
 import java.net.URI;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,6 +49,15 @@ public class DocumentoConcursoEditalController extends DefaultController<Documen
             List<ConcursoEnvio> Lenvio= concursoEnvioRepository.buscarEnvioFAse1PorEdital(listE.get(i).getId());
            if (listE.get(i).getVeiculoPublicacao()==null  || listE.get(i).getDataPublicacao()==null || listE.get(i).getDataInicioInscricoes()==null || listE.get(i).getDataFimInscricoes() == null  || listE.get(i).getPrazoValidade()==null || listE.get(i).getCnpjEmpresaOrganizadora()==null ) {
                 listE.get(i).setSituacao("Dados Incompletos");
+               listE.get(i).setTooltip("Complete o cadastro dos campos vazios antes de prosseguir");
+            }
+           else if (
+                   ( Integer.valueOf(listE.get(i).getNumeroEdital().substring(listE.get(i).getNumeroEdital().length()-4)) <1990
+                           ||  Integer.valueOf(listE.get(i).getNumeroEdital().substring(listE.get(i).getNumeroEdital().length()-4)) > (LocalDateTime.now().getYear() +5) )
+
+           ){
+               listE.get(i).setSituacao("Dados Incompletos");
+               listE.get(i).setTooltip("numero do edital deve ter o formato numero e ano. Exemplo:00042022");
             }
            else if( Lenvio.size()>0 ){
                ConcursoEnvio envio  = Lenvio.get(0);

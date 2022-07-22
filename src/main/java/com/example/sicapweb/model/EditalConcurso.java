@@ -27,6 +27,17 @@ public class EditalConcurso{
     private String prazoValidade;
     private String veiculoPublicacao;
     private String situacao;
+
+    private String tooltip;
+
+    public String getTooltip() {
+        return tooltip;
+    }
+
+    public void setTooltip(String tooltip) {
+        this.tooltip = tooltip;
+    }
+
     private String cnpjEmpresaOrganizadora;
     private String nomEmpresaOrganizadora;
     private BigDecimal valorContratacao;

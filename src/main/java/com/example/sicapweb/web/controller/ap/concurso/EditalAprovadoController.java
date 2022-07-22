@@ -77,11 +77,11 @@ public class EditalAprovadoController extends DefaultController<EditalAprovado> 
         if (mesmocpf!=null ) {
             if (! id.equals(mesmocpf.getId())  ) throw new InvalitInsert("Cpf ja Cadastrado!");
         } else if (mesmoinscricao!=null){
-            if (! id.equals(mesmocpf.getId())  ) throw new InvalitInsert("Outro aprovado com o mesmo numero de inscrição!");
+            if (! id.equals(mesmoinscricao.getId())  ) throw new InvalitInsert("Outro aprovado com o mesmo numero de inscrição!");
         }
         else if (mesmaclassifmesmavaga!=null)
         {
-            if (! id.equals(mesmocpf.getId())  ) throw new InvalitInsert("utro aprovado ja se encontra na mesma classificação e tipo de concorrencia para mesma vaga!");
+            if (! id.equals(mesmaclassifmesmavaga.getId())  ) throw new InvalitInsert("outro aprovado ja se encontra na mesma classificação para mesma vaga!");
         }
 
 
