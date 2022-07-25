@@ -92,6 +92,7 @@ public class AssinarConcursoController {
                             System.out.println("idenvio: " + idenvio);
                             ConcursoEnvio envio = (ConcursoEnvio) concursoEnvioRepository.findById(idenvio);
                             if (envio!=null ){
+                                if (envio.getStatus()==3) throw new InvalitInsert("Envio ja Assindado!!");
                                 ConcursoEnvioAssinatura novo = new ConcursoEnvioAssinatura();
                                 novo.setIdCargo(User.getUser(concursoEnvioAssinaturaRepository.getRequest()).getCargo().getValor());
                                 novo.setCpf(User.getUser(concursoEnvioAssinaturaRepository.getRequest()).getCpf());

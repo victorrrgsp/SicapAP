@@ -120,6 +120,7 @@ public class AssinarAdmissaoController {
     @PostMapping
     public ResponseEntity<?> AssinarAdmissao(@RequestBody String hashassinante_hashAssinado )  throws JsonProcessingException,Exception {
         User userlogado = User.getUser(processoAdmissaoRepository.getRequest());
+        Boolean sucess = true;
         // try {
         if (userlogado != null) {
             JsonNode requestJson = new ObjectMapper().readTree(hashassinante_hashAssinado);
@@ -217,7 +218,11 @@ public class AssinarAdmissaoController {
                                 String cpfAprovado = aprov.getCpf();
                                 String nomeAprovado = aprov.getNome();
                                 //sera necessario gerar a chave atravez do metodo id_Document 'exec cadun.dbo.obterCodigoNovaPessoa'
-                                Integer codigopessoa = admissaoEnvioAssinaturaRepository.insertCadunPessoaInterressada(cpfAprovado,nomeAprovado, novo.getIp(),userlogado.getUserName() );
+                                String  StringResponseCadunsalvasimples = admissaoEnvioAssinaturaRepository.insertCadunPessoaInterressada(cpfAprovado,nomeAprovado);
+                                JsonNode JsonesponseCadunsalvasimples = new ObjectMapper().readTree(StringResponseCadunsalvasimples);
+                                Integer codigopessoa =  requestJson.get("id").asInt();
+                                String mensagemPessao = requestJson.get("msg").asText();
+                                if (codigopessoa.equals(0)) throw new InvalitInsert("erro:"+mensagemPessao+", cpf: "+cpfAprovado+" nome: "+nomeAprovado);
                                 if (codigopessoa ==null) throw new InvalitInsert("Não gerou codigo de pessoa fisica do interessado "+nomeAprovado+" no cadun!");
                                 if ( contador ==1){
 
@@ -311,26 +316,6 @@ public class AssinarAdmissaoController {
         //}
 
         return ResponseEntity.ok().body("OK");
-    }
-
-    @CrossOrigin
-    @PostMapping(path="/getPessoaByCPF")
-    public static String getPessoaBycpf(@RequestBody String cpf) throws IOException {
-        OkHttpClient client = new OkHttpClient().newBuilder()
-                .build();
-
-        MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
-        okhttp3.RequestBody body = okhttp3.RequestBody.create(mediaType,"cpf="+cpf);
-        Request request = new Request.Builder()
-                .url("https://dev2.tce.to.gov.br/cadun/app/controllers/?&c=TCE_CADUN_PessoaFisica&m=getPessoaByCPF")
-                .method("POST", body)
-                .addHeader("Accept", "application/json")
-                .addHeader("Referer", "https://app.tce.to.gov.br/")
-                .build();
-
-        Response response = client.newCall(request).execute();
-        String resposta = response.body().string();
-        return resposta;
     }
 
 
