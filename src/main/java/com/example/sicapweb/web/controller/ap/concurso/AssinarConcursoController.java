@@ -6,6 +6,7 @@ import br.gov.to.tce.model.ap.concurso.documento.DocumentoEditalHomologacao;
 import br.gov.to.tce.util.Date;
 import br.gov.to.tce.model.ap.concurso.ConcursoEnvio;
 import br.gov.to.tce.model.ap.concurso.ConcursoEnvioAssinatura;
+import com.example.sicapweb.exception.InvalitInsert;
 import com.example.sicapweb.model.ConcursoEnvioAssRetorno;
 import com.example.sicapweb.repository.concurso.ConcursoEnvioAssinaturaRepository;
 import com.example.sicapweb.repository.concurso.ConcursoEnvioRepository;
@@ -158,12 +159,15 @@ public class AssinarConcursoController {
                                     Integer anoEdital=null;
                                     numEdital = Integer.valueOf(envio.getEdital().getNumeroEdital().substring(0, envio.getEdital().getNumeroEdital().length() - 4));
                                     anoEdital = Integer.valueOf(envio.getEdital().getNumeroEdital().substring(envio.getEdital().getNumeroEdital().length() - 4));
+                                    if (  numEdital==null || numEdital==0 ) throw  new InvalitInsert("numero do edital não esta no formato certo!");
+                                    if (  anoEdital==null || anoEdital<1990 ) throw  new InvalitInsert("numero do edital não esta no formato certo!");
                                     concursoEnvioAssinaturaRepository.insertProcesso(procnumero,ano,anoEdital,ProcessoNpai , ProcessoApai ,relatorio, complemento ,assuntocodigo ,classeassunto , idprotocolo , origem, id_entidade_vinculada,idassunto );
                                     concursoEnvioAssinaturaRepository.insertAndamentoProcesso(procnumero,ano);
                                     concursoEnvioAssinaturaRepository.insertProcEdital(procnumero,ano,numEdital,anoEdital);
                                     concursoEnvioAssinaturaRepository.insertPessoaInteressada(procnumero,ano, responsavel , 1,4  );
                                     concursoEnvioAssinaturaRepository.insertHist(procnumero,ano,deptoAutuacao);
                                     BigDecimal idDocument =  concursoEnvioAssinaturaRepository.insertDocument(tipodocumento,procnumero,ano,evento);
+                                    if ( idDocument==null ) throw  new InvalitInsert("não gerou o ID do documento no econtas!");
                                     String Arquivo=null;
                                     if (envio.getFase()==1){
                                         List<DocumentoEdital> ldocs =  documentoEditalRepository.buscarDocumentosEdital("'I','II','III','IV','V','VI','VII','VIII','IX','IX.I','X',''",envio.getEdital().getId());
@@ -174,9 +178,12 @@ public class AssinarConcursoController {
                                                     concursoEnvioAssinaturaRepository.insertArquivoDocument(idDocument,Arquivo,doc.getIdCastorFile());
                                                 } else
                                                 {
-                                                    throw new Exception("erro:não encontrou descrição do arquiva no inciso e fase!");
+                                                    throw new Exception("não encontrou descrição do arquiva no inciso e fase!");
                                                 }
                                             }
+                                        }
+                                        else{
+                                            throw  new InvalitInsert("não encontrou documentos anexados!");
                                         }
 
                                     } else if (envio.getFase()==2) {
@@ -188,9 +195,12 @@ public class AssinarConcursoController {
                                                     concursoEnvioAssinaturaRepository.insertArquivoDocument(idDocument,Arquivo,doc.getIdCastorFile());
                                                 } else
                                                 {
-                                                    throw new Exception("erro:não encontrou descrição do arquiva no inciso e fase!");
+                                                    throw new Exception("não encontrou descrição do arquiva no inciso e fase!");
                                                 }
                                             }
+                                        }
+                                        else{
+                                            throw  new InvalitInsert("não encontrou documentos anexados!");
                                         }
                                     }
                                     //atualiza o campo processo no envio com o numero e ano do processo econtas
@@ -198,18 +208,18 @@ public class AssinarConcursoController {
                                     envio.setStatus(ConcursoEnvio.Status.Finalizado.getValor());
                                     concursoEnvioRepository.update(envio);
                                 } else {
-                                    throw new Exception("erro:id do protocolo não foi gerado!");
+                                    throw new Exception("id do protocolo não foi gerado!");
                                 }
                             }
                             else{
-                                throw new Exception("erro:id do envio não encontrado!");
+                                throw new Exception("id do envio não encontrado!");
                             }
 //
                     }
                 }
                 //throw new SQLException("Test erro handling");
             } else {
-                System.out.println("erro:não encontrou usuario logado!!");
+                System.out.println("não encontrou usuario logado!!");
             }
 
        // }catch(Exception e){

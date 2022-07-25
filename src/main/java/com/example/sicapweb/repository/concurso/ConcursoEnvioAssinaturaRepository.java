@@ -28,11 +28,12 @@ public class ConcursoEnvioAssinaturaRepository  extends DefaultRepository<Concur
     Integer idProtocolo;
     public Integer insertProtocolo(String matricula,Integer ano, LocalDateTime dh_protocolo, Integer id_end_origem) throws NoSuchAlgorithmException {
         Query query = entityManager.createNativeQuery(
-                "INSERT INTO SICAPAP21W..PROTOCOLOS(ID_PROTOCOLO, ANO, DH_PROTOCOLO,MATRICULA,ID_ENT_ORIGEM,HASH) " +
+                "INSERT INTO SCP..PROTOCOLOS(ID_PROTOCOLO, ANO, DH_PROTOCOLO,MATRICULA,ID_ENT_ORIGEM,HASH) " +
                         "VALUES (:ID_PROTOCOLO, :ANO, CONVERT(datetime2, '"+ dh_protocolo+"' ),:MATRICULA,:ID_ENT_ORIGEM,:HASH)");
 
+
         Query query1 = entityManager.createNativeQuery(
-                "select coalesce(MAX(ID_PROTOCOLO), 0)+1 from SICAPAP21W..PROTOCOLOS where ANO = YEAR(GETDATE()) "
+                "select coalesce(MAX(ID_PROTOCOLO), 0)+1 from SCP..PROTOCOLOS where ANO = YEAR(GETDATE()) "
                        );
         //dh_protocolo
         idProtocolo =  (Integer)query1.getSingleResult();
@@ -63,7 +64,7 @@ public class ConcursoEnvioAssinaturaRepository  extends DefaultRepository<Concur
                                Integer idprotocolo, Integer entidadeorigem, Integer entidadevinculada, Integer  idassunto
                                ){
         Query query = entityManager.createNativeQuery(
-                " INSERT INTO SICAPAP21W..processo (" +
+                " INSERT INTO SCP..processo (" +
                         "                    processo_dtaass, processo_numero, processo_ano, pentids_ecodc_ccodg, pentids_ecodc_ccodc," +
                         "                    pentids_ecode, processo_modelo, processo_interes, processo_assunto, processo_mrefer," +
                         "                    processo_arefer, processo_dtaaut, processo_haut, processo_qtdvol, processo_status," +
@@ -119,7 +120,7 @@ public class ConcursoEnvioAssinaturaRepository  extends DefaultRepository<Concur
     }
 
     public void insertAndamentoProcesso(Integer procnumero, Integer ano){
-        Query query = entityManager.createNativeQuery("INSERT INTO SICAPAP21W..ProcessoAndamento(NumProc,AnoProc,Descricao,DHinsert,IdDepto)" +
+        Query query = entityManager.createNativeQuery("INSERT INTO SCP..ProcessoAndamento(NumProc,AnoProc,Descricao,DHinsert,IdDepto)" +
                 "                VALUES (:procnumero, :ano, 'AUTUACAO', GETDATE(), 55)");
         query.setParameter("procnumero",procnumero);
         query.setParameter("ano",ano);
@@ -129,8 +130,11 @@ public class ConcursoEnvioAssinaturaRepository  extends DefaultRepository<Concur
 
 
     public void insertProcEdital(Integer procnumero, Integer ano, Integer numedital, Integer anoedital ){
-        Query query = entityManager.createNativeQuery("INSERT INTO SICAPAP21W..ProcEdital (NumProc, AnoProc, NumEdital, AnoEdital, MatriculaInsert, Situacao , DataInsert)" +
-                "                VALUES (:procnumero, :ano, :numedital, :anoedital, 000003, 1 , GETDATE())");
+//        Query query = entityManager.createNativeQuery("INSERT INTO SCP..ProcEdital (NumProc, AnoProc, NumEdital, AnoEdital, MatriculaInsert, Situacao , DataInsert)" +
+//                "                VALUES (:procnumero, :ano, :numedital, :anoedital, 000003, 1 , GETDATE())");
+
+        Query query = entityManager.createNativeQuery("INSERT INTO SCP..ProcEdital (NumProc, AnoProc, NumEdital, AnoEdital, MatriculaInsert, Situacao )" +
+                "                VALUES (:procnumero, :ano, :numedital, :anoedital, 000003, 1 )");
         query.setParameter("procnumero",procnumero);
         query.setParameter("ano",ano);
         query.setParameter("numedital",numedital);
@@ -140,7 +144,7 @@ public class ConcursoEnvioAssinaturaRepository  extends DefaultRepository<Concur
     }
 
     public void insertPessoaInteressada(Integer procnumero, Integer ano, Integer idpessoa, Integer papel, Integer idcargo ){
-        Query query = entityManager.createNativeQuery("INSERT INTO SICAPAP21W..PESSOAS_PROCESSO (NUM_PROC, ANO_PROC, ID_PESSOA, ID_PAPEL, ID_CARGO)" +
+        Query query = entityManager.createNativeQuery("INSERT INTO SCP..PESSOAS_PROCESSO (NUM_PROC, ANO_PROC, ID_PESSOA, ID_PAPEL, ID_CARGO)" +
                 "                VALUES (:procnumero , :ano , :idpessoa , :papel , :idcargo )");
         query.setParameter("procnumero",procnumero);
         query.setParameter("ano",ano);
@@ -153,7 +157,7 @@ public class ConcursoEnvioAssinaturaRepository  extends DefaultRepository<Concur
 
 
     public void insertHist(Integer procnumero, Integer ano, String  deptoAutuacao){
-        Query query = entityManager.createNativeQuery("INSERT INTO SICAPAP21W..hists" +
+        Query query = entityManager.createNativeQuery("INSERT INTO SCP..hists" +
                 "(hcodp_pnumero, hcodp_pano, hists_data,hists_hora, hists_origem, hoent_ecodc_ccodg, hoent_ecodc_ccodc," +
                 "                         hoent_ecode, hdest_ldepto, hdest_llogin, hent_ecodc_ccodg, hent_ecodc_ccodc, hent_ecode, status," +
                 "                         hists_dest_resp, data_receb, hora_receb, data_env_depto, hora_env_depto)" +
@@ -164,7 +168,7 @@ public class ConcursoEnvioAssinaturaRepository  extends DefaultRepository<Concur
         query.executeUpdate();
         //entityManager.flush();
 
-        Query query1 = entityManager.createNativeQuery("INSERT INTO SICAPAP21W..hists" +
+        Query query1 = entityManager.createNativeQuery("INSERT INTO SCP..hists" +
                 "(hcodp_pnumero, hcodp_pano, hists_data,hists_hora, hists_origem, hoent_ecodc_ccodg, hoent_ecodc_ccodc," +
                 "                         hoent_ecode, hdest_ldepto, hdest_llogin, hent_ecodc_ccodg, hent_ecodc_ccodc, hent_ecode, status," +
                 "                         hists_dest_resp, data_receb, hora_receb)" +
@@ -180,7 +184,7 @@ public class ConcursoEnvioAssinaturaRepository  extends DefaultRepository<Concur
 
     BigDecimal idDocument;
     public BigDecimal insertDocument(String tipodocumento,Integer procnumero, Integer ano, Integer evento ){
-        Query query = entityManager.createNativeQuery("INSERT INTO SICAPAP21W..document(docmt_tipo,dcnproc_pnumero,dcnproc_pano,docmt_numero,docmt_ano,docmt_depto,docmt_excluido" +
+        Query query = entityManager.createNativeQuery("INSERT INTO SCP..document(docmt_tipo,dcnproc_pnumero,dcnproc_pano,docmt_numero,docmt_ano,docmt_depto,docmt_excluido" +
                 ",docmt_data,docmt_hora,login_usr,docmt_is_assinado,docmt_depto_doc,sigiloso, num_evento)" +
                 "     VALUES (:tipodocumento,:procnumero,:ano,:procnumero,:ano,'COPRO','',getdate(),getdate(),'000003','S','COPRO','N', :evento)");
         query.setParameter("tipodocumento",tipodocumento);
@@ -200,7 +204,7 @@ public class ConcursoEnvioAssinaturaRepository  extends DefaultRepository<Concur
 
 
     public void insertArquivoDocument(BigDecimal id_documento, String arquivo, String  idDocumentoCastor   ){
-        Query query = entityManager.createNativeQuery(" insert into SICAPAP21W..DOCUMENT_ARQUIVOS (ID_DOCUMENT,NOME_ARQ,DESCRICAO,DATA,LOGIN_INSERIU,EXCLUIDO,UUID_CAS)" +
+        Query query = entityManager.createNativeQuery(" insert into SCP..DOCUMENT_ARQUIVOS (ID_DOCUMENT,NOME_ARQ,DESCRICAO,DATA,LOGIN_INSERIU,EXCLUIDO,UUID_CAS)" +
                 "Values (:id_documento,:arquivo,:arquivo,GETDATE(),'000003','N',:idDocumentoCastor)");
         query.setParameter("id_documento",id_documento);
         query.setParameter("arquivo",arquivo);
@@ -211,8 +215,12 @@ public class ConcursoEnvioAssinaturaRepository  extends DefaultRepository<Concur
     }
 
     public String GetDescricaoArquivoEdital(String inciso, Integer fase){
-        return (String) entityManager.createNativeQuery("select CONCAT(REPLICATE('0', 2 - LEN(cs.inciso_numero)),cs.inciso_numero , '- ', cs.nome) as arquivo from SicapAP..Conc_Subcategoria cs " +
-                "where id_fase=:fase and inciso=:inciso").setParameter("fase",fase).setParameter("inciso",inciso).getSingleResult();
+//        switch (inciso+'-'+fase.toString()){
+//            case ""
+//        }
+
+        return (String) entityManager.createNativeQuery("select top 1 CONCAT(REPLICATE('0', 2 - LEN(cs.inciso_numero)),cs.inciso_numero , '- ', cs.nome) as arquivo from SicapAP..Conc_Subcategoria cs " +
+                "where id_fase=:fase and isnull(inciso,'0')=:inciso").setParameter("fase",fase).setParameter("inciso",inciso).getSingleResult();
 
     }
 
@@ -223,9 +231,7 @@ public class ConcursoEnvioAssinaturaRepository  extends DefaultRepository<Concur
                 "                LEFT JOIN cadun..vwUnidadesPessoasCargos up on pj.cnpj = up.codunidadegestora and idCargo = 4 and dataFim is null " +
                 "                   WHERE pj.CNPJ ='"+Cnpj+ "' or pj.CodigoUnidadeGestora = '"+Cnpj+"' ").getResultList();
         if (cadunL.size()>0) {
-            for (Integer cad : cadunL) {
-              return   cad;
-            }
+            return cadunL.get(0);
         }
         return null;
     }
@@ -235,9 +241,7 @@ public class ConcursoEnvioAssinaturaRepository  extends DefaultRepository<Concur
                 "                LEFT JOIN cadun..vwUnidadesPessoasCargos up on pj.cnpj = up.codunidadegestora and idCargo = 4 and dataFim is null " +
                 "                   WHERE pj.CNPJ ='"+Cnpj+ "' or pj.CodigoUnidadeGestora = '"+Cnpj+"' ").getResultList();
         if (cadunL.size()>0) {
-            for (Integer cad : cadunL) {
-                return   cad;
-            }
+            return cadunL.get(0);
         }
         return null;
     }

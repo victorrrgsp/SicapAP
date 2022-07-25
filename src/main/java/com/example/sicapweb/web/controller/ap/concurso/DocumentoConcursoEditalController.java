@@ -129,7 +129,7 @@ public class DocumentoConcursoEditalController extends DefaultController<Documen
                 "Edital de abertura do consurso público e o respectivo comprovante de publicação", "", "Sim"));
         list.add(new Inciso("XI", "Demais editais do consurso público, quando houver",
                 "Demais editais do consurso público, quando houver", "", "Não"));
-        list.add(new Inciso("", "Outros",
+        list.add(new Inciso("0", "Outros",
                 "Outros", "", "Não"));
 
         for (int i = 0; i < list.size(); i++){
