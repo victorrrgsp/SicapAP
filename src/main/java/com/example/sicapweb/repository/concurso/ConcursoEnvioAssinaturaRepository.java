@@ -2,7 +2,9 @@ package com.example.sicapweb.repository.concurso;
 
 import br.gov.to.tce.util.Date;
 import br.gov.to.tce.model.ap.concurso.ConcursoEnvioAssinatura;
+import com.example.sicapweb.exception.InvalitInsert;
 import com.example.sicapweb.repository.DefaultRepository;
+import net.bytebuddy.asm.Advice;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -120,8 +122,8 @@ public class ConcursoEnvioAssinaturaRepository  extends DefaultRepository<Concur
     }
 
     public void insertAndamentoProcesso(Integer procnumero, Integer ano){
-        Query query = entityManager.createNativeQuery("INSERT INTO SCP..ProcessoAndamento(NumProc,AnoProc,Descricao,DHinsert,IdDepto)" +
-                "                VALUES (:procnumero, :ano, 'AUTUACAO', GETDATE(), 55)");
+        Query query = entityManager.createNativeQuery("INSERT INTO SCP..ProcessoAndamento(NumProc,AnoProc,Descricao,DHinsert,IdDepto,MatriculaPessoa)" +
+                "                VALUES (:procnumero, :ano, 'AUTUACAO', GETDATE(), 55,0)");
         query.setParameter("procnumero",procnumero);
         query.setParameter("ano",ano);
         query.executeUpdate();
@@ -215,12 +217,32 @@ public class ConcursoEnvioAssinaturaRepository  extends DefaultRepository<Concur
     }
 
     public String GetDescricaoArquivoEdital(String inciso, Integer fase){
-//        switch (inciso+'-'+fase.toString()){
-//            case ""
-//        }
+        String retorno="";
+            if ((inciso + "-" + fase.toString()).equals("I-1") )  return "01- Ofício subscrito pela autoridade competente";
+            else if ((inciso + '-' + fase.toString()).equals("II-1") )  return "02- Justificativa para a abertura do concurso público" ;
+            else if ((inciso + '-' + fase.toString()).equals("III-1") )  return "03- Demonstrativo de despesa do impacto orçamentário-financeiro";
+            else if ((inciso + '-' + fase.toString()).equals("IV-1") )  return "04- Declaração de despesa da autorização para realização do concurso público";
+            else if ((inciso + '-'+ fase.toString()).equals("V-1") )  return "05- Demonstrativo informando o percentual da despesa total com pessoal";
+            else if ((inciso + '-' + fase.toString()).equals("VI-1") )  return "06- Ato expedido pela autoridade competente designando a comissão examinadora/julgadora";
+            else if ((inciso + '-'+ fase.toString()).equals("VII-1") )  return "07- Demonstrativo do quadro de pessoal efetivo e quantidade de vagas criadas por lei";
+            else if ((inciso + '-'+ fase.toString()).equals("VIII-1") )  return "08- Lei(s) de criação e/ou alteração dos cargos disponibilizados no Edital";
+            else if ((inciso + '-' + fase.toString()).equals("IX-1") )   return "09- Documentos da contratação da entidade promotora do certame";
+            else if ((inciso + '-' + fase.toString()).equals("IX.I-1") ) return "09- Comprovante de cadastramento no SICAP-LCO";
+            else if ((inciso + '-' + fase.toString()).equals("X-1") )  return "10- Edital de abertura do concurso público e o respectivo comprovante de publicação";
+            else if ((inciso + '-' + fase.toString()).equals("XI-1") )  return "11- Demais editais do concurso público, quando houver";
+            else if ((inciso+'-'+fase.toString()).equals("XI-2") )  return "11- Demais editais do concurso público, quando houver";
+            else if ((inciso + '-' + fase.toString()).equals("XII-2") )  return "12- Relação de candidatos inscritos para o concurso público";
+            else if ((inciso + '-' + fase.toString()).equals("XIII-2") )  return "13- Lista de presença dos candidatos";
+            else if ((inciso + '-' + fase.toString()).equals("XIV-2") )  return "14- Ata ou relatório final dos trabalhos realizados na promoção do concurso público";
+            else if ((inciso + '-' + fase.toString()).equals("XV-2") ) return "15- Ato de homologação do resultado do concurso público e lista de aprovados";
+            else if ((inciso + '-' + fase.toString()).equals("XVI-2") ) return "16- Demais documentos exigidos em legislação específica de concurso público";
+            else if ((inciso + '-' + fase.toString()).equals("sem-1") )  return "Outros";
+            else if ((inciso + '-' + fase.toString()).equals("sem-2") )  return "outros";
+            else throw new InvalitInsert("Descrição não Encontrada!");
 
-        return (String) entityManager.createNativeQuery("select top 1 CONCAT(REPLICATE('0', 2 - LEN(cs.inciso_numero)),cs.inciso_numero , '- ', cs.nome) as arquivo from SicapAP..Conc_Subcategoria cs " +
-                "where id_fase=:fase and isnull(inciso,'0')=:inciso").setParameter("fase",fase).setParameter("inciso",inciso).getSingleResult();
+
+       // return (String) entityManager.createNativeQuery("select top 1 case when cs.inciso_numero is not null  then CONCAT(REPLICATE('0', 2 - LEN(cs.inciso_numero)),cs.inciso_numero , '- ', cs.nome) else cs.nome end as arquivo from SicapAP..Conc_Subcategoria cs " +
+         //       "where id_fase=:fase and isnull(inciso,'0')=:inciso").setParameter("fase",fase).setParameter("inciso",inciso).getSingleResult();
 
     }
 

@@ -92,7 +92,7 @@ public class AssinarConcursoController {
                             System.out.println("idenvio: " + idenvio);
                             ConcursoEnvio envio = (ConcursoEnvio) concursoEnvioRepository.findById(idenvio);
                             if (envio!=null ){
-                                if (envio.getStatus()==3) throw new InvalitInsert("Envio ja Assindado!!");
+                                if (envio.getStatus()==3) throw new InvalitInsert("Envio ja Assinado!!");
                                 ConcursoEnvioAssinatura novo = new ConcursoEnvioAssinatura();
                                 novo.setIdCargo(User.getUser(concursoEnvioAssinaturaRepository.getRequest()).getCargo().getValor());
                                 novo.setCpf(User.getUser(concursoEnvioAssinaturaRepository.getRequest()).getCpf());
@@ -171,7 +171,7 @@ public class AssinarConcursoController {
                                     if ( idDocument==null ) throw  new InvalitInsert("não gerou o ID do documento no econtas!");
                                     String Arquivo=null;
                                     if (envio.getFase()==1){
-                                        List<DocumentoEdital> ldocs =  documentoEditalRepository.buscarDocumentosEdital("'I','II','III','IV','V','VI','VII','VIII','IX','IX.I','X',''",envio.getEdital().getId());
+                                        List<DocumentoEdital> ldocs =  documentoEditalRepository.buscarDocumentosEdital("'I','II','III','IV','V','VI','VII','VIII','IX','IX.I','X','sem'",envio.getEdital().getId());
                                         if(ldocs.size()>0){
                                             for(DocumentoEdital  doc: ldocs){
                                                 Arquivo = concursoEnvioAssinaturaRepository.GetDescricaoArquivoEdital(doc.getInciso(),envio.getFase());
@@ -188,7 +188,7 @@ public class AssinarConcursoController {
                                         }
 
                                     } else if (envio.getFase()==2) {
-                                        List<DocumentoEditalHomologacao> ldocs =  documentoEditalHomologacaoRepository.buscarDocumentosEditalHomologacao("'XI','XII','XIII','XIV','XV',''",envio.getEdital().getId());
+                                        List<DocumentoEditalHomologacao> ldocs =  documentoEditalHomologacaoRepository.buscarDocumentosEditalHomologacao("'XI','XII','XIII','XIV','XV','sem'",envio.getEdital().getId());
                                         if(ldocs.size()>0){
                                             for(DocumentoEditalHomologacao  doc: ldocs){
                                                 Arquivo = concursoEnvioAssinaturaRepository.GetDescricaoArquivoEdital(doc.getInciso(),envio.getFase());
@@ -218,7 +218,7 @@ public class AssinarConcursoController {
 //
                     }
                 }
-                //throw new SQLException("Test erro handling");
+               // throw new Exception("Test erro handling");
             } else {
                 System.out.println("não encontrou usuario logado!!");
             }

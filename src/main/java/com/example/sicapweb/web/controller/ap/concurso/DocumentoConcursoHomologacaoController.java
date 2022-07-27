@@ -66,10 +66,8 @@ public class DocumentoConcursoHomologacaoController extends DefaultController<Ed
                     listE.get(i).setProcesso(envio.getProcesso());
                 }
             }
-            else  if(quantidadeDocumentos <  4) {
+            else {
                 listE.get(i).setSituacao("Pendente");
-            } else if(quantidadeDocumentos == 4){
-                listE.get(i).setSituacao("Aguardando Assinatura");
             }
         }
         return ResponseEntity.ok().body(paginacaoUtil);
@@ -109,7 +107,7 @@ public class DocumentoConcursoHomologacaoController extends DefaultController<Ed
         List<Inciso> list = new ArrayList<>();
         list.add(new Inciso("XI", "Demais editais do concurso público, quando houver",
                 "Demais editais do concurso público, quando houver", "", "Não"));
-        list.add(new Inciso("XII ", "Relação de candidatos inscritos para o concurso público",
+        list.add(new Inciso("XII", "Relação de candidatos inscritos para o concurso público",
                 "Relação de candidatos inscritos para o concurso público", "", "Sim"));
         list.add(new Inciso("XIII", "Lista de presença dos candidatos",
                 "Lista de presença dos candidatos", "", "Sim"));
@@ -119,7 +117,7 @@ public class DocumentoConcursoHomologacaoController extends DefaultController<Ed
                 "Ato de homologação do resultado do concurso público e lista de aprovados", "", "Sim"));
         list.add(new Inciso("XVI", "Demais documentos exigidos em legislação específica de concurso público",
                 "Demais documentos exigidos em legislação específica de concurso público", "", "Não"));
-        list.add(new Inciso("", "Outros",
+        list.add(new Inciso("sem", "Outros",
                 "Outros", "", "Não"));
 
         for (int i = 0; i < list.size(); i++){
@@ -147,6 +145,8 @@ public class DocumentoConcursoHomologacaoController extends DefaultController<Ed
     public ResponseEntity<ConcursoEnvio>Enviar(@RequestBody ConcursoEnvio concursoEnvio){
         concursoEnvio.setFase(ConcursoEnvio.Fase.Homologacao.getValor());
         concursoEnvio.setStatus(ConcursoEnvio.Status.Enviado.getValor());
+        ConcursoEnvio envioPai =  concursoEnvioRepository.buscarEnvioFAse1PorEditalassinado(concursoEnvio.getEdital().getId());
+        if (envioPai !=null) concursoEnvio.setProcessoPai(envioPai.getProcesso());
         concursoEnvioRepository.save(concursoEnvio);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(concursoEnvio.getId()).toUri();
         return ResponseEntity.created(uri).body(concursoEnvio);

@@ -1,6 +1,7 @@
 package com.example.sicapweb.repository.concurso;
 
 import br.gov.to.tce.model.ap.concurso.ConcursoEnvio;
+import com.example.sicapweb.exception.InvalitInsert;
 import com.example.sicapweb.model.ConcursoEnvioAssRetorno;
 import com.example.sicapweb.repository.DefaultRepository;
 import com.example.sicapweb.util.PaginacaoUtil;
@@ -32,6 +33,19 @@ public class ConcursoEnvioRepository extends DefaultRepository<ConcursoEnvio, Bi
                         "select ev.* from ConcursoEnvio ev "+
                                 " where fase=2 and  idEdital = " + idEdital, ConcursoEnvio.class)
                 .getResultList();
+    }
+
+    public ConcursoEnvio buscarEnvioFAse1PorEditalassinado(BigInteger idEdital) {
+        List<ConcursoEnvio> lc=  getEntityManager().createNativeQuery(
+                        "select  ev.* from ConcursoEnvio ev "+
+                                " where fase=1 and status=3 and  idEdital = " + idEdital+ " order by dataEnvio desc ", ConcursoEnvio.class)
+                .getResultList();
+        if (lc.size() ==1 ) {return lc.get(0);
+        } else if (lc.size() > 1 ) {
+            throw new InvalitInsert("Encontrou mais de um processo pai para o envio da homologação!! ");
+        }
+
+        return null;
     }
 
 

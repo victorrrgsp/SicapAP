@@ -69,11 +69,9 @@ public class DocumentoConcursoEditalController extends DefaultController<Documen
                    listE.get(i).setProcesso(envio.getProcesso());
                }
            }
-            else  if(quantidadeDocumentos <  11) {
-                listE.get(i).setSituacao("Pendente");
-            } else if(quantidadeDocumentos >= 11){
-                listE.get(i).setSituacao("Pendente");
-            }
+            else {
+               listE.get(i).setSituacao("Pendente");
+           }
         }
 
         return ResponseEntity.ok().body(paginacaoUtil);
@@ -129,7 +127,7 @@ public class DocumentoConcursoEditalController extends DefaultController<Documen
                 "Edital de abertura do consurso público e o respectivo comprovante de publicação", "", "Sim"));
         list.add(new Inciso("XI", "Demais editais do consurso público, quando houver",
                 "Demais editais do consurso público, quando houver", "", "Não"));
-        list.add(new Inciso("0", "Outros",
+        list.add(new Inciso("sem", "Outros",
                 "Outros", "", "Não"));
 
         for (int i = 0; i < list.size(); i++){
