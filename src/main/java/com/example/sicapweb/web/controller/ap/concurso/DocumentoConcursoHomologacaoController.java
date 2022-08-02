@@ -175,6 +175,8 @@ public class DocumentoConcursoHomologacaoController extends DefaultController<Ed
          if (situacao < 4) throw  new InvalitInsert("Anexe todos os documentos obrigatorios!!");
         concursoEnvio.setFase(ConcursoEnvio.Fase.Homologacao.getValor());
         concursoEnvio.setStatus(ConcursoEnvio.Status.Enviado.getValor());
+        LocalDateTime dt = LocalDateTime.now();
+        concursoEnvio.setDataEnvio(dt);
         ConcursoEnvio envioPai =  concursoEnvioRepository.buscarEnvioFAse1PorEditalassinado(concursoEnvio.getEdital().getId());
         if (envioPai !=null) concursoEnvio.setProcessoPai(envioPai.getProcesso());
         concursoEnvioRepository.save(concursoEnvio);

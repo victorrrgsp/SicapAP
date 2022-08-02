@@ -19,6 +19,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -57,6 +58,12 @@ public class AssinarConcursoController {
     @CrossOrigin
     @GetMapping(path="/{searchParams}/{tipoParams}/pagination")
     public ResponseEntity<PaginacaoUtil<ConcursoEnvioAssRetorno>> listaAEnviosAguardandoAss(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
+        User userlogado = User.getUser(concursoEnvioAssinaturaRepository.getRequest());
+        if (userlogado.getCargo().getValor()!=4 ){
+            List<ConcursoEnvioAssRetorno> listavazia= new ArrayList<>() ;
+            PaginacaoUtil<ConcursoEnvioAssRetorno> paginacaoUtilvazia= new PaginacaoUtil<ConcursoEnvioAssRetorno>(0, 1, 1, 0, listavazia);
+            return ResponseEntity.ok().body(paginacaoUtilvazia);
+        }
         PaginacaoUtil<ConcursoEnvioAssRetorno> paginacaoUtil = concursoEnvioRepository.buscarEnviosAguardandoAss(pageable,searchParams,tipoParams);
         return ResponseEntity.ok().body(paginacaoUtil);
     }
@@ -68,6 +75,7 @@ public class AssinarConcursoController {
         User userlogado = User.getUser(concursoEnvioAssinaturaRepository.getRequest());
        // try {
             if (userlogado != null) {
+                if (userlogado.getCargo().getValor() !=4 ) throw new InvalitInsert("Apenas o gestor da unidade gestora pode assinar envios!!");
                 JsonNode requestJson = new ObjectMapper().readTree(hashassinante_hashAssinado);
                 String hashassinante =  URLDecoder.decode(requestJson.get("hashassinante").asText(), StandardCharsets.UTF_8);
                 String hashassinado =  URLDecoder.decode(requestJson.get("hashassinado").asText(), StandardCharsets.UTF_8);
@@ -77,13 +85,10 @@ public class AssinarConcursoController {
                 System.out.println("hashassinante:"+hashassinante);
                 System.out.println("hashassinado:"+hashassinado);
 
-
-
                 if (arrayNodeproc.isArray()) {
                     while (itrproc.hasNext()) {
                         JsonNode aux = itrproc.next();
                         System.out.println("id: " + aux.get("id").asText());
-                        System.out.println("edital.id: " + aux.get("edital").get("id").asText());
 
                         // para cada envio adiciona uma linha na tabela de assinatura com o mesmo hash assinado e assinante
 
@@ -100,7 +105,7 @@ public class AssinarConcursoController {
                                 novo.setIp(getIp.getRequest().getRemoteAddr());
                                 novo.setConcursoEnvio(envio);
                                 LocalDateTime dt =LocalDateTime.now();
-                                novo.setData_Assinatura(Date.from(dt.atZone(ZoneId.systemDefault()).toInstant()));
+                                novo.setData_Assinatura(dt);
                                 novo.setHashAssinante(hashassinante);
                                 novo.setHashAssinado(hashassinado);
                                 concursoEnvioAssinaturaRepository.save(novo);
@@ -218,7 +223,7 @@ public class AssinarConcursoController {
 //
                     }
                 }
-               // throw new Exception("Test erro handling");
+                throw new Exception("em manutenção!!");
             } else {
                 System.out.println("não encontrou usuario logado!!");
             }

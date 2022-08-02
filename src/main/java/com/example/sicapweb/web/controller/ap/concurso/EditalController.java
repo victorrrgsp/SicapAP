@@ -1,6 +1,8 @@
 package com.example.sicapweb.web.controller.ap.concurso;
 
+import br.gov.to.tce.model.ap.concurso.ConcursoEnvio;
 import br.gov.to.tce.model.ap.concurso.Edital;
+import com.example.sicapweb.repository.concurso.ConcursoEnvioRepository;
 import com.example.sicapweb.repository.concurso.EditalRepository;
 import com.example.sicapweb.util.PaginacaoUtil;
 import com.example.sicapweb.web.controller.DefaultController;
@@ -25,6 +27,9 @@ public class EditalController extends DefaultController<Edital> {
 
     @Autowired
     private EditalRepository editalRepository;
+
+    @Autowired
+    private ConcursoEnvioRepository concursoEnvioRepository;
 
     @CrossOrigin
     @GetMapping(path="/{searchParams}/{tipoParams}/pagination")
@@ -60,9 +65,14 @@ public class EditalController extends DefaultController<Edital> {
     public ResponseEntity<Edital> create(@RequestBody Edital edital) {
         edital.setInfoRemessa(editalRepository.buscarPrimeiraRemessa());
         Edital e =editalRepository.buscarEditalPorNumero(edital.getNumeroEdital());
+
         if (e == null) {
             if  ( Integer.valueOf(edital.getNumeroEdital().substring(edital.getNumeroEdital().length()-4)) <1990 ||  Integer.valueOf(edital.getNumeroEdital().substring(edital.getNumeroEdital().length()-4)) > (LocalDateTime.now().getYear() +5) ) {
                 throw new InvalitInsert("não é um número de Edital valido. Os ultinmos 4 digitos correspondem ao ano do edital !!");
+            }
+            ConcursoEnvio envio = concursoEnvioRepository.buscarEnvioFAse1PorEditalassinado(e.getId());
+            if(envio != null){
+                if (envio.getStatus()==3) throw new InvalitInsert("Edital não pode ser assinado pois ja foi enviado processo no econtas !!");
             }
             editalRepository.save(edital);
 
@@ -85,17 +95,21 @@ public class EditalController extends DefaultController<Edital> {
         edital.setId(id);
         Edital e =editalRepository.buscarEditalPorNumero(edital.getNumeroEdital());
 
-        if (e == null) {
+        if (e == null || edital.getId() == id) {
             if  ( Integer.valueOf(edital.getNumeroEdital().substring(edital.getNumeroEdital().length()-4)) <1990 ||  Integer.valueOf(edital.getNumeroEdital().substring(edital.getNumeroEdital().length()-4)) > (LocalDateTime.now().getYear() +5) ) {
                 throw new InvalitInsert("não é um numero de Edital valido. Os ultinmos 4 digitos correspondem ao ano do edital !!");
             }
+
+            ConcursoEnvio envio = concursoEnvioRepository.buscarEnvioFAse1PorEditalassinado(e.getId());
+            if(envio != null){
+                if (envio.getStatus()==3) throw new InvalitInsert("Edital não pode ser alterado pois ja foi enviado processo no econtas !!");
+            }
+
             editalRepository.update(edital);
             return ResponseEntity.noContent().build();
 
         } else {
-
             throw new InvalitInsert("ja existe o edital!!");
-
         }
 
 

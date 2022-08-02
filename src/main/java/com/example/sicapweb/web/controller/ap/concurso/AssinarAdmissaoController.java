@@ -5,6 +5,7 @@ import br.gov.to.tce.model.ap.concurso.documento.DocumentoAdmissao;
 import br.gov.to.tce.util.Date;
 import com.example.sicapweb.exception.InvalitInsert;
 import com.example.sicapweb.model.AdmissaoEnvioAssRetorno;
+import com.example.sicapweb.model.ConcursoEnvioAssRetorno;
 import com.example.sicapweb.repository.concurso.AdmissaoEnvioAssinaturaRepository;
 import com.example.sicapweb.repository.concurso.DocumentoAdmissaoRepository;
 import com.example.sicapweb.repository.concurso.ProcessoAdmissaoRepository;
@@ -32,6 +33,7 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Iterator;
 import java.util.List;
@@ -52,6 +54,12 @@ public class AssinarAdmissaoController {
     @CrossOrigin
     @GetMapping(path="/{searchParams}/{tipoParams}/pagination")
     public ResponseEntity<PaginacaoUtil<AdmissaoEnvioAssRetorno>> listaAProcessosAguardandoAss(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
+        User userlogado = User.getUser(processoAdmissaoRepository.getRequest());
+        if (userlogado.getCargo().getValor()!=4 ){
+            List<AdmissaoEnvioAssRetorno> listavazia= new ArrayList<>() ;
+            PaginacaoUtil<AdmissaoEnvioAssRetorno> paginacaoUtilvazia= new PaginacaoUtil<AdmissaoEnvioAssRetorno>(0, 1, 1, 0, listavazia);
+            return ResponseEntity.ok().body(paginacaoUtilvazia);
+        }
         PaginacaoUtil<AdmissaoEnvioAssRetorno> paginacaoUtil = processoAdmissaoRepository.buscarProcessosAguardandoAss(pageable,searchParams,tipoParams);
         return ResponseEntity.ok().body(paginacaoUtil);
     }
@@ -124,6 +132,7 @@ public class AssinarAdmissaoController {
         Boolean sucess = true;
         // try {
         if (userlogado != null) {
+            if (userlogado.getCargo().getValor() !=4 ) throw new InvalitInsert("Apenas o gestor da unidade gestora pode assinar envios!!");
             JsonNode requestJson = new ObjectMapper().readTree(hashassinante_hashAssinado);
             String hashassinante =  URLDecoder.decode(requestJson.get("hashassinante").asText(), StandardCharsets.UTF_8);
             String hashassinado =  URLDecoder.decode(requestJson.get("hashassinado").asText(), StandardCharsets.UTF_8);
@@ -308,7 +317,7 @@ public class AssinarAdmissaoController {
 
                 }
             }
-            throw new Exception("Test erro handling");
+            throw new Exception("em manutenção!!");
         } else {
             System.out.println("erro:não encontrou usuario logado!!");
         }

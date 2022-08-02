@@ -167,6 +167,8 @@ public class DocumentoConcursoEditalController extends DefaultController<Documen
         if (situacao < 11) throw  new InvalitInsert("Anexe todos os documentos obrigatorios!!");
         concursoEnvio.setFase(ConcursoEnvio.Fase.Edital.getValor());
         concursoEnvio.setStatus(ConcursoEnvio.Status.Enviado.getValor());
+        LocalDateTime dt = LocalDateTime.now();
+        concursoEnvio.setDataEnvio(dt);
         concursoEnvioRepository.save(concursoEnvio);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(concursoEnvio.getId()).toUri();
         return ResponseEntity.created(uri).body(concursoEnvio);
