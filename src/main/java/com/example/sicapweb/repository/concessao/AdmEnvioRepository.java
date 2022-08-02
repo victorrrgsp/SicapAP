@@ -58,10 +58,10 @@ public class AdmEnvioRepository extends DefaultRepository<AdmEnvio, BigInteger> 
 
     public List<HashMap<String, Object>> infoByRecibo(long idAdmissao) {
         List<Object[]> list = getEntityManager().createNativeQuery("select top 1  env.processo,env.unidadeGestora ,ug.nome as nomeEntidade ,CAST(se.nome AS varchar(500)) as nomeServidor ,env.tipoRegistro\n" +
-                        "    from SICAPAP21w.dbo.AdmEnvio env\n" +
-                        "    join SICAPAP21w.dbo.unidadegestora ug on env.unidadeGestora = ug.id\n" +
-                        "    join SICAPAP21w.dbo.Admissao ad on env.idAdmissao = ad.id\n" +
-                        "    join SICAPAP21w.dbo.Servidor se on ad.idServidor = se.id\n" +
+                        "    from AdmEnvio env\n" +
+                        "    join unidadegestora ug on env.unidadeGestora = ug.id\n" +
+                        "    join Admissao ad on env.idAdmissao = ad.id\n" +
+                        "    join Servidor se on ad.idServidor = se.id\n" +
                         "      where status = 3 and\n" +
                         "        env.idAdmissao = ?")
                 .setParameter(1, idAdmissao)

@@ -3,11 +3,13 @@ package com.example.sicapweb.web.controller.ap.concessao;
 import br.gov.to.tce.model.adm.AdmEnvio;
 import br.gov.to.tce.model.ap.concessoes.DocumentoPensao;
 import br.gov.to.tce.model.ap.pessoal.Pensao;
+import br.gov.to.tce.util.Date;
 import com.example.sicapweb.model.Inciso;
 import com.example.sicapweb.model.dto.PensaoDTO;
 import com.example.sicapweb.repository.concessao.AdmEnvioRepository;
 import com.example.sicapweb.repository.concessao.DocumentoPensaoRepository;
 import com.example.sicapweb.repository.concessao.PensaoRepository;
+import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
 import com.example.sicapweb.web.controller.DefaultController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigInteger;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -76,13 +80,18 @@ public class ConcessaoPensaoController extends DefaultController<DocumentoPensao
     @CrossOrigin
     @Transactional
     @PostMapping("/upload/{inciso}/{id}")
-    public ResponseEntity<?> addFile(@RequestParam("file") MultipartFile file, @PathVariable String inciso, @PathVariable BigInteger id) {
+    public ResponseEntity<?> addFile(@RequestParam("file") MultipartFile file, @PathVariable String inciso, @PathVariable BigInteger id, @RequestParam(value = "descricao", required = false) String descricao) throws UnknownHostException {
         DocumentoPensao documentoPensao = new DocumentoPensao();
         documentoPensao.setPensao(pensaoRepository.findById(id));
         documentoPensao.setInciso(inciso);
         String idCastor = super.setCastorFile(file, "Pensao");
         documentoPensao.setIdCastorFile(idCastor);
         documentoPensao.setStatus(DocumentoPensao.Status.Informado.getValor());
+        documentoPensao.setDescricao(descricao);
+        documentoPensao.setIdCargo(User.getUser(pensaoRepository.getRequest()).getCargo().getValor());
+        documentoPensao.setCpfUsuario(User.getUser(pensaoRepository.getRequest()).getCpf());
+        documentoPensao.setIpUsuario(InetAddress.getLocalHost().getHostAddress());
+        documentoPensao.setDataUpload(new Date());
         documentoPensaoRepository.save(documentoPensao);
         return ResponseEntity.ok().body(idCastor);
     }

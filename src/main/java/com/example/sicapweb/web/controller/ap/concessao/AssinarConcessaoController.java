@@ -1,38 +1,81 @@
 package com.example.sicapweb.web.controller.ap.concessao;
 
+import br.gov.to.tce.application.ApplicationException;
 import br.gov.to.tce.model.adm.AdmEnvio;
 import br.gov.to.tce.model.adm.AdmEnvioAssinatura;
+import br.gov.to.tce.model.ap.pessoal.Pensionista;
 import br.gov.to.tce.util.Date;
-import com.example.sicapweb.repository.concessao.AdmEnvioAssinaturaRepository;
-import com.example.sicapweb.repository.concessao.AdmEnvioRepository;
+import com.example.sicapweb.model.dto.AssuntoProcessoDTO;
+import com.example.sicapweb.repository.concessao.*;
+import com.example.sicapweb.repository.geral.UnidadeGestoraRepository;
+import com.example.sicapweb.repository.movimentacaoDePessoal.PensionistaRepository;
 import com.example.sicapweb.security.User;
+import com.example.sicapweb.service.AssinarCertificado;
+import com.example.sicapweb.service.ChampionRequest;
 import com.example.sicapweb.util.PaginacaoUtil;
-import com.example.sicapweb.service.AssinarCertificadoDigital;
 import com.example.sicapweb.web.controller.DefaultController;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import org.apache.catalina.valves.rewrite.InternalRewriteMap;
+import org.eclipse.persistence.dynamic.DynamicType;
+import org.hibernate.type.TrueFalseType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.math.BigInteger;
 import java.net.InetAddress;
+import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.Iterator;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.*;
 
 @CrossOrigin
 @RestController
 @RequestMapping("/assinarConcessao")
 public class AssinarConcessaoController extends DefaultController<AdmEnvio> {
 
+    @Value("${sso.oauth2.client_id}")
+    private String sso_client_id;
+
+    @Value("${sso.oauth2.client_secret}")
+    private String sso_client_secret;
+
     @Autowired
     private AdmEnvioRepository admEnvioRepository;
 
     @Autowired
     private AdmEnvioAssinaturaRepository admEnvioAssinaturaRepository;
+
+    @Autowired
+    private UnidadeGestoraRepository unidadeGestoraRepository;
+
+    @Autowired
+    private PensionistaRepository pensionistaRepository;
+
+    @Autowired
+    private DocumentoAposentadoriaRepository documentoAposentadoriaRepository;
+
+    @Autowired
+    private DocumentoPensaoRepository documentoPensaoRepository;
+
+    @Autowired
+    private DocumentoReintegracaoRepository documentoReintegracaoRepository;
+
+    @Autowired
+    private DocumentoReconducaoRepository documentoReconducaoRepository;
+
+    @Autowired
+    private DocumentoReadaptacaoRepository documentoReadaptacaoRepository;
+
+    @Autowired
+    private DocumentoAproveitamentoRepository documentoAproveitamentoRepository;
 
 
     @GetMapping(path = "/{searchParams}/{tipoParams}/pagination")
@@ -69,8 +112,10 @@ public class AssinarConcessaoController extends DefaultController<AdmEnvio> {
                         admEnvioAssinaturaRepository.save(admEnvioAssinatura);
                         envio.setStatus(4);
                         admEnvioRepository.update(envio);
+
+                        gerarProcesso(envio.getId());
                     } else {
-                        throw new Exception("id do envio não encontrado!");
+                        throw new Exception("Aconteceu um erro inesperado. Entre em contato com o administrador do sistema!");
                     }
                 }
             }
@@ -78,6 +123,282 @@ public class AssinarConcessaoController extends DefaultController<AdmEnvio> {
             e.printStackTrace();
         }
         return ResponseEntity.ok().body(hashassinante_hashAssinado);
+    }
+
+    public void gerarProcesso(BigInteger idAdmEnvio) throws ApplicationException, NoSuchAlgorithmException, IOException, URISyntaxException {
+        AdmEnvio admEnvio = admEnvioRepository.findById(idAdmEnvio);
+        AssuntoProcessoDTO assunto = getAssuntoProcesso(admEnvio.getTipoRegistro());
+        Map<String, Object> entidade = getUnidadeOrigemVinculada(admEnvio.getUnidadeGestora(), admEnvio.getOrgaoOrigem());
+
+        Integer numprotocolo = admEnvioAssinaturaRepository.gerarProtocolo();
+
+        MessageDigest md = MessageDigest.getInstance("MD5");
+        String value = "^TC3TO" + new Date() + numprotocolo + "*000003*^";
+        String hash = Arrays.toString(md.digest(value.getBytes()));
+        hash = hash.substring(17, 32).toUpperCase();
+        String matricula = "000003"; //matricula do usuario do SICAP -- quando o sistema gera o processo
+        Integer entidadeOrigem = (Integer) entidade.get("origem");
+        Integer entidadeVinculada = (Integer) entidade.get("vinculada");
+        Integer cargoGestor = 4;
+
+
+        Map<String, Object> protocolo = new HashMap<>();
+        protocolo.put("matricula", matricula);
+        protocolo.put("entidadeorigem", entidadeOrigem);
+        protocolo.put("hash", hash);
+        protocolo.put("idprotocolo", numprotocolo);
+
+        Integer gestorResponsavel = (Integer) entidade.get("responsavel");
+
+        //para os casos de Readaptacao, Reconducao, Reintegracao, Aproveitamento e Reversao
+        //a origem deve ser quem fez o pedido
+        if (assunto.getAssuntocodigo().equals("18") || assunto.getAssuntocodigo().equals("19") ||
+                assunto.getAssuntocodigo().equals("20") || assunto.getAssuntocodigo().equals("21") ||
+                assunto.getAssuntocodigo().equals("22")) {
+            entidadeOrigem = (Integer) entidade.get("solicitante");
+            protocolo.put("entidadeorigem", entidade.get("solicitante"));
+            gestorResponsavel = (Integer) entidade.get("responsavel_solicitante");
+        }
+
+        admEnvioAssinaturaRepository.salvarProtocolo(protocolo);
+
+        /* configuracoes do processo */
+        Integer ano = Calendar.getInstance().get(Calendar.YEAR);
+        Map<String, Object> processo = new HashMap<>();
+        processo.put("procnumero", numprotocolo);
+        processo.put("ano", ano);
+        processo.put("anoreferencia", ano);
+        processo.put("relatoria", 70); //distribuicao para o corpo especial de auditores
+        processo.put("complemento", admEnvio.getComplemento());
+        processo.put("assuntocodigo", assunto.getAssuntocodigo());
+        processo.put("classeassunto", assunto.getClasseassunto());
+        processo.put("idprotocolo", numprotocolo);
+        processo.put("entidadeorigem", entidadeOrigem);
+        processo.put("entidadevinculada", entidadeVinculada);
+        processo.put("idassunto", assunto.getIdassunto());
+        processo.put("processoNpai", 0);
+        processo.put("processoApai", 0);
+
+        admEnvioAssinaturaRepository.salvarProcesso(processo);
+        admEnvioAssinaturaRepository.salvarAndamentoProcesso(processo);
+
+        /* configuracoes do Gestor */
+        Map<String, Object> interessado = new HashMap<>();
+        interessado.put("procnumero", processo.get("procnumero"));
+        interessado.put("ano", processo.get("ano"));
+        interessado.put("idpessoa", gestorResponsavel);
+        interessado.put("papel", 1);
+        interessado.put("idcargo", cargoGestor);
+
+        admEnvioAssinaturaRepository.salvarPessoasInteressadas(interessado);
+
+        /* configuracoes do Interessado */
+        //verifica se e pensao ou revisao de pensao para salvar os interessados
+        if (assunto.getAssuntocodigo().equals("8") || assunto.getAssuntocodigo().equals("12")) {
+            List<Object> dependentes = pensionistaRepository.getDependentesPensao(admEnvio.getAdmissao().getServidor().getCpfServidor());
+            for (Object obj : dependentes) {
+                String pessoaInteressada = String.valueOf(ChampionRequest.salvarSimples(((HashMap) obj).get("cpf").toString(), ((HashMap) obj).get("nome").toString(), "SICAPAP", sso_client_id, sso_client_secret));
+                JsonNode respostaJson = new ObjectMapper().readTree(pessoaInteressada);
+                interessado.put("idpessoa", respostaJson.get("id").asText());
+                interessado.put("papel", 2);
+                interessado.put("idcargo", 0);
+
+                admEnvioAssinaturaRepository.salvarPessoasInteressadas(interessado);
+            }
+
+            //salva o instituidor 14
+            String pessoaInteressada = AssinarCertificado.salvarSimples(admEnvio.getAdmissao().getServidor().getCpfServidor(), admEnvio.getAdmissao().getServidor().getNome(), "SICAPAP", sso_client_id, sso_client_secret);
+            JsonNode respostaJson = new ObjectMapper().readTree(pessoaInteressada);
+            interessado.put("idpessoa", respostaJson.get("id").asText());
+            interessado.put("papel", 14);
+            interessado.put("idcargo", 0);
+
+            admEnvioAssinaturaRepository.salvarPessoasInteressadas(interessado);
+        } else {
+            String pessoaInteressada = AssinarCertificado.salvarSimples(admEnvio.getAdmissao().getServidor().getCpfServidor(), admEnvio.getAdmissao().getServidor().getNome(), "SICAPAP", sso_client_id, sso_client_secret);
+            JsonNode respostaJson = new ObjectMapper().readTree(pessoaInteressada);
+            interessado.put("idpessoa", respostaJson.get("id").asText());
+            interessado.put("papel", 2);
+            interessado.put("idcargo", 0);
+
+            admEnvioAssinaturaRepository.salvarPessoasInteressadas(interessado);
+        }
+
+        admEnvioAssinaturaRepository.salvarHistorico1(processo);
+        admEnvioAssinaturaRepository.salvarHistorico2(processo);
+
+        //salva o documento e retorna o id
+        admEnvioAssinaturaRepository.salvarDocumento(processo);
+        Integer id_documento = admEnvioAssinaturaRepository.buscarUltimoIdDocumento();
+
+        List<Object> arquivos = consultarDocumentosAEnviar(admEnvio);
+
+        for (Object arquivo : arquivos) {
+            admEnvioAssinaturaRepository.salvarArquivosDocumentos((Map<String, Object>) arquivo, id_documento);
+        }
+
+        admEnvio.setProcesso(processo.get("procnumero") + "/" + processo.get("ano"));
+        admEnvioRepository.update(admEnvio);
+    }
+
+    private AssuntoProcessoDTO getAssuntoProcesso(Integer tipoRegistro) {
+        AssuntoProcessoDTO dto = new AssuntoProcessoDTO();
+        switch (tipoRegistro) {
+            case 1: //Aposentadoria
+                dto.setIdassunto("71");
+                dto.setAssuntocodigo("7");
+                dto.setClasseassunto("8");
+                break;
+            case 2: //Pensao
+                dto.setIdassunto("77");
+                dto.setAssuntocodigo("8");
+                dto.setClasseassunto("8");
+                break;
+            case 3: //Reserva
+                dto.setIdassunto("83");
+                dto.setAssuntocodigo("9");
+                dto.setClasseassunto("8");
+                break;
+            case 4: //Reforma
+                dto.setIdassunto("89");
+                dto.setAssuntocodigo("10");
+                dto.setClasseassunto("8");
+                break;
+            case 5: //Reintegracao
+                dto.setIdassunto("148");
+                dto.setAssuntocodigo("19");
+                dto.setClasseassunto("8");
+                break;
+            case 6: //Reconducao
+                dto.setIdassunto("112");
+                dto.setAssuntocodigo("18");
+                dto.setClasseassunto("8");
+                break;
+            case 7: // Readaptacao
+                dto.setIdassunto("175");
+                dto.setAssuntocodigo("21");
+                dto.setClasseassunto("8");
+                break;
+            case 8: //Aproveitamento
+                dto.setIdassunto("176");
+                dto.setAssuntocodigo("22");
+                dto.setClasseassunto("8");
+                break;
+            case 9: //Revisao de Aposentadoria
+                dto.setIdassunto("94");
+                dto.setAssuntocodigo("11");
+                dto.setClasseassunto("8");
+                break;
+            case 10: //Revisao de pensao
+                dto.setIdassunto("98");
+                dto.setAssuntocodigo("12");
+                dto.setClasseassunto("8");
+                break;
+            case 11: //Revisao de reserva
+                dto.setIdassunto("101");
+                dto.setAssuntocodigo("13");
+                dto.setClasseassunto("8");
+                break;
+            case 12: //Revisao de reforma
+                dto.setIdassunto("104");
+                dto.setAssuntocodigo("14");
+                dto.setClasseassunto("8");
+                break;
+            case 13: //Reversao de Aposentadoria/ Reserva
+                dto.setIdassunto("172");
+                dto.setAssuntocodigo("20");
+                dto.setClasseassunto("8");
+                break;
+        }
+        return dto;
+    }
+
+    public List<Object> consultarDocumentosAEnviar(AdmEnvio admEnvio) {
+        if (admEnvio != null) {
+            List<Object> documentos = new ArrayList<>();
+            switch (admEnvio.getTipoRegistro()) {
+                case 1:
+                    documentos = documentoAposentadoriaRepository.buscarDocumentos(admEnvio.getIdMovimentacao());
+                    return documentos;
+                case 2:
+                    documentos = documentoPensaoRepository.buscarDocumentos(admEnvio.getIdMovimentacao());
+                    return documentos;
+                case 3:
+                    documentos = documentoAposentadoriaRepository.buscarDocumentosReserva(admEnvio.getIdMovimentacao());
+                    return documentos;
+                case 4:
+                    documentos = documentoAposentadoriaRepository.buscarDocumentosReforma(admEnvio.getIdMovimentacao());
+                    return documentos;
+                case 5:
+                    documentos = documentoReintegracaoRepository.buscarDocumentos(admEnvio.getIdMovimentacao());
+                    return documentos;
+                case 6:
+                    documentos = documentoReconducaoRepository.buscarDocumentos(admEnvio.getIdMovimentacao());
+                    return documentos;
+                case 7:
+                    documentos = documentoReadaptacaoRepository.buscarDocumentos(admEnvio.getIdMovimentacao());
+                    return documentos;
+                case 8:
+                    documentos = documentoAproveitamentoRepository.buscarDocumentos(admEnvio.getIdMovimentacao());
+                    return documentos;
+                case 9:
+                    documentos = documentoAposentadoriaRepository.buscarDocumentosRevisao(admEnvio.getIdMovimentacao());
+                    return documentos;
+                case 10:
+                    documentos = documentoPensaoRepository.buscarDocumentosRevisao(admEnvio.getIdMovimentacao());
+                    return documentos;
+                case 11:
+                    documentos = documentoAposentadoriaRepository.buscarDocumentosRevisaoReserva(admEnvio.getIdMovimentacao());
+                    return documentos;
+                case 12:
+                    documentos = documentoAposentadoriaRepository.buscarDocumentosRevisaoReforma(admEnvio.getIdMovimentacao());
+                    return documentos;
+                case 13:
+                    documentos = documentoAposentadoriaRepository.buscarDocumentosReversao(admEnvio.getIdMovimentacao());
+                    return documentos;
+            }
+        }
+        return null;
+    }
+
+    @PostMapping(path = "/gerar")
+    public void teste() throws ApplicationException, IOException, URISyntaxException {
+        ChampionRequest.salvarSimples("06562780136", "LARA FLAVIA DE ALMEIDA LIMA", "SICAPAP", sso_client_id, sso_client_secret);
+    }
+
+
+    public Map<String, Object> getUnidadeOrigemVinculada(String cnpj, String orgaoOrigem) throws ApplicationException {
+        Object ug = unidadeGestoraRepository.buscarDadosUnidadeGestora(cnpj);
+        Object ugOrgaoOrigem = unidadeGestoraRepository.buscarDadosUnidadeGestora(orgaoOrigem);
+        Map<String, Object> theMap = new HashMap<>();
+
+        if (Objects.equals(((HashMap) ug).get("Divisao_id"), 5) || Objects.equals(((HashMap) ug).get("Divisao_id"), 12)) {
+            Object instituto = unidadeGestoraRepository.buscarDadosFundoOuInstituto(cnpj);
+            theMap.put("temInstituto", true);
+            theMap.put("origem", ((HashMap) instituto).get("idPessoaJuridica"));
+            theMap.put("vinculada", ((HashMap) ugOrgaoOrigem).get("idPessoaJuridica"));
+            theMap.put("solicitante", ((HashMap) ug).get("idPessoaJuridica"));
+            theMap.put("responsavel", ((HashMap) instituto).get("idPessoaJuridica"));
+            theMap.put("responsavel_solicitante", ((HashMap) ug).get("idPessoaJuridica"));
+        } else {
+            Object instituto = unidadeGestoraRepository.buscarDadosFundoOuInstituto(cnpj);
+            if (instituto == null) {
+                theMap.put("temInstituto", false);
+                theMap.put("origem", ((HashMap) ug).get("idPessoaJuridica"));
+                theMap.put("vinculada", ((HashMap) ugOrgaoOrigem).get("idPessoaJuridica"));
+                theMap.put("solicitante", ((HashMap) ug).get("idPessoaJuridica"));
+                theMap.put("responsavel", ((HashMap) ug).get("idPessoaJuridica"));
+                theMap.put("responsavel_solicitante", ((HashMap) ug).get("idPessoaJuridica"));
+            } else {
+                theMap.put("temInstituto", true);
+                theMap.put("origem", ((HashMap) instituto).get("idPessoaJuridica"));
+                theMap.put("vinculada", ((HashMap) ugOrgaoOrigem).get("idPessoaJuridica"));
+                theMap.put("solicitante", ((HashMap) ug).get("idPessoaJuridica"));
+                theMap.put("responsavel", ((HashMap) instituto).get("idPessoaJuridica"));
+                theMap.put("responsavel_solicitante", ((HashMap) ug).get("idPessoaJuridica"));
+            }
+        }
+        return theMap;
     }
 
     @CrossOrigin
@@ -97,7 +418,7 @@ public class AssinarConcessaoController extends DefaultController<AdmEnvio> {
             } else if (!userlogado.getCpf().equals(hash)) {
                 throw new Exception("nao é o mesmo  certificado que esta logado!!");
             } else {
-                respostaIniciarAssinatura = AssinarCertificadoDigital.inicializarAssinatura(certificado, Original);
+                respostaIniciarAssinatura = AssinarCertificado.inicializarAssinatura(certificado, Original);
             }
             //decodigica a mensagem
             byte[] decodedBytes2 = Base64.getDecoder().decode(Original);
@@ -123,7 +444,7 @@ public class AssinarConcessaoController extends DefaultController<AdmEnvio> {
             String desafio = respostaJson.get("desafio").asText();
             String assinatura = respostaJson.get("assinatura").asText();
             String mensagem = respostaJson.get("original").asText();
-            respostaFinalizarAssinatura = AssinarCertificadoDigital.FinalizarAssinatura(desafio, assinatura, mensagem);
+            respostaFinalizarAssinatura = AssinarCertificado.FinalizarAssinatura(desafio, assinatura, mensagem);
         } catch (Exception e) {
             System.out.println("[falha]: " + e.toString());
             e.printStackTrace();

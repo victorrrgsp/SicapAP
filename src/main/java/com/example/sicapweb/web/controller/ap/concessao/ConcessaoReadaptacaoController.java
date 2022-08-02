@@ -3,11 +3,13 @@ package com.example.sicapweb.web.controller.ap.concessao;
 import br.gov.to.tce.model.adm.AdmEnvio;
 import br.gov.to.tce.model.ap.concessoes.DocumentoReadaptacao;
 import br.gov.to.tce.model.ap.pessoal.Readaptacao;
+import br.gov.to.tce.util.Date;
 import com.example.sicapweb.model.Inciso;
 import com.example.sicapweb.model.dto.ReadaptacaoDTO;
 import com.example.sicapweb.repository.concessao.AdmEnvioRepository;
 import com.example.sicapweb.repository.concessao.DocumentoReadaptacaoRepository;
 import com.example.sicapweb.repository.concessao.ReadaptacaoRepository;
+import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
 import com.example.sicapweb.web.controller.DefaultController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigInteger;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -78,13 +82,18 @@ public class ConcessaoReadaptacaoController extends DefaultController<DocumentoR
     @CrossOrigin
     @Transactional
     @PostMapping("/upload/{inciso}/{id}")
-    public ResponseEntity<?> addFile(@RequestParam("file") MultipartFile file, @PathVariable String inciso, @PathVariable BigInteger id) {
+    public ResponseEntity<?> addFile(@RequestParam("file") MultipartFile file, @PathVariable String inciso, @PathVariable BigInteger id, @RequestParam(value = "descricao", required = false) String descricao) throws UnknownHostException {
         DocumentoReadaptacao documentoReadaptacao = new DocumentoReadaptacao();
         documentoReadaptacao.setReadaptacao(readaptacaoRepository.findById(id));
         documentoReadaptacao.setInciso(inciso);
         String idCastor = super.setCastorFile(file, "Readaptacao");
         documentoReadaptacao.setIdCastorFile(idCastor);
         documentoReadaptacao.setStatus(DocumentoReadaptacao.Status.Informado.getValor());
+        documentoReadaptacao.setDescricao(descricao);
+        documentoReadaptacao.setIdCargo(User.getUser(readaptacaoRepository.getRequest()).getCargo().getValor());
+        documentoReadaptacao.setCpfUsuario(User.getUser(readaptacaoRepository.getRequest()).getCpf());
+        documentoReadaptacao.setIpUsuario(InetAddress.getLocalHost().getHostAddress());
+        documentoReadaptacao.setDataUpload(new Date());
         documentoReadaptacaoRepository.save(documentoReadaptacao);
         return ResponseEntity.ok().body(idCastor);
     }
@@ -131,11 +140,11 @@ public class ConcessaoReadaptacaoController extends DefaultController<DocumentoR
         list.add(new Inciso("Outros", "Outros",
                 "Outros", "", "Não"));
 
-        for (int i = 0; i < list.size(); i++){
-            Integer existeArquivo = documentoReadaptacaoRepository.findAllInciso("documentoReadaptacao","idReadaptacao",id, list.get(i).getInciso());
-            if (existeArquivo > 0){
+        for (int i = 0; i < list.size(); i++) {
+            Integer existeArquivo = documentoReadaptacaoRepository.findAllInciso("documentoReadaptacao", "idReadaptacao", id, list.get(i).getInciso());
+            if (existeArquivo > 0) {
                 list.get(i).setStatus("Informado");
-            }else{
+            } else {
                 list.get(i).setStatus("Não informado");
             }
         }
@@ -159,22 +168,20 @@ public class ConcessaoReadaptacaoController extends DefaultController<DocumentoR
 
     @CrossOrigin
     @PostMapping("/enviarGestor/{id}")
-    public ResponseEntity<?> enviarGestorAssinar(@PathVariable BigInteger id,@RequestParam(value = "Ug", required = false) String ug) {
-        AdmEnvio admEnvio = preencherEnvio(id,ug);
+    public ResponseEntity<?> enviarGestorAssinar(@PathVariable BigInteger id, @RequestParam(value = "Ug", required = false) String ug) {
+        AdmEnvio admEnvio = preencherEnvio(id, ug);
         admEnvioRepository.save(admEnvio);
         return ResponseEntity.ok().body("Ok");
     }
-    private AdmEnvio preencherEnvio(BigInteger id) {
-        return preencherEnvio(id,null);
-    }
-    private AdmEnvio preencherEnvio(BigInteger id,String ug) {
+
+    private AdmEnvio preencherEnvio(BigInteger id, String ug) {
         Readaptacao readaptacao = readaptacaoRepository.findById(id);
         AdmEnvio admEnvio = new AdmEnvio();
         admEnvio.setTipoRegistro(AdmEnvio.TipoRegistro.READAPTACAO.getValor());
         admEnvio.setUnidadeGestora(readaptacao.getChave().getIdUnidadeGestora());
         admEnvio.setStatus(AdmEnvio.Status.AGUARDANDOASSINATURA.getValor());
-        if(ug != null && !ug.equals("")){
-          admEnvio.setOrgaoOrigem(ug);
+        if (ug != null && !ug.equals("")) {
+            admEnvio.setOrgaoOrigem(ug);
         }
         admEnvio.setIdMovimentacao(id);
         admEnvio.setComplemento("Conforme PORTARIA: " + readaptacao.getAto().getNumeroAto() + " De: " + readaptacao.getAto().getDataPublicacao());

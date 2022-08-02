@@ -3,11 +3,13 @@ package com.example.sicapweb.web.controller.ap.concessao;
 import br.gov.to.tce.model.adm.AdmEnvio;
 import br.gov.to.tce.model.ap.concessoes.DocumentoReconducao;
 import br.gov.to.tce.model.ap.pessoal.Reconducao;
+import br.gov.to.tce.util.Date;
 import com.example.sicapweb.model.Inciso;
 import com.example.sicapweb.model.dto.ReconducaoDTO;
 import com.example.sicapweb.repository.concessao.AdmEnvioRepository;
 import com.example.sicapweb.repository.concessao.DocumentoReconducaoRepository;
 import com.example.sicapweb.repository.concessao.ReconducaoRepository;
+import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
 import com.example.sicapweb.web.controller.DefaultController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigInteger;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -76,13 +80,18 @@ public class ConcessaoReconducaoController extends DefaultController<DocumentoRe
     @CrossOrigin
     @Transactional
     @PostMapping("/upload/{inciso}/{id}")
-    public ResponseEntity<?> addFile(@RequestParam("file") MultipartFile file, @PathVariable String inciso, @PathVariable BigInteger id) {
+    public ResponseEntity<?> addFile(@RequestParam("file") MultipartFile file, @PathVariable String inciso, @PathVariable BigInteger id, @RequestParam(value = "descricao", required = false) String descricao) throws UnknownHostException {
         DocumentoReconducao documentoReconducao = new DocumentoReconducao();
         documentoReconducao.setReconducao(reconducaoRepository.findById(id));
         documentoReconducao.setInciso(inciso);
         String idCastor = super.setCastorFile(file, "Reconducao");
         documentoReconducao.setIdCastorFile(idCastor);
         documentoReconducao.setStatus(DocumentoReconducao.Status.Informado.getValor());
+        documentoReconducao.setDescricao(descricao);
+        documentoReconducao.setIdCargo(User.getUser(reconducaoRepository.getRequest()).getCargo().getValor());
+        documentoReconducao.setCpfUsuario(User.getUser(reconducaoRepository.getRequest()).getCpf());
+        documentoReconducao.setIpUsuario(InetAddress.getLocalHost().getHostAddress());
+        documentoReconducao.setDataUpload(new Date());
         documentoReconducaoRepository.save(documentoReconducao);
         return ResponseEntity.ok().body(idCastor);
     }
@@ -161,22 +170,19 @@ public class ConcessaoReconducaoController extends DefaultController<DocumentoRe
 
     @CrossOrigin
     @PostMapping("/enviarGestor/{id}")
-    public ResponseEntity<?> enviarGestorAssinar(@PathVariable BigInteger id,@RequestParam(value = "Ug", required = false) String ug) {
-        AdmEnvio admEnvio = preencherEnvio(id,ug);
+    public ResponseEntity<?> enviarGestorAssinar(@PathVariable BigInteger id, @RequestParam(value = "Ug", required = false) String ug) {
+        AdmEnvio admEnvio = preencherEnvio(id, ug);
         admEnvioRepository.save(admEnvio);
         return ResponseEntity.ok().body("Ok");
     }
 
-    private AdmEnvio preencherEnvio(BigInteger id) {
-        return preencherEnvio(id,null);
-    }
-    private AdmEnvio preencherEnvio(BigInteger id,String ug) {
+    private AdmEnvio preencherEnvio(BigInteger id, String ug) {
         Reconducao reconducao = reconducaoRepository.findById(id);
         AdmEnvio admEnvio = new AdmEnvio();
         admEnvio.setTipoRegistro(AdmEnvio.TipoRegistro.RECONDUCAO.getValor());
         admEnvio.setUnidadeGestora(reconducao.getChave().getIdUnidadeGestora());
-        admEnvio.setStatus(AdmEnvio.Status.AGUARDANDOASSINATURA.getValor());   
-        if(ug != null && !ug.equals("")){
+        admEnvio.setStatus(AdmEnvio.Status.AGUARDANDOASSINATURA.getValor());
+        if (ug != null && !ug.equals("")) {
             admEnvio.setOrgaoOrigem(ug);
         }
         admEnvio.setIdMovimentacao(id);

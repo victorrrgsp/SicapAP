@@ -3,11 +3,13 @@ package com.example.sicapweb.web.controller.ap.concessao;
 import br.gov.to.tce.model.adm.AdmEnvio;
 import br.gov.to.tce.model.ap.concessoes.DocumentoAposentadoria;
 import br.gov.to.tce.model.ap.pessoal.Aposentadoria;
+import br.gov.to.tce.util.Date;
 import com.example.sicapweb.model.Inciso;
 import com.example.sicapweb.model.dto.AposentadoriaDTO;
 import com.example.sicapweb.repository.concessao.AdmEnvioRepository;
 import com.example.sicapweb.repository.concessao.AposentadoriaRepository;
 import com.example.sicapweb.repository.concessao.DocumentoAposentadoriaRepository;
+import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
 import com.example.sicapweb.web.controller.DefaultController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigInteger;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -76,7 +80,7 @@ public class ConcessaoReversaoAposentadoriaReservaController extends DefaultCont
     @CrossOrigin
     @Transactional
     @PostMapping("/upload/{inciso}/{id}")
-    public ResponseEntity<?> addFile(@RequestParam("file") MultipartFile file, @PathVariable String inciso, @PathVariable BigInteger id) {
+    public ResponseEntity<?> addFile(@RequestParam("file") MultipartFile file, @PathVariable String inciso, @PathVariable BigInteger id, @RequestParam(value = "descricao", required = false) String descricao) throws UnknownHostException {
         DocumentoAposentadoria documentoAposentadoria = new DocumentoAposentadoria();
         documentoAposentadoria.setAposentadoria(aposentadoriaRepository.findById(id));
         documentoAposentadoria.setInciso(inciso);
@@ -84,6 +88,11 @@ public class ConcessaoReversaoAposentadoriaReservaController extends DefaultCont
         documentoAposentadoria.setIdCastorFile(idCastor);
         documentoAposentadoria.setStatus(DocumentoAposentadoria.Status.Informado.getValor());
         documentoAposentadoria.setReversao("S");
+        documentoAposentadoria.setDescricao(descricao);
+        documentoAposentadoria.setIdCargo(User.getUser(aposentadoriaRepository.getRequest()).getCargo().getValor());
+        documentoAposentadoria.setCpfUsuario(User.getUser(aposentadoriaRepository.getRequest()).getCpf());
+        documentoAposentadoria.setIpUsuario(InetAddress.getLocalHost().getHostAddress());
+        documentoAposentadoria.setDataUpload(new Date());
         documentoAposentadoriaRepository.save(documentoAposentadoria);
         return ResponseEntity.ok().body(idCastor);
     }

@@ -1,17 +1,18 @@
 package com.example.sicapweb.repository;
 
+import br.gov.to.tce.application.ApplicationException;
 import br.gov.to.tce.model.DefaultEntity;
 import br.gov.to.tce.model.InfoRemessa;
+import br.gov.to.tce.util.ResultMapList;
+import br.gov.to.tce.util.Util;
 import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
+import org.eclipse.persistence.exceptions.DatabaseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
-import javax.persistence.TypedQuery;
+import javax.persistence.*;
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
@@ -169,5 +170,47 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
         List<InfoRemessa> list = getEntityManager().createNativeQuery("select * from infoRemessa " +
                 "where remessa = 1 and exercicio = 2021 and idUnidadeGestora = '" + User.getUser(request).getUnidadeGestora().getId() + "'", InfoRemessa.class).getResultList();
         return list.get(0);
+    }
+
+    public Object buscarResultadoUnico(Query query) throws ApplicationException {
+        try{
+            query.setMaxResults(1);
+            return findSingleResult(query);
+        } catch (IllegalStateException | DatabaseException | IllegalArgumentException | PersistenceException | ApplicationException e) {
+            if(e.getClass() == ApplicationException.class)
+                return null;
+
+            throw new ApplicationException(Util.removeEnters(e.getMessage()));
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public Object findSingleResult(Query query) throws ApplicationException {
+        try {
+
+            return query.getSingleResult();
+        } catch (IllegalStateException | DatabaseException | IllegalArgumentException | PersistenceException  e) {
+            throw new ApplicationException(Util.removeEnters(e.getMessage()));
+        }
+    }
+
+    public List<Object> buscarSQL(Query query, String colunas) throws ApplicationException {
+        try{
+            List<Object> lista = findSQL(query);
+            ResultMapList result = null;
+            if (!lista.isEmpty())
+                result = new ResultMapList(colunas, lista);
+            return result;
+        } catch (IllegalStateException | DatabaseException | IllegalArgumentException | PersistenceException  e) {
+            throw new ApplicationException(Util.removeEnters(e.getMessage()));
+        }
+    }
+
+    public List<Object> findSQL(Query query) throws ApplicationException {
+        try {
+            return query.getResultList();
+        } catch (IllegalStateException | DatabaseException | IllegalArgumentException | PersistenceException e) {
+            throw new ApplicationException(Util.removeEnters(e.getMessage()));
+        }
     }
 }

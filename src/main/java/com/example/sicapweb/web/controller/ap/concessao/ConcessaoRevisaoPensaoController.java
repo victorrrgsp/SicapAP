@@ -3,11 +3,13 @@ package com.example.sicapweb.web.controller.ap.concessao;
 import br.gov.to.tce.model.adm.AdmEnvio;
 import br.gov.to.tce.model.ap.concessoes.DocumentoPensao;
 import br.gov.to.tce.model.ap.pessoal.Pensao;
+import br.gov.to.tce.util.Date;
 import com.example.sicapweb.model.Inciso;
 import com.example.sicapweb.model.dto.PensaoDTO;
 import com.example.sicapweb.repository.concessao.AdmEnvioRepository;
 import com.example.sicapweb.repository.concessao.DocumentoPensaoRepository;
 import com.example.sicapweb.repository.concessao.PensaoRepository;
+import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
 import com.example.sicapweb.web.controller.DefaultController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigInteger;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,7 +41,7 @@ public class ConcessaoRevisaoPensaoController extends DefaultController<Document
 
     HashMap<String, Object> pensao = new HashMap<String, Object>();
 
-    public class PensaoDocumento{
+    public class PensaoDocumento {
         private Pensao pensao;
 
         private String situacao;
@@ -60,9 +64,9 @@ public class ConcessaoRevisaoPensaoController extends DefaultController<Document
     }
 
     @CrossOrigin
-    @GetMapping(path="/{searchParams}/{tipoParams}/pagination")
+    @GetMapping(path = "/{searchParams}/{tipoParams}/pagination")
     public ResponseEntity<PaginacaoUtil<PensaoDTO>> listRevisaoPensao(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
-        PaginacaoUtil<PensaoDTO> paginacaoUtil = pensaoRepository.buscaPaginadaPensaoRevisao(pageable,searchParams,tipoParams);
+        PaginacaoUtil<PensaoDTO> paginacaoUtil = pensaoRepository.buscaPaginadaPensaoRevisao(pageable, searchParams, tipoParams);
         return ResponseEntity.ok().body(paginacaoUtil);
     }
 
@@ -76,7 +80,7 @@ public class ConcessaoRevisaoPensaoController extends DefaultController<Document
     @CrossOrigin
     @Transactional
     @PostMapping("/upload/{inciso}/{id}")
-    public ResponseEntity<?> addFile(@RequestParam("file") MultipartFile file, @PathVariable String inciso, @PathVariable BigInteger id) {
+    public ResponseEntity<?> addFile(@RequestParam("file") MultipartFile file, @PathVariable String inciso, @PathVariable BigInteger id, @RequestParam(value = "descricao", required = false) String descricao) throws UnknownHostException {
         DocumentoPensao documentoPensao = new DocumentoPensao();
         documentoPensao.setPensao(pensaoRepository.findById(id));
         documentoPensao.setInciso(inciso);
@@ -84,6 +88,11 @@ public class ConcessaoRevisaoPensaoController extends DefaultController<Document
         documentoPensao.setIdCastorFile(idCastor);
         documentoPensao.setStatus(DocumentoPensao.Status.Informado.getValor());
         documentoPensao.setRevisao("S");
+        documentoPensao.setDescricao(descricao);
+        documentoPensao.setIdCargo(User.getUser(pensaoRepository.getRequest()).getCargo().getValor());
+        documentoPensao.setCpfUsuario(User.getUser(pensaoRepository.getRequest()).getCpf());
+        documentoPensao.setIpUsuario(InetAddress.getLocalHost().getHostAddress());
+        documentoPensao.setDataUpload(new Date());
         documentoPensaoRepository.save(documentoPensao);
         return ResponseEntity.ok().body(idCastor);
     }
@@ -93,15 +102,15 @@ public class ConcessaoRevisaoPensaoController extends DefaultController<Document
     public ResponseEntity<?> findAllDocumentos() {
         List<Pensao> list = pensaoRepository.buscarPensaoRevisao();
         PensaoDocumento situacao = new PensaoDocumento();
-        for(Integer i= 0; i < list.size(); i++){
-            Integer quantidadeDocumentos = documentoPensaoRepository.findSituacao("documentoPensao","idPensao", list.get(i).getId(), "'I', 'II', 'III', 'IV', 'V', 'VI'");
-            if(quantidadeDocumentos == 0) {
+        for (Integer i = 0; i < list.size(); i++) {
+            Integer quantidadeDocumentos = documentoPensaoRepository.findSituacao("documentoPensao", "idPensao", list.get(i).getId(), "'I', 'II', 'III', 'IV', 'V', 'VI'");
+            if (quantidadeDocumentos == 0) {
                 situacao.setPensao(list.get(i));
                 situacao.setSituacao("Pendente");
-            } else if(quantidadeDocumentos == 6){
+            } else if (quantidadeDocumentos == 6) {
                 situacao.setPensao(list.get(i));
                 situacao.setSituacao("Concluído");
-            } else{
+            } else {
                 situacao.setPensao(list.get(i));
                 situacao.setSituacao("Aguardando verificação");
             }
@@ -115,7 +124,7 @@ public class ConcessaoRevisaoPensaoController extends DefaultController<Document
     @CrossOrigin
     @GetMapping(path = {"getSituacao/{id}"})
     public ResponseEntity<?> findSituacao(@PathVariable BigInteger id) {
-        Integer situacao = documentoPensaoRepository.findSituacao("documentoPensao","idPensao",id, "'I', 'II', 'III', 'IV', 'V', 'VI'");
+        Integer situacao = documentoPensaoRepository.findSituacao("documentoPensao", "idPensao", id, "'I', 'II', 'III', 'IV', 'V', 'VI'");
         return ResponseEntity.ok().body(situacao);
     }
 
@@ -138,11 +147,11 @@ public class ConcessaoRevisaoPensaoController extends DefaultController<Document
         list.add(new Inciso("Outros", "Outros",
                 "Outros", "", "Não"));
 
-        for (int i = 0; i < list.size(); i++){
-            Integer existeArquivo = documentoPensaoRepository.findAllInciso("documentoPensao","idPensao",id, list.get(i).getInciso());
-            if (existeArquivo > 0){
+        for (int i = 0; i < list.size(); i++) {
+            Integer existeArquivo = documentoPensaoRepository.findAllInciso("documentoPensao", "idPensao", id, list.get(i).getInciso());
+            if (existeArquivo > 0) {
                 list.get(i).setStatus("Informado");
-            }else{
+            } else {
                 list.get(i).setStatus("Não informado");
             }
         }
