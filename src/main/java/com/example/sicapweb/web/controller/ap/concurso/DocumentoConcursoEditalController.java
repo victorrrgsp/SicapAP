@@ -2,13 +2,16 @@ package com.example.sicapweb.web.controller.ap.concurso;
 
 
 import br.gov.to.tce.model.ap.concurso.ConcursoEnvio;
+import br.gov.to.tce.model.ap.concurso.documento.DocumentoAdmissao;
 import br.gov.to.tce.model.ap.concurso.documento.DocumentoEdital;
 import br.gov.to.tce.model.ap.concurso.Edital;
+import com.example.sicapweb.exception.InvalitInsert;
 import com.example.sicapweb.model.EditalConcurso;
 import com.example.sicapweb.model.Inciso;
 import com.example.sicapweb.repository.concurso.ConcursoEnvioRepository;
 import com.example.sicapweb.repository.concurso.DocumentoEditalRepository;
 import com.example.sicapweb.repository.concurso.EditalRepository;
+import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
 import com.example.sicapweb.web.controller.DefaultController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +19,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -92,8 +97,13 @@ public class DocumentoConcursoEditalController extends DefaultController<Documen
         documentoEdital.setEdital(editalRepository.findById(id));
         documentoEdital.setInciso(inciso);
         String idCastor = super.setCastorFile(file, "Edital");
+        if (idCastor == null) throw  new InvalitInsert("não conseguiu gravar o file castor. Entre em contato com o TCE!!");
         documentoEdital.setIdCastorFile(idCastor);
         documentoEdital.setStatus(DocumentoEdital.Status.Informado.getValor());
+        documentoEdital.setData_cr(LocalDateTime.now());
+        ServletRequestAttributes getIp = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+        documentoEdital.setIp_cr(getIp.getRequest().getRemoteAddr());
+        documentoEdital.setUsuario_cr(User.getUser(documentoEditalRepository.getRequest()).getUserName());
         documentoEditalRepository.save(documentoEdital);
         return ResponseEntity.ok().body(idCastor);
     }
@@ -153,6 +163,8 @@ public class DocumentoConcursoEditalController extends DefaultController<Documen
     @Transactional
     @PostMapping(path = {"/envio"})
     public ResponseEntity<ConcursoEnvio>Enviar(@RequestBody ConcursoEnvio concursoEnvio){
+        Integer situacao = documentoEditalRepository.findSituacaobyIdEdital(concursoEnvio.getEdital().getId(), "'I','II','III','IV','V','VI','VII','VIII','IX','IX.I','X'");
+        if (situacao < 11) throw  new InvalitInsert("Anexe todos os documentos obrigatorios!!");
         concursoEnvio.setFase(ConcursoEnvio.Fase.Edital.getValor());
         concursoEnvio.setStatus(ConcursoEnvio.Status.Enviado.getValor());
         concursoEnvioRepository.save(concursoEnvio);
@@ -167,6 +179,21 @@ public class DocumentoConcursoEditalController extends DefaultController<Documen
         return ResponseEntity.ok().body(list);
     }
 
+    @CrossOrigin
+    @Transactional
+    @PutMapping("/anexos/excluir/{id}" )
+    public ResponseEntity<?> ExcluirDocumento( @PathVariable BigInteger id) {
+        DocumentoEdital documentoEdital = documentoEditalRepository.findById(id);
+        if (documentoEdital != null ){
+            documentoEdital.setStatus(DocumentoEdital.Status.NaoInformado.getValor());
+            ServletRequestAttributes getIp = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+            documentoEdital.setIp_altr(getIp.getRequest().getRemoteAddr());
+            documentoEdital.setUsuario_altr(User.getUser(documentoEditalRepository.getRequest()).getUserName());
+            documentoEdital.setData_altr(LocalDateTime.now());
+            documentoEditalRepository.update(documentoEdital);
+        }
+        return ResponseEntity.noContent().build();
+    }
 
     @CrossOrigin
     @Transactional

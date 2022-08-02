@@ -129,4 +129,11 @@ public class ProcessoAdmissaoRepository  extends DefaultRepository<ProcessoAdmis
         return (Integer) query.getSingleResult();
     }
 
+    public ProcessoAdmissao GetEmAbertoByEdital(BigInteger idedital){
+        Query query = getEntityManager().createNativeQuery("select top 1 a.* from ProcessoAdmissao a " +
+                "where a.processo is null and   a.cnpjEmpresaOrganizadora = '"+ User.getUser(super.request).getUnidadeGestora().getId()+ "'and a.idEdital ="+idedital,ProcessoAdmissao.class);
+        return  (ProcessoAdmissao) query.getSingleResult();
+
+    }
+
 }

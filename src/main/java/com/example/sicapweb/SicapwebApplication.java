@@ -22,7 +22,7 @@ public class SicapwebApplication {
 
     @PostConstruct
     public void init() {
-        TimeZone.setDefault(TimeZone.getTimeZone("America/Brasilia"));
+        TimeZone.setDefault(TimeZone.getTimeZone("America/Araguaina"));
     }
 
     public static void main(String[] args) {

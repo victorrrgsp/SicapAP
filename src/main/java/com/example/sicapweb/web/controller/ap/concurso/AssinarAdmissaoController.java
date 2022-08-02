@@ -45,6 +45,7 @@ public class AssinarAdmissaoController {
     @Autowired
     private AdmissaoEnvioAssinaturaRepository admissaoEnvioAssinaturaRepository;
 
+    @Autowired
     private DocumentoAdmissaoRepository documentoAdmissaoRepository;
 
 
@@ -220,8 +221,8 @@ public class AssinarAdmissaoController {
                                 //sera necessario gerar a chave atravez do metodo id_Document 'exec cadun.dbo.obterCodigoNovaPessoa'
                                 String  StringResponseCadunsalvasimples = admissaoEnvioAssinaturaRepository.insertCadunPessoaInterressada(cpfAprovado,nomeAprovado);
                                 JsonNode JsonesponseCadunsalvasimples = new ObjectMapper().readTree(StringResponseCadunsalvasimples);
-                                Integer codigopessoa =  requestJson.get("id").asInt();
-                                String mensagemPessao = requestJson.get("msg").asText();
+                                Integer codigopessoa =  JsonesponseCadunsalvasimples.get("id").asInt();
+                                String mensagemPessao = JsonesponseCadunsalvasimples.get("msg").asText();
                                 if (codigopessoa.equals(0)) throw new InvalitInsert("erro:"+mensagemPessao+", cpf: "+cpfAprovado+" nome: "+nomeAprovado);
                                 if (codigopessoa ==null) throw new InvalitInsert("Não gerou codigo de pessoa fisica do interessado "+nomeAprovado+" no cadun!");
                                 if ( contador ==1){
@@ -269,8 +270,11 @@ public class AssinarAdmissaoController {
                                 String cpfAprovado = aprov.getCpf();
                                 String nomeAprovado = aprov.getNome();
                                 //sera necessario gerar a chave atravez do metodo id_Document 'exec cadun.dbo.obterCodigoNovaPessoa'
-                                //Integer codigopessoa = admissaoEnvioAssinaturaRepository.insertCadunPessoaInterressada(cpfAprovado,nomeAprovado, novo.getIp(),userlogado.getUserName() );
-                                Integer codigopessoa = 1;
+                                String  StringResponseCadunsalvasimples = admissaoEnvioAssinaturaRepository.insertCadunPessoaInterressada(cpfAprovado,nomeAprovado);
+                                JsonNode JsonesponseCadunsalvasimples = new ObjectMapper().readTree(StringResponseCadunsalvasimples);
+                                Integer codigopessoa =  JsonesponseCadunsalvasimples.get("id").asInt();
+                                String mensagemPessao = JsonesponseCadunsalvasimples.get("msg").asText();
+                                if (codigopessoa.equals(0)) throw new InvalitInsert("erro:"+mensagemPessao+", cpf: "+cpfAprovado+" nome: "+nomeAprovado);
                                 if (codigopessoa ==null) throw new InvalitInsert("Não gerou codigo de pessoa fisica do interessado "+nomeAprovado+" no cadun!");
                                 nomeAprovado = aprov.getNome()+"-"+Descricao;
                                 if ( contador ==1){
@@ -304,7 +308,7 @@ public class AssinarAdmissaoController {
 
                 }
             }
-            //throw new SQLException("Test erro handling");
+            throw new Exception("Test erro handling");
         } else {
             System.out.println("erro:não encontrou usuario logado!!");
         }

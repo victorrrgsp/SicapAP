@@ -3,13 +3,16 @@ package com.example.sicapweb.web.controller.ap.concurso;
 
 import br.gov.to.tce.model.ap.concurso.ConcursoEnvio;
 import br.gov.to.tce.model.ap.concurso.EditalHomologacao;
+import br.gov.to.tce.model.ap.concurso.documento.DocumentoEdital;
 import br.gov.to.tce.model.ap.concurso.documento.DocumentoEditalHomologacao;
+import com.example.sicapweb.exception.InvalitInsert;
 import com.example.sicapweb.model.EditalConcurso;
 import com.example.sicapweb.model.EditalHomologaConcurso;
 import com.example.sicapweb.model.Inciso;
 import com.example.sicapweb.repository.concurso.ConcursoEnvioRepository;
 import com.example.sicapweb.repository.concurso.DocumentoEditalHomologacaoRepository;
 import com.example.sicapweb.repository.concurso.EditalHomologacaoRepository;
+import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
 import com.example.sicapweb.web.controller.DefaultController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,11 +20,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.math.BigInteger;
 import java.net.URI;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -97,6 +103,10 @@ public class DocumentoConcursoHomologacaoController extends DefaultController<Ed
         String idCastor = super.setCastorFile(file, "EditalHomologacao");
         documentoEditalHomologacao.setIdCastorFile(idCastor);
         documentoEditalHomologacao.setStatus(DocumentoEditalHomologacao.Status.Informado.getValor());
+        documentoEditalHomologacao.setData_cr(LocalDateTime.now());
+        ServletRequestAttributes getIp = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+        documentoEditalHomologacao.setIp_cr(getIp.getRequest().getRemoteAddr());
+        documentoEditalHomologacao.setUsuario_cr(User.getUser(editalHomologacaoRepository.getRequest()).getUserName());
         documentoEditalHomologacaoRepository.save(documentoEditalHomologacao);
         return ResponseEntity.ok().body(idCastor);
     }
@@ -139,10 +149,30 @@ public class DocumentoConcursoHomologacaoController extends DefaultController<Ed
         return ResponseEntity.ok().body(list);
     }
 
+
+    @CrossOrigin
+    @Transactional
+    @PutMapping("/anexos/excluir/{id}" )
+    public ResponseEntity<?> ExcluirDocumento( @PathVariable BigInteger id) {
+        DocumentoEditalHomologacao documentoEditalHomologacao = documentoEditalHomologacaoRepository.findById(id);
+        if (documentoEditalHomologacao != null ){
+            documentoEditalHomologacao.setStatus(DocumentoEditalHomologacao.Status.NaoInformado.getValor());
+            ServletRequestAttributes getIp = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+            documentoEditalHomologacao.setIp_altr(getIp.getRequest().getRemoteAddr());
+            documentoEditalHomologacao.setUsuario_altr(User.getUser(documentoEditalHomologacaoRepository.getRequest()).getUserName());
+            documentoEditalHomologacao.setData_altr(LocalDateTime.now());
+            documentoEditalHomologacaoRepository.update(documentoEditalHomologacao);
+        }
+        return ResponseEntity.noContent().build();
+    }
+
     @CrossOrigin
     @Transactional
     @PostMapping(path = {"/envio"})
     public ResponseEntity<ConcursoEnvio>Enviar(@RequestBody ConcursoEnvio concursoEnvio){
+        Integer situacao=0;
+         situacao = documentoEditalHomologacaoRepository.findSituacaobyIdEdital(concursoEnvio.getEdital().getId(), "'XII','XIII','XIV','XV'");
+         if (situacao < 4) throw  new InvalitInsert("Anexe todos os documentos obrigatorios!!");
         concursoEnvio.setFase(ConcursoEnvio.Fase.Homologacao.getValor());
         concursoEnvio.setStatus(ConcursoEnvio.Status.Enviado.getValor());
         ConcursoEnvio envioPai =  concursoEnvioRepository.buscarEnvioFAse1PorEditalassinado(concursoEnvio.getEdital().getId());
@@ -151,6 +181,8 @@ public class DocumentoConcursoHomologacaoController extends DefaultController<Ed
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(concursoEnvio.getId()).toUri();
         return ResponseEntity.created(uri).body(concursoEnvio);
     }
+
+
 
     @CrossOrigin
     @Transactional

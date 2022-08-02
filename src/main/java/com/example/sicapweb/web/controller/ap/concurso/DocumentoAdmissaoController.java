@@ -2,6 +2,7 @@ package com.example.sicapweb.web.controller.ap.concurso;
 
 
 import br.gov.to.tce.model.ap.concurso.documento.DocumentoAdmissao;
+import com.example.sicapweb.exception.InvalitInsert;
 import com.example.sicapweb.repository.concurso.DocumentoAdmissaoRepository;
 import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
@@ -11,11 +12,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.math.BigInteger;
 import java.net.URI;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -83,10 +87,13 @@ public class DocumentoAdmissaoController extends DefaultController<DocumentoAdmi
         String idCastor=null;
         if (documentoAdmissao != null ){
              idCastor = super.setCastorFile(file, "documentoAdmissao");
+             if (idCastor == null) throw  new InvalitInsert("não conseguiu gravar o file castor. Entre em contato com o TCE!!");
             documentoAdmissao.setDocumentoCastorId(idCastor);
             documentoAdmissao.setStatus(DocumentoAdmissao.Status.Informado.getValor());
-            documentoAdmissao.setDataAnexouDocumento(new Date());
-            documentoAdmissao.setUsuarioAnexouDocumento(User.getUser(documentoAdmissaoRepository.getRequest()).getUnidadeGestora().getId());
+            documentoAdmissao.setData_cr(LocalDateTime.now());
+            ServletRequestAttributes getIp = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+            documentoAdmissao.setIp_cr(getIp.getRequest().getRemoteAddr());
+            documentoAdmissao.setUsuario_cr(User.getUser(documentoAdmissaoRepository.getRequest()).getUserName());
             documentoAdmissaoRepository.update(documentoAdmissao);
         }
         return ResponseEntity.ok().body(idCastor);
@@ -95,17 +102,17 @@ public class DocumentoAdmissaoController extends DefaultController<DocumentoAdmi
     @CrossOrigin
     @Transactional
     @PutMapping("/upload/excluir/{id}" )
-    public ResponseEntity<?> uploadDocumentoAdmissao( @PathVariable BigInteger id) {
+    public ResponseEntity<?> ExcluirDocumentoAdmissao( @PathVariable BigInteger id) {
         DocumentoAdmissao documentoAdmissao = documentoAdmissaoRepository.findById(id);
-        String idCastor=null;
         if (documentoAdmissao != null ){
-            documentoAdmissao.setDocumentoCastorId(idCastor);
             documentoAdmissao.setStatus(DocumentoAdmissao.Status.NaoInformado.getValor());
-            documentoAdmissao.setDataAnexouDocumento(null);
-            documentoAdmissao.setUsuarioAnexouDocumento(null);
+            ServletRequestAttributes getIp = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+            documentoAdmissao.setIp_altr(getIp.getRequest().getRemoteAddr());
+            documentoAdmissao.setUsuario_altr(User.getUser(documentoAdmissaoRepository.getRequest()).getUserName());
+            documentoAdmissao.setData_altr(LocalDateTime.now());
             documentoAdmissaoRepository.update(documentoAdmissao);
         }
-        return ResponseEntity.ok().body(null);
+        return ResponseEntity.noContent().build();
     }
 
     @CrossOrigin

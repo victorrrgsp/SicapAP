@@ -1,6 +1,7 @@
 package com.example.sicapweb.web.controller.ap.concurso;
 
 import br.gov.to.tce.model.ap.concurso.ProcessoAdmissao;
+import com.example.sicapweb.exception.InvalitInsert;
 import com.example.sicapweb.model.EditalFinalizado;
 import com.example.sicapweb.model.NomeacaoConcurso;
 import com.example.sicapweb.model.AdmissaoEnvioAssRetorno;
@@ -90,6 +91,8 @@ public class EditalAdmissaoController {
     public ResponseEntity<ProcessoAdmissao> create(@RequestBody ProcessoAdmissao processoAdmissao) {
 
         processoAdmissao.setCnpjEmpresaOrganizadora(User.getUser(processoAdmissaoRepository.getRequest()).getUnidadeGestora().getId());
+        ProcessoAdmissao pa = processoAdmissaoRepository.GetEmAbertoByEdital(processoAdmissao.getEdital().getId());
+        if (pa != null) throw  new InvalitInsert("Existe um processo em aberto para esse edital!");
         processoAdmissaoRepository.save(processoAdmissao);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(processoAdmissao.getClass()).toUri();
         return ResponseEntity.created(uri).body(processoAdmissao);

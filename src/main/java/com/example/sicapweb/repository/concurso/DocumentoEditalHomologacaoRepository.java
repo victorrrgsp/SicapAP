@@ -17,14 +17,14 @@ public class DocumentoEditalHomologacaoRepository extends DefaultRepository<Docu
 
     public List<DocumentoEditalHomologacao> buscarDocumentoEditalHomologacao(String coluna, BigInteger idEditalHomologacao) {
         return getEntityManager().createNativeQuery(
-                "select * from DocumentoEditalHomologacao where inciso = '"
+                "select * from DocumentoEditalHomologacao where status = 2 and inciso = '"
                         + coluna + "' and idEditalHomologacao = " + idEditalHomologacao, DocumentoEditalHomologacao.class)
                 .getResultList();
     }
 
     public List<DocumentoEditalHomologacao> buscarDocumentosEditalHomologacao(String coluna, BigInteger idEdital) {
         return  getEntityManager().createNativeQuery(
-                        "select * from DocumentoEditalHomologacao h join EditalHomologacao EH on H.idEditalHomologacao= EH.id   where H.inciso in ("
+                        "select * from DocumentoEditalHomologacao h join EditalHomologacao EH on H.idEditalHomologacao= EH.id   where h.status = 2 and  H.inciso in ("
                                 + coluna + ") and EH.idEdital = " + idEdital, DocumentoEditalHomologacao.class)
                 .getResultList();
     }
@@ -32,7 +32,23 @@ public class DocumentoEditalHomologacaoRepository extends DefaultRepository<Docu
     public Integer findSituacao(String entidade, String pk ,BigInteger id, String incisos) {
         return (Integer) getEntityManager().createNativeQuery("select count(*) \n" +
                 " Situacao from "+ entidade +
-                " where "+ pk +" = "+ id +" and inciso in ("+ incisos + ") " ).getSingleResult();
+                " where status = 2  and "+ pk +" = "+ id +" and inciso in ("+ incisos + ") " ).getSingleResult();
 
     }
+
+    public Integer findSituacaobyIdEdital(BigInteger id, String incisos) {
+        return (Integer) getEntityManager().createNativeQuery(
+                "select count(1) from DocumentoEditalHomologacao h " +
+                        "join EditalHomologacao EH on H.idEditalHomologacao= EH.id  " +
+                        " where h.status = 2 and   h.inciso in (" + incisos + ") and EH.idEdital = " + id).getSingleResult();
+
+    }
+
+
+    public Integer findAllInciso(String entidade, String pk, BigInteger id, String inciso) {
+        return (Integer) getEntityManager().createNativeQuery("select count(*) from " + entidade +
+                " where status = 2 and " + pk + " = " + id + " and inciso = '" + inciso + "'").getSingleResult();
+
+    }
+
 }
