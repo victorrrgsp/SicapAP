@@ -9,7 +9,7 @@
       <b-row>
         &nbsp;&nbsp;&nbsp;
         <b-col>
-          <p align="left">
+          <p align ="left">
             <b-form-group label="Unidade Gestora*	">
               <b-form-input
                 list="unidadeGestora"
@@ -60,10 +60,14 @@
           </p>
         </b-col>
       </b-row>
+      <div class="text-md text-center font-weight-bold">
 
-      <span>
-        {{ tableData.length }} - Remessas enviadas    
-      </span>
+       <strong>
+         {{ FilterSize }} - registros    
+
+       </strong>
+      
+      </div>
 
       <b-table
         striped
@@ -227,9 +231,9 @@ export default {
       perPage: 325,
       currentPage: 1,
       filter: "",
+      FilterSize: 0,
       filterform: "",
       items: [],
-
       gestor: "",
       rh: "",
       controleInterno: "",
@@ -315,7 +319,6 @@ export default {
           sortable: true,
         },
       ],
-
       formdata: {
         exercicio: 2021,
         exercicios: [
@@ -350,6 +353,7 @@ export default {
     this.findAllUnidadeGestora().then(resp => {
       this.unidades = resp;
     });
+    this.filterSize();
     //  this.ActionFind(),
     //  setTimeout(() =>{// aguarda com spinner antes da pesquisa aparecer na pesquisa inicial
     //       this.isBusy = false
@@ -362,14 +366,15 @@ export default {
     ...mapState("remessas", ["tableData"]),
   },
   methods: {
+    
     ...mapActions("remessas", ["ActionFind"]),
     ...mapActions("remessas", ["ActionFindByRemessa"]),
     ...mapActions("remessas", ["ActionFindByExercicio"]),
     ...mapActions("remessas", ["ActionFindExercicio"]),
 
     pesquisarExercicios() {
+      
       api.get("/exercicio").then((resp) => {
-        console.log("resp.data", resp.data);
         this.formdata.exercicios = resp.data.map((p) => {
           return {
             value: p,
@@ -385,7 +390,7 @@ export default {
     },
     pesquisarRemessas() {
       api.get("/remessa/" + this.formdata.exercicio).then((resp) => {
-        console.log("resp.data remessa", resp.data);
+        
         this.formdata.remessas = resp.data.map((p) => {
           return {
             value: p,
@@ -398,6 +403,7 @@ export default {
         };
         this.formdata.remessa = 0;
       });
+      this.filterSize();
     },
     iconStatusTitle(item) {
       if (item.contAssinaturas > 2) {
@@ -411,7 +417,16 @@ export default {
         return "Aguardando Envio";
       }
     },
-
+    filterSize(){
+      let sum = 0 ;
+      this.tableData.map(x => {
+        if(x.nomeEntidade.toUpperCase().includes(this.filter.trim().toUpperCase())){
+          sum ++;
+        }
+      })
+      this.FilterSize = sum;
+      return sum ;
+    },
     iconStatus(item) {
       if (item.contAssinaturas > 2) {
         return "check-square";
@@ -457,16 +472,18 @@ export default {
     },
 
     async pesquisarRemesssa() {
+      console.log(this);
       this.isBusy = !this.isBusy; //loading
       await this.ActionFindByExercicio(this.formdata).then({});
       this.isBusy = false;
-
       this.filter = this.filterform;
+      this.filterSize();
     },
     async pesquisar() {
       this.isBusy = !this.isBusy; //loading
       await this.ActionFind();
       this.isBusy = false;
+      this.filterSize();
     },
 
     mascaraCnpj(value) {
