@@ -58,9 +58,11 @@ public class LeiRepository extends DefaultRepository<Lei, BigInteger> {
         Query query = getEntityManager()
                .createNativeQuery("select DISTINCT a.* from    Lei   a " +
                        " join InfoRemessa info on info.chave = a.chave and info.idUnidadeGestora = '"
-                       + User.getUser(request).getUnidadeGestora().getId()+"'   and  numeroLei = '"+numeroLei+"'  and numeroAto =  '"+ numeroAto+"' and  tipoAto = "+tipoAto+" ",Lei.class );
-       Integer ctlei = (Integer) query.getSingleResult();
-       if (ctlei > 0) {
+                       + User.getUser(request).getUnidadeGestora().getId()+"'      " +
+                       " left join dbo.Ato b on a.idAto=b.id  " +
+                       "  where   a.numeroLei = '"+numeroLei+"'  and b.numeroAto =  '"+ numeroAto+"' and  b.tipoAto = "+tipoAto+" ",Lei.class );
+       List<Lei> llei = query.getResultList();
+       if (llei.size() > 0) {
            return true;
        }
         return false;

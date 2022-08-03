@@ -48,7 +48,7 @@ public class AtoController extends DefaultController<Ato>  {
 
     @Transactional
     @PostMapping("/create")
-    public ResponseEntity<Ato> update(@RequestBody Ato ato) {
+    public ResponseEntity<Ato> create(@RequestBody Ato ato) {
         InfoRemessa chave = atoRepository.findAll().get(0).getChave();
         ato.setNumeroAto(ato.getNumeroAto().replace("/", ""));
         ato.setCnpjUgPublicacao(ato.getCnpjUgPublicacao().replace(".", "").replace("-", "").replace("/", ""));

@@ -67,12 +67,16 @@ public class LeiController extends DefaultController<Lei> {
         try {
 
             lei.setChave(leiRepository.buscarPrimeiraRemessa());
+            if (lei.getAto() != null) {
+                lei.setNumeroAto(lei.getAto().getNumeroAto());
+                lei.setTipoAto(lei.getAto().getTipoAto());
+            }
             if (leiRepository.ExistLeiIqual(lei.getNumeroLei(),lei.getNumeroAto(),lei.getTipoAto(),lei.getVeiculoPublicacao(),lei.getDataPublicacao()) )  {
                 return ResponseEntity.status(HttpStatus.CONFLICT).body(lei);
               //  throw new InvalitInsert(" já existe registro da lei gravado");
             }
             else {
-             //   leiRepository.save(lei);
+                leiRepository.save(lei);
                 URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(lei.getId()).toUri();
                 return ResponseEntity.created(uri).body(lei);
             }

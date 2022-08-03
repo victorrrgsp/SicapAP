@@ -70,10 +70,7 @@ public class EditalController extends DefaultController<Edital> {
             if  ( Integer.valueOf(edital.getNumeroEdital().substring(edital.getNumeroEdital().length()-4)) <1990 ||  Integer.valueOf(edital.getNumeroEdital().substring(edital.getNumeroEdital().length()-4)) > (LocalDateTime.now().getYear() +5) ) {
                 throw new InvalitInsert("não é um número de Edital valido. Os ultinmos 4 digitos correspondem ao ano do edital !!");
             }
-            ConcursoEnvio envio = concursoEnvioRepository.buscarEnvioFAse1PorEditalassinado(e.getId());
-            if(envio != null){
-                if (envio.getStatus()==3) throw new InvalitInsert("Edital não pode ser assinado pois ja foi enviado processo no econtas !!");
-            }
+
             editalRepository.save(edital);
 
             URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(edital.getId()).toUri();
