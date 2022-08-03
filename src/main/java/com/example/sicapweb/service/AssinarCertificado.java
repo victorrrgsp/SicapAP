@@ -124,7 +124,6 @@ public class AssinarCertificado {
 
         try {
             String processosBase64Decoded = new String(Base64.decodeBase64(processos.getBytes()));
-            //System.out.println(processosBase64Decoded);
 
             JsonArray processosJson = new JsonParser().parse(processosBase64Decoded).getAsJsonArray();
             Iterator<JsonElement> processosJsonIterator = processosJson.iterator();
@@ -133,15 +132,12 @@ public class AssinarCertificado {
 
             while (processosJsonIterator.hasNext()) {
                 JsonElement processo = processosJsonIterator.next();
-                //System.out.println(processo);
                 Map assinatura = salvarAssinatura(processo, entrada, saida);
 
                 ////
                 int idProcesso2 = processo.getAsJsonObject().get("id").getAsInt();
                 Map resultadoGerarProcesso2 = gerarProcesso(idProcesso2);
                 procSucesso += processo.getAsJsonObject().get("nome").getAsString() + " (" + processo.getAsJsonObject().get("tipo").getAsString() + ") - " + resultadoGerarProcesso2.get("processo") + "/" + resultadoGerarProcesso2.get("ano") + ", ";
-                System.out.println(procSucesso);
-                ////
 
                 if (assinatura.get("sucess").equals(true)) {
                     arrayAssinaturas.add((Integer) assinatura.get("idAssinatura"));
@@ -156,7 +152,6 @@ public class AssinarCertificado {
 
                         return resultado;
                     }
-
                     procSucesso += processo.getAsJsonObject().get("nome");
                     System.out.println(procSucesso);
                 } else {
@@ -172,19 +167,12 @@ public class AssinarCertificado {
             resultado.put("sucess", true);
             resultado.put("msg", "Os seguintes processos foram gerados corretamente: " + procSucesso + "O acompanhamento será através do sistema eContas.");
             return resultado;
-
-
         } catch (Exception excecao) {
-
             resultado.put("sucess", false);
             resultado.put("msg", excecao.toString());
-
             return resultado;
         }
-
-
     }
-
 
     public static String inicializarAssinatura(String certificado, String original) throws IOException {
         OkHttpClient client = new OkHttpClient().newBuilder()
@@ -193,7 +181,6 @@ public class AssinarCertificado {
         MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
         RequestBody body = RequestBody.create(mediaType, "certificado=" + certificado + "&original=" + original);
 
-        // System.out.println("body: "+body.toString());
         Request request = new Request.Builder()
                 .url("https://dev2.tce.to.gov.br/assinador/app/controllers/?&c=TCE_Assinador_AssinadorWeb&m=inicializarAssinatura")
                 .method("POST", body)
@@ -201,7 +188,6 @@ public class AssinarCertificado {
                 .addHeader("Content-Type", "application/x-www-form-urlencoded")
                 .addHeader("Referer", "https://app.tce.to.gov.br/")
                 .build();
-
         Response response = client.newCall(request).execute();
         String resposta = response.body().string();
         return resposta;
@@ -219,76 +205,8 @@ public class AssinarCertificado {
                 .addHeader("Content-Type", "application/x-www-form-urlencoded")
                 .addHeader("Referer", "https://app.tce.to.gov.br/")
                 .build();
-
         Response response = client.newCall(request).execute();
         String resposta = response.body().string();
         return resposta;
     }
-
-    public static String assinarRequest(String key, String data) {
-        try {
-
-            Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
-            SecretKeySpec secret_key = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
-            sha256_HMAC.init(secret_key);
-
-            return Hex.encodeHexString(sha256_HMAC.doFinal(data.getBytes(StandardCharsets.UTF_8)));
-
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    public static String salvarSimples(String cpf, String nome, String sistema, String sso_client_id, String sso_client_secret) throws IOException {
-        Date date = new Date();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("Y-MM-dd HH:mm:ss");
-        dateFormat.setTimeZone(TimeZone.getTimeZone("America/Araguaina"));
-        String timestamp = dateFormat.format(date.getTime());
-        String servico = "/cadun/api/PessoaFisica/salvarSimples";
-        String message = sso_client_id + "GET" + servico + timestamp;
-        String hash = assinarRequest(sso_client_secret, message);
-
-        JsonObject jsonObject = new JsonObject();
-
-        try {//"cpf=" + cpf + "&nome=" + nome
-            jsonObject.addProperty("cpf", cpf);
-            jsonObject.addProperty("nome", nome);
-        } catch (JsonIOException e) {
-            e.printStackTrace();
-        }
-//        RequestBody formBody = new FormBody.Builder()
-//                .add("cpf", cpf)
-//                .add("nome",nome)
-//                .build();
-
-        OkHttpClient client = new OkHttpClient().newBuilder().addInterceptor(new HttpLoggingInterceptor()).build();
-        //MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
-
-        MediaType mediaType = MediaType.parse("application/json");
-
-        RequestBody body = RequestBody.create(mediaType, jsonObject.toString());
-
-        URL url = new URL("https://dev2.tce.to.gov.br" + servico);
-
-        Request request = new Request.Builder()
-                .url(url)
-                .method("POST", body)
-                .header("Authorization", sso_client_id + ":" + hash + "")
-                .addHeader("Accept", "application/json")
-                //.addHeader("Content-Type", "application/x-www-form-urlencoded")
-                .addHeader("Content-Type", "application/json")
-                .addHeader("Referer", "https://dev2.tce.to.gov.br/cadun/")
-                .addHeader("X-Timestamp", timestamp)
-                .build();
-
-        Response response = client.newCall(request).execute();
-        String resposta = response.body().string();
-        System.out.println(resposta);
-        return resposta;
-    }
-
 }

@@ -3,8 +3,6 @@ package com.example.sicapweb.web.controller.ap.concessao;
 import br.gov.to.tce.application.ApplicationException;
 import br.gov.to.tce.model.adm.AdmEnvio;
 import br.gov.to.tce.model.adm.AdmEnvioAssinatura;
-import br.gov.to.tce.model.ap.pessoal.Pensionista;
-import br.gov.to.tce.util.Date;
 import com.example.sicapweb.model.dto.AssuntoProcessoDTO;
 import com.example.sicapweb.repository.concessao.*;
 import com.example.sicapweb.repository.geral.UnidadeGestoraRepository;
@@ -12,14 +10,12 @@ import com.example.sicapweb.repository.movimentacaoDePessoal.PensionistaReposito
 import com.example.sicapweb.security.User;
 import com.example.sicapweb.service.AssinarCertificado;
 import com.example.sicapweb.service.ChampionRequest;
+import com.example.sicapweb.service.SHA2;
 import com.example.sicapweb.util.PaginacaoUtil;
 import com.example.sicapweb.web.controller.DefaultController;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import org.apache.catalina.valves.rewrite.InternalRewriteMap;
-import org.eclipse.persistence.dynamic.DynamicType;
-import org.hibernate.type.TrueFalseType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
@@ -34,6 +30,7 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @CrossOrigin
@@ -86,7 +83,7 @@ public class AssinarConcessaoController extends DefaultController<AdmEnvio> {
 
     @CrossOrigin
     @PostMapping(path = "/assinar")
-    public ResponseEntity<?> AssinarConcessorio(@RequestBody String hashassinante_hashAssinado) {
+    public ResponseEntity<?> AssinarConcessorio(@RequestBody String hashassinante_hashAssinado) throws Exception {
         try {
             JsonNode requestJson = new ObjectMapper().readTree(hashassinante_hashAssinado);
             String hashassinante = URLDecoder.decode(requestJson.get("hashassinante").asText(), StandardCharsets.UTF_8);
@@ -109,32 +106,37 @@ public class AssinarConcessaoController extends DefaultController<AdmEnvio> {
                         admEnvioAssinatura.setData_assinatura(new Date());
                         admEnvioAssinatura.setHash_assinante(hashassinante);
                         admEnvioAssinatura.setHash_assinado(hashassinado);
+
+                        gerarProcesso(envio.getId());
+
                         admEnvioAssinaturaRepository.save(admEnvioAssinatura);
                         envio.setStatus(4);
                         admEnvioRepository.update(envio);
-
-                        gerarProcesso(envio.getId());
-                    } else {
-                        throw new Exception("Aconteceu um erro inesperado. Entre em contato com o administrador do sistema!");
                     }
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new Exception("Aconteceu um erro inesperado. Entre em contato com o administrador do sistema!");
         }
         return ResponseEntity.ok().body(hashassinante_hashAssinado);
     }
 
-    public void gerarProcesso(BigInteger idAdmEnvio) throws ApplicationException, NoSuchAlgorithmException, IOException, URISyntaxException {
+    public void gerarProcesso(BigInteger idAdmEnvio) throws Exception {
         AdmEnvio admEnvio = admEnvioRepository.findById(idAdmEnvio);
         AssuntoProcessoDTO assunto = getAssuntoProcesso(admEnvio.getTipoRegistro());
         Map<String, Object> entidade = getUnidadeOrigemVinculada(admEnvio.getUnidadeGestora(), admEnvio.getOrgaoOrigem());
 
         Integer numprotocolo = admEnvioAssinaturaRepository.gerarProtocolo();
 
+        Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("d/M/Y HH:mm:ss");
+        dateFormat.setTimeZone(TimeZone.getTimeZone("America/Araguaina"));
+        String timestamp = dateFormat.format(date.getTime());
+
         MessageDigest md = MessageDigest.getInstance("MD5");
-        String value = "^TC3TO" + new Date() + numprotocolo + "*000003*^";
-        String hash = Arrays.toString(md.digest(value.getBytes()));
+        String value = "^TC3TO" + timestamp + numprotocolo + "*000003*^";
+        md.update(value.getBytes());
+        String hash = SHA2.stringHexa(md.digest());
         hash = hash.substring(17, 32).toUpperCase();
         String matricula = "000003"; //matricula do usuario do SICAP -- quando o sistema gera o processo
         Integer entidadeOrigem = (Integer) entidade.get("origem");
@@ -197,7 +199,7 @@ public class AssinarConcessaoController extends DefaultController<AdmEnvio> {
         if (assunto.getAssuntocodigo().equals("8") || assunto.getAssuntocodigo().equals("12")) {
             List<Object> dependentes = pensionistaRepository.getDependentesPensao(admEnvio.getAdmissao().getServidor().getCpfServidor());
             for (Object obj : dependentes) {
-                String pessoaInteressada = String.valueOf(ChampionRequest.salvarSimples(((HashMap) obj).get("cpf").toString(), ((HashMap) obj).get("nome").toString(), "SICAPAP", sso_client_id, sso_client_secret));
+                String pessoaInteressada = ChampionRequest.salvarSimples(((HashMap) obj).get("cpf").toString(), ((HashMap) obj).get("nome").toString(), "SICAPAP", sso_client_id, sso_client_secret).toString();
                 JsonNode respostaJson = new ObjectMapper().readTree(pessoaInteressada);
                 interessado.put("idpessoa", respostaJson.get("id").asText());
                 interessado.put("papel", 2);
@@ -207,7 +209,7 @@ public class AssinarConcessaoController extends DefaultController<AdmEnvio> {
             }
 
             //salva o instituidor 14
-            String pessoaInteressada = AssinarCertificado.salvarSimples(admEnvio.getAdmissao().getServidor().getCpfServidor(), admEnvio.getAdmissao().getServidor().getNome(), "SICAPAP", sso_client_id, sso_client_secret);
+            String pessoaInteressada = ChampionRequest.salvarSimples(admEnvio.getAdmissao().getServidor().getCpfServidor(), admEnvio.getAdmissao().getServidor().getNome(), "SICAPAP", sso_client_id, sso_client_secret).toString();
             JsonNode respostaJson = new ObjectMapper().readTree(pessoaInteressada);
             interessado.put("idpessoa", respostaJson.get("id").asText());
             interessado.put("papel", 14);
@@ -215,7 +217,7 @@ public class AssinarConcessaoController extends DefaultController<AdmEnvio> {
 
             admEnvioAssinaturaRepository.salvarPessoasInteressadas(interessado);
         } else {
-            String pessoaInteressada = AssinarCertificado.salvarSimples(admEnvio.getAdmissao().getServidor().getCpfServidor(), admEnvio.getAdmissao().getServidor().getNome(), "SICAPAP", sso_client_id, sso_client_secret);
+            String pessoaInteressada = ChampionRequest.salvarSimples(admEnvio.getAdmissao().getServidor().getCpfServidor(), admEnvio.getAdmissao().getServidor().getNome(), "SICAPAP", sso_client_id, sso_client_secret).toString();
             JsonNode respostaJson = new ObjectMapper().readTree(pessoaInteressada);
             interessado.put("idpessoa", respostaJson.get("id").asText());
             interessado.put("papel", 2);
@@ -314,60 +316,74 @@ public class AssinarConcessaoController extends DefaultController<AdmEnvio> {
     }
 
     public List<Object> consultarDocumentosAEnviar(AdmEnvio admEnvio) {
-        if (admEnvio != null) {
-            List<Object> documentos = new ArrayList<>();
-            switch (admEnvio.getTipoRegistro()) {
-                case 1:
-                    documentos = documentoAposentadoriaRepository.buscarDocumentos(admEnvio.getIdMovimentacao());
-                    return documentos;
-                case 2:
-                    documentos = documentoPensaoRepository.buscarDocumentos(admEnvio.getIdMovimentacao());
-                    return documentos;
-                case 3:
-                    documentos = documentoAposentadoriaRepository.buscarDocumentosReserva(admEnvio.getIdMovimentacao());
-                    return documentos;
-                case 4:
-                    documentos = documentoAposentadoriaRepository.buscarDocumentosReforma(admEnvio.getIdMovimentacao());
-                    return documentos;
-                case 5:
-                    documentos = documentoReintegracaoRepository.buscarDocumentos(admEnvio.getIdMovimentacao());
-                    return documentos;
-                case 6:
-                    documentos = documentoReconducaoRepository.buscarDocumentos(admEnvio.getIdMovimentacao());
-                    return documentos;
-                case 7:
-                    documentos = documentoReadaptacaoRepository.buscarDocumentos(admEnvio.getIdMovimentacao());
-                    return documentos;
-                case 8:
-                    documentos = documentoAproveitamentoRepository.buscarDocumentos(admEnvio.getIdMovimentacao());
-                    return documentos;
-                case 9:
-                    documentos = documentoAposentadoriaRepository.buscarDocumentosRevisao(admEnvio.getIdMovimentacao());
-                    return documentos;
-                case 10:
-                    documentos = documentoPensaoRepository.buscarDocumentosRevisao(admEnvio.getIdMovimentacao());
-                    return documentos;
-                case 11:
-                    documentos = documentoAposentadoriaRepository.buscarDocumentosRevisaoReserva(admEnvio.getIdMovimentacao());
-                    return documentos;
-                case 12:
-                    documentos = documentoAposentadoriaRepository.buscarDocumentosRevisaoReforma(admEnvio.getIdMovimentacao());
-                    return documentos;
-                case 13:
-                    documentos = documentoAposentadoriaRepository.buscarDocumentosReversao(admEnvio.getIdMovimentacao());
-                    return documentos;
+        try {
+            if (admEnvio != null) {
+                List<Object> documentos;
+                switch (admEnvio.getTipoRegistro()) {
+                    case 1:
+                        documentos = documentoAposentadoriaRepository.buscarDocumentos(admEnvio.getIdMovimentacao());
+                        return documentos;
+                    case 2:
+                        documentos = documentoPensaoRepository.buscarDocumentos(admEnvio.getIdMovimentacao());
+                        return documentos;
+                    case 3:
+                        documentos = documentoAposentadoriaRepository.buscarDocumentosReserva(admEnvio.getIdMovimentacao());
+                        return documentos;
+                    case 4:
+                        documentos = documentoAposentadoriaRepository.buscarDocumentosReforma(admEnvio.getIdMovimentacao());
+                        return documentos;
+                    case 5:
+                        documentos = documentoReintegracaoRepository.buscarDocumentos(admEnvio.getIdMovimentacao());
+                        return documentos;
+                    case 6:
+                        documentos = documentoReconducaoRepository.buscarDocumentos(admEnvio.getIdMovimentacao());
+                        return documentos;
+                    case 7:
+                        documentos = documentoReadaptacaoRepository.buscarDocumentos(admEnvio.getIdMovimentacao());
+                        return documentos;
+                    case 8:
+                        documentos = documentoAproveitamentoRepository.buscarDocumentos(admEnvio.getIdMovimentacao());
+                        return documentos;
+                    case 9:
+                        documentos = documentoAposentadoriaRepository.buscarDocumentosRevisao(admEnvio.getIdMovimentacao());
+                        return documentos;
+                    case 10:
+                        documentos = documentoPensaoRepository.buscarDocumentosRevisao(admEnvio.getIdMovimentacao());
+                        return documentos;
+                    case 11:
+                        documentos = documentoAposentadoriaRepository.buscarDocumentosRevisaoReserva(admEnvio.getIdMovimentacao());
+                        return documentos;
+                    case 12:
+                        documentos = documentoAposentadoriaRepository.buscarDocumentosRevisaoReforma(admEnvio.getIdMovimentacao());
+                        return documentos;
+                    case 13:
+                        documentos = documentoAposentadoriaRepository.buscarDocumentosReversao(admEnvio.getIdMovimentacao());
+                        return documentos;
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return null;
     }
 
     @PostMapping(path = "/gerar")
-    public void teste() throws ApplicationException, IOException, URISyntaxException {
-        ChampionRequest.salvarSimples("06562780136", "LARA FLAVIA DE ALMEIDA LIMA", "SICAPAP", sso_client_id, sso_client_secret);
+    public void teste() throws ApplicationException, IOException, URISyntaxException, NoSuchAlgorithmException {
+        Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("d/M/Y HH:mm:ss");
+        dateFormat.setTimeZone(TimeZone.getTimeZone("America/Araguaina"));
+        String timestamp = dateFormat.format(date.getTime());
+
+        MessageDigest md = MessageDigest.getInstance("MD5");
+        String value = "^TC3TO" + timestamp + 5269 + "*000003*^";
+        md.update(value.getBytes());
+        String hash = SHA2.stringHexa(md.digest());
+        hash = hash.substring(17, 32).toUpperCase();
+//        ChampionRequest.salvarSimples("06562780136", "LARA FLAVIA DE ALMEIDA LIMA", "SICAPAP", sso_client_id, sso_client_secret);
     }
 
 
-    public Map<String, Object> getUnidadeOrigemVinculada(String cnpj, String orgaoOrigem) throws ApplicationException {
+    public Map<String, Object> getUnidadeOrigemVinculada(String cnpj, String orgaoOrigem) throws Exception {
         Object ug = unidadeGestoraRepository.buscarDadosUnidadeGestora(cnpj);
         Object ugOrgaoOrigem = unidadeGestoraRepository.buscarDadosUnidadeGestora(orgaoOrigem);
         Map<String, Object> theMap = new HashMap<>();
