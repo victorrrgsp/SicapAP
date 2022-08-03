@@ -60,10 +60,10 @@
           </p>
         </b-col>
       </b-row>
-      <div class="text-md text-center font-weight-bold">
+      <div class=" text-center font-weight-bold" style="font-size: 1.3em;">
 
        <strong>
-         {{ FilterSize }} - registros    
+         {{ FilterSize }} registros    
 
        </strong>
       

@@ -10,19 +10,8 @@
         {{ "Sem processos" }}
       </b-card-body>
       <b-card-body v-else>
-        <b-table
-          striped
-          hover
-          responsive
-          sticky-header="450px"
-          id="table"
-          :items="fila"
-          :fields="items2"
-          :per-page="perPage"
-          :current-page="currentPage"
-          aria-controls="table"
-          small
-        >
+        <b-table striped hover responsive sticky-header="450px" id="table" :items="fila" :fields="items2"
+          :per-page="perPage" :current-page="currentPage" aria-controls="table" small>
           <template #table-busy>
             <div class="text-center text-danger my-2">
               <b-spinner class="align-middle"></b-spinner>
@@ -44,13 +33,8 @@
         <b-col>
           <p align="left">
             <b-form-group label="Unidade Gestora*	">
-              <b-form-input
-                list="unidadeGestora"
-                required
-                v-model="filterform"
-                name="unidadeGestora"
-                placeholder="Pesquise aqui..."
-              >
+              <b-form-input list="unidadeGestora" required v-model="filterform" name="unidadeGestora"
+                placeholder="Pesquise aqui...">
               </b-form-input>
 
               <b-form-datalist id="unidadeGestora">
@@ -65,28 +49,15 @@
         <b-col>
           <p align="right" class="pesquisa_select">
             <b>Exercicio:</b> &nbsp;
-            <b-form-select
-              class="select-selected"
-              v-model="formdata.exercicio"
-              :options="formdata.exercicios"
-              @change="pesquisarRemessas"
-            >
+            <b-form-select class="select-selected" v-model="formdata.exercicio" :options="formdata.exercicios"
+              @change="pesquisarRemessas">
             </b-form-select>
             &nbsp;
             <b>Remessa:</b> &nbsp;
-            <b-form-select
-              class="select-selected"
-              v-model="formdata.remessa"
-              :options="formdata.remessas"
-            >
+            <b-form-select class="select-selected" v-model="formdata.remessa" :options="formdata.remessas">
             </b-form-select>
             &nbsp;
-            <b-button
-              @click="pesquisarRemesssa(formdata.exercicio, formdata.remessa)"
-              pill
-              variant="success"
-              size="sm"
-            >
+            <b-button @click="pesquisarRemesssa(formdata.exercicio, formdata.remessa)" pill variant="success" size="sm">
               Pesquisar
             </b-button>
             &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
@@ -96,27 +67,18 @@
 
       <b-card-body>
 
-        <span>
-        {{ processos.length }} - Processos finalizados    
-        </span>
+        <div class=" text-center font-weight-bold" style="font-size: 1.3em;">
 
-        <b-table
-          :busy="isBusy"
-          striped
-          hover
-          responsive
-          sticky-header="450px"
-          id="my-table"
-          :filter="filter"
-          :items="processos"
-          :filter-included-fields="['nome']"
-          :fields="items"
-          :per-page="perPage"
-          :current-page="currentPage"
-          aria-controls="my-table"
-          :tbody-tr-class="rowClass"
-          small
-        >
+          <strong>
+            {{ FilterSize }} registros
+
+          </strong>
+
+        </div>
+
+        <b-table :busy="isBusy" striped hover responsive sticky-header="450px" id="my-table" :filter="filter"
+          :items="processos" :filter-included-fields="['nome']" :fields="items" :per-page="perPage"
+          :current-page="currentPage" aria-controls="my-table" :tbody-tr-class="rowClass" small>
           <template #table-busy>
             <div class="text-center text-danger my-2">
               <b-spinner class="align-middle"></b-spinner>
@@ -125,29 +87,12 @@
           </template>
 
           <template #cell(status)="data">
-            <b-icon
-              v-if="statusIcon(data.value) == 'x-circle'"
-              class="h6 mb-1"
-              :icon="statusIcon(data.value)"
-              variant="danger"
-              cursor="pointer"
-              title="Assinaturas"
-              @click="info(data.item, data.index, $event.target)"
-              pill
-              size="sm"
-            >
+            <b-icon v-if="statusIcon(data.value) == 'x-circle'" class="h6 mb-1" :icon="statusIcon(data.value)"
+              variant="danger" cursor="pointer" title="Assinaturas" @click="info(data.item, data.index, $event.target)"
+              pill size="sm">
             </b-icon>
-            <b-icon
-              v-else
-              class="h6 mb-1"
-              :icon="statusIcon(data.value)"
-              variant="success"
-              cursor="pointer"
-              title="Assinaturas"
-              @click="info(data.item, data.index, $event.target)"
-              pill
-              size="sm"
-            >
+            <b-icon v-else class="h6 mb-1" :icon="statusIcon(data.value)" variant="success" cursor="pointer"
+              title="Assinaturas" @click="info(data.item, data.index, $event.target)" pill size="sm">
             </b-icon>
           </template>
         </b-table>
@@ -173,6 +118,7 @@ import { api } from "@/plugins/axios";
 export default {
   data() {
     return {
+      FilterSize: 0,
       unidades: [],
       aprovado: "aprovado",
       isBusy: true,
@@ -344,6 +290,7 @@ export default {
         });
 
       this.filter = this.filterform;
+      this.filterSize();
     },
     FindAll() {
       api.get("filaProcessamento/processos").then((resp) => {
@@ -351,10 +298,21 @@ export default {
         this.isBusy = false;
       });
     },
+    filterSize() {
+      let sum = 0;
+      this.processos.map(x => {
+        if (x.nome.toUpperCase().includes(this.filter.trim().toUpperCase())) {
+          sum++;
+        }
+      })
+      this.FilterSize = sum;
+      return sum;
+    },
     async pesquisar() {
       this.isBusy = !this.isBusy; //loading
       this.FindAll();
       this.isBusy = false;
+      this.filterSize()
     },
 
     readForms() {
@@ -404,9 +362,11 @@ export default {
   font-size: 14px;
   text-align: left;
 }
+
 .fonteLinhaLeft {
   font-size: 14px;
 }
+
 .select-selected {
   border-color: black;
   border: 6px solid;
@@ -416,6 +376,7 @@ export default {
   border-color: black;
   top: 7px;
 }
+
 .select-items div,
 .select-selected {
   color: black;
@@ -437,18 +398,22 @@ export default {
 .select-hide {
   display: none;
 }
+
 .pesquisa_select {
   position: relative;
   margin-top: 20px;
 }
+
 .select-items div:hover,
 .same-as-selected {
   background-color: rgba(0, 0, 0, 0.1);
 }
+
 @mixin flex-center($columns: false) {
   display: flex;
   align-items: center;
   justify-content: center;
+
   @if $columns {
     flex-direction: column;
   }
