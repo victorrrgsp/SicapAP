@@ -70,6 +70,12 @@ public class EditalController extends DefaultController<Edital> {
             if  ( Integer.valueOf(edital.getNumeroEdital().substring(edital.getNumeroEdital().length()-4)) <1990 ||  Integer.valueOf(edital.getNumeroEdital().substring(edital.getNumeroEdital().length()-4)) > (LocalDateTime.now().getYear() +5) ) {
                 throw new InvalitInsert("não é um número de Edital valido. Os ultinmos 4 digitos correspondem ao ano do edital !!");
             }
+            if (edital.getNumeroEdital() == null || edital.getCnpjEmpresaOrganizadora()==null || edital.getTipoEdital() ==null || edital.getDataPublicacao()==null ||edital.getDataInicioInscricoes()==null || edital.getDataFimInscricoes() == null || edital.getPrazoValidade() == null ||edital.getVeiculoPublicacao() == null ){
+                throw new InvalitInsert("favor envie todos os campos obrigatorios preenchidos!!");
+
+            } else if (edital.getNumeroEdital().isEmpty() || edital.getCnpjEmpresaOrganizadora().isEmpty() || edital.getPrazoValidade().isEmpty() || edital.getVeiculoPublicacao().isEmpty()) {
+                throw new InvalitInsert("favor envie todos os campos obrigatorios preenchidos!!");
+            }
 
             editalRepository.save(edital);
 
