@@ -10,6 +10,8 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.math.BigInteger;
+import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -57,12 +59,14 @@ public class AdmEnvioRepository extends DefaultRepository<AdmEnvio, BigInteger> 
     }
 
     public List<HashMap<String, Object>> infoByRecibo(long idAdmissao) {
-        List<Object[]> list = getEntityManager().createNativeQuery("select top 1  env.processo,env.unidadeGestora ,ug.nome as nomeEntidade ,CAST(se.nome AS varchar(500)) as nomeServidor ,env.tipoRegistro\n" +
+        List<Object[]> list = getEntityManager().createNativeQuery("select top 1  env.processo,env.unidadeGestora ,ug.nome as nomeEntidade ,CAST(se.nome AS varchar(500)) as nomeServidor ,env.tipoRegistro ,AEA.data_assinatura\n" +
                         "    from AdmEnvio env\n" +
                         "    join unidadegestora ug on env.unidadeGestora = ug.id\n" +
                         "    join Admissao ad on env.idAdmissao = ad.id\n" +
                         "    join Servidor se on ad.idServidor = se.id\n" +
-                        "      where status = 3 and\n" +
+                        "    left join AdmEnvioAssinatura AEA on env.id = AEA.idEnvio" +
+                        "      where " +
+                        //"status = 3 and\n" +
                         "        env.idAdmissao = ?")
                 .setParameter(1, idAdmissao)
                 .getResultList();
@@ -74,8 +78,10 @@ public class AdmEnvioRepository extends DefaultRepository<AdmEnvio, BigInteger> 
             aux.put("UnidadeGestora", (String) admEnvio[1]);
             aux.put("nomeEntidade", (String) admEnvio[2]);
             aux.put("nomeServidor", (String) admEnvio[3]);
+            aux.put("dataAssinatura", new Date(((Timestamp)admEnvio[5]).getTime()));
             var tipoLabel = Arrays.stream(AdmEnvio.TipoRegistro.values()).filter(a -> a.getValor() == (int) admEnvio[4]).findFirst().get().getLabel();
             aux.put("tipoRegistro", tipoLabel.toUpperCase());
+
             resutSet.add(aux);
         });
         return resutSet;
