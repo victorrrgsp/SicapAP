@@ -21,4 +21,6 @@ public class AposentadoriaDTO {
     private String numeroAto;
 
     private Integer status;
+
+    private String processo;
 }

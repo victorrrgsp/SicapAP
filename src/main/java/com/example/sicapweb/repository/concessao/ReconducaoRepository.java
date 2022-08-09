@@ -47,7 +47,7 @@ public class ReconducaoRepository extends DefaultRepository<Reconducao, BigInteg
 
         Query query = getEntityManager()
                 .createNativeQuery("select distinct s.cpfServidor, s.nome, c.nomeCargo, ato.numeroAto, " +
-                        " (CASE WHEN ae.status IS NULL THEN 1 ELSE ae.status END) as status, a.id from Reconducao a " +
+                        " (CASE WHEN ae.status IS NULL THEN 1 ELSE ae.status END) as status, ae.processo, a.id from Reconducao a " +
                         "join InfoRemessa i on a.chave = i.chave " +
                         "join Admissao ad on ad.id = a.id " +
                         "join Cargo c on c.id = ad.idCargo " +
@@ -70,7 +70,8 @@ public class ReconducaoRepository extends DefaultRepository<Reconducao, BigInteg
             dto.setCargo(String.valueOf(obj[2]));
             dto.setNumeroAto(String.valueOf(obj[3]));
             dto.setStatus(Integer.valueOf(String.valueOf(obj[4])));
-            dto.setId(BigInteger.valueOf(Long.parseLong(String.valueOf(obj[5]))));
+            dto.setProcesso(String.valueOf(obj[5]));
+            dto.setId(BigInteger.valueOf(Long.parseLong(String.valueOf(obj[6]))));
             reconducaoDTOList.add(dto);
         }
 

@@ -48,7 +48,7 @@ public class AproveitamentoRepository extends DefaultRepository<Aproveitamento, 
                                 "       ser.nome, " +
                                 "       car.nomeCargo, " +
                                 "       ato.numeroAto, " +
-                                "       (CASE WHEN ae.status IS NULL THEN 1 ELSE ae.status END) as status, " +
+                                "       (CASE WHEN ae.status IS NULL THEN 1 ELSE ae.status END) as status, ae.processo, " +
                                 "       a.id " +
                                 "from Aproveitamento a " +
                                 "    join Admissao ad on ad.id = a.id " +
@@ -70,7 +70,8 @@ public class AproveitamentoRepository extends DefaultRepository<Aproveitamento, 
             aux.setCargo((String)a[2]);
             aux.setNumeroAto((String)a[3]);
             aux.setStatus((Integer)a[4]);
-            aux.setId((BigDecimal) a[5]);
+            aux.setProcesso((String)a[5]);
+            aux.setId((BigDecimal) a[6]);
             aproveitamentoDTOArrayList.add(aux);
         });
 

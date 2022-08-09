@@ -63,7 +63,7 @@ public class PensaoRepository extends DefaultRepository<Pensao, BigInteger> {
 
         Query query = getEntityManager()
                 .createNativeQuery("select distinct a.cpfServidor, ser.nome, car.nomeCargo, ato.numeroAto, " +
-                        " (CASE WHEN ae.status IS NULL THEN 1 ELSE ae.status END) as status, a.id from Pensao a " +
+                        " (CASE WHEN ae.status IS NULL THEN 1 ELSE ae.status END) as status, ae.processo, a.id from Pensao a " +
                         "join Admissao ad on ad.id = a.id " +
                         "join Servidor ser on ser.id = ad.idServidor " +
                         "join Cargo car on car.id = ad.idCargo " +
@@ -107,7 +107,7 @@ public class PensaoRepository extends DefaultRepository<Pensao, BigInteger> {
 
         Query query = getEntityManager()
                 .createNativeQuery("select distinct a.cpfServidor, ser.nome, car.nomeCargo, ato.numeroAto, " +
-                        " (CASE WHEN ae.status IS NULL THEN 1 ELSE ae.status END) as status, a.id from Pensao a " +
+                        " (CASE WHEN ae.status IS NULL THEN 1 ELSE ae.status END) as status, ae.processo, a.id from Pensao a " +
                         "join Admissao ad on ad.id = a.id " +
                         "join Servidor ser on ser.id = ad.idServidor " +
                         "join Cargo car on car.id = ad.idCargo " +
@@ -149,7 +149,8 @@ public class PensaoRepository extends DefaultRepository<Pensao, BigInteger> {
             dto.setCargo(String.valueOf(obj[2]));
             dto.setNumeroAto(String.valueOf(obj[3]));
             dto.setStatus(Integer.valueOf(String.valueOf(obj[4])));
-            dto.setId(BigInteger.valueOf(Long.parseLong(String.valueOf(obj[5]))));
+            dto.setProcesso(String.valueOf(obj[5]));
+            dto.setId(BigInteger.valueOf(Long.parseLong(String.valueOf(obj[6]))));
             pensaoDTOList.add(dto);
         }
         return pensaoDTOList;

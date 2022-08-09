@@ -10,12 +10,8 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.math.BigInteger;
-import java.sql.Date;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 @Repository
 public class AdmEnvioRepository extends DefaultRepository<AdmEnvio, BigInteger> {
@@ -44,7 +40,7 @@ public class AdmEnvioRepository extends DefaultRepository<AdmEnvio, BigInteger> 
         String campo = String.valueOf(pageable.getSort()).replace(":", "");
 
         List<AdmEnvio> list = getEntityManager().createNativeQuery("" +
-                        "select * from SICAPAP21..AdmEnvio " +
+                        "select * from AdmEnvio " +
                         "where status = 3 and unidadeGestora = '"
                         + User.getUser(request).getUnidadeGestora().getId() + "' " + search + " ORDER BY "
                         + campo, AdmEnvio.class)
@@ -89,7 +85,7 @@ public class AdmEnvioRepository extends DefaultRepository<AdmEnvio, BigInteger> 
 
     public Integer countEnvio() {
         Query query = getEntityManager().createNativeQuery("" +
-                "select count(*) from SICAPAP21..AdmEnvio " +
+                "select count(*) from AdmEnvio " +
                 "where status = 3 and unidadeGestora = '"
                 + User.getUser(request).getUnidadeGestora().getId() + "' ");
         return (Integer) query.getSingleResult();

@@ -13,4 +13,5 @@ public class ReintegracaoDTO {
     private String numeroAto;
     private Integer status;
     private Date DataExertcio;
+    private String processo;
 }

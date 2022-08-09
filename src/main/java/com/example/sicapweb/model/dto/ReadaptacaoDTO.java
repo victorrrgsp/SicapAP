@@ -16,4 +16,5 @@ public class ReadaptacaoDTO {
     private String numeroAto;
     private Integer status;
     private Date dataInicial;
+    private String processo;
 }

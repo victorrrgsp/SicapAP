@@ -7,6 +7,7 @@ import com.example.sicapweb.repository.DefaultRepository;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import java.math.BigInteger;
 import java.util.List;
@@ -18,14 +19,21 @@ import java.util.List;
             super(em);
         }
 
-        public List<Object> getDependentesPensao(String cpfServidorPensao) throws ApplicationException {
-            Query query = getEntityManager().createNativeQuery("" +
-                    "select distinct p.cpfPensionista as cpf, p.nome " +
-                    "from SICAPAP21..Pensionista p " +
-                    "         join SICAPAP21..Pensao pe on p.cpfServidor = pe.cpfServidor " +
-                    "where pe.cpfServidor = '" + cpfServidorPensao +"'");
-            List<Object> result = buscarSQL(query, "p.cpfPensionista as cpf, p.nome");
-            return result;
+        public List<Object> getDependentesPensao(String cpfServidorPensao) throws Exception {
+            try {
+                Query query = getEntityManager().createNativeQuery("" +
+                        "select distinct p.cpfPensionista as cpf, p.nome " +
+                        "from SICAPAP21..Pensionista p " +
+                        "         join SICAPAP21..Pensao pe on p.cpfServidor = pe.cpfServidor " +
+                        "where pe.cpfServidor = '" + cpfServidorPensao + "'");
+                List<Object> result = buscarSQL(query, "p.cpfPensionista as cpf, p.nome");
+                return result;
+            } catch (NoResultException e) {
+                e.printStackTrace();
+                return null;
+            } catch (Exception e) {
+                throw new Exception("Erro inexperado na consulta 'getDependentesPensao'!");
+            }
         }
     }
 

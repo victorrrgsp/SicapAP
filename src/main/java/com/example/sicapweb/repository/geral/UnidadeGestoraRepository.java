@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.lang.reflect.ParameterizedType;
@@ -147,29 +148,43 @@ public class UnidadeGestoraRepository extends DefaultRepository<UnidadeGestora, 
         return list.get(0);
     }
 
-    public Object buscarDadosUnidadeGestora(String cnpj) throws ApplicationException {
-        Query query = getEntityManager().createNativeQuery("" +
-                "select pj.Divisao_id, up.idPessoaFisica, up.idPessoaJuridica " +
-                "from Cadun..PessoaJuridica pj " +
-                "         LEFT JOIN cadun..vwUnidadesPessoasCargos up " +
-                "                   on pj.cnpj = up.codunidadegestora and idCargo = 4 and dataFim is null " +
-                "WHERE pj.CNPJ = '" + cnpj + "'" +
-                "   or pj.CodigoUnidadeGestora = '" + cnpj + "'");
-        List<Object> result = buscarSQL(query, "pj.Divisao_id, up.idPessoaFisica, up.idPessoaJuridica");
-        return result.get(0);
+    public Object buscarDadosUnidadeGestora(String cnpj) throws Exception {
+        try {
+            Query query = getEntityManager().createNativeQuery("" +
+                    "select pj.Divisao_id, up.idPessoaFisica, up.idPessoaJuridica " +
+                    "from Cadun..PessoaJuridica pj " +
+                    "         LEFT JOIN cadun..vwUnidadesPessoasCargos up " +
+                    "                   on pj.cnpj = up.codunidadegestora and idCargo = 4 and dataFim is null " +
+                    "WHERE pj.CNPJ = '" + cnpj + "'" +
+                    "   or pj.CodigoUnidadeGestora = '" + cnpj + "'");
+            List<Object> result = buscarSQL(query, "pj.Divisao_id, up.idPessoaFisica, up.idPessoaJuridica");
+            return result.get(0);
+        } catch (NoResultException e) {
+            e.printStackTrace();
+            return null;
+        } catch (Exception e) {
+            throw new Exception("Erro inexperado na consulta 'buscarDadosUnidadeGestora'!");
+        }
     }
 
-    public Object buscarDadosFundoOuInstituto(String cnpj) throws ApplicationException {
-        Query query = getEntityManager().createNativeQuery("" +
-                "SELECT up.idPessoaFisica, up.idPessoaJuridica " +
-                "FROM Cadun..PessoaJuridica pj " +
-                "         LEFT JOIN cadun..vwUnidadesPessoasCargos up " +
-                "                   on pj.cnpj = up.codunidadegestora and idCargo = 4 and dataFim is null " +
-                "WHERE pj.CNPJ = '" + cnpj + "'" +
-                "   or pj.CodigoUnidadeGestora = '" + cnpj + "'" +
-                "    and pj.Divisao_id in (4, 12, 5)\n" +
-                "    and pj.RazaoSocial like '%prev%'");
-        List<Object> result = buscarSQL(query, "up.idPessoaFisica, up.idPessoaJuridica");
-        return result.get(0);
+    public Object buscarDadosFundoOuInstituto(String cnpj) throws Exception {
+        try {
+            Query query = getEntityManager().createNativeQuery("" +
+                    "SELECT up.idPessoaFisica, up.idPessoaJuridica " +
+                    "FROM Cadun..PessoaJuridica pj " +
+                    "         LEFT JOIN cadun..vwUnidadesPessoasCargos up " +
+                    "                   on pj.cnpj = up.codunidadegestora and idCargo = 4 and dataFim is null " +
+                    "WHERE pj.CNPJ = '" + cnpj + "'" +
+                    "   or pj.CodigoUnidadeGestora = '" + cnpj + "'" +
+                    "    and pj.Divisao_id in (4, 12, 5)\n" +
+                    "    and pj.RazaoSocial like '%prev%'");
+            List<Object> result = buscarSQL(query, "up.idPessoaFisica, up.idPessoaJuridica");
+            return result.get(0);
+        } catch (NoResultException e) {
+            e.printStackTrace();
+            return null;
+        } catch (Exception e) {
+            throw new Exception("Erro inexperado na consulta 'buscarDadosFundoOuInstituto'!");
+        }
     }
 }

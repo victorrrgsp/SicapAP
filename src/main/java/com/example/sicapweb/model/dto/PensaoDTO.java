@@ -17,4 +17,5 @@ public class PensaoDTO {
     private String cargo;
     private String numeroAto;
     private Integer status;
+    private String processo;
 }

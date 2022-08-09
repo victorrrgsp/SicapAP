@@ -23,14 +23,14 @@ public class DocumentoReintegracaoRepository extends DefaultRepository<Documento
                 .getResultList();
     }
 
-    public List<Object> buscarDocumentos(BigInteger idMovimentacao) {
+    public List<Object> buscarDocumentos(BigInteger idEnvio) {
         try {
             Query query = getEntityManager().createNativeQuery("" +
                     "select CONCAT(dp.inciso, '-', dp.descricao) as arquivo, dp.idCastorFile " +
-                    "from SICAPAP21..AdmEnvio ae " +
-                    "         join SICAPAP21..DocumentoReintegracao dp on ae.idMovimentacao = dp.idReintegracao " +
-                    "where ae.id = :idMovimentacao");
-            query.setParameter("idMovimentacao", idMovimentacao);
+                    "from AdmEnvio ae " +
+                    "         join DocumentoReintegracao dp on ae.idMovimentacao = dp.idReintegracao " +
+                    "where ae.id = :idEnvio");
+            query.setParameter("idEnvio", idEnvio.intValue());
             List<Object> result = buscarSQL(query, "arquivo, idCastorFile");
             return result;
         } catch (ApplicationException e) {

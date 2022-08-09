@@ -23,14 +23,14 @@ public class DocumentoReadaptacaoRepository extends DefaultRepository<DocumentoR
                 .getResultList();
     }
 
-    public List<Object> buscarDocumentos(BigInteger idMovimentacao) {
+    public List<Object> buscarDocumentos(BigInteger idEnvio) {
         try {
             Query query = getEntityManager().createNativeQuery("" +
                     "select CONCAT(dp.inciso, '-', dp.descricao) as arquivo, dp.idCastorFile " +
-                    "from SICAPAP21..AdmEnvio ae " +
-                    "         join SICAPAP21..DocumentoReadaptacao dp on ae.idMovimentacao = dp.idReadaptacao " +
-                    "where ae.id = :idMovimentacao");
-            query.setParameter("idMovimentacao", idMovimentacao);
+                    "from AdmEnvio ae " +
+                    "         join DocumentoReadaptacao dp on ae.idMovimentacao = dp.idReadaptacao " +
+                    "where ae.id = :idEnvio");
+            query.setParameter("idEnvio", idEnvio.intValue());
             List<Object> result = buscarSQL(query, "arquivo, idCastorFile");
             return result;
         } catch (ApplicationException e) {

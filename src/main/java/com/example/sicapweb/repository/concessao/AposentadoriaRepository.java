@@ -63,7 +63,7 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
 
         Query query = getEntityManager()
                 .createNativeQuery("select distinct a.cpfServidor, ser.nome, car.nomeCargo, a.tipoAposentadoria, ato.numeroAto, " +
-                        " (CASE WHEN ae.status IS NULL THEN 1 ELSE ae.status END) as status, a.id from Aposentadoria a " +
+                        " (CASE WHEN ae.status IS NULL THEN 1 ELSE ae.status END) as status, ae.processo, a.id from Aposentadoria a " +
                         "join Admissao ad on ad.id = a.id " +
                         "join Servidor ser on ser.id = ad.idServidor " +
                         "join Cargo car on car.id = ad.idCargo " +
@@ -118,7 +118,7 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
 
         List<Object[]> list = getEntityManager()
                 .createNativeQuery("select distinct a.cpfServidor, ser.nome, car.nomeCargo, a.tipoAposentadoria, ato.numeroAto, " +
-                        " (CASE WHEN ae.status IS NULL THEN 1 ELSE ae.status END) as status, a.id " +
+                        " (CASE WHEN ae.status IS NULL THEN 1 ELSE ae.status END) as status, ae.processo, a.id " +
                         " from Aposentadoria a " +
                         " join Admissao ad on ad.id = a.id " +
                         " join Servidor ser on ser.id = ad.idServidor " +
@@ -176,7 +176,7 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
 
         List<Object[]> list = getEntityManager()
                 .createNativeQuery("select distinct a.cpfServidor, ser.nome, car.nomeCargo, a.tipoAposentadoria, ato.numeroAto, " +
-                        " (CASE WHEN ae.status IS NULL THEN 1 ELSE ae.status END) as status, a.id " +
+                        " (CASE WHEN ae.status IS NULL THEN 1 ELSE ae.status END) as status, ae.processo, a.id " +
                         " from Aposentadoria a " +
                         " join Admissao ad on ad.id = a.id " +
                         " join Servidor ser on ser.id = ad.idServidor " +
@@ -234,7 +234,7 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
 
         List<Object[]> list = getEntityManager()
                 .createNativeQuery("select distinct a.cpfServidor, ser.nome, car.nomeCargo, a.tipoAposentadoria, ato.numeroAto, " +
-                        " (CASE WHEN ae.status IS NULL THEN 1 ELSE ae.status END) as status, a.id " +
+                        " (CASE WHEN ae.status IS NULL THEN 1 ELSE ae.status END) as status, ae.processo, a.id " +
                                 " from Aposentadoria a " +
                                 " join Admissao ad on ad.id = a.id " +
                                 " join Servidor ser on ser.id = ad.idServidor " +
@@ -290,7 +290,7 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
         // Object test = new Integer[]{1,2,3,4,5};
         List<Object[]> list = getEntityManager()
                 .createNativeQuery("select distinct a.cpfServidor, ser.nome, car.nomeCargo, a.tipoAposentadoria, ato.numeroAto, " +
-                        " (CASE WHEN ae.status IS NULL THEN 1 ELSE ae.status END) as status, a.id " +
+                        " (CASE WHEN ae.status IS NULL THEN 1 ELSE ae.status END) as status, ae.processo, a.id " +
                                 " from Aposentadoria a " +
                                 " join Admissao ad on ad.id = a.id " +
                                 " join Servidor ser on ser.id = ad.idServidor " +
@@ -346,7 +346,7 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
 
         List<AposentadoriaDTO> list = getEntityManager()
                 .createNativeQuery("select distinct a.cpfServidor, ser.nome, car.nomeCargo, a.tipoAposentadoria, ato.numeroAto, " +
-                        " (CASE WHEN ae.status IS NULL THEN 1 ELSE ae.status END) as status, a.id " +
+                        " (CASE WHEN ae.status IS NULL THEN 1 ELSE ae.status END) as status, ae.processo, a.id " +
                         " from Aposentadoria a " +
                         " join Admissao ad on ad.id = a.id " +
                         " join Servidor ser on ser.id = ad.idServidor " +
@@ -401,7 +401,8 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
             dto.setTipoAposentadoria(Integer.valueOf(String.valueOf(obj[3])));
             dto.setNumeroAto(String.valueOf(obj[4]));
             dto.setStatus(Integer.valueOf(String.valueOf(obj[5])));
-            dto.setId(BigInteger.valueOf(Long.parseLong(String.valueOf(obj[6]))));
+            dto.setProcesso(String.valueOf(obj[6]));
+            dto.setId(BigInteger.valueOf(Long.parseLong(String.valueOf(obj[7]))));
             aposentadoriaDTOList.add(dto);
         }
         return aposentadoriaDTOList;

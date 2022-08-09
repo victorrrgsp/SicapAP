@@ -31,14 +31,14 @@ public class DocumentoPensaoRepository extends DefaultRepository<DocumentoPensao
                 .getResultList();
     }
 
-    public List<Object> buscarDocumentos(BigInteger idMovimentacao) {
+    public List<Object> buscarDocumentos(BigInteger idEnvio) {
         try {
             Query query = getEntityManager().createNativeQuery("" +
                     "select CONCAT(dp.inciso, '-', dp.descricao) as arquivo, dp.idCastorFile " +
-                    "from SICAPAP21..AdmEnvio ae " +
-                    "         join SICAPAP21..DocumentoPensao dp on ae.idMovimentacao = dp.idPensao " +
-                    "where ae.id = :idMovimentacao");
-            query.setParameter("idMovimentacao", idMovimentacao);
+                    "from AdmEnvio ae " +
+                    "         join DocumentoPensao dp on ae.idMovimentacao = dp.idPensao " +
+                    "where ae.id = :idEnvio");
+            query.setParameter("idEnvio", idEnvio.intValue());
             List<Object> result = buscarSQL(query, "arquivo, idCastorFile");
             return result;
         } catch (ApplicationException e) {
@@ -47,14 +47,14 @@ public class DocumentoPensaoRepository extends DefaultRepository<DocumentoPensao
         }
     }
 
-    public List<Object> buscarDocumentosRevisao(BigInteger idMovimentacao) {
+    public List<Object> buscarDocumentosRevisao(BigInteger idEnvio) {
         try {
             Query query = getEntityManager().createNativeQuery("" +
                     "select CONCAT(dp.inciso, '-', dp.descricao) as arquivo, dp.idCastorFile " +
-                    "from SICAPAP21..AdmEnvio ae " +
-                    "         join SICAPAP21..DocumentoPensao dp on ae.idMovimentacao = dp.idPensao " +
-                    "where ae.id = :idMovimentacao and dp.revisao = 'S'");
-            query.setParameter("idMovimentacao", idMovimentacao);
+                    "from AdmEnvio ae " +
+                    "         join DocumentoPensao dp on ae.idMovimentacao = dp.idPensao " +
+                    "where ae.id = :idEnvio and dp.revisao = 'S'");
+            query.setParameter("idEnvio", idEnvio.intValue());
             List<Object> result = buscarSQL(query, "arquivo, idCastorFile");
             return result;
         } catch (ApplicationException e) {
