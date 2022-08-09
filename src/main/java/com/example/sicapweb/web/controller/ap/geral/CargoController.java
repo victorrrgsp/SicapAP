@@ -47,7 +47,7 @@ public class CargoController  extends DefaultController<Cargo> {
         return ResponseEntity.ok().body(list);
     }
     @CrossOrigin
-    @GetMapping("/{unidade}")
+    @GetMapping("/byUnidade/{unidade}")
     public ResponseEntity<List<Object>> findByunidade( @PathVariable String unidade ) {
         List<Object> list = cargoRepository.buscarCargoPorUnidade(unidade);
         return ResponseEntity.ok().body(list);
