@@ -57,7 +57,7 @@ public class EditalHomologacaoRepository extends DefaultRepository<EditalHomolog
         List<EditalHomologacao> list = getEntityManager()
                 .createNativeQuery("select a.* from EditalHomologacao a " +
                         "join Edital e on a.idEdital = e.id " +
-                        "join  ConcursoEnvio env on a.idEdital = env.idEdital  and env.fase=1 and env.status=3 " +
+                        "join  ConcursoEnvio env on a.idEdital = env.idEdital  and env.fase=1 and env.status=0 " +
                         "join InfoRemessa i on a.chave = i.chave " +
                         "where   i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, EditalHomologacao.class)
                 .setFirstResult(pagina)

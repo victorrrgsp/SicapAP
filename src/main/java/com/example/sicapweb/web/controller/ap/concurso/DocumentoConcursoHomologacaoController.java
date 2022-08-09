@@ -64,11 +64,19 @@ public class DocumentoConcursoHomologacaoController extends DefaultController<Ed
             }
             else if( Lenvio.size()>0 ){
                 ConcursoEnvio envio  = Lenvio.get(0);
-                if (envio.getStatus() == ConcursoEnvio.Status.Enviado.getValor() ){
+                if (envio.getStatus() == ConcursoEnvio.Status.Aguardandoassinatura.getValor() ){
                     listE.get(i).setSituacao("Aguardando Assinatura");
                 }
-                else if (envio.getStatus() == ConcursoEnvio.Status.Finalizado.getValor() ){
+                else if (envio.getStatus() == ConcursoEnvio.Status.Concluido.getValor() ){
                     listE.get(i).setSituacao("Concluido");
+                    listE.get(i).setProcesso(envio.getProcesso());
+                }
+                else if (envio.getStatus() == ConcursoEnvio.Status.Desambiguado.getValor() ){
+                    listE.get(i).setSituacao("Desambiquado");
+                    listE.get(i).setProcesso(envio.getProcesso());
+                }
+                else if (envio.getStatus() == ConcursoEnvio.Status.Pendente.getValor() ){
+                    listE.get(i).setSituacao("Pendente");
                     listE.get(i).setProcesso(envio.getProcesso());
                 }
             }
@@ -174,7 +182,7 @@ public class DocumentoConcursoHomologacaoController extends DefaultController<Ed
          situacao = documentoEditalHomologacaoRepository.findSituacaobyIdEdital(concursoEnvio.getEdital().getId(), "'XII','XIII','XIV','XV'");
          if (situacao < 4) throw  new InvalitInsert("Anexe todos os documentos obrigatorios!!");
         concursoEnvio.setFase(ConcursoEnvio.Fase.Homologacao.getValor());
-        concursoEnvio.setStatus(ConcursoEnvio.Status.Enviado.getValor());
+        concursoEnvio.setStatus(ConcursoEnvio.Status.Aguardandoassinatura.getValor());
         LocalDateTime dt = LocalDateTime.now();
         concursoEnvio.setDataEnvio(dt);
         ConcursoEnvio envioPai =  concursoEnvioRepository.buscarEnvioFAse1PorEditalassinado(concursoEnvio.getEdital().getId());

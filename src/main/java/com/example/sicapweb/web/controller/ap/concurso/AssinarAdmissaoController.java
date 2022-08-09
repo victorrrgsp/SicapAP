@@ -7,6 +7,7 @@ import com.example.sicapweb.exception.InvalitInsert;
 import com.example.sicapweb.model.AdmissaoEnvioAssRetorno;
 import com.example.sicapweb.model.ConcursoEnvioAssRetorno;
 import com.example.sicapweb.repository.concurso.AdmissaoEnvioAssinaturaRepository;
+import com.example.sicapweb.repository.concurso.ConcursoEnvioRepository;
 import com.example.sicapweb.repository.concurso.DocumentoAdmissaoRepository;
 import com.example.sicapweb.repository.concurso.ProcessoAdmissaoRepository;
 import com.example.sicapweb.security.User;
@@ -51,15 +52,16 @@ public class AssinarAdmissaoController {
     private DocumentoAdmissaoRepository documentoAdmissaoRepository;
 
 
+
     @CrossOrigin
     @GetMapping(path="/{searchParams}/{tipoParams}/pagination")
     public ResponseEntity<PaginacaoUtil<AdmissaoEnvioAssRetorno>> listaAProcessosAguardandoAss(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
         User userlogado = User.getUser(processoAdmissaoRepository.getRequest());
-        if (userlogado.getCargo().getValor()!=4 ){
-            List<AdmissaoEnvioAssRetorno> listavazia= new ArrayList<>() ;
-            PaginacaoUtil<AdmissaoEnvioAssRetorno> paginacaoUtilvazia= new PaginacaoUtil<AdmissaoEnvioAssRetorno>(0, 1, 1, 0, listavazia);
-            return ResponseEntity.ok().body(paginacaoUtilvazia);
-        }
+//        if (userlogado.getCargo().getValor()!=4 ){
+//            List<AdmissaoEnvioAssRetorno> listavazia= new ArrayList<>() ;
+//            PaginacaoUtil<AdmissaoEnvioAssRetorno> paginacaoUtilvazia= new PaginacaoUtil<AdmissaoEnvioAssRetorno>(0, 1, 1, 0, listavazia);
+//            return ResponseEntity.ok().body(paginacaoUtilvazia);
+//        }
         PaginacaoUtil<AdmissaoEnvioAssRetorno> paginacaoUtil = processoAdmissaoRepository.buscarProcessosAguardandoAss(pageable,searchParams,tipoParams);
         return ResponseEntity.ok().body(paginacaoUtil);
     }
@@ -133,6 +135,7 @@ public class AssinarAdmissaoController {
         // try {
         if (userlogado != null) {
             if (userlogado.getCargo().getValor() !=4 ) throw new InvalitInsert("Apenas o gestor da unidade gestora pode assinar envios!!");
+
             JsonNode requestJson = new ObjectMapper().readTree(hashassinante_hashAssinado);
             String hashassinante =  URLDecoder.decode(requestJson.get("hashassinante").asText(), StandardCharsets.UTF_8);
             String hashassinado =  URLDecoder.decode(requestJson.get("hashassinado").asText(), StandardCharsets.UTF_8);
@@ -155,6 +158,7 @@ public class AssinarAdmissaoController {
                     System.out.println("idenvio: " + idenvio);
                     ProcessoAdmissao envio = (ProcessoAdmissao) processoAdmissaoRepository.findById(idenvio);
                     if (envio!=null ){
+
                         AdmissaoEnvioAssinatura  novo = new AdmissaoEnvioAssinatura();
                         novo.setIdCargo(User.getUser(admissaoEnvioAssinaturaRepository.getRequest()).getCargo().getValor());
                         novo.setCpf(User.getUser(admissaoEnvioAssinaturaRepository.getRequest()).getCpf());
@@ -232,8 +236,8 @@ public class AssinarAdmissaoController {
                                 JsonNode JsonesponseCadunsalvasimples = new ObjectMapper().readTree(StringResponseCadunsalvasimples);
                                 Integer codigopessoa =  JsonesponseCadunsalvasimples.get("id").asInt();
                                 String mensagemPessao = JsonesponseCadunsalvasimples.get("msg").asText();
-                                if (codigopessoa.equals(0)) throw new InvalitInsert("erro:"+mensagemPessao+", cpf: "+cpfAprovado+" nome: "+nomeAprovado);
                                 if (codigopessoa ==null) throw new InvalitInsert("Não gerou codigo de pessoa fisica do interessado "+nomeAprovado+" no cadun!");
+                                if (codigopessoa.equals(0)) throw new InvalitInsert("erro:"+mensagemPessao+", cpf: "+cpfAprovado+" nome: "+nomeAprovado);
                                 if ( contador ==1){
 
                                     id_Document = admissaoEnvioAssinaturaRepository.insertDocument(tipodocumento,procnumero,ano, ContadorEvento );
@@ -317,7 +321,7 @@ public class AssinarAdmissaoController {
 
                 }
             }
-            throw new Exception("em manutenção!!");
+          //  throw new Exception("em manutenção!!");
         } else {
             System.out.println("erro:não encontrou usuario logado!!");
         }

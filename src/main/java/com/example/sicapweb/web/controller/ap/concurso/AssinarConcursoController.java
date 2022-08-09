@@ -59,11 +59,11 @@ public class AssinarConcursoController {
     @GetMapping(path="/{searchParams}/{tipoParams}/pagination")
     public ResponseEntity<PaginacaoUtil<ConcursoEnvioAssRetorno>> listaAEnviosAguardandoAss(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
         User userlogado = User.getUser(concursoEnvioAssinaturaRepository.getRequest());
-        if (userlogado.getCargo().getValor()!=4 ){
-            List<ConcursoEnvioAssRetorno> listavazia= new ArrayList<>() ;
-            PaginacaoUtil<ConcursoEnvioAssRetorno> paginacaoUtilvazia= new PaginacaoUtil<ConcursoEnvioAssRetorno>(0, 1, 1, 0, listavazia);
-            return ResponseEntity.ok().body(paginacaoUtilvazia);
-        }
+//        if (userlogado.getCargo().getValor()!=4 ){
+//            List<ConcursoEnvioAssRetorno> listavazia= new ArrayList<>() ;
+//            PaginacaoUtil<ConcursoEnvioAssRetorno> paginacaoUtilvazia= new PaginacaoUtil<ConcursoEnvioAssRetorno>(0, 1, 1, 0, listavazia);
+//            return ResponseEntity.ok().body(paginacaoUtilvazia);
+//        }
         PaginacaoUtil<ConcursoEnvioAssRetorno> paginacaoUtil = concursoEnvioRepository.buscarEnviosAguardandoAss(pageable,searchParams,tipoParams);
         return ResponseEntity.ok().body(paginacaoUtil);
     }
@@ -211,7 +211,7 @@ public class AssinarConcursoController {
                                     }
                                     //atualiza o campo processo no envio com o numero e ano do processo econtas
                                     envio.setProcesso(procnumero+"/"+ano);
-                                    envio.setStatus(ConcursoEnvio.Status.Finalizado.getValor());
+                                    envio.setStatus(ConcursoEnvio.Status.Concluido.getValor());
                                     concursoEnvioRepository.update(envio);
                                 } else {
                                     throw new Exception("id do protocolo não foi gerado!");
@@ -223,7 +223,7 @@ public class AssinarConcursoController {
 //
                     }
                 }
-                throw new Exception("em manutenção!!");
+               // throw new Exception("em manutenção!!");
             } else {
                 System.out.println("não encontrou usuario logado!!");
             }

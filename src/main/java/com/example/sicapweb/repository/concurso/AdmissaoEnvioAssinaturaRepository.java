@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
+import javax.persistence.Lob;
 import javax.persistence.Query;
 import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
@@ -145,7 +146,6 @@ public class AdmissaoEnvioAssinaturaRepository  extends DefaultRepository<Admiss
         query.setParameter("papel",papel);
         query.setParameter("idcargo",idcargo);
         query.executeUpdate();
-        //entityManager.flush();
     }
 
 
@@ -159,7 +159,6 @@ public class AdmissaoEnvioAssinaturaRepository  extends DefaultRepository<Admiss
         query.setParameter("procnumero",procnumero);
         query.setParameter("ano",ano);
         query.executeUpdate();
-        //entityManager.flush();
 
         Query query1 = entityManager.createNativeQuery("INSERT INTO SCP..hists" +
                 "(hcodp_pnumero, hcodp_pano, hists_data,hists_hora, hists_origem, hoent_ecodc_ccodg, hoent_ecodc_ccodc," +
@@ -172,7 +171,6 @@ public class AdmissaoEnvioAssinaturaRepository  extends DefaultRepository<Admiss
         query1.setParameter("ano",ano);
         query1.setParameter("deptoAutuacao",deptoAutuacao);
         query1.executeUpdate();
-        //entityManager.flush();
     }
 
 
@@ -186,13 +184,11 @@ public class AdmissaoEnvioAssinaturaRepository  extends DefaultRepository<Admiss
         query.setParameter("procnumero",procnumero);
         //vai  precisar usar SolicitarNumeroSND para gerar o numero
         Integer idDocsnd = this.SolicitarNumeroSND(5,"COCAP",ano,"000003",null,"SICAP-AP");
-        if (idDocsnd == null) throw  new InvalitInsert("numero do documento nao gerado!");
+        if (idDocsnd == null) throw  new InvalitInsert("numero do documento não gerado!");
         query.setParameter("numero",idDocsnd);
         query.setParameter("ano",ano);
         query.setParameter("evento",evento);
         query.executeUpdate();
-        //entityManager.flush();
-
         Query query2 = entityManager.createNativeQuery(
                 "SELECT @@IDENTITY ");
 
@@ -213,9 +209,10 @@ public class AdmissaoEnvioAssinaturaRepository  extends DefaultRepository<Admiss
         if (idDoc != null ){
             Query query1 =entityManager.createNativeQuery(" insert into Snd..documento " +
                     " (cod_tipo_documento, cod_departamento, numero , data_documento , data_gravacao , ano" +
-                    "  , matricula_emissor, assunto,  status ,  elaboradoPor )" +
+                    "  , matricula_emissor,  status ,  elaboradoPor )" +
                     " values ( :tipo_doc,:CodDepartamento,:numero ,:data_documento , :data_gravacao, :ano" +
-                    " , :emissor, :assunto , :status,  :elaboradoPor   ) ");
+                    " , :emissor , :status, cast( :elaboradoPor  as text )  ) ");
+
             query1.setParameter("tipo_doc",tipo_doc);
             query1.setParameter("CodDepartamento",CodDepartamento);
             query1.setParameter("numero",idDoc);
@@ -224,9 +221,9 @@ public class AdmissaoEnvioAssinaturaRepository  extends DefaultRepository<Admiss
             query1.setParameter("data_gravacao",dt);
             query1.setParameter("ano",ano);
             query1.setParameter("emissor",Emissor);
-            query1.setParameter("assunto",Assunto);
+         //   query1.setParameter("assunto",Assunto);
             query1.setParameter("status","CONFIRMADO");
-            query1.setParameter("elaboradoPor","Automatizado por Sistema de "+Sistema+"");
+            query1.setParameter("elaboradoPor",   "Automatizado por Sistema de SICAP-AP"  );
             query1.executeUpdate();
             return idDoc;
         }

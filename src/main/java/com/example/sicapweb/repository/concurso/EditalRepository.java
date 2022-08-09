@@ -8,12 +8,17 @@ import com.example.sicapweb.model.EditalConcurso;
 import com.example.sicapweb.repository.DefaultRepository;
 import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.math.BigInteger;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Repository
@@ -25,7 +30,7 @@ public class EditalRepository extends DefaultRepository<Edital, BigInteger> {
     }
 
 
-    public String getSearch(String searchParams, Integer tipoParams) {
+    public String getSearch(String searchParams, Integer tipoParams)  {
         String search = "";
         //monta pesquisa search
         if (searchParams.length() > 3) {
@@ -35,8 +40,19 @@ public class EditalRepository extends DefaultRepository<Edital, BigInteger> {
                     search = " and a." + arrayOfStrings[0] + " LIKE '%" + arrayOfStrings[1] + "%'  ";
                 else if (arrayOfStrings[0].equals("veiculoPublicacao"))
                     search = " and a." + arrayOfStrings[0] + " LIKE '%" + arrayOfStrings[1] + "%'  ";
-                else if (arrayOfStrings[0].equals("dataPublicacao"))
-                    search = " and a." + arrayOfStrings[0] + " LIKE '%" + arrayOfStrings[1] + "%'  ";
+                else if (arrayOfStrings[0].equals("dataPublicacao")) {
+//                    String dateInString = "07/06-2013";
+//                    try {
+//                        Date date = DateUtils.parseDate(  arrayOfStrings[1].substring(1,arrayOfStrings[1].length()-1), new String[]{"dd-MM-yyyy", "yyyy-MM-dd"});
+//                    }catch (Exception e){
+//                        e.printStackTrace();
+//                    }
+                    //  .withResolverStyle(ResolverStyle.STRICT); // para não aceitar datas inválidas
+                    LocalDate data = LocalDate.parse((arrayOfStrings[1] ), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
+
+                    search = " and a." + arrayOfStrings[0] + " = '" + data.format(DateTimeFormatter.ofPattern("d/MM/uuuu"))+ "'  ";
+                }
                 else
                     search = " and " + arrayOfStrings[0] + " LIKE '%" + arrayOfStrings[1] + "%'  ";
             } else {
@@ -62,7 +78,7 @@ public class EditalRepository extends DefaultRepository<Edital, BigInteger> {
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();
-        long totalRegistros = this.countEditais();
+        long totalRegistros = this.countEditais(search);
         long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
         List<EditalConcurso> listc= new ArrayList<EditalConcurso>() ;
         for(Integer i= 0; i < list.size(); i++){
@@ -97,10 +113,10 @@ public class EditalRepository extends DefaultRepository<Edital, BigInteger> {
         return new PaginacaoUtil<EditalConcurso>(tamanho, pagina, totalPaginas, totalRegistros, listc);
     }
 
-    public Integer countEditais() {
+    public Integer countEditais(String search) {
         Query query = getEntityManager().createNativeQuery("select count(*) from Edital a " +
                 "join InfoRemessa i on a.chave = i.chave " +
-                "where a.tipoEdital =1  and  i.idUnidadeGestora= '"+ User.getUser(super.request).getUnidadeGestora().getId()+ "'");
+                "where a.tipoEdital =1  and  i.idUnidadeGestora= '"+ User.getUser(super.request).getUnidadeGestora().getId()+ "' "+ search);
         return (Integer) query.getSingleResult();
     }
     public Edital buscarEditalPorNumero(String numeroEdital) {
@@ -133,7 +149,7 @@ public class EditalRepository extends DefaultRepository<Edital, BigInteger> {
         List<Edital> list = getEntityManager()
                 .createNativeQuery("select a.* from Edital a " +
                         "join InfoRemessa i on a.chave = i.chave " +
-                        "join ConcursoEnvio e on a.id = e.idEdital and e.fase=1 and e.Status=3 " +
+                        "join ConcursoEnvio e on a.id = e.idEdital and e.fase=1 and e.Status in (2,4)  " +
                         "where  a.tipoEdital =1   and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, Edital.class)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
@@ -150,7 +166,7 @@ public class EditalRepository extends DefaultRepository<Edital, BigInteger> {
             edf.setData(list.get(i).getDataPublicacao());
             edf.setEdital((Edital)list.get(i));
             List<ConcursoEnvio> leo =  getEntityManager()
-                    .createNativeQuery("select E.* from ConcursoEnvio E where  e.fase=1 and e.Status=3 and  idEdital=" + list.get(i).getId() + "", ConcursoEnvio.class)
+                    .createNativeQuery("select E.* from ConcursoEnvio E where  e.fase=1 and e.Status in (2,4) and  idEdital=" + list.get(i).getId() + "", ConcursoEnvio.class)
                     .getResultList();
             if (leo.size()>0){
                 ConcursoEnvio eo = leo.get(0);
@@ -202,6 +218,13 @@ public class EditalRepository extends DefaultRepository<Edital, BigInteger> {
         } catch (Exception e) {
             return null;
         }
+    }
+
+
+    public Integer GetQuantidadePorNumeroEdital(String numeroEdital, String ug) {
+        Integer CT = (Integer)getEntityManager().createNativeQuery("select count(1) from Edital  ed join InfoRemessa i  on ed.chave=i.chave and i.idUnidadeGestora = :ug  where " +
+                "  numeroEdital = :numeroEdital " ).setParameter("numeroEdital",numeroEdital).setParameter("ug",ug).getSingleResult();
+        return CT;
     }
 
 }

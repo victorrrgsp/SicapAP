@@ -65,7 +65,7 @@ public class DocumentoAdmissaoController extends DefaultController<DocumentoAdmi
 
     @CrossOrigin
     @GetMapping(path = {"/getOocumentosAprovados/{idproc}/pagination"})
-    public ResponseEntity<PaginacaoUtil<DocumentoAdmissao>> getOocumentosAmissoes(Pageable pageable, @PathVariable BigInteger idproc) {
+    public ResponseEntity<PaginacaoUtil<DocumentoAdmissao>>  getOocumentosAprovados(Pageable pageable, @PathVariable BigInteger idproc) {
         PaginacaoUtil<DocumentoAdmissao> paginacaoUtil = documentoAdmissaoRepository.buscaPaginadaApr(pageable,idproc) ;
         return ResponseEntity.ok().body(paginacaoUtil);
     }
@@ -73,7 +73,7 @@ public class DocumentoAdmissaoController extends DefaultController<DocumentoAdmi
 
     @CrossOrigin
     @GetMapping(path = {"/getOocumentosAdmissoes/{idproc}/pagination"})
-    public ResponseEntity<PaginacaoUtil<DocumentoAdmissao>> getOocumentosAprovados(Pageable pageable, @PathVariable BigInteger idproc) {
+    public ResponseEntity<PaginacaoUtil<DocumentoAdmissao>> getOocumentosAmissoes(Pageable pageable, @PathVariable BigInteger idproc) {
         PaginacaoUtil<DocumentoAdmissao> paginacaoUtil = documentoAdmissaoRepository.buscaPaginadaAdm(pageable,idproc) ;
         return ResponseEntity.ok().body(paginacaoUtil);
     }
@@ -105,20 +105,48 @@ public class DocumentoAdmissaoController extends DefaultController<DocumentoAdmi
     public ResponseEntity<?> ExcluirDocumentoAdmissao( @PathVariable BigInteger id) {
         DocumentoAdmissao documentoAdmissao = documentoAdmissaoRepository.findById(id);
         if (documentoAdmissao != null ){
-            documentoAdmissao.setStatus(DocumentoAdmissao.Status.NaoInformado.getValor());
+            documentoAdmissao.setStatus(DocumentoAdmissao.Status.ExcluidoDocumento.getValor());
             ServletRequestAttributes getIp = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
             documentoAdmissao.setIp_altr(getIp.getRequest().getRemoteAddr());
             documentoAdmissao.setUsuario_altr(User.getUser(documentoAdmissaoRepository.getRequest()).getUserName());
             documentoAdmissao.setData_altr(LocalDateTime.now());
             documentoAdmissaoRepository.update(documentoAdmissao);
+            DocumentoAdmissao novo = new DocumentoAdmissao();
+            novo.setDocumentoCastorId(null);
+            novo.setStatus(DocumentoAdmissao.Status.NaoInformado.getValor());
+            novo.setAdmissao(documentoAdmissao.getAdmissao());
+            novo.setEditalAprovado(documentoAdmissao.getEditalAprovado());
+            novo.setOpcaoDesistencia(documentoAdmissao.getOpcaoDesistencia());
+            novo.setProcessoAdmissao(documentoAdmissao.getProcessoAdmissao());
+            documentoAdmissaoRepository.save(novo);
         }
         return ResponseEntity.noContent().build();
+    }
+
+
+    @CrossOrigin
+    @Transactional
+    @PutMapping("/excluir/{id}" )
+    public ResponseEntity<?> ExcluiAprovado( @PathVariable BigInteger id) {
+        DocumentoAdmissao documentoAdmissao = documentoAdmissaoRepository.findById(id);
+        if (documentoAdmissao != null ){
+            documentoAdmissao.setDocumentoCastorId(null);
+            documentoAdmissao.setStatus(DocumentoAdmissao.Status.ExcluidoAprovado.getValor());
+            documentoAdmissao.setData_altr(LocalDateTime.now());
+            ServletRequestAttributes getIp = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+            documentoAdmissao.setIp_altr(getIp.getRequest().getRemoteAddr());
+            documentoAdmissao.setUsuario_altr(User.getUser(documentoAdmissaoRepository.getRequest()).getUserName());
+            documentoAdmissaoRepository.update(documentoAdmissao);
+        }
+        return ResponseEntity.ok().body(documentoAdmissao);
     }
 
     @CrossOrigin
     @Transactional
     @DeleteMapping(value = {"/{id}"})
     public ResponseEntity<?> delete(@PathVariable BigInteger id) {
+        DocumentoAdmissao documentoAdmissao = documentoAdmissaoRepository.findById(id);
+        if (documentoAdmissao.getDocumentoCastorId()!=null ) throw new RuntimeException("remova  primeiro o documento antes de excluir a aprovado!!");
         documentoAdmissaoRepository.delete(id);
         return ResponseEntity.noContent().build();
     }

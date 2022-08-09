@@ -53,7 +53,7 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
             editalAprovadoConcurso.setCpf(list.get(i).getCpf());
             editalAprovadoConcurso.setEditalaprovado(list.get(i));
             Integer enviado = (Integer) getEntityManager().createNativeQuery("select count(*) from DocumentoAdmissao a " +
-                    "where  a.idAprovado = "+list.get(i).getId()+ "").getSingleResult();
+                    "where status > 0 and  a.idAprovado = "+list.get(i).getId()+ "").getSingleResult();
             if (enviado > 0 ){
                 editalAprovadoConcurso.setSituacao("Aprovado Anexado");
             }
@@ -138,7 +138,7 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
                     "select p.nome NomeResponsavel,p.cpf CpfResponsavel,a.data_assinatura DataAssinatura, null NumeroEdital, i.nomeUnidade , i.idUnidadeGestora , pj.nomeMunicipio  , ed.nome , ed.cpf from " +
                             " AdmissaoEnvioAssinatura a" +
                             "  inner join SICAPAP21..ProcessoAdmissao env on a.idProcesso= env.id" +
-                            "  inner join SICAPAP21..DocumentoAdmissao docenv on env.id= docenv.idProcessoAdmissao" +
+                            "  inner join SICAPAP21..DocumentoAdmissao docenv on env.id= docenv.idProcessoAdmissao and docenv.status > 0 " +
                             "  inner join SICAPAP21..EditalAprovado ed on docenv.idAprovado = ed.id " +
                             "  inner join cadun..vwPessoa p on a.cpf=p.cpf " +
                             "  inner join InfoRemessa i on ed.chave=i.chave  and env.cnpjEmpresaOrganizadora = i.idUnidadeGestora " +

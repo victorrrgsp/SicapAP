@@ -1,5 +1,6 @@
 package com.example.sicapweb.repository.concurso;
 
+import br.gov.to.tce.model.ap.concurso.EditalVaga;
 import br.gov.to.tce.model.ap.concurso.ProcessoAdmissao;
 import com.example.sicapweb.model.AdmissaoEnvioAssRetorno;
 import com.example.sicapweb.repository.DefaultRepository;
@@ -10,9 +11,9 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Repository
 public class ProcessoAdmissaoRepository  extends DefaultRepository<ProcessoAdmissao, BigInteger>  {
@@ -71,7 +72,7 @@ public class ProcessoAdmissaoRepository  extends DefaultRepository<ProcessoAdmis
             pac.setEdital(list.get(i).getEdital());
             pac.setProcesso(list.get(i).getProcesso());
             Integer qt = (Integer)  getEntityManager().createNativeQuery("select count(*) from DocumentoAdmissao a " +
-                    "where   a.idProcessoAdmissao = "+ pac.getId()+ "").getSingleResult();
+                    "where status > 0  and  a.idProcessoAdmissao = "+ pac.getId()+ "").getSingleResult();
             pac.setQuantidade(qt);
             listc.add(pac);
         }
@@ -113,7 +114,7 @@ public class ProcessoAdmissaoRepository  extends DefaultRepository<ProcessoAdmis
             pac.setStatus(list.get(i).getStatus());
             pac.setEdital(list.get(i).getEdital());
             Integer qt = (Integer)  getEntityManager().createNativeQuery("select count(*) from DocumentoAdmissao a " +
-                    "where   a.idProcessoAdmissao = "+ pac.getId()+ "").getSingleResult();
+                    "where status > 0 and    a.idProcessoAdmissao = "+ pac.getId()+ "").getSingleResult();
             pac.setQuantidade(qt);
             listc.add(pac);
         }
@@ -129,11 +130,90 @@ public class ProcessoAdmissaoRepository  extends DefaultRepository<ProcessoAdmis
         return (Integer) query.getSingleResult();
     }
 
-    public ProcessoAdmissao GetEmAbertoByEdital(BigInteger idedital){
+    public List<ProcessoAdmissao> GetEmAbertoByEdital(BigInteger idedital){
         Query query = getEntityManager().createNativeQuery("select top 1 a.* from ProcessoAdmissao a " +
                 "where a.processo is null and   a.cnpjEmpresaOrganizadora = '"+ User.getUser(super.request).getUnidadeGestora().getId()+ "'and a.idEdital ="+idedital,ProcessoAdmissao.class);
-        return  (ProcessoAdmissao) query.getSingleResult();
+        return  (List<ProcessoAdmissao>) query.getResultList();
 
+    }
+
+
+
+    public List<Map<String,Object>> getValidInfoEnvio(BigInteger idEdital) {
+
+        List<Map<String, Object>> retorno = new ArrayList<Map<String, Object>>();
+
+        try {
+
+            List<Object[]> list = entityManager.createNativeQuery(
+
+                    "select  ev.id idvaga,ev.codigoVaga, c.nomeCargo, ev.especialidadeVaga,  ev.tipoConcorrencia,  cast(ev.quantidade as INTEGER) quantidade , count(1) qt_aprov, min( cast(classificacao as INTEGER)) min_classif, " +
+                            "        max(cast(classificacao as INTEGER)) max_classif,  sum(case when da.status=1 then 1 else 0 end) ct_nao_anexados " +
+                            "from dbo.ProcessoAdmissao pa  join dbo.DocumentoAdmissao da on pa.id=da.idProcessoAdmissao   and da.status> 0 " +
+                            "join dbo.EditalAprovado EA on da.idAprovado = ea.id " +
+                            "join dbo.EditalVaga EV on ea.idEditalVaga = ev.id " +
+                            "join dbo.Cargo c on ev.idCargo = c.id " +
+                            "where pa.idEdital =:idEdital " +
+                            " group by ev.id ,ev.codigoVaga, c.nomeCargo, ev.especialidadeVaga,  ev.tipoConcorrencia, ev.quantidade ").setParameter("idEdital",idEdital).getResultList();
+
+
+            for (Object[] obj : list) {
+
+                Map<String, Object> mapa = new HashMap<String, Object>();
+
+                mapa.put("idvaga", (BigDecimal) obj[0]);
+                mapa.put("codigoVaga", (String) obj[1]);
+                mapa.put("nomeCargo", (String) obj[2]);
+                mapa.put("especialidadeVaga", (String) obj[3]);
+                mapa.put("tipoConcorrencia", (Integer) obj[4]);
+                mapa.put("quantidade", (Integer) obj[5]);
+                mapa.put("qt_aprov", (Integer) obj[6]);
+                mapa.put("min_classif", (Integer) obj[7]);
+                mapa.put("max_classif", (Integer) obj[8]);
+                mapa.put("ct_nao_anexados", (Integer) obj[9]);
+                String descricao_tipo ="";
+                switch ( ((Integer)mapa.get("tipoConcorrencia")) ){
+                    case 1:
+                        descricao_tipo="Geral";
+                        break;
+                    case 2:
+                        descricao_tipo="PNE";
+                        break;
+                    case 3:
+                        descricao_tipo="Cota racial";
+                        break;
+                    default:
+                        descricao_tipo="Outros";
+
+                }
+                if ( ((Integer)mapa.get("quantidade")) <  ((Integer)mapa.get("max_classif"))  ){
+                    mapa.put("valido", (Boolean) false);
+                    mapa.put("ocorrencia", (String) " o numero de aprovados axcedeu o limite estipulado da vaga de codigo "+((String)mapa.get("codigoVaga"))+"-"+((String)mapa.get("nomeCargo"))+"-" +descricao_tipo );
+                } else if (((Integer)mapa.get("ct_nao_anexados")) > 0 ){
+                    mapa.put("valido", (Boolean) false);
+                    mapa.put("ocorrencia", (String) "A vaga de codigo "+((String)mapa.get("codigoVaga"))+"-"+((String)mapa.get("nomeCargo"))+"-" +descricao_tipo+" tem aprovados ao qual não foi anexado documentos!! " );
+                }
+                else if ( ((Integer)mapa.get("max_classif")) >   ((Integer)mapa.get("qt_aprov"))   ){
+                    mapa.put("valido", (Boolean) false);
+                    mapa.put("ocorrencia", (String) "A vaga de codigo "+((String)mapa.get("codigoVaga"))+"-"+((String)mapa.get("nomeCargo"))+"-" +descricao_tipo+" não tem os classificados na ordem de classificacão!! " );
+                }
+                else{
+                    mapa.put("valido", (Boolean) true);
+                    mapa.put("ocorrencia", (String) "");
+                }
+
+
+                retorno.add(mapa);
+
+            }
+            ;
+
+            return retorno;
+
+
+        } catch (Exception e) {
+            throw  new RuntimeException(e.getMessage());
+        }
     }
 
 }

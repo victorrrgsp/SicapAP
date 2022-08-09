@@ -81,7 +81,7 @@ public class EditalHomologacaoController extends DefaultController<EditalHomolog
     @PostMapping(path = {"/envio"})
     public ResponseEntity<ConcursoEnvio>Enviar(@RequestBody ConcursoEnvio concursoEnvio){
         concursoEnvio.setFase(ConcursoEnvio.Fase.Homologacao.getValor());
-        concursoEnvio.setStatus(ConcursoEnvio.Status.Enviado.getValor());
+        concursoEnvio.setStatus(ConcursoEnvio.Status.Aguardandoassinatura.getValor());
         List<ConcursoEnvio> le = concursoEnvioRepository.buscarEnvioFAse1PorEdital(concursoEnvio.getEdital().getId());
         if (le.size()>0 ){
             ConcursoEnvio c = le.get(0);

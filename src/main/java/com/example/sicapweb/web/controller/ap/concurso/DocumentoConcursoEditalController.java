@@ -29,6 +29,7 @@ import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/documentoConcursoEdital")
@@ -52,9 +53,17 @@ public class DocumentoConcursoEditalController extends DefaultController<Documen
         for(Integer i= 0; i < listE.size(); i++){
             Integer quantidadeDocumentos = documentoEditalRepository.findSituacao("documentoEdital","idEdital", listE.get(i).getId(), "'I','II','III','IV','V','VI','VII','VIII','IX','IX.I','X'");
             List<ConcursoEnvio> Lenvio= concursoEnvioRepository.buscarEnvioFAse1PorEdital(listE.get(i).getId());
+            Integer numEdital = Integer.valueOf(listE.get(i).getNumeroEdital().substring(0, listE.get(i).getNumeroEdital().length() - 4));
+            Integer anoEdital = Integer.valueOf(listE.get(i).getNumeroEdital().substring(listE.get(i).getNumeroEdital().length() - 4));
+            Integer quantEdital =editalRepository.GetQuantidadePorNumeroEdital(listE.get(i).getNumeroEdital(),User.getUser(editalRepository.getRequest()).getUnidadeGestora().getId() );
+            List<Map<String, Integer>> listaprocessoes =  concursoEnvioRepository.getProcessosEcontas(numEdital,anoEdital,User.getUser(concursoEnvioRepository.getRequest()).getUnidadeGestora().getId());
            if (listE.get(i).getVeiculoPublicacao()==null  || listE.get(i).getDataPublicacao()==null || listE.get(i).getDataInicioInscricoes()==null || listE.get(i).getDataFimInscricoes() == null  || listE.get(i).getPrazoValidade()==null || listE.get(i).getCnpjEmpresaOrganizadora()==null ) {
                 listE.get(i).setSituacao("Dados Incompletos");
                listE.get(i).setTooltip("Complete o cadastro dos campos vazios antes de prosseguir");
+            }
+           else  if (quantEdital > 1 ) {
+                listE.get(i).setSituacao("Inconsistente");
+                listE.get(i).setTooltip("duplicidade no numero do edital!!");
             }
            else if (
                    ( Integer.valueOf(listE.get(i).getNumeroEdital().substring(listE.get(i).getNumeroEdital().length()-4)) <1990
@@ -66,15 +75,25 @@ public class DocumentoConcursoEditalController extends DefaultController<Documen
             }
            else if( Lenvio.size()>0 ){
                ConcursoEnvio envio  = Lenvio.get(0);
-               if (envio.getStatus() == ConcursoEnvio.Status.Enviado.getValor() ){
+               if (envio.getStatus() == ConcursoEnvio.Status.Aguardandoassinatura.getValor() ){
                    listE.get(i).setSituacao("Aguardando Assinatura");
                }
-               else if (envio.getStatus() == ConcursoEnvio.Status.Finalizado.getValor() ){
+               else if (envio.getStatus() == ConcursoEnvio.Status.Concluido.getValor() ){
                    listE.get(i).setSituacao("Concluido");
                    listE.get(i).setProcesso(envio.getProcesso());
                }
-           }
-            else {
+               else if (envio.getStatus() == ConcursoEnvio.Status.Desambiguado.getValor() ){
+                   listE.get(i).setSituacao("Desambiquado");
+                   listE.get(i).setProcesso(envio.getProcesso());
+               }
+               else if (envio.getStatus() == ConcursoEnvio.Status.Pendente.getValor() ){
+                   listE.get(i).setSituacao("Pendente");
+                   listE.get(i).setProcesso(envio.getProcesso());
+               }
+           } else if (listaprocessoes.size() > 0){
+               listE.get(i).setSituacao("Aguardando Verificação");
+               listE.get(i).setTooltip("Processo existente no eContas, clique na opção no ícone ao lado (coluna Documentos) para que os problemas de duplicidade sejam resolvidos.");
+           } else {
                listE.get(i).setSituacao("Pendente");
            }
         }
@@ -165,11 +184,22 @@ public class DocumentoConcursoEditalController extends DefaultController<Documen
     public ResponseEntity<ConcursoEnvio>Enviar(@RequestBody ConcursoEnvio concursoEnvio){
         Integer situacao = documentoEditalRepository.findSituacaobyIdEdital(concursoEnvio.getEdital().getId(), "'I','II','III','IV','V','VI','VII','VIII','IX','IX.I','X'");
         if (situacao < 11) throw  new InvalitInsert("Anexe todos os documentos obrigatorios!!");
+        List<ConcursoEnvio> envios = concursoEnvioRepository.buscarEnvioFAse1PorEdital(concursoEnvio.getEdital().getId());
+        if (envios.size() > 0  ){
+            if (envios.size()>1) throw  new InvalitInsert("Tem mais de um processo pro mesmo edital!!");
+            ConcursoEnvio  envio= envios.get(0);
+            LocalDateTime dt = LocalDateTime.now();
+            envio.setDataEnvio(dt);
+            envio.setStatus(ConcursoEnvio.Status.Aguardandoassinatura.getValor());
+            concursoEnvioRepository.update(envio);
+        }
+        else{
         concursoEnvio.setFase(ConcursoEnvio.Fase.Edital.getValor());
-        concursoEnvio.setStatus(ConcursoEnvio.Status.Enviado.getValor());
+        concursoEnvio.setStatus(ConcursoEnvio.Status.Aguardandoassinatura.getValor());
         LocalDateTime dt = LocalDateTime.now();
         concursoEnvio.setDataEnvio(dt);
         concursoEnvioRepository.save(concursoEnvio);
+        }
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(concursoEnvio.getId()).toUri();
         return ResponseEntity.created(uri).body(concursoEnvio);
     }

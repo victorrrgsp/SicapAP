@@ -4,8 +4,12 @@ import br.gov.to.tce.model.ap.concurso.ConcursoEnvio;
 import br.gov.to.tce.model.ap.concurso.Edital;
 import com.example.sicapweb.repository.concurso.ConcursoEnvioRepository;
 import com.example.sicapweb.repository.concurso.EditalRepository;
+import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
 import com.example.sicapweb.web.controller.DefaultController;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -126,6 +130,71 @@ public class EditalController extends DefaultController<Edital> {
         return ResponseEntity.ok().body(Objects.requireNonNullElse(infoRecibo, "seminfo"));
     }
 
+
+    @CrossOrigin
+    @PostMapping(path = {"/VincularProcessoPreExistente/{id}"})
+    public ResponseEntity<?> VincularProcessoPreExistente(@PathVariable BigInteger id,@RequestBody String processo) throws JsonProcessingException {
+        Edital edital = editalRepository.findById(id);
+        ConcursoEnvio novo= new ConcursoEnvio();
+        novo.setEdital(edital);
+        novo.setFase(ConcursoEnvio.Fase.Edital.getValor());
+
+        if ( processo != null  ){
+            try{
+                JsonNode requestJson = new ObjectMapper().readTree(processo);
+                String proc = requestJson.get("processo").asText();
+                if (proc.length()>0){
+                    novo.setProcesso(proc);
+                    novo.setStatus(ConcursoEnvio.Status.Desambiguado.getValor());
+
+                }else{
+                    novo.setStatus(ConcursoEnvio.Status.Pendente.getValor());
+                }
+            }catch (JsonProcessingException e){
+                throw new RuntimeException("Formato invalido de payload!");
+            }
+        }
+        else {
+            novo.setStatus(ConcursoEnvio.Status.Pendente.getValor());
+        }
+
+        novo.setDataEnvio(LocalDateTime.now());
+        concursoEnvioRepository.save(novo);
+        return ResponseEntity.ok().body(novo);
+    }
+
+    @CrossOrigin
+    @PutMapping(path = {"/NaoVincularProcessoPreExistente/{id}"})
+    public ResponseEntity<?>  NaoVincularProcessoPreExistente(@PathVariable BigInteger id) {
+        Edital edital = editalRepository.findById(id);
+        ConcursoEnvio novo= new ConcursoEnvio();
+        novo.setEdital(edital);
+        novo.setFase(ConcursoEnvio.Fase.Edital.getValor());
+        novo.setStatus(ConcursoEnvio.Status.Pendente.getValor());
+        concursoEnvioRepository.save(novo);
+        return ResponseEntity.ok().body(novo);
+    }
+
+
+
+    @CrossOrigin
+    @GetMapping(path = {"/getProcessosEcontas/{id}"})
+    public ResponseEntity<?> getProcessosEcontaporEdital(@PathVariable BigInteger id) {
+        Edital edital = editalRepository.findById(id);
+        List<Map<String, Integer>> htp;
+        if (edital!= null ){
+            Integer numEdital = Integer.valueOf(edital.getNumeroEdital().substring(0, edital.getNumeroEdital().length() - 4));
+            Integer anoEdital = Integer.valueOf(edital.getNumeroEdital().substring(edital.getNumeroEdital().length() - 4));
+             htp =  concursoEnvioRepository.getProcessosEcontas(numEdital,anoEdital, User.getUser(concursoEnvioRepository.getRequest()).getUnidadeGestora().getId());
+        }
+        else { throw new RuntimeException("não encontrou edital!!");}
+
+
+        return ResponseEntity.ok().body(htp);
+    }
+
+
+
     @CrossOrigin
     @Transactional
     @DeleteMapping(value = {"/{id}"})
@@ -133,6 +202,7 @@ public class EditalController extends DefaultController<Edital> {
         editalRepository.delete(id);
         return ResponseEntity.noContent().build();
     }
+
 
 
 }

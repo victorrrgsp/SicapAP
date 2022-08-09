@@ -10,9 +10,12 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public class ConcursoEnvioRepository extends DefaultRepository<ConcursoEnvio, BigInteger> {
@@ -88,7 +91,7 @@ public class ConcursoEnvioRepository extends DefaultRepository<ConcursoEnvio, Bi
                 .getResultList();
 
 
-        long totalRegistros = countEnviosAguardandoAss();
+        long totalRegistros = countEnviosAguardandoAss(search);
         long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
 
         List<ConcursoEnvioAssRetorno> listc= new ArrayList<ConcursoEnvioAssRetorno>() ;
@@ -108,10 +111,42 @@ public class ConcursoEnvioRepository extends DefaultRepository<ConcursoEnvio, Bi
 
 
 
-    public Integer countEnviosAguardandoAss() {
+    public Integer countEnviosAguardandoAss(String search) {
         Query query = getEntityManager().createNativeQuery("select count(*) from ConcursoEnvio a " +
-                " where not exists(select 1 from ConcursoEnvioAssinatura ass  where  ass.idEnvio=a.id) ");
+                " where not exists(select 1 from ConcursoEnvioAssinatura ass  where  ass.idEnvio=a.id) " + search);
         return (Integer) query.getSingleResult();
+    }
+
+    public List<Map<String, Integer>> getProcessosEcontas(Integer numEdital, Integer anoEdital, String ug){
+        List<Map<String, Integer>> retorno = new ArrayList<Map<String, Integer>>();
+        Query query = getEntityManager().createNativeQuery("SELECT " +
+                "                        distinct p.processo_numero, p.processo_ano " +
+                "                   FROM " +
+                "                          SCP..processo p " +
+                " INNER JOIN SCP..ProcEdital pe on p.processo_numero = pe.NumProc and p.processo_ano = pe.AnoProc " +
+                "                    INNER JOIN SCP..assunto a on a.assunto_classe_assunto = p.processo_assunto_classe_assunto " +
+                "                                            and a.assunto_codigo = p.processo_assunto_codigo " +
+                "                                            and a.id = :assunto " +
+                "                    INNER JOIN Cadun..vwPessoaGeral pj ON (pj.id = p.id_entidade_origem) OR (pj.id = p.id_entidade_vinc) " +
+                "                   WHERE pj.cnpj = :cnpj" +
+                "   AND p.processo_assunto_codigo = 6" +
+                "   AND p.processo_assunto_classe_assunto = 8" +
+                "   AND pe.NumEdital = :numeroedital and pe.AnoEdital = :anoedital");
+        query.setParameter("cnpj",ug);
+        query.setParameter("numeroedital",numEdital);
+        query.setParameter("anoedital",anoEdital);
+        query.setParameter("assunto",64);
+        List<Object[]> list  = query.getResultList();
+        for (Object[] obj :list){
+            Map<String, Integer> mapa = new HashMap<String, Integer>();
+
+            mapa.put("processo_numero", (Integer) obj[0]);
+            mapa.put("processo_ano", (Integer) obj[1]);
+            retorno.add(mapa);
+        }
+        return retorno;
+
+
     }
 
 

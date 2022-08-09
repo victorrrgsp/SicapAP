@@ -32,7 +32,7 @@ public class DocumentoAdmissaoRepository extends DefaultRepository<DocumentoAdmi
 
         List<DocumentoAdmissao> list = getEntityManager()
                 .createNativeQuery("select a.* from DocumentoAdmissao a " +
-                        "where status=2 and idAdmissao is null  and a.idProcessoAdmissao = " + id + " " + " ORDER BY " + campo, DocumentoAdmissao.class)
+                        "where status>0 and idAdmissao is null  and a.idProcessoAdmissao = " + id + " " + " ORDER BY " + campo, DocumentoAdmissao.class)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();
@@ -44,7 +44,7 @@ public class DocumentoAdmissaoRepository extends DefaultRepository<DocumentoAdmi
 
     public Integer countApr(BigInteger id) {
         Query query = getEntityManager().createNativeQuery("select count(*) from DocumentoAdmissao a " +
-                "where status =2 and idAdmissao is null  and a.idProcessoAdmissao = "+ id+ "");
+                "where status>0 and idAdmissao is null  and a.idProcessoAdmissao = "+ id+ "");
         return (Integer) query.getSingleResult();
     }
 
@@ -58,7 +58,7 @@ public class DocumentoAdmissaoRepository extends DefaultRepository<DocumentoAdmi
 
         List<DocumentoAdmissao> list = getEntityManager()
                 .createNativeQuery("select a.* from DocumentoAdmissao a " +
-                        "where status =2 and  idAdmissao is not  null  and a.idProcessoAdmissao = " + id + " " + " ORDER BY " + campo, DocumentoAdmissao.class)
+                        "where status>0 and  idAdmissao is not  null  and a.idProcessoAdmissao = " + id + " " + " ORDER BY " + campo, DocumentoAdmissao.class)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();
@@ -70,14 +70,14 @@ public class DocumentoAdmissaoRepository extends DefaultRepository<DocumentoAdmi
 
     public Integer countAdm(BigInteger id) {
         Query query = getEntityManager().createNativeQuery("select count(*) from DocumentoAdmissao a " +
-                "where status =2 and  idAdmissao is not  null  and a.idProcessoAdmissao = "+ id+ "");
+                "where status>0 and  idAdmissao is not  null  and a.idProcessoAdmissao = "+ id+ "");
         return (Integer) query.getSingleResult();
     }
 
     public List<DocumentoAdmissao> getAprovadosSemAdmissao(BigInteger id){
         return getEntityManager()
                 .createNativeQuery("select a.* from DocumentoAdmissao a " +
-                        "where  status=2 idAdmissao is  null  and a.idProcessoAdmissao = " + id + " " + " ORDER BY id " , DocumentoAdmissao.class)
+                        "where  status>0 and idAdmissao is  null  and a.idProcessoAdmissao = " + id + " " + " ORDER BY id " , DocumentoAdmissao.class)
                 .getResultList();
 
     }
@@ -87,7 +87,7 @@ public class DocumentoAdmissaoRepository extends DefaultRepository<DocumentoAdmi
         String i ="";
         return getEntityManager()
                 .createNativeQuery("select a.* from DocumentoAdmissao a " +
-                        "where status = 2 and idAdmissao is not  null  and a.idProcessoAdmissao = " + id + " " + " ORDER BY id " , DocumentoAdmissao.class)
+                        "where status>0 and idAdmissao is not  null  and a.idProcessoAdmissao = " + id + " " + " ORDER BY id " , DocumentoAdmissao.class)
                 .getResultList();
 
     }

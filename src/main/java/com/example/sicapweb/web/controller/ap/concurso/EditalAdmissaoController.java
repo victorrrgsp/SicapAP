@@ -1,5 +1,6 @@
 package com.example.sicapweb.web.controller.ap.concurso;
 
+import br.gov.to.tce.model.ap.concurso.ConcursoEnvio;
 import br.gov.to.tce.model.ap.concurso.ProcessoAdmissao;
 import com.example.sicapweb.exception.InvalitInsert;
 import com.example.sicapweb.model.EditalFinalizado;
@@ -12,6 +13,7 @@ import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -40,6 +42,8 @@ public class EditalAdmissaoController {
     @Autowired
     private EditalRepository editalRepository;
 
+    @Autowired
+    private ConcursoEnvioRepository concursoEnvioRepository;
 
     @CrossOrigin
     @GetMapping(path="/aprovados/{searchParams}/{tipoParams}/pagination")
@@ -91,8 +95,10 @@ public class EditalAdmissaoController {
     public ResponseEntity<ProcessoAdmissao> create(@RequestBody ProcessoAdmissao processoAdmissao) {
 
         processoAdmissao.setCnpjEmpresaOrganizadora(User.getUser(processoAdmissaoRepository.getRequest()).getUnidadeGestora().getId());
-        ProcessoAdmissao pa = processoAdmissaoRepository.GetEmAbertoByEdital(processoAdmissao.getEdital().getId());
-        if (pa != null) throw  new InvalitInsert("Existe um processo em aberto para esse edital!");
+        List<ProcessoAdmissao> pa = processoAdmissaoRepository.GetEmAbertoByEdital(processoAdmissao.getEdital().getId());
+        if (pa.size()>0) throw  new InvalitInsert("Existe um processo em aberto para esse edital!");
+        List<ConcursoEnvio> enviofase2 = concursoEnvioRepository.buscarEnvioFAse2PorEdital(processoAdmissao.getEdital().getId());
+        if (enviofase2.size()==0) throw  new InvalitInsert("Fase de homnogação não foi concluida!!");
         processoAdmissaoRepository.save(processoAdmissao);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(processoAdmissao.getClass()).toUri();
         return ResponseEntity.created(uri).body(processoAdmissao);
@@ -104,9 +110,16 @@ public class EditalAdmissaoController {
     public ResponseEntity<ProcessoAdmissao> Enviar(@PathVariable BigInteger id) {
         ProcessoAdmissao processoAdmissao = processoAdmissaoRepository.findById(id);
         if (processoAdmissao!= null) {
+            List<Map<String,Object>> la = processoAdmissaoRepository.getValidInfoEnvio(processoAdmissao.getEdital().getId());
+            for (Map<String,Object> hashmap : la){
+                if (  !((Boolean)hashmap.get("valido"))  ) {
+                    throw new InvalitInsert( ((String)hashmap.get("ocorrencia")) );
+                }
+            }
             processoAdmissao.setStatus(2);
             processoAdmissaoRepository.update(processoAdmissao);
         }
+
         return ResponseEntity.ok().body(processoAdmissao);
     }
 
