@@ -52,8 +52,9 @@ import java.util.List;
 
             List<Admissao> list = getEntityManager()
                     .createNativeQuery("select a.* from Admissao a " +
-                            "join InfoRemessa i on a.chave = i.chave " +
-                            "where a.tipoAdmissao =1 and  i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, Admissao.class)
+                            "join InfoRemessa i on a.chave = i.chave and i.idUnidadeGestora = :ug " +
+                            "where a.tipoAdmissao =1 " + " " + search + " ORDER BY " + campo, Admissao.class)
+                    .setParameter("ug",User.getUser(super.request).getUnidadeGestora().getId())
                     .setFirstResult(pagina)
                     .setMaxResults(tamanho)
                     .getResultList();
@@ -70,11 +71,22 @@ import java.util.List;
                 nc.setNumeroEdital(list.get(i).getNumeroEdital());
                 nc.setAdmissao(list.get(i));
                 List<EditalAprovado> ea =  getEntityManager()
-                        .createNativeQuery("select a.* from EditalAprovado a " +
+                        .createNativeQuery(" with vaga as ( " +
+                                "   select v.* from  EditalVaga v join InfoRemessa i  on v.chave=i.chave and i.idUnidadeGestora = :ug " +
+                                "), " +
+                                "Aprovado as (" +
+                                "   select v.* from  EditalAprovado v join InfoRemessa i  on v.chave=i.chave and i.idUnidadeGestora = :ug " +
+                                " ) " +
+                                "select a.* from EditalAprovado a " +
                                 "join EditalVaga b on a.idEditalVaga= b.id "  +
-                                "join InfoRemessa i on a.chave = i.chave " +
-                                " where  b.idCargo =  "+list.get(i).getCargo().getId()+" and   cpf='" + nc.getCpf()  +  "'"  + " and  i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId()+"'", EditalAprovado.class)
+                                " where  b.idCargo = :idcargo and   cpf= :cpf ", EditalAprovado.class)
+                        .setParameter("ug",User.getUser(super.request).getUnidadeGestora().getId())
+                        .setParameter("idcargo",list.get(i).getCargo().getId())
+                        .setParameter("cpf",nc.getCpf())
                         .getResultList();
+
+
+
                 if (ea.size()>0 ){
                     nc.setEditalAprovado((EditalAprovado) ea.get(0) );
 
@@ -105,8 +117,10 @@ import java.util.List;
 
         public Integer countAdmissoes() {
             Query query = getEntityManager().createNativeQuery("select count(*) from Admissao a " +
-                    "join InfoRemessa i on a.chave = i.chave " +
-                    "where  a.tipoAdmissao =1 and i.idUnidadeGestora= '"+ User.getUser(super.request).getUnidadeGestora().getId()+ "'");
+                    "join InfoRemessa i on a.chave = i.chave and i.idUnidadeGestora = :ug " +
+                    "where  a.tipoAdmissao =1 ")
+                    .setParameter("ug",User.getUser(super.request).getUnidadeGestora().getId())
+                    ;
             return (Integer) query.getSingleResult();
         }
 

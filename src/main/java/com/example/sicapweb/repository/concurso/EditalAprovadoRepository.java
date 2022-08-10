@@ -32,11 +32,15 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
         String campo = String.valueOf(pageable.getSort()).replace(":", "");
 
         List<EditalAprovado> list = getEntityManager()
-                .createNativeQuery("select distinct a.* from EditalAprovado  a" +
-                        " join  EditalVaga b on a.idEditalVaga = b.id" +
-                        "    join InfoRemessa i on a.chave = i.chave and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' " +
-                        "     left join   Servidor se on a.cpf = se.cpfServidor" +
-                        "    left join Admissao ad on se.id = ad.idServidor and   b.idCargo = ad.idCargo  where  i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' "  + " ORDER BY " + campo, EditalAprovado.class)
+                .createNativeQuery("with  Admissao1 as " +
+                        "(select a.* from Admissao a join InfoRemessa i on a.chave = i.chave and i.idUnidadeGestora=:ug and a.tipoAdmissao=1 ), " +
+                        "  Servidor1 as " +
+                        "(select a.* from Servidor a join InfoRemessa i on a.chave = i.chave and i.idUnidadeGestora=:ug )," +
+                        "      Aprovado as " +
+                        "(select a.* from EditalAprovado a join InfoRemessa i on a.chave = i.chave and i.idUnidadeGestora=:ug )" +
+                        " " +
+                        "select distinct a.* from Aprovado a where (select count(1) from  Admissao1 ad join Servidor1 s  on  ad.idServidor = s.id and s.cpfServidor = a.cpf )=0  "  + " ORDER BY " + campo, EditalAprovado.class)
+                .setParameter("ug",User.getUser(super.request).getUnidadeGestora().getId())
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();
@@ -68,10 +72,18 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
     }
 
     public Integer countAprovados() {
-        Query query = getEntityManager().createNativeQuery("select count(*) from EditalAprovado a " +
-                "join InfoRemessa i on a.chave = i.chave " +
-                "where not exists(select 1 from Admissao ad  where ad.numeroInscricao=a.numeroInscricao)  and  i.idUnidadeGestora= '"+ User.getUser(super.request).getUnidadeGestora().getId()+ "'");
-        return (Integer) query.getSingleResult();
+
+        Query query =    getEntityManager()
+                .createNativeQuery("with  Admissao1 as " +
+                        "(select a.* from Admissao a join InfoRemessa i on a.chave = i.chave and i.idUnidadeGestora=:ug and a.tipoAdmissao=1 ), " +
+                        "  Servidor1 as " +
+                        "(select a.* from Servidor a join InfoRemessa i on a.chave = i.chave and i.idUnidadeGestora=:ug )," +
+                        "      Aprovado as " +
+                        "(select a.* from EditalAprovado a join InfoRemessa i on a.chave = i.chave and i.idUnidadeGestora=:ug )" +
+                        " " +
+                        "select distinct count(1) from Aprovado a where (select count(1) from  Admissao1 ad join Servidor1 s  on  ad.idServidor = s.id and s.cpfServidor = a.cpf )=0  ")
+                .setParameter("ug",User.getUser(super.request).getUnidadeGestora().getId());
+              return (Integer) query.getSingleResult();
     }
 
 

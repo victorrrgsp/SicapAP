@@ -57,11 +57,11 @@ public class AssinarAdmissaoController {
     @GetMapping(path="/{searchParams}/{tipoParams}/pagination")
     public ResponseEntity<PaginacaoUtil<AdmissaoEnvioAssRetorno>> listaAProcessosAguardandoAss(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
         User userlogado = User.getUser(processoAdmissaoRepository.getRequest());
-//        if (userlogado.getCargo().getValor()!=4 ){
-//            List<AdmissaoEnvioAssRetorno> listavazia= new ArrayList<>() ;
-//            PaginacaoUtil<AdmissaoEnvioAssRetorno> paginacaoUtilvazia= new PaginacaoUtil<AdmissaoEnvioAssRetorno>(0, 1, 1, 0, listavazia);
-//            return ResponseEntity.ok().body(paginacaoUtilvazia);
-//        }
+        if (userlogado.getCargo().getValor()!=4 ){
+            List<AdmissaoEnvioAssRetorno> listavazia= new ArrayList<>() ;
+            PaginacaoUtil<AdmissaoEnvioAssRetorno> paginacaoUtilvazia= new PaginacaoUtil<AdmissaoEnvioAssRetorno>(0, 1, 1, 0, listavazia);
+            return ResponseEntity.ok().body(paginacaoUtilvazia);
+        }
         PaginacaoUtil<AdmissaoEnvioAssRetorno> paginacaoUtil = processoAdmissaoRepository.buscarProcessosAguardandoAss(pageable,searchParams,tipoParams);
         return ResponseEntity.ok().body(paginacaoUtil);
     }
@@ -131,7 +131,6 @@ public class AssinarAdmissaoController {
     @PostMapping
     public ResponseEntity<?> AssinarAdmissao(@RequestBody String hashassinante_hashAssinado )  throws JsonProcessingException,Exception {
         User userlogado = User.getUser(processoAdmissaoRepository.getRequest());
-        Boolean sucess = true;
         // try {
         if (userlogado != null) {
             if (userlogado.getCargo().getValor() !=4 ) throw new InvalitInsert("Apenas o gestor da unidade gestora pode assinar envios!!");
@@ -324,6 +323,7 @@ public class AssinarAdmissaoController {
           //  throw new Exception("em manutenção!!");
         } else {
             System.out.println("erro:não encontrou usuario logado!!");
+            throw new Exception("erro:não encontrou usuario logado!!");
         }
 
         // }catch(Exception e){

@@ -16,7 +16,7 @@ public class AssinarCertificadoDigital {
 
        // System.out.println("body: "+body.toString());
         Request request = new Request.Builder()
-                .url("https://dev2.tce.to.gov.br/assinador/app/controllers/?&c=TCE_Assinador_AssinadorWeb&m=inicializarAssinatura")
+                .url("https://app.tce.to.gov.br/assinador/app/controllers/?&c=TCE_Assinador_AssinadorWeb&m=inicializarAssinatura")
                 .method("POST", body)
                 .addHeader("Accept", "application/json")
                 .addHeader("Content-Type", "application/x-www-form-urlencoded")
@@ -34,7 +34,7 @@ public class AssinarCertificadoDigital {
         MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
         RequestBody body = RequestBody.create(mediaType, "desafio=" + desafio + "&assinatura=" + assinatura + "&original=" + original);
         Request request = new Request.Builder()
-                .url("https://dev2.tce.to.gov.br/assinador/app/controllers/?&c=TCE_Assinador_AssinadorWeb&m=finalizarAssinatura")
+                .url("https://app.tce.to.gov.br/assinador/app/controllers/?&c=TCE_Assinador_AssinadorWeb&m=finalizarAssinatura")
                 .method("POST", body)
                 .addHeader("Accept", "application/json")
                 .addHeader("Content-Type", "application/x-www-form-urlencoded")

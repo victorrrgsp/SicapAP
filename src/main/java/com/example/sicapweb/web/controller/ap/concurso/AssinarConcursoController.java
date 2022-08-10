@@ -59,11 +59,11 @@ public class AssinarConcursoController {
     @GetMapping(path="/{searchParams}/{tipoParams}/pagination")
     public ResponseEntity<PaginacaoUtil<ConcursoEnvioAssRetorno>> listaAEnviosAguardandoAss(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
         User userlogado = User.getUser(concursoEnvioAssinaturaRepository.getRequest());
-//        if (userlogado.getCargo().getValor()!=4 ){
-//            List<ConcursoEnvioAssRetorno> listavazia= new ArrayList<>() ;
-//            PaginacaoUtil<ConcursoEnvioAssRetorno> paginacaoUtilvazia= new PaginacaoUtil<ConcursoEnvioAssRetorno>(0, 1, 1, 0, listavazia);
-//            return ResponseEntity.ok().body(paginacaoUtilvazia);
-//        }
+        if (userlogado.getCargo().getValor()!=4 ){
+            List<ConcursoEnvioAssRetorno> listavazia= new ArrayList<>() ;
+            PaginacaoUtil<ConcursoEnvioAssRetorno> paginacaoUtilvazia= new PaginacaoUtil<ConcursoEnvioAssRetorno>(0, 1, 1, 0, listavazia);
+            return ResponseEntity.ok().body(paginacaoUtilvazia);
+        }
         PaginacaoUtil<ConcursoEnvioAssRetorno> paginacaoUtil = concursoEnvioRepository.buscarEnviosAguardandoAss(pageable,searchParams,tipoParams);
         return ResponseEntity.ok().body(paginacaoUtil);
     }
@@ -97,7 +97,7 @@ public class AssinarConcursoController {
                             System.out.println("idenvio: " + idenvio);
                             ConcursoEnvio envio = (ConcursoEnvio) concursoEnvioRepository.findById(idenvio);
                             if (envio!=null ){
-                                if (envio.getStatus()==3) throw new InvalitInsert("Envio ja Assinado!!");
+                                if (envio.getStatus()==2) throw new InvalitInsert("Envio ja Assinado!!");
                                 ConcursoEnvioAssinatura novo = new ConcursoEnvioAssinatura();
                                 novo.setIdCargo(User.getUser(concursoEnvioAssinaturaRepository.getRequest()).getCargo().getValor());
                                 novo.setCpf(User.getUser(concursoEnvioAssinaturaRepository.getRequest()).getCpf());
@@ -226,6 +226,7 @@ public class AssinarConcursoController {
                // throw new Exception("em manutenção!!");
             } else {
                 System.out.println("não encontrou usuario logado!!");
+                throw new Exception("não encontrou usuario logado!");
             }
 
        // }catch(Exception e){
