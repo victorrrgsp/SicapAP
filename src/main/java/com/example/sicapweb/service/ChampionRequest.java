@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.TimeZone;
 public class ChampionRequest {
 
-    public static String server = "https://dev2.tce.to.gov.br";
+    public static String server = "https://app.tce.to.gov.br";
 
     public static ResponseEntity<String> salvarSimples(String cpf, String nome, String sistema, String sso_client_id, String sso_client_secret) throws IOException, URISyntaxException {
         String servico = "/cadun/app/controllers/index.php?&c=TCE_CADUN_PessoaFisica&m=salvarSimples";
