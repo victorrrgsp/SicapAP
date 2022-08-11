@@ -96,7 +96,7 @@ public class ProcessoAdmissaoRepository  extends DefaultRepository<ProcessoAdmis
 
         List<ProcessoAdmissao> list = getEntityManager()
                 .createNativeQuery("select a.* from ProcessoAdmissao a " +
-                        "where not exists(select 1 from AdmissaoEnvioAssinatura ass  where  ass.idProcesso=a.id)  and a.status=2 and  a.cnpjEmpresaOrganizadora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, ProcessoAdmissao.class)
+                        "where status=2 and not exists(select 1 from AdmissaoEnvioAssinatura ass  where  ass.idProcesso=a.id)  and a.status=2 and  a.cnpjEmpresaOrganizadora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, ProcessoAdmissao.class)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();

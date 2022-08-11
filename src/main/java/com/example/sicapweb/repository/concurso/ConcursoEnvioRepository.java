@@ -85,7 +85,7 @@ public class ConcursoEnvioRepository extends DefaultRepository<ConcursoEnvio, Bi
 
         List<ConcursoEnvio> list = getEntityManager()
                 .createNativeQuery("select a.* from ConcursoEnvio a " +
-                        " where not exists(select 1 from ConcursoEnvioAssinatura ass  where  ass.idEnvio=a.id) " + search + " ORDER BY " + campo, ConcursoEnvio.class)
+                        " where status=3 and  not exists(select 1 from ConcursoEnvioAssinatura ass  where  ass.idEnvio=a.id) " + search + " ORDER BY " + campo, ConcursoEnvio.class)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();
