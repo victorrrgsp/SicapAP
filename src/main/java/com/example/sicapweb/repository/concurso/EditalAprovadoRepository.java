@@ -164,7 +164,7 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
 
                 mapa.put("NomeResponsavel", (String) obj[0]);
                 mapa.put("CpfResponsavel", (String) obj[1]);
-                mapa.put("DataAssinatura", (Date) obj[2]);
+                mapa.put("DataAssinatura", (String) obj[2]);
                 mapa.put("NumeroEdital", (String) obj[3]);
                 mapa.put("nomeUnidade", (String) obj[4]);
                 mapa.put("idUnidadeGestora", (String) obj[5]);

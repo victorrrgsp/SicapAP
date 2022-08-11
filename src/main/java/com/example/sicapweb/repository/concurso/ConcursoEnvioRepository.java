@@ -128,9 +128,9 @@ public class ConcursoEnvioRepository extends DefaultRepository<ConcursoEnvio, Bi
                 "                                            and a.assunto_codigo = p.processo_assunto_codigo " +
                 "                                            and a.id = :assunto " +
                 "                    INNER JOIN Cadun..vwPessoaGeral pj ON (pj.id = p.id_entidade_origem) OR (pj.id = p.id_entidade_vinc) " +
-                "                   WHERE pj.cnpj = :cnpj" +
+                "                   WHERE pj.cnpj = :cnpj " +
                 "   AND p.processo_assunto_codigo = 6" +
-                "   AND p.processo_assunto_classe_assunto = 8" +
+                "   AND p.processo_assunto_classe_assunto = 8 " +
                 "   AND pe.NumEdital = :numeroedital and pe.AnoEdital = :anoedital");
         query.setParameter("cnpj",ug);
         query.setParameter("numeroedital",numEdital);

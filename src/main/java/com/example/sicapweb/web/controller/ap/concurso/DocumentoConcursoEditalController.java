@@ -138,8 +138,8 @@ public class DocumentoConcursoEditalController extends DefaultController<Documen
                 "Justificativa para a abertura do concurso público", "", "Sim"));
         list.add(new Inciso("III", "Demonstrativo de despesa do impacto orçamentário-financeiro",
                 "Demonstrativo de despesa do impacto orçamentário-financeiro", "", "Sim"));
-        list.add(new Inciso("IV", "Declaração de despesa da autorização para realização do consurso público",
-                "Declaração de despesa da autorização para realização do consurso público", "", "Sim"));
+        list.add(new Inciso("IV", "Declaração de despesa da autorização para realização do concurso público",
+                "Declaração de despesa da autorização para realização do concurso público", "", "Sim"));
         list.add(new Inciso("V", "Demonstrativo informando o percentual da despesa total com pessoal",
                 "Demonstrativo informando o percentual da despesa total com pessoal", "", "Sim"));
         list.add(new Inciso("VI", "Ato expedido pela autoridade competente designando a comissão examinadora/julgadora",
@@ -148,14 +148,14 @@ public class DocumentoConcursoEditalController extends DefaultController<Documen
                 "Demonstrativo do quadro de pessoal efetivo e quantidade de vagas criadas por lei", "", "Sim"));
         list.add(new Inciso("VIII", "Lei(s) de criação e/ou alteração dos cargos disponibilizados no Edital",
                 "Lei(s) de criação e/ou alteração dos cargos disponibilizados no Edital", "", "Sim"));
-        list.add(new Inciso("IX", "Documentos da contratação da entidade pomotora do certame",
-                "Documentos da contratação da entidade pomotora do certame", "", "Sim"));
-        list.add(new Inciso("IX.I", "Comprovante de cadastramento no SICAP-LCO",
+        list.add(new Inciso("IX", "Documentos da contratação da entidade promotora do certame",
+                "Documentos da contratação da entidade promotora do certame", "", "Sim"));
+        list.add(new Inciso("IX.I", "Comprovante de cadastramento do contrato no SICAP-LCO",
                 "Comprovante de cadastramento no SICAP-LCO", "", "Sim"));
-        list.add(new Inciso("X", "Edital de abertura do consurso público e o respectivo comprovante de publicação",
-                "Edital de abertura do consurso público e o respectivo comprovante de publicação", "", "Sim"));
-        list.add(new Inciso("XI", "Demais editais do consurso público, quando houver",
-                "Demais editais do consurso público, quando houver", "", "Não"));
+        list.add(new Inciso("X", "Edital de abertura do concurso público e o respectivo comprovante de publicação",
+                "Edital de abertura do concurso público e o respectivo comprovante de publicação", "", "Sim"));
+        list.add(new Inciso("XI", "Demais editais do concurso público, quando houver",
+                "Demais editais do concurso público, quando houver", "", "Não"));
         list.add(new Inciso("sem", "Outros",
                 "Outros", "", "Não"));
 

@@ -76,6 +76,7 @@ public class AssinarConcursoController {
        // try {
             if (userlogado != null) {
                 if (userlogado.getCargo().getValor() !=4 ) throw new InvalitInsert("Apenas o gestor da unidade gestora pode assinar envios!!");
+                if (userlogado.getUnidadeGestora().getId().equals("00000000000000") ) throw new InvalitInsert("Não assina envios na ug de teste!!");
                 JsonNode requestJson = new ObjectMapper().readTree(hashassinante_hashAssinado);
                 String hashassinante =  URLDecoder.decode(requestJson.get("hashassinante").asText(), StandardCharsets.UTF_8);
                 String hashassinado =  URLDecoder.decode(requestJson.get("hashassinado").asText(), StandardCharsets.UTF_8);

@@ -80,6 +80,9 @@ public class EditalController extends DefaultController<Edital> {
             } else if (edital.getNumeroEdital().isEmpty() || edital.getCnpjEmpresaOrganizadora().isEmpty() || edital.getPrazoValidade().isEmpty() || edital.getVeiculoPublicacao().isEmpty()) {
                 throw new InvalitInsert("favor envie todos os campos obrigatorios preenchidos!!");
             }
+            if (1==1){
+                throw new InvalitInsert("testabdi");
+            }
 
             editalRepository.save(edital);
 

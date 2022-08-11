@@ -15,9 +15,11 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.math.BigInteger;
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -95,7 +97,8 @@ public class EditalRepository extends DefaultRepository<Edital, BigInteger> {
            if  ( list.get(i).getCnpjEmpresaOrganizadora()!=null ) {
                try {
                    List<EmpresaOrganizadora> leo =  getEntityManager()
-                           .createNativeQuery("select a.* from empresaOrganizadora a where  cnpjEmpresaOrganizadora='" + list.get(i).getCnpjEmpresaOrganizadora() + "'", EmpresaOrganizadora.class)
+                           .createNativeQuery("select a.* from empresaOrganizadora a  join infoRemessa i on a.chave=i.chave and i.idUnidadeGestora = :ug  where  cnpjEmpresaOrganizadora='" + list.get(i).getCnpjEmpresaOrganizadora() + "'", EmpresaOrganizadora.class)
+                           .setParameter("ug",User.getUser(super.getRequest()).getUnidadeGestora().getId() )
                            .getResultList();
 
                    if (leo.size()>0){
@@ -185,14 +188,14 @@ public class EditalRepository extends DefaultRepository<Edital, BigInteger> {
         try {
 
             List<Object[]> list = entityManager.createNativeQuery(
-
                     "select p.nome NomeResponsavel,p.cpf CpfResponsavel,a.data_assinatura DataAssinatura, ed.numeroEdital NumeroEdital, i.nomeUnidade , i.idUnidadeGestora , pj.nomeMunicipio from " +
                             "     ConcursoEnvioAssinatura a " +
                             "     inner join ConcursoEnvio env on a.idEnvio= env.id " +
                             "     inner join Edital ed on ed.id = env.idEdital " +
                             "inner join cadun..vwPessoa p on a.cpf=p.cpf " +
                             "     inner join InfoRemessa i on ed.chave=i.chave  " +
-                            " inner join cadun..vwPessoaJuridica pj on i.idUnidadeGestora=pj.cnpj"+
+                            " inner join cadun..vwPessoaJuridica pj on i.idUnidadeGestora=pj.cnpj" +
+                            "" +
                     " where env.processo='"+procnumero+"/"+procano+ "'").getResultList();
 
 
@@ -202,7 +205,7 @@ public class EditalRepository extends DefaultRepository<Edital, BigInteger> {
 
                 mapa.put("NomeResponsavel", (String) obj[0]);
                 mapa.put("CpfResponsavel", (String) obj[1]);
-                mapa.put("DataAssinatura", (Date) obj[2]);
+                mapa.put("DataAssinatura",  (String) obj[2]);
                 mapa.put("NumeroEdital", (String) obj[3]);
                 mapa.put("nomeUnidade", (String) obj[4]);
                 mapa.put("idUnidadeGestora", (String) obj[5]);
