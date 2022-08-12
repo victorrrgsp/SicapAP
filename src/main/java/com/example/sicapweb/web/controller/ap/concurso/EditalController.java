@@ -80,7 +80,6 @@ public class EditalController extends DefaultController<Edital> {
             } else if (edital.getNumeroEdital().isEmpty() || edital.getCnpjEmpresaOrganizadora().isEmpty() || edital.getPrazoValidade().isEmpty() || edital.getVeiculoPublicacao().isEmpty()) {
                 throw new InvalitInsert("favor envie todos os campos obrigatorios preenchidos!!");
             }
-
             editalRepository.save(edital);
 
             URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(edital.getId()).toUri();
@@ -107,7 +106,7 @@ public class EditalController extends DefaultController<Edital> {
                 throw new InvalitInsert("não é um numero de Edital valido. Os ultinmos 4 digitos correspondem ao ano do edital !!");
             }
 
-            ConcursoEnvio envio = concursoEnvioRepository.buscarEnvioFAse1PorEditalassinado(e.getId());
+            ConcursoEnvio envio = concursoEnvioRepository.buscarEnvioFAse1PorEditalassinado(id);
             if(envio != null){
                 if (envio.getStatus()==3) throw new InvalitInsert("Edital não pode ser alterado pois ja foi enviado processo no econtas !!");
             }
