@@ -83,6 +83,29 @@ public class AdmEnvioRepository extends DefaultRepository<AdmEnvio, BigInteger> 
         return resutSet;
     }
 
+    public List<AdmEnvio> buscaTotalNaoPaginada(String searchParams, Integer tipoParams){
+        String search = "";
+        //monta pesquisa search
+        if (searchParams.length() > 3) {
+
+            if (tipoParams == 0) { //entra para tratar a string
+                String arrayOfStrings[] = searchParams.split("=");
+                search = " AND " + arrayOfStrings[0] + " LIKE  '%" + arrayOfStrings[1] + "%'  ";
+            } else {
+                search = " AND " + searchParams + "   ";
+            }
+        }
+
+        List<AdmEnvio> list = getEntityManager().createNativeQuery(
+                        "select  * from AdmEnvio " +
+                                "where status = 4  " + search, AdmEnvio.class)
+                .getResultList();
+        return list;
+
+
+    }
+
+
     public Integer countEnvio() {
         Query query = getEntityManager().createNativeQuery("" +
                 "select count(*) from AdmEnvio " +
