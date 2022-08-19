@@ -187,4 +187,15 @@ public class UnidadeGestoraRepository extends DefaultRepository<UnidadeGestora, 
             throw new Exception("Erro inexperado na consulta 'buscarDadosFundoOuInstituto'!");
         }
     }
+
+    public List<UnidadeGestora> findAllWithConsesorios() {
+
+            var result = getEntityManager().createNativeQuery(
+                    "select\n" +
+                    "distinct UG.*\n" +
+                    "    from AdmEnvio ad\n" +
+                    "     join SICAPAP21.dbo.UnidadeGestora UG on UG.id = ad.unidadeGestora",UnidadeGestora.class).getResultList();
+            return result;
+
+    }
 }

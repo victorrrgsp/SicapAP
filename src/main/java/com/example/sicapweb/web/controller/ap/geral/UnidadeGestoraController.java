@@ -28,6 +28,12 @@ public class UnidadeGestoraController {
         List<UnidadeGestora> list = unidadeGestoraRepository.findAll();
         return ResponseEntity.ok().body(list);
     }
+    @CrossOrigin
+    @GetMapping(path = "/findAllWithConsesorios")
+    public ResponseEntity<List<UnidadeGestora>> findAllWithConsesorios() {
+        List<UnidadeGestora> list = unidadeGestoraRepository.findAllWithConsesorios();
+        return ResponseEntity.ok().body(list);
+    }
 
 
     @CrossOrigin
