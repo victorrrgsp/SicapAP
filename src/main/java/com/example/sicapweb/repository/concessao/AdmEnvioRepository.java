@@ -102,8 +102,7 @@ public class AdmEnvioRepository extends DefaultRepository<AdmEnvio, BigInteger> 
                                         "     join SICAPAP21.dbo.UnidadeGestora UG on UG.id = ad.unidadeGestora\n" +
                                         "     join SICAPAP21.dbo.UnidadeGestora UGorigen on UGorigen.id = ad.orgaoOrigem\n" +
                                         "     left join AdmEnvioAssinatura1 adA on adA.idEnvio = ad.id and adA.rank = 1\n" +
-                                        "where status = 4\n" +
-                                        "  and (ad.unidadeGestora in :ug or 'todos' in :ug ) \n"+
+                                        "where (ad.unidadeGestora in :ug or 'todos' in :ug ) \n"+
                                         "  and (ad.tipoRegistro in :TipoRegistro or -1 in :TipoRegistro )\n" +
                                         "  and ((adA.data_assinatura between :dataInico and :dataFim) or (:dataInico is null or :dataFim is null))"
                 )
