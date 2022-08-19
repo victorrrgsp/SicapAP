@@ -87,12 +87,14 @@ public class AdmEnvioRepository extends DefaultRepository<AdmEnvio, BigInteger> 
         String search = "";
         //monta pesquisa search
         if (searchParams.length() > 3) {
-
-            if (tipoParams == 0) { //entra para tratar a string
-                String arrayOfStrings[] = searchParams.split("=");
-                search = " AND " + arrayOfStrings[0] + " LIKE  '%" + arrayOfStrings[1] + "%'  ";
-            } else {
-                search = " AND " + searchParams + "   ";
+            List<String> lparam =  new ArrayList(Arrays.asList(searchParams.split("&")));
+            for (String param : lparam){
+                if (tipoParams == 0) { //entra para tratar a string
+                    String arrayOfStrings[] = param.split("=");
+                    search = search + " AND " + arrayOfStrings[0] + " LIKE  '%" + arrayOfStrings[1] + "%'  ";
+                } else {
+                    search = " AND " + searchParams + "   ";
+                }
             }
         }
 
@@ -101,8 +103,6 @@ public class AdmEnvioRepository extends DefaultRepository<AdmEnvio, BigInteger> 
                                 "where status = 4  " + search, AdmEnvio.class)
                 .getResultList();
         return list;
-
-
     }
 
 
