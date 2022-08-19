@@ -86,8 +86,9 @@ public class AdmEnvioRepository extends DefaultRepository<AdmEnvio, BigInteger> 
         return resutSet;
     }
 
-    public List<HashMap<String,Object>> buscaTotalNaoPaginada(String searchParams, List<String> ug, Integer tipoRegistro , LocalDate dataInico, LocalDate dataFim){
-        List<Object[]> list = getEntityManager().createNativeQuery(
+    public List<HashMap<String,Object>> buscaTotalNaoPaginada(String searchParams, List<String> ug, List<Integer> tipoRegistro , LocalDate dataInico, LocalDate dataFim){
+
+                var query = getEntityManager().createNativeQuery(
                                         "with AdmEnvioAssinatura1 as\n" +
                                         "         (select ROW_NUMBER() over(partition by idEnvio order by data_assinatura) as rank, idEnvio ,data_assinatura\n" +
                                         "          from SICAPAP21..AdmEnvioAssinatura\n" +
@@ -102,19 +103,20 @@ public class AdmEnvioRepository extends DefaultRepository<AdmEnvio, BigInteger> 
                                         "     join SICAPAP21.dbo.UnidadeGestora UGorigen on UGorigen.id = ad.orgaoOrigem\n" +
                                         "     left join AdmEnvioAssinatura1 adA on adA.idEnvio = ad.id and adA.rank = 1\n" +
                                         "where status = 4\n" +
-                                        "  and (ad.unidadeGestora in (:ug) or 'todos' in (:ug) ) \n"+
-                                        "  and (ad.tipoRegistro in (:TipoRegistro) or :TipoRegistro is null )\n" +
+                                        "  and (ad.unidadeGestora in :ug or 'todos' in :ug ) \n"+
+                                        "  and (ad.tipoRegistro in :TipoRegistro or -1 in :TipoRegistro )\n" +
                                         "  and ((adA.data_assinatura between :dataInico and :dataFim) or (:dataInico is null or :dataFim is null))"
                 )
                 .setParameter("ug" ,ug)
                 .setParameter("TipoRegistro" ,tipoRegistro)
                 .setParameter("dataInico" ,dataInico)
-                .setParameter("dataFim" ,dataFim)
-                .getResultList();
+                .setParameter("dataFim" ,dataFim);
+        List<Object[]> list = query.getResultList();
         List<HashMap<String,Object>> retorno = new ArrayList<HashMap<String,Object>>();
+
         list.forEach(envio ->{
             var aux = new HashMap<String,Object>();
-            aux.put("id", envio[0] );
+            //aux.put("id", envio[0] );
             aux.put("TipoRegistro",this.getTipoByValue((Integer)envio[1]));
             //aux.put("UnidadeGestora", envio[2] );
             aux.put("processo", envio[3] );
@@ -133,6 +135,7 @@ public class AdmEnvioRepository extends DefaultRepository<AdmEnvio, BigInteger> 
             aux.put("Complemento", envio[7] );
             aux.put("nomeUg", envio[9] );
             aux.put("nomeUgOrigem", envio[10] );
+            aux.put("DataAsinatura", envio[11] );
             retorno.add(aux);
         });
         return retorno;

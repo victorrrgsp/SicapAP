@@ -30,7 +30,7 @@ public class AdmEnvioController extends DefaultController<AdmEnvio> {
     public ResponseEntity<List<HashMap<String,Object>>> BuscaTotal(
             @PathVariable String searchParams,
             @RequestParam(required = false) List<String> Ug ,
-            @RequestParam(required = false) Integer TipoRegistro ,
+            @RequestParam(required = false) List<Integer> TipoRegistro ,
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate dataInico,
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate dataFim
     ){
