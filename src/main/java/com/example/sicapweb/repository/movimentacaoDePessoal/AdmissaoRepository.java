@@ -79,32 +79,30 @@ public class AdmissaoRepository extends DefaultRepository<Admissao, BigInteger> 
                 .getResultList();
 
 
-        long totalRegistros = countAdmissoes(search);
-        long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
-        List<NomeacaoConcurso> listc= new ArrayList<NomeacaoConcurso>() ;
-        for(Integer i= 0; i < list.size(); i++){
-            NomeacaoConcurso nc =new NomeacaoConcurso();
-            nc.setNome(list.get(i).getServidor().getNome());
-            nc.setCpf(list.get(i).getServidor().getCpfServidor());
-            nc.setAto(list.get(i).getAto());
-            nc.setNumeroEdital(list.get(i).getNumeroEdital());
-            nc.setAdmissao(list.get(i));
-            List<EditalAprovado> ea =  getEntityManager()
-                    .createNativeQuery(" with vaga as ( " +
-                            "   select v.* from  EditalVaga v join InfoRemessa i  on v.chave=i.chave and i.idUnidadeGestora = :ug  and v.idCargo = :idcargo" +
-                            "), " +
-                            "Aprovado as (" +
-                            "   select v.* from  EditalAprovado v join InfoRemessa i  on v.chave=i.chave and i.idUnidadeGestora = :ug and cpf= :cpf" +
-                            " ) " +
-                            "select a.* from EditalAprovado a " +
-                            "join EditalVaga b on a.idEditalVaga= b.id "  +
-                            " where   b.idCargo = :idcargo and   cpf= :cpf ", EditalAprovado.class)
-                    .setParameter("ug",User.getUser(super.request).getUnidadeGestora().getId())
-                    .setParameter("idcargo",list.get(i).getCargo().getId())
-                    .setParameter("cpf",nc.getCpf())
-                    .getResultList();
-
-
+            long totalRegistros = countAdmissoes(search);
+            long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
+            List<NomeacaoConcurso> listc= new ArrayList<NomeacaoConcurso>() ;
+            for(Integer i= 0; i < list.size(); i++){
+                NomeacaoConcurso nc =new NomeacaoConcurso();
+                nc.setNome(list.get(i).getServidor().getNome());
+                nc.setCpf(list.get(i).getServidor().getCpfServidor());
+                nc.setAto(list.get(i).getAto());
+                nc.setNumeroEdital(list.get(i).getNumeroEdital());
+                nc.setAdmissao(list.get(i));
+                List<EditalAprovado> ea =  getEntityManager()
+                        .createNativeQuery(" with vaga as ( " +
+                                "   select v.* from  EditalVaga v join InfoRemessa i  on v.chave=i.chave and i.idUnidadeGestora = :ug  and v.idCargo = :idcargo" +
+                                "), " +
+                                "Aprovado as (" +
+                                "   select v.* from  EditalAprovado v join InfoRemessa i  on v.chave=i.chave and i.idUnidadeGestora = :ug and cpf= :cpf" +
+                                " ) " +
+                                "select a.* from EditalAprovado a " +
+                                "join EditalVaga b on a.idEditalVaga= b.id "  +
+                                " where   b.idCargo = :idcargo and   cpf= :cpf ", EditalAprovado.class)
+                        .setParameter("ug",User.getUser(super.request).getUnidadeGestora().getId())
+                        .setParameter("idcargo",list.get(i).getCargo().getId())
+                        .setParameter("cpf",nc.getCpf())
+                        .getResultList();
 
             if (ea.size()>0 ){
                 nc.setEditalAprovado((EditalAprovado) ea.get(0) );
