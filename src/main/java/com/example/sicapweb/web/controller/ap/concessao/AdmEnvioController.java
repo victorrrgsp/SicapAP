@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -31,10 +32,19 @@ public class AdmEnvioController extends DefaultController<AdmEnvio> {
             @PathVariable String searchParams,
             @RequestParam(required = false) List<String> Ug ,
             @RequestParam(required = false) List<Integer> TipoRegistro ,
+            @RequestParam(required = false) Integer Status ,
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate dataInico,
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate dataFim
     ){
-        List<HashMap<String,Object>> Listatotal = admEnvioRepository.buscaTotalNaoPaginada(searchParams,Ug,TipoRegistro,dataInico,dataFim);
+
+        // Status       = ifNull(Status,-1);
+        TipoRegistro = ifNull(TipoRegistro,Arrays.asList(new Integer[]{-1}));
+        Ug           = ifNull(Ug, Arrays.asList(new String[]{"todos"}));
+
+        List<HashMap<String,Object>> Listatotal = admEnvioRepository.buscaTotalNaoPaginada(searchParams,Ug,TipoRegistro,dataInico,dataFim,Status);
         return ResponseEntity.ok().body(Listatotal);
+    }
+    <T> T ifNull(T obj, T seNull){
+        return obj = obj == null?seNull:obj;
     }
 }
