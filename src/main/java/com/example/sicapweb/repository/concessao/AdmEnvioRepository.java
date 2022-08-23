@@ -86,7 +86,7 @@ public class AdmEnvioRepository extends DefaultRepository<AdmEnvio, BigInteger> 
         return resutSet;
     }
 
-    public List<HashMap<String,Object>> buscaTotalNaoPaginada(String searchParams, List<String> ug, List<Integer> tipoRegistro , LocalDate dataInico, LocalDate dataFim){
+    public List<HashMap<String,Object>> buscaTotalNaoPaginada(String searchParams, List<String> ug, List<Integer> tipoRegistro , LocalDate dataInico, LocalDate dataFim,Integer Ststuss){
 
                 var query = getEntityManager().createNativeQuery(
                                         "with AdmEnvioAssinatura1 as\n" +
@@ -105,11 +105,13 @@ public class AdmEnvioRepository extends DefaultRepository<AdmEnvio, BigInteger> 
                                         "where (ad.unidadeGestora in :ug or 'todos' in :ug ) \n"+
                                         "     and (ad.tipoRegistro in :TipoRegistro or -1 in :TipoRegistro )\n" +
                                         "     and ((adA.data_assinatura between :dataInico and :dataFim) or (:dataInico is null or :dataFim is null))\n" +
-                                        "     and ad.unidadeGestora <> '00000000000000'"
+                                        "     and ad.unidadeGestora <> '00000000000000'"+
+                                        "     and ( :status is null or ad.status = :status) "
                 )
                 .setParameter("ug" ,ug)
                 .setParameter("TipoRegistro" ,tipoRegistro)
                 .setParameter("dataInico" ,dataInico)
+                .setParameter("status" ,Ststuss)
                 .setParameter("dataFim" ,dataFim);
         List<Object[]> list = query.getResultList();
         List<HashMap<String,Object>> retorno = new ArrayList<HashMap<String,Object>>();
