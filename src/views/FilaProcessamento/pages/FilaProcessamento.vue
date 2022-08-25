@@ -96,6 +96,11 @@
             </b-icon>
           </template>
         </b-table>
+        <div v-show="FilterSize < 1" class=" text-center font-weight-bold" style="font-size: 1.3em;">
+          <strong>
+            nao contem registros
+          </strong>
+        </div>
         <b-icon class="h6 mb-1" icon="check-square" variant="success"> </b-icon>
         &nbsp; &nbsp;Enviado &nbsp; &nbsp; &nbsp;
         <b-icon class="h6 mb-1" icon="x-circle" variant="danger"> </b-icon>
@@ -256,13 +261,13 @@ export default {
       api.get("/exercicio").then((resp) => {
         console.log("resp.data", resp.data);
         this.formdata.exercicios = resp.data
-        .filter(p => p > 2020)
-        .map((p) => {
-          return {
-            value: p,
-            text: "" + p,
-          };
-        });
+          .filter(p => p > 2020)
+          .map((p) => {
+            return {
+              value: p,
+              text: "" + p,
+            };
+          });
       });
     },
 

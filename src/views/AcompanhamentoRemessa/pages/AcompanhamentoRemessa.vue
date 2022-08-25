@@ -9,20 +9,15 @@
       <b-row>
         &nbsp;&nbsp;&nbsp;
         <b-col>
-          <p align ="left">
+          <p align="left">
             <b-form-group label="Unidade Gestora*	">
-              <b-form-input
-                list="unidadeGestora"
-                required
-                v-model="filterform"
-                name="unidadeGestora"
-                placeholder="Pesquise aqui..."
-              >
+              <b-form-input list="unidadeGestora" required v-model="filterform" name="unidadeGestora"
+                placeholder="Pesquise aqui...">
               </b-form-input>
 
               <b-form-datalist id="unidadeGestora">
                 <option v-for="(item, index) in unidades" v-bind:key="index.id">
-                   {{ item.nome }}
+                  {{ item.nome }}
                 </option>
               </b-form-datalist>
             </b-form-group>
@@ -32,28 +27,15 @@
         <b-col>
           <p align="right" class="pesquisa_select">
             <b>Exercicio:</b> &nbsp;
-            <b-form-select
-              class="select-selected"
-              v-model="formdata.exercicio"
-              :options="formdata.exercicios"
-              @change="pesquisarRemessas"
-            >
+            <b-form-select class="select-selected" v-model="formdata.exercicio" :options="formdata.exercicios"
+              @change="pesquisarRemessas">
             </b-form-select>
             &nbsp;
             <b>Remessa:</b> &nbsp;
-            <b-form-select
-              class="select-selected"
-              v-model="formdata.remessa"
-              :options="formdata.remessas"
-            >
+            <b-form-select class="select-selected" v-model="formdata.remessa" :options="formdata.remessas">
             </b-form-select>
             &nbsp;
-            <b-button
-              @click="pesquisarRemesssa"
-              pill
-              variant="success"
-              size="sm"
-            >
+            <b-button @click="pesquisarRemesssa" pill variant="success" size="sm">
               Pesquisar
             </b-button>
             &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
@@ -62,28 +44,16 @@
       </b-row>
       <div class=" text-center font-weight-bold" style="font-size: 1.3em;">
 
-       <strong>
-         {{ FilterSize }} registros    
+        <strong>
+          {{ FilterSize }} registros
 
-       </strong>
-      
+        </strong>
+
       </div>
 
-      <b-table
-        striped
-        hover
-        responsive
-        sticky-header="450px"
-        id="my-table"
-        :busy="isBusy"
-        :items="tableData"
-        :filter="filter"
-        :fields="columns"
-        :filter-included-fields="['nomeEntidade']"
-        :current-page="currentPage"
-        aria-controls="my-table"
-        small
-      >
+      <b-table striped hover responsive sticky-header="450px" id="my-table" :busy="isBusy" :items="tableData"
+        :filter="filter" :fields="columns" :filter-included-fields="['nomeEntidade']" :current-page="currentPage"
+        aria-controls="my-table" small>
         <template #table-busy>
           <div class="text-center text-danger my-2">
             <b-spinner class="align-middle"></b-spinner>
@@ -93,41 +63,25 @@
 
         <!--  Assinaturas  -->
         <template #cell(assinaturas)="data">
-          <b-icon
-            icon="pen-fill"
-            :hidden="verIconAssinatura(data.item)"
-            cursor="pointer"
-            title="Assinaturas"
-            @click="info(data.item, data.index, $event.target)"
-            pill
-            variant="primary"
-            size="sm"
-          >
+          <b-icon icon="pen-fill" :hidden="verIconAssinatura(data.item)" cursor="pointer" title="Assinaturas"
+            @click="info(data.item, data.index, $event.target)" pill variant="primary" size="sm">
           </b-icon>
           &nbsp;
-          <b-icon
-            icon="file-earmark-arrow-down"
-            :hidden="verIconRecibo(data.item)"
-            cursor="pointer"
-            title="Recibo"
-            @click="abrirRecibo(data.item)"
-            pill
-            variant="primary"
-            size="sm"
-          >
+          <b-icon icon="file-earmark-arrow-down" :hidden="verIconRecibo(data.item)" cursor="pointer" title="Recibo"
+            @click="abrirRecibo(data.item)" pill variant="primary" size="sm">
           </b-icon>
         </template>
         <template #cell(status)="data">
-          <b-icon
-            :icon="iconStatus(data.item)"
-            cursor="pointer"
-            :title="iconStatusTitle(data.item)"
-            :variant="iconStatusVariant(data.item)"
-            size="sm"
-          >
+          <b-icon :icon="iconStatus(data.item)" cursor="pointer" :title="iconStatusTitle(data.item)"
+            :variant="iconStatusVariant(data.item)" size="sm">
           </b-icon>
         </template>
       </b-table>
+      <div v-show="FilterSize < 1" class=" text-center font-weight-bold" style="font-size: 1.3em;">
+        <strong>
+          nao contem registros
+        </strong>
+      </div>
     </b-card>
 
     <!--
@@ -156,6 +110,7 @@
 
                   },
  -->
+
     <b-icon class="h6 mb-2" icon="check-square" variant="success"> </b-icon>
     &nbsp; &nbsp;Assinado &nbsp; &nbsp; &nbsp;
     <b-icon class="h6 mb-2" icon="exclamation-triangle-fill" variant="warning">
@@ -167,13 +122,7 @@
     &nbsp;Aguardando Envio &nbsp; &nbsp;
 
     <!-- Info modal -->
-    <b-modal
-      :id="infoModal.id"
-      :title="infoModal.title"
-      ok-only
-      @hide="resetInfoModal"
-      size="xl"
-    >
+    <b-modal :id="infoModal.id" :title="infoModal.title" ok-only @hide="resetInfoModal" size="xl">
       <b-container fluid="xl">
         <b-row>
           <b-col><b>Gestor</b></b-col>
@@ -188,26 +137,20 @@
         </b-row>
 
         <b-row class="fonteLinhas">
-          <b-col
-            >Data Assinatura:
+          <b-col>Data Assinatura:
             {{
-              dataAssinaturaGestor == ""
-                ? "---"
-                : formatarData(dataAssinaturaGestor)
-            }}</b-col
-          >
-          <b-col
-            >Data Assinatura:
+                dataAssinaturaGestor == ""
+                  ? "---"
+                  : formatarData(dataAssinaturaGestor)
+            }}</b-col>
+          <b-col>Data Assinatura:
             {{
-              dataAssinaturaRh === "" ? "---" : formatarData(dataAssinaturaRh)
-            }}</b-col
-          >
-          <b-col
-            >Data Assinatura:
+                dataAssinaturaRh === "" ? "---" : formatarData(dataAssinaturaRh)
+            }}</b-col>
+          <b-col>Data Assinatura:
             {{
-              dataAssinaturaCI === "" ? "---" : formatarData(dataAssinaturaCI)
-            }}</b-col
-          >
+                dataAssinaturaCI === "" ? "---" : formatarData(dataAssinaturaCI)
+            }}</b-col>
         </b-row>
       </b-container>
     </b-modal>
@@ -226,7 +169,7 @@ export default {
 
   data() {
     return {
-      unidades: [], 
+      unidades: [],
       isBusy: true,
       perPage: 325,
       currentPage: 1,
@@ -280,7 +223,6 @@ export default {
           sortable: false,
           tdClass: "fonteLinhas",
         },
-
         {
           key: "dataEntrega",
           label: "Data Entrega",
@@ -304,14 +246,12 @@ export default {
           tdClass: "fonteLinhas",
           sortable: true,
         },
-
         {
           key: "assinaturas",
           label: "Assinaturas",
           tdClass: "fonteLinhas",
           sortable: true,
         },
-
         {
           key: "status",
           label: "Status",
@@ -366,14 +306,14 @@ export default {
     ...mapState("remessas", ["tableData"]),
   },
   methods: {
-    
+
     ...mapActions("remessas", ["ActionFind"]),
     ...mapActions("remessas", ["ActionFindByRemessa"]),
     ...mapActions("remessas", ["ActionFindByExercicio"]),
     ...mapActions("remessas", ["ActionFindExercicio"]),
 
     pesquisarExercicios() {
-      
+
       api.get("/exercicio").then((resp) => {
         this.formdata.exercicios = resp.data
           .filter(p => p > 2020)
@@ -392,7 +332,7 @@ export default {
     },
     pesquisarRemessas() {
       api.get("/remessa/" + this.formdata.exercicio).then((resp) => {
-        
+
         this.formdata.remessas = resp.data.map((p) => {
           return {
             value: p,
@@ -419,15 +359,15 @@ export default {
         return "Aguardando Envio";
       }
     },
-    filterSize(){
-      let sum = 0 ;
+    filterSize() {
+      let sum = 0;
       this.tableData.map(x => {
-        if(x.nomeEntidade.toUpperCase().includes(this.filter.trim().toUpperCase())){
-          sum ++;
+        if (x.nomeEntidade.toUpperCase().includes(this.filter.trim().toUpperCase())) {
+          sum++;
         }
       })
       this.FilterSize = sum;
-      return sum ;
+      return sum;
     },
     iconStatus(item) {
       if (item.contAssinaturas > 2) {
@@ -577,9 +517,9 @@ export default {
 
       doc.text(
         "O Tribunal de Contas do Tocantins, atesta o recebimento das informações referentes aos dados do(s) mês(es) " +
-          item.remessa +
-          " de " +
-          item.exercicio,
+        item.remessa +
+        " de " +
+        item.exercicio,
         10,
         120
       );
@@ -649,9 +589,11 @@ export default {
   font-size: 14px;
   text-align: center;
 }
+
 .fonteLinhasLeft {
   font-size: 14px;
 }
+
 .select-selected {
   border-color: black;
   border: 6px solid;
@@ -661,6 +603,7 @@ export default {
   border-color: black;
   top: 7px;
 }
+
 .select-items div,
 .select-selected {
   color: black;
@@ -691,10 +634,12 @@ export default {
 .same-as-selected {
   background-color: rgba(0, 0, 0, 0.1);
 }
+
 @mixin flex-center($columns: false) {
   display: flex;
   align-items: center;
   justify-content: center;
+
   @if $columns {
     flex-direction: column;
   }
