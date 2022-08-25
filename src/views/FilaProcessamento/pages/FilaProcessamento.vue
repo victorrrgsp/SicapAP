@@ -255,7 +255,9 @@ export default {
     pesquisarExercicios() {
       api.get("/exercicio").then((resp) => {
         console.log("resp.data", resp.data);
-        this.formdata.exercicios = resp.data.map((p) => {
+        this.formdata.exercicios = resp.data
+        .filter(p => p > 2020)
+        .map((p) => {
           return {
             value: p,
             text: "" + p,

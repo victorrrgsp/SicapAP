@@ -375,12 +375,14 @@ export default {
     pesquisarExercicios() {
       
       api.get("/exercicio").then((resp) => {
-        this.formdata.exercicios = resp.data.map((p) => {
-          return {
-            value: p,
-            text: "" + p,
-          };
-        });
+        this.formdata.exercicios = resp.data
+          .filter(p => p > 2020)
+          .map((p) => {
+            return {
+              value: p,
+              text: "" + p,
+            };
+          });
         this.formdata.exercicios[this.formdata.exercicios.length] = {
           value: 0,
           text: "Todos",
