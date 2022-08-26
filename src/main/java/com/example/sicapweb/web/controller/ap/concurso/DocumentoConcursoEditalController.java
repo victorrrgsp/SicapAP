@@ -69,10 +69,6 @@ public class DocumentoConcursoEditalController extends DefaultController<Documen
                listE.get(i).setSituacao("Dados Incompletos");
                listE.get(i).setTooltip("numero do edital deve ter o formato numero e ano. Exemplo:00042022");
            }
-           else  if (quantEdital > 1 ) {
-                listE.get(i).setSituacao("Inconsistente");
-                listE.get(i).setTooltip("duplicidade no numero do edital!!");
-            }
            else if( Lenvio.size()>0 ){
                ConcursoEnvio envio  = Lenvio.get(0);
                if (envio.getStatus() == ConcursoEnvio.Status.Aguardandoassinatura.getValor() ){
@@ -90,7 +86,12 @@ public class DocumentoConcursoEditalController extends DefaultController<Documen
                    listE.get(i).setSituacao("Pendente");
                    listE.get(i).setProcesso(envio.getProcesso());
                }
-           } else if (listaprocessoes.size() > 0){
+           }
+           else  if (quantEdital > 1 ) {
+               listE.get(i).setSituacao("Inconsistente");
+               listE.get(i).setTooltip("duplicidade no numero do edital!!");
+           }
+           else if (listaprocessoes.size() > 0){
                listE.get(i).setSituacao("Aguardando Verificação");
                listE.get(i).setTooltip("Processo existente no eContas, clique na opção no ícone ao lado (coluna Documentos) para que os problemas de duplicidade sejam resolvidos.");
            } else {

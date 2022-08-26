@@ -76,7 +76,7 @@ public class EditalRepository extends DefaultRepository<Edital, BigInteger> {
         List<Edital> list = getEntityManager()
                 .createNativeQuery("with edt as ( " +
                         "        select dataPublicacao,dataInicioInscricoes,dataFimInscricoes,numeroEdital,prazoValidade,veiculoPublicacao, cnpjEmpresaOrganizadora,c.id,max(a.id)  max_id " +
-                        "             from Edital a   join infoRemessa i on a.chave = i.chave and  a.tipoEdital =1  and i.idUnidadeGestora = '"+User.getUser(super.request).getUnidadeGestora().getId()+"' left  join ConcursoEnvio c on a.id = c.idEdital     group by " +
+                        "             from Edital a   join infoRemessa i on a.chave = i.chave and  a.tipoEdital =1  and i.idUnidadeGestora = '"+User.getUser(super.request).getUnidadeGestora().getId()+"' left  join ConcursoEnvio c on a.id = c.idEdital and c.fase=1     group by " +
                         "                dataPublicacao,dataInicioInscricoes,dataFimInscricoes,numeroEdital,prazoValidade,veiculoPublicacao, cnpjEmpresaOrganizadora,c.id " +
                         "                         ) " +
                         "select   a.* from Edital a join edt b on a.id= b.max_id where 1=1 " + search + " ORDER BY " + campo, Edital.class)
@@ -135,7 +135,7 @@ public class EditalRepository extends DefaultRepository<Edital, BigInteger> {
         List<Edital> list = getEntityManager()
                 .createNativeQuery("with edt as ( " +
                         "        select dataPublicacao,dataInicioInscricoes,dataFimInscricoes,numeroEdital,prazoValidade,veiculoPublicacao, cnpjEmpresaOrganizadora,c.id,max(a.id)  max_id " +
-                        "             from Edital a   join infoRemessa i on a.chave = i.chave and  a.tipoEdital =1  and i.idUnidadeGestora = '"+User.getUser(super.request).getUnidadeGestora().getId()+"' left  join ConcursoEnvio c on a.id = c.idEdital     group by " +
+                        "             from Edital a   join infoRemessa i on a.chave = i.chave and  a.tipoEdital =1  and i.idUnidadeGestora = '"+User.getUser(super.request).getUnidadeGestora().getId()+"' left  join ConcursoEnvio c on a.id = c.idEdital  and c.fase=1   group by " +
                         "                dataPublicacao,dataInicioInscricoes,dataFimInscricoes,numeroEdital,prazoValidade,veiculoPublicacao, cnpjEmpresaOrganizadora,c.id " +
                         "                         ) " +
                         "select   a.* from Edital a join edt b on a.id= b.max_id where 1=1 " + search + " ORDER BY " + campo, Edital.class)
@@ -152,7 +152,7 @@ public class EditalRepository extends DefaultRepository<Edital, BigInteger> {
     public Integer countEditais(String search) {
         Query query = getEntityManager().createNativeQuery("with edt as (\n" +
                 "        select dataPublicacao,dataInicioInscricoes,dataFimInscricoes,numeroEdital,prazoValidade,veiculoPublicacao, cnpjEmpresaOrganizadora,c.id,max(a.id)  max_id\n" +
-                "             from Edital a  join infoRemessa i on a.chave = i.chave and  a.tipoEdital =1  and i.idUnidadeGestora = '"+User.getUser(super.request).getUnidadeGestora().getId()+"'  left  join ConcursoEnvio c on a.id = c.idEdital group by\n" +
+                "             from Edital a  join infoRemessa i on a.chave = i.chave and  a.tipoEdital =1  and i.idUnidadeGestora = '"+User.getUser(super.request).getUnidadeGestora().getId()+"'  left  join ConcursoEnvio c on a.id = c.idEdital  and c.fase=1 group by\n" +
                 "                dataPublicacao,dataInicioInscricoes,dataFimInscricoes,numeroEdital,prazoValidade,veiculoPublicacao, cnpjEmpresaOrganizadora,c.id " +
                 "                         )\n" +
                 "select   count(1) from Edital a join edt b on a.id= b.max_id where 1=1 " + search);
@@ -263,7 +263,7 @@ public class EditalRepository extends DefaultRepository<Edital, BigInteger> {
         Integer CT = (Integer)getEntityManager().createNativeQuery("with edt as ( " +
                 "        select dataPublicacao,dataInicioInscricoes,dataFimInscricoes,numeroEdital,prazoValidade,veiculoPublicacao, cnpjEmpresaOrganizadora,c.id,max(a.id)  max_id " +
                 "             from Edital a  join infoRemessa i on a.chave = i.chave and  a.tipoEdital =1  and i.idUnidadeGestora = '"+User.getUser(super.request).getUnidadeGestora().getId()+"' " +
-                "  and numeroEdital ='"+ numeroEdital+"' left  join ConcursoEnvio c on a.id = c.idEdital  group by " +
+                "  and numeroEdital ='"+ numeroEdital+"' left  join ConcursoEnvio c on a.id = c.idEdital and c.fase=1  group by " +
                 "                dataPublicacao,dataInicioInscricoes,dataFimInscricoes,numeroEdital,prazoValidade,veiculoPublicacao, cnpjEmpresaOrganizadora,c.id " +
                 "                         ) " +
                 "select  count(1)  from Edital a join edt b on a.id= b.max_id where 1=1 " ).getSingleResult();
