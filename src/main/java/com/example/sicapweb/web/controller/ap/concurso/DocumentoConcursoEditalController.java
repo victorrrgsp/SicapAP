@@ -55,15 +55,11 @@ public class DocumentoConcursoEditalController extends DefaultController<Documen
             List<ConcursoEnvio> Lenvio= concursoEnvioRepository.buscarEnvioFAse1PorEdital(listE.get(i).getId());
             Integer numEdital = Integer.valueOf(listE.get(i).getNumeroEdital().substring(0, listE.get(i).getNumeroEdital().length() - 4));
             Integer anoEdital = Integer.valueOf(listE.get(i).getNumeroEdital().substring(listE.get(i).getNumeroEdital().length() - 4));
-            Integer quantEdital =editalRepository.GetQuantidadePorNumeroEdital(listE.get(i).getNumeroEdital(),User.getUser(editalRepository.getRequest()).getUnidadeGestora().getId() );
+            Integer quantEdital =editalRepository.GetQuantidadePorNumeroEdital(listE.get(i).getNumeroEdital() );
             List<Map<String, Integer>> listaprocessoes =  concursoEnvioRepository.getProcessosEcontas(numEdital,anoEdital,User.getUser(concursoEnvioRepository.getRequest()).getUnidadeGestora().getId());
            if (listE.get(i).getVeiculoPublicacao()==null  || listE.get(i).getDataPublicacao()==null || listE.get(i).getDataInicioInscricoes()==null || listE.get(i).getDataFimInscricoes() == null  || listE.get(i).getPrazoValidade()==null || listE.get(i).getCnpjEmpresaOrganizadora()==null ) {
                 listE.get(i).setSituacao("Dados Incompletos");
                listE.get(i).setTooltip("Complete o cadastro dos campos vazios antes de prosseguir");
-            }
-           else  if (quantEdital > 1 ) {
-                listE.get(i).setSituacao("Inconsistente");
-                listE.get(i).setTooltip("duplicidade no numero do edital!!");
             }
            else if (
                    ( Integer.valueOf(listE.get(i).getNumeroEdital().substring(listE.get(i).getNumeroEdital().length()-4)) <1990
@@ -72,6 +68,10 @@ public class DocumentoConcursoEditalController extends DefaultController<Documen
            ){
                listE.get(i).setSituacao("Dados Incompletos");
                listE.get(i).setTooltip("numero do edital deve ter o formato numero e ano. Exemplo:00042022");
+           }
+           else  if (quantEdital > 1 ) {
+                listE.get(i).setSituacao("Inconsistente");
+                listE.get(i).setTooltip("duplicidade no numero do edital!!");
             }
            else if( Lenvio.size()>0 ){
                ConcursoEnvio envio  = Lenvio.get(0);
