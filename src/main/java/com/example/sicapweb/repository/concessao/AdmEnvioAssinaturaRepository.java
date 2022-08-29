@@ -2,9 +2,8 @@ package com.example.sicapweb.repository.concessao;
 
 import br.gov.to.tce.model.adm.AdmEnvioAssinatura;
 import com.example.sicapweb.repository.DefaultRepository;
-import com.example.sicapweb.security.User;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -30,6 +29,7 @@ public class AdmEnvioAssinaturaRepository extends DefaultRepository<AdmEnvioAssi
         }
     }
 
+    @Transactional
     public void salvarProtocolo(Map<String, Object> protocolo) {
         try {
             Query query = getEntityManager().createNativeQuery(
@@ -46,6 +46,7 @@ public class AdmEnvioAssinaturaRepository extends DefaultRepository<AdmEnvioAssi
         }
     }
 
+    @Transactional
     public void salvarProcesso(Map<String, Object> processo) {
         try {
             Query query = getEntityManager().createNativeQuery("" +
@@ -106,6 +107,7 @@ public class AdmEnvioAssinaturaRepository extends DefaultRepository<AdmEnvioAssi
         }
     }
 
+    @Transactional
     public void salvarAndamentoProcesso(Map<String, Object> processo) {
         try {
             Query query = getEntityManager().createNativeQuery(
@@ -119,6 +121,7 @@ public class AdmEnvioAssinaturaRepository extends DefaultRepository<AdmEnvioAssi
         }
     }
 
+    @Transactional
     public void salvarPessoasInteressadas(Map<String, Object> interessado) {
         try {
             Query query = getEntityManager().createNativeQuery(
@@ -135,6 +138,7 @@ public class AdmEnvioAssinaturaRepository extends DefaultRepository<AdmEnvioAssi
         }
     }
 
+    @Transactional
     public void salvarHistorico1(Map<String, Object> processo) {
         try {
             Query query = getEntityManager().createNativeQuery(
@@ -152,6 +156,7 @@ public class AdmEnvioAssinaturaRepository extends DefaultRepository<AdmEnvioAssi
         }
     }
 
+    @Transactional
     public void salvarHistorico2(Map<String, Object> processo) {
         try {
             Query query = getEntityManager().createNativeQuery(
@@ -169,6 +174,7 @@ public class AdmEnvioAssinaturaRepository extends DefaultRepository<AdmEnvioAssi
         }
     }
 
+    @Transactional
     public void salvarDocumento(Map<String, Object> processo) {
         try {
             Query query = getEntityManager().createNativeQuery(
@@ -195,6 +201,7 @@ public class AdmEnvioAssinaturaRepository extends DefaultRepository<AdmEnvioAssi
         }
     }
 
+    @Transactional
     public void salvarArquivosDocumentos(Map<String, Object> arquivo, Integer idDocumento) {
         try {
             Query query = getEntityManager().createNativeQuery(
