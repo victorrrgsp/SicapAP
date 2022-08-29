@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
+import java.util.HashMap;
 import java.util.List;
 
 @RestController
@@ -32,6 +33,18 @@ public class UnidadeAdministrativaController  extends DefaultController<UnidadeA
     public ResponseEntity<PaginacaoUtil<UnidadeAdministrativa>> listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
         PaginacaoUtil<UnidadeAdministrativa> paginacaoUtil = unidadeAdministrativaRepository.buscaPaginada(pageable,searchParams,tipoParams);
         return ResponseEntity.ok().body(paginacaoUtil);
+    }
+    @CrossOrigin
+    @GetMapping(path="/pesquisaPorUg/{Ug}")
+    public ResponseEntity<List<HashMap<String, Object>>> pesquisaPorUg(@PathVariable String Ug) {
+         
+        return ResponseEntity.ok().body(unidadeAdministrativaRepository.pesquisaPorUg(Ug));
+    }
+
+    @CrossOrigin
+    @GetMapping(path="/pesquisaLotacaoPorUg/{Ug}")
+    public ResponseEntity<List<Object>> pesquisaLotacaoPorUg(@PathVariable String Ug) {
+        return ResponseEntity.ok().body(unidadeAdministrativaRepository.pesquisaLotacoesPorUg(Ug));
     }
 
 
