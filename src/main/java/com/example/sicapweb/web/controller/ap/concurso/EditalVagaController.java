@@ -69,7 +69,7 @@ public class EditalVagaController extends DefaultController<EditalVaga> {
     @PostMapping
     public ResponseEntity<EditalVaga> create(@RequestBody EditalVaga editalVaga) {
             editalVaga.setChave(editalVagaRepository.buscarPrimeiraRemessa());
-            editalVaga.setEdital(editalRepository.buscarEditalPorNumero(editalVaga.getNumeroEdital()));
+            editalVaga.setEdital(editalRepository.buscarEditalPorNumero(editalVaga.getNumeroEdital(),editalVaga.getComplementoEdital()));
             editalVaga.setUnidadeAdministrativa(unidadeAdministrativaRepository.buscarUnidadePorcodigo(editalVaga.codigoUnidadeAdministrativa));
             editalVaga.setCargo(cargoRepository.buscarCargoPorcodigo(editalVaga.codigoCargo));
             EditalVaga mesmocodigo = editalVagaRepository.buscarVagasPorCodigo(editalVaga.getCodigoVaga());
@@ -87,7 +87,7 @@ public class EditalVagaController extends DefaultController<EditalVaga> {
             
             editalVaga.setId(id);
             editalVaga.setChave(editalVagaRepository.buscarPrimeiraRemessa());
-            editalVaga.setEdital(editalRepository.buscarEditalPorNumero(editalVaga.getNumeroEdital()));
+            editalVaga.setEdital(editalRepository.buscarEditalPorNumero(editalVaga.getNumeroEdital(),editalVaga.getComplementoEdital() ));
             editalVaga.setUnidadeAdministrativa(unidadeAdministrativaRepository.buscarUnidadePorcodigo(editalVaga.codigoUnidadeAdministrativa));
             editalVaga.setCargo(cargoRepository.buscarCargoPorcodigo(editalVaga.codigoCargo));
             EditalVaga mesmocodigo = editalVagaRepository.buscarVagasPorCodigo(editalVaga.getCodigoVaga());

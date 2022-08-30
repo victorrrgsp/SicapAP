@@ -68,7 +68,7 @@ public class EditalController extends DefaultController<Edital> {
     @PostMapping
     public ResponseEntity<Edital> create(@RequestBody Edital edital) {
         edital.setInfoRemessa(editalRepository.buscarPrimeiraRemessa());
-        Edital e =editalRepository.buscarEditalPorNumero(edital.getNumeroEdital());
+        Edital e =editalRepository.buscarEditalPorNumero(edital.getNumeroEdital(),edital.getComplementoNumero());
 
         if (e == null) {
             if  ( Integer.valueOf(edital.getNumeroEdital().substring(edital.getNumeroEdital().length()-4)) <1990 ||  Integer.valueOf(edital.getNumeroEdital().substring(edital.getNumeroEdital().length()-4)) > (LocalDateTime.now().getYear() +5) ) {
@@ -99,7 +99,7 @@ public class EditalController extends DefaultController<Edital> {
     public ResponseEntity<Edital> update(@RequestBody Edital edital, @PathVariable BigInteger id) {
         edital.setInfoRemessa(editalRepository.buscarPrimeiraRemessa());
         edital.setId(id);
-        Edital e =editalRepository.buscarEditalPorNumero(edital.getNumeroEdital());
+        Edital e =editalRepository.buscarEditalPorNumero(edital.getNumeroEdital(),edital.getComplementoNumero());
 
         if (e == null || edital.getId() == id) {
             if  ( Integer.valueOf(edital.getNumeroEdital().substring(edital.getNumeroEdital().length()-4)) <1990 ||  Integer.valueOf(edital.getNumeroEdital().substring(edital.getNumeroEdital().length()-4)) > (LocalDateTime.now().getYear() +5) ) {

@@ -11,6 +11,8 @@ public class EditalConcurso{
     private Integer tipoEdital;
     private String numeroEdital;
 
+    private String complementoNumero;
+
     private String processo;
 
     public String getProcesso() {
@@ -116,6 +118,14 @@ public class EditalConcurso{
 
     public void setCnpjEmpresaOrganizadora(String cnpjEmpresaOrganizadora) {
         this.cnpjEmpresaOrganizadora = cnpjEmpresaOrganizadora;
+    }
+
+    public String getComplementoNumero() {
+        return complementoNumero;
+    }
+
+    public void setComplementoNumero(String complementoNumero) {
+        this.complementoNumero = complementoNumero;
     }
 
     public String getNomEmpresaOrganizadora() {

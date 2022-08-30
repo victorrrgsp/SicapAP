@@ -55,7 +55,7 @@ public class DocumentoConcursoEditalController extends DefaultController<Documen
             List<ConcursoEnvio> Lenvio= concursoEnvioRepository.buscarEnvioFAse1PorEdital(listE.get(i).getId());
             Integer numEdital = Integer.valueOf(listE.get(i).getNumeroEdital().substring(0, listE.get(i).getNumeroEdital().length() - 4));
             Integer anoEdital = Integer.valueOf(listE.get(i).getNumeroEdital().substring(listE.get(i).getNumeroEdital().length() - 4));
-            Integer quantEdital =editalRepository.GetQuantidadePorNumeroEdital(listE.get(i).getNumeroEdital() );
+            Integer quantEdital =editalRepository.GetQuantidadePorNumeroEdital(listE.get(i).getNumeroEdital(),listE.get(i).getComplementoNumero() );
             List<Map<String, Integer>> listaprocessoes =  concursoEnvioRepository.getProcessosEcontas(numEdital,anoEdital,User.getUser(concursoEnvioRepository.getRequest()).getUnidadeGestora().getId());
            if (listE.get(i).getVeiculoPublicacao()==null  || listE.get(i).getDataPublicacao()==null || listE.get(i).getDataInicioInscricoes()==null || listE.get(i).getDataFimInscricoes() == null  || listE.get(i).getPrazoValidade()==null || listE.get(i).getCnpjEmpresaOrganizadora()==null ) {
                 listE.get(i).setSituacao("Dados Incompletos");
