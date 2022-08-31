@@ -74,7 +74,6 @@ public class ConcessaoAposentadoriaController extends DefaultController<Document
     @CrossOrigin
     @GetMapping(path = {"/{id}"})
     public ResponseEntity<?> findById(@PathVariable BigInteger id) {
-        System.out.println("BACKEND " + id);
         Aposentadoria list = aposentadoriaRepository.findById(id);
         return ResponseEntity.ok().body(list);
     }
