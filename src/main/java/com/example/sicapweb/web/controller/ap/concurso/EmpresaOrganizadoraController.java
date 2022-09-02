@@ -68,6 +68,7 @@ public class EmpresaOrganizadoraController extends DefaultController<EmpresaOrga
         empresaOrganizadora.setChave(empresaOrganizadoraRepository.buscarPrimeiraRemessa());
         EmpresaOrganizadora e =   empresaOrganizadoraRepository.buscaEmpresaPorCnpj(empresaOrganizadora.getCnpjEmpresaOrganizadora());
         if (e != null) {
+            if (! id.equals(e.getId())  )
              throw new InvalitInsert("ja existe uma empresa organizadora com esse cnpj!!");
         }
         empresaOrganizadoraRepository.update(empresaOrganizadora);
@@ -79,6 +80,14 @@ public class EmpresaOrganizadoraController extends DefaultController<EmpresaOrga
     @PostMapping("/upload")
     public ResponseEntity<?> addFile(@RequestParam("file") MultipartFile file) {
         return ResponseEntity.ok().body(super.setCastorFile(file, "EmpresaOrganizadora"));
+    }
+
+    @CrossOrigin
+    @Transactional
+    @DeleteMapping(value = {"/{id}"})
+    public ResponseEntity<?> delete(@PathVariable BigInteger id) {
+        empresaOrganizadoraRepository.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }
 
