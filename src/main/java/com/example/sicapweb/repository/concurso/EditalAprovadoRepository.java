@@ -3,6 +3,7 @@ package com.example.sicapweb.repository.concurso;
 import br.gov.to.tce.model.UnidadeGestora;
 import br.gov.to.tce.model.ap.concurso.Edital;
 import br.gov.to.tce.model.ap.concurso.EditalAprovado;
+import br.gov.to.tce.model.ap.concurso.EditalVaga;
 import br.gov.to.tce.model.ap.concurso.EmpresaOrganizadora;
 import com.example.sicapweb.model.EditalAprovadoConcurso;
 import com.example.sicapweb.model.EditalConcurso;
@@ -23,6 +24,48 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
         super(em);
     }
 
+
+
+    public PaginacaoUtil<EditalAprovado> buscaPaginada(Pageable pageable, String searchParams, Integer tipoParams) {
+
+        int pagina = Integer.valueOf(pageable.getPageNumber());
+        int tamanho = Integer.valueOf(pageable.getPageSize());
+        String search = "";
+
+        //monta pesquisa search
+        search = "";
+
+        //retirar os : do Sort pageable
+        String campo = String.valueOf(pageable.getSort()).replace(":", "");
+
+        List<EditalAprovado> list = getEntityManager()
+                .createNativeQuery("with edt as ( " +
+                        "        select a.cpf,a.numeroInscricao, i.idUnidadeGestora ,max(a.id)  max_id " +
+                        "             from EditalAprovado a  join infoRemessa i on a.chave = i.chave  and i.idUnidadeGestora = '"+User.getUser(super.request).getUnidadeGestora().getId()+"'  group by " +
+                        "                a.cpf,a.numeroInscricao , i.idUnidadeGestora " +
+                        "                         ) " +
+                        "select   a.* from EditalAprovado a join infoRemessa i on a.chave = i.chave join edt b on a.id= b.max_id and i.idUnidadeGestora=b.idUnidadeGestora where 1=1 " + search + " ORDER BY " + campo, EditalAprovado.class)
+                .setFirstResult(pagina)
+                .setMaxResults(tamanho)
+                .getResultList();
+
+        long totalRegistros = countAprov( search);
+        long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
+
+        return new PaginacaoUtil<EditalAprovado>(tamanho, pagina, totalPaginas, totalRegistros, list);
+    }
+
+    public Integer countAprov(String search) {
+
+        Query query =    getEntityManager()
+                .createNativeQuery("with edt as ( " +
+                        "        select a.cpf,a.numeroInscricao, i.idUnidadeGestora ,max(a.id)  max_id " +
+                        "             from EditalAprovado a  join infoRemessa i on a.chave = i.chave  and i.idUnidadeGestora = '"+User.getUser(super.request).getUnidadeGestora().getId()+"'  group by " +
+                        "                a.cpf,a.numeroInscricao , i.idUnidadeGestora " +
+                        "                         ) " +
+                        "select   count(1) from EditalAprovado a join infoRemessa i on a.chave = i.chave join edt b on a.id= b.max_id and i.idUnidadeGestora=b.idUnidadeGestora where 1=1 " + search);
+        return (Integer) query.getSingleResult();
+    }
 
 
     public PaginacaoUtil<EditalAprovadoConcurso> buscaPaginadaAprovados(Pageable pageable) {

@@ -83,11 +83,9 @@ public class CargoRepository extends DefaultRepository<Cargo, BigInteger> {
     public List<Cargo> buscarCargoPorUG(String cnpj) {
 
         var query = getEntityManager().createNativeQuery(
-                "SELECT DISTINCT c.* "+
-                        "FROM Cargo c "+
-                        " join InfoRemessa  i on c.chave=i.chave " +
-                        "WHERE i.idUnidadeGestora = '"+cnpj+ "'"+
-                        "order by c.nomeCargo",Cargo.class);
+                "with ids_cargo as " +
+                        "(select t.codigoCargo,i.idUnidadeGestora, max(t.id) max_id_por_chave from SICAPAP21.dbo.Cargo t  join SICAPAP21.dbo.InfoRemessa  i on  t.chave = i.chave and i.idUnidadeGestora='"+cnpj+"'  group by t.codigoCargo,i.idUnidadeGestora ) " +
+                        "select t.* from SICAPAP21.dbo.Cargo t  join SICAPAP21.dbo.InfoRemessa  i  on t.chave =  i.chave join ids_cargo ie on t.id = ie.max_id_por_chave and i.idUnidadeGestora=ie.idUnidadeGestora order by t.nomeCargo",Cargo.class);
         List<Cargo> list = query.getResultList();
         /*
         List<Map<String,Object>> retorno = new ArrayList<Map<String,Object>>();

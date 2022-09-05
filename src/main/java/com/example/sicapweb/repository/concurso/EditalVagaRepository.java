@@ -1,11 +1,15 @@
 package com.example.sicapweb.repository.concurso;
 
+import br.gov.to.tce.model.ap.concurso.Edital;
 import br.gov.to.tce.model.ap.concurso.EditalVaga;
 import com.example.sicapweb.repository.DefaultRepository;
 import com.example.sicapweb.security.User;
+import com.example.sicapweb.util.PaginacaoUtil;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -14,6 +18,49 @@ public class EditalVagaRepository extends DefaultRepository<EditalVaga, BigInteg
 
     public EditalVagaRepository(EntityManager em) {
         super(em);
+    }
+
+
+
+
+
+    public PaginacaoUtil<EditalVaga> buscaPaginada(Pageable pageable, String searchParams, Integer tipoParams) {
+
+        int pagina = Integer.valueOf(pageable.getPageNumber());
+        int tamanho = Integer.valueOf(pageable.getPageSize());
+        String search = "";
+
+        //monta pesquisa search
+        search = "";
+
+        //retirar os : do Sort pageable
+        String campo = String.valueOf(pageable.getSort()).replace(":", "");
+
+        List<EditalVaga> list = getEntityManager()
+                .createNativeQuery("with edt as ( " +
+                        "        select a.codigoVaga, i.idUnidadeGestora ,max(a.id)  max_id " +
+                        "             from EditalVaga a  join infoRemessa i on a.chave = i.chave  and i.idUnidadeGestora = '"+User.getUser(super.request).getUnidadeGestora().getId()+"'  group by " +
+                        "                a.codigoVaga, i.idUnidadeGestora " +
+                        "                         ) " +
+                        "select   a.* from EditalVaga a join infoRemessa i on a.chave = i.chave join edt b on a.id= b.max_id and i.idUnidadeGestora=b.idUnidadeGestora where 1=1 " + search + " ORDER BY " + campo, EditalVaga.class)
+                .setFirstResult(pagina)
+                .setMaxResults(tamanho)
+                .getResultList();
+
+        long totalRegistros = countEditaisvaga( search);
+        long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
+
+        return new PaginacaoUtil<EditalVaga>(tamanho, pagina, totalPaginas, totalRegistros, list);
+    }
+
+    public Integer countEditaisvaga(String search) {
+        Query query = getEntityManager().createNativeQuery("with edt as ( " +
+                "        select a.codigoVaga, i.idUnidadeGestora ,max(a.id)  max_id " +
+                "             from EditalVaga a  join infoRemessa i on a.chave = i.chave  and i.idUnidadeGestora = '"+User.getUser(super.request).getUnidadeGestora().getId()+"'  group by " +
+                "                a.codigoVaga, i.idUnidadeGestora " +
+                "                         ) " +
+                "select   count(1) from EditalVaga a join infoRemessa i on a.chave = i.chave join edt b on a.id= b.max_id and i.idUnidadeGestora=b.idUnidadeGestora where 1=1 " + search);
+        return (Integer) query.getSingleResult();
     }
 
     public List<EditalVaga> buscarVagas() {
@@ -26,19 +73,25 @@ public class EditalVagaRepository extends DefaultRepository<EditalVaga, BigInteg
 
     public List<EditalVaga> buscarVagasPorEdital(Integer idEdital) {
         return getEntityManager().createNativeQuery(
-                "select e.* from EditalVaga e " +
-                        " join InfoRemessa i on a.chave = i.chave " +
-                        "where  i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' "+
-                        " and  e.idEdital = " + idEdital, EditalVaga.class)
+                        "with edt as ( " +
+                                "        select a.codigoVaga, i.idUnidadeGestora ,max(a.id)  max_id " +
+                                "             from EditalVaga a  join infoRemessa i on a.chave = i.chave  and i.idUnidadeGestora = '"+User.getUser(super.request).getUnidadeGestora().getId()+"'  group by " +
+                                "                a.codigoVaga, i.idUnidadeGestora " +
+                                "                         ) " +
+                                "select   a.* from EditalVaga a join infoRemessa i on a.chave = i.chave join edt b on a.id= b.max_id and i.idUnidadeGestora=b.idUnidadeGestora where 1=1 "+
+                        "  and  a.idEdital = " + idEdital, EditalVaga.class)
                 .getResultList();
     }
 
     public EditalVaga buscarVagasPorCodigo(String codigo) {
         List<EditalVaga> list = getEntityManager().createNativeQuery(
-                "select e.* from EditalVaga e " +
-                        " join InfoRemessa i on e.chave = i.chave " +
-                        "where  i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' "+
-                " and e.codigoVaga = '" + codigo + "'    ", EditalVaga.class).getResultList();
+                "with edt as ( " +
+                        "        select a.codigoVaga, i.idUnidadeGestora ,max(a.id)  max_id " +
+                        "             from EditalVaga a  join infoRemessa i on a.chave = i.chave  and i.idUnidadeGestora = '"+User.getUser(super.request).getUnidadeGestora().getId()+"'  group by " +
+                        "                a.codigoVaga, i.idUnidadeGestora " +
+                        "                         ) " +
+                        "select   a.* from EditalVaga a join infoRemessa i on a.chave = i.chave join edt b on a.id= b.max_id and i.idUnidadeGestora=b.idUnidadeGestora where 1=1 "+
+                " and a.codigoVaga = '" + codigo + "'    ", EditalVaga.class).getResultList();
         if (list.size()>0 ){
             return list.get(0);
         }

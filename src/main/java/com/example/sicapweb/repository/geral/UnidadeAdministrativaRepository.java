@@ -20,8 +20,10 @@ public class UnidadeAdministrativaRepository extends DefaultRepository<UnidadeAd
 
     public UnidadeAdministrativa buscarUnidadePorcodigo(String codigo) {
         List<UnidadeAdministrativa> list = getEntityManager()
-                .createNativeQuery("select * from UnidadeAdministrativa ed" +
-                        " where codigoUnidadeAdministrativa = '" + codigo + "'    ", UnidadeAdministrativa.class)
+                .createNativeQuery(" with ids_UnidadeAdministrativa as " +
+                        "(select t.codigoUnidadeAdministrativa,i.idUnidadeGestora, max(t.id) max_id_por_chave from SICAPAP21.dbo.UnidadeAdministrativa t  join SICAPAP21.dbo.InfoRemessa  i on  t.chave = i.chave and i.idUnidadeGestora='"+User.getUser(super.request).getUnidadeGestora().getId()+"'  group by t.codigoUnidadeAdministrativa,i.idUnidadeGestora )" +
+                        "select t.*  from SICAPAP21.dbo.UnidadeAdministrativa t  join SICAPAP21.dbo.InfoRemessa  i  on t.chave =  i.chave join ids_UnidadeAdministrativa ie on t.id = ie.max_id_por_chave and i.idUnidadeGestora=ie.idUnidadeGestora" +
+                        " where t.codigoUnidadeAdministrativa = '" + codigo + "'  ", UnidadeAdministrativa.class)
                 .getResultList();
         return list.get(0);
     }
@@ -55,8 +57,9 @@ public class UnidadeAdministrativaRepository extends DefaultRepository<UnidadeAd
     public List<UnidadeAdministrativa> findbyUg() {
         List<UnidadeAdministrativa> list = getEntityManager().createNativeQuery(
 
-                " select ad.* from UnidadeAdministrativa ad join InfoRemessa i on ad.chave= i.chave " +
-                        "where i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' ",
+                "  with ids_UnidadeAdministrativa as " +
+                        "(select t.codigoUnidadeAdministrativa,i.idUnidadeGestora, max(t.id) max_id_por_chave from SICAPAP21.dbo.UnidadeAdministrativa t  join SICAPAP21.dbo.InfoRemessa  i on  t.chave = i.chave and i.idUnidadeGestora='"+User.getUser(super.request).getUnidadeGestora().getId()+"'  group by t.codigoUnidadeAdministrativa,i.idUnidadeGestora ) " +
+                        "select t.*  from SICAPAP21.dbo.UnidadeAdministrativa t  join SICAPAP21.dbo.InfoRemessa  i  on t.chave =  i.chave join ids_UnidadeAdministrativa ie on t.id = ie.max_id_por_chave and i.idUnidadeGestora=ie.idUnidadeGestora ",
                 UnidadeAdministrativa.class).getResultList();
 
         return list;

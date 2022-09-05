@@ -1,5 +1,6 @@
 package com.example.sicapweb.repository.concurso;
 
+import br.gov.to.tce.model.adm.AdmEnvio;
 import br.gov.to.tce.model.ap.concurso.ConcursoEnvio;
 import com.example.sicapweb.exception.InvalitInsert;
 import com.example.sicapweb.model.ConcursoEnvioAssRetorno;
@@ -12,10 +13,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDate;
+import java.util.*;
 
 @Repository
 public class ConcursoEnvioRepository extends DefaultRepository<ConcursoEnvio, BigInteger> {
@@ -41,19 +40,14 @@ public class ConcursoEnvioRepository extends DefaultRepository<ConcursoEnvio, Bi
     public ConcursoEnvio buscarEnvioFAse1PorEditalassinado(BigInteger idEdital) {
         List<ConcursoEnvio> lc=  getEntityManager().createNativeQuery(
                         "select  ev.* from ConcursoEnvio ev "+
-                                " where fase=1 and status=3 and  idEdital = " + idEdital+ " order by dataEnvio desc ", ConcursoEnvio.class)
+                                " where fase=1 and status in (2,3,4) and  idEdital = " + idEdital+ " order by dataEnvio desc ", ConcursoEnvio.class)
                 .getResultList();
-        if (lc.size() ==1 ) {return lc.get(0);
-        } else if (lc.size() > 1 ) {
+        if (lc.size() ==1 ) { return lc.get(0); }
+        else if (lc.size() > 1 ) {
             throw new InvalitInsert("Encontrou mais de um processo pai para o envio da homologação!! ");
         }
-
         return null;
     }
-
-
-
-
     public String getSearch(String searchParams, Integer tipoParams) {
         String search = "";
         //monta pesquisa search
@@ -147,6 +141,76 @@ public class ConcursoEnvioRepository extends DefaultRepository<ConcursoEnvio, Bi
         return retorno;
 
 
+    }
+
+
+    public List<HashMap<String,Object>> buscaTotalNaoPaginada(String searchParams, List<String> ug, List<Integer> tipoRegistro , LocalDate dataInico, LocalDate dataFim, Integer Ststuss){
+
+        var query = getEntityManager().createNativeQuery(
+                        "with AdmEnvioAssinatura1 as\n" +
+                                "         (select ROW_NUMBER() over(partition by idEnvio order by data_assinatura) as rank, idEnvio ,data_assinatura\n" +
+                                "          from SICAPAP21..AdmEnvioAssinatura\n" +
+                                "        )\n" +
+                                "select\n" +
+                                "    ad.*,\n" +
+                                "    UG.nome as nomeUg,\n" +
+                                "    UGorigen.nome as nomeUgOrigem,\n" +
+                                "    adA.data_assinatura\n" +
+                                "from AdmEnvio ad\n" +
+                                "     join SICAPAP21.dbo.UnidadeGestora UG on UG.id = ad.unidadeGestora\n" +
+                                "     join SICAPAP21.dbo.UnidadeGestora UGorigen on UGorigen.id = ad.orgaoOrigem\n" +
+                                "     left join AdmEnvioAssinatura1 adA on adA.idEnvio = ad.id and adA.rank = 1\n" +
+                                "where (ad.unidadeGestora in :ug or 'todos' in :ug ) \n"+
+                                "     and (ad.tipoRegistro in :TipoRegistro or -1 in :TipoRegistro )\n" +
+                                "     and ((adA.data_assinatura between :dataInico and :dataFim) or (:dataInico is null or :dataFim is null))\n" +
+                                "     and ad.unidadeGestora <> '00000000000000'"+
+                                "     and ( :status is null or ad.status = :status) "
+                )
+                .setParameter("ug" ,ug)
+                .setParameter("TipoRegistro" ,tipoRegistro)
+                .setParameter("dataInico" ,dataInico)
+                .setParameter("status" ,Ststuss)
+                .setParameter("dataFim" ,dataFim);
+        List<Object[]> list = query.getResultList();
+        List<HashMap<String,Object>> retorno = new ArrayList<HashMap<String,Object>>();
+
+        list.forEach(envio ->{
+            var aux = new HashMap<String,Object>();
+            //aux.put("id", envio[0] );
+            aux.put("TipoRegistro",this.getTipoByValue((Integer)envio[1]));
+            //aux.put("UnidadeGestora", envio[2] );
+            aux.put("processo", envio[3] );
+            {
+                var status = Arrays.asList(AdmEnvio.Status.values());
+                aux.put("status",
+                        status
+                                .stream()
+                                .filter(stat -> stat.getValor() == (Integer)envio[4])
+                                .findFirst()
+                                .get()
+                );
+            }
+            //aux.put("orgaoOrigem", envio[5] );
+            //aux.put("idMovimentacoes", envio[6] );
+            aux.put("Complemento", envio[7] );
+            aux.put("nomeUg", envio[9] );
+            aux.put("nomeUgOrigem", envio[10] );
+            aux.put("DataAsinatura", envio[11] );
+            retorno.add(aux);
+        });
+        return retorno;
+
+
+    }
+
+    public static ConcursoEnvio.Fase getTipoByValue(Integer value){
+        var tipos = Arrays.asList(ConcursoEnvio.Fase.values());
+        return tipos
+                .stream()
+                .filter(tipo -> tipo.getValor() == value)
+                .findFirst()
+                .get()
+                ;
     }
 
 
