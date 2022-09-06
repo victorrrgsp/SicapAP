@@ -1,14 +1,12 @@
 package com.example.sicapweb.repository.geral;
 
-import br.gov.to.tce.model.adm.AdmEnvio;
 import br.gov.to.tce.model.ap.relacional.Ato;
-import br.gov.to.tce.model.ap.relacional.Lotacao;
 import com.example.sicapweb.repository.DefaultRepository;
 import com.example.sicapweb.security.User;
-import org.eclipse.persistence.config.QueryHints;
-import org.eclipse.persistence.config.ResultType;
+import com.example.sicapweb.util.PaginacaoUtil;
 import org.hibernate.query.internal.NativeQueryImpl;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -21,8 +19,72 @@ import java.util.List;
 
 @Repository
 public class AtoRepository extends DefaultRepository<Ato, BigInteger> {
+
     public AtoRepository(EntityManager em) {
         super(em);
+    }
+
+    Integer vinculo=1;
+
+
+
+    public String getSearch(String searchParams, Integer tipoParams) {
+        String search = "";
+        //monta pesquisa search
+        if (searchParams.length() > 3) {
+            List<String> lparam =  new ArrayList(Arrays.asList(searchParams.split("&")));
+            for (String param : lparam){
+                if (tipoParams == 0) { //entra para tratar a string
+                    String arrayOfStrings[] = param.split("=");
+                    if (arrayOfStrings[0].equals("numeroAto")){
+                        search = search + " AND a." + arrayOfStrings[0]  + " like  '%" + arrayOfStrings[1] + "%'  ";
+                    }
+                    else if (arrayOfStrings[0].equals("idAto")) {
+                        search = search + " AND " + arrayOfStrings[0]  + " = " + arrayOfStrings[1] + "  ";
+                    }
+
+                } else {
+                    search = " AND " + searchParams + "   ";
+                }
+            }
+        }
+        return search;
+    }
+
+
+    public PaginacaoUtil<Ato> buscaPaginadaAtos(Pageable pageable, String searchParams, Integer tipoParams) {
+
+        int pagina = Integer.valueOf(pageable.getPageNumber());
+        int tamanho = Integer.valueOf(pageable.getPageSize());
+        String search = "";
+
+        //monta pesquisa search
+       search = getSearch(searchParams,tipoParams);
+
+        //retirar os : do Sort pageable
+        String campo = String.valueOf(pageable.getSort()).replace(":", "");
+        List<Ato> listfiltrada ;
+        long totalPaginas;
+        long totalRegistros;
+            List<Ato> list = getEntityManager()
+                    .createNativeQuery("select a.* from Ato a " +
+                            " join InfoRemessa info on info.chave = a.chave and info.idUnidadeGestora = '"
+                            + User.getUser(request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, Ato.class)
+                    .setFirstResult(pagina)
+                    .setMaxResults(tamanho)
+                    .getResultList();
+
+
+             totalRegistros = countAtos(search);
+             totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
+            listfiltrada = list;
+        return new PaginacaoUtil<Ato>(tamanho, pagina, totalPaginas, totalRegistros, listfiltrada);
+    }
+
+
+    public Integer countAtos(String search) {
+        Query query = getEntityManager().createNativeQuery("select count(1) from Ato a join InfoRemessa i on a.chave = i.chave where i.idUnidadeGestora= '"+ User.getUser(request).getUnidadeGestora().getId()+ "' "+search);
+        return (Integer) query.getSingleResult();
     }
 
     public List<Ato> findAll() {
@@ -40,7 +102,7 @@ public class AtoRepository extends DefaultRepository<Ato, BigInteger> {
         return list.get(0);
     }
 
-    public List<HashMap<String,Object>> buscaVinculos(BigInteger  idato){
+    public List<HashMap<String,Object>> buscaVinculos(BigInteger  idato ,Integer vinculo){
         var queryadm = getEntityManager().createNativeQuery("WITH Adm AS (SELECT * FROM Admissao where idAto =:ato ) " +
                 " select distinct 'ADMISSÃO' TABELA,a.matriculaServidor , b.cpfServidor , b.nome  , convert(varchar, a.dataExercicio,103)  dataExercicio  from Adm A JOIN Servidor B  ON A.idServidor = B.id  ").setParameter("ato",idato);
 
@@ -157,21 +219,72 @@ public class AtoRepository extends DefaultRepository<Ato, BigInteger> {
 
 
         List<HashMap<String,Object>> retorno = new ArrayList<HashMap<String,Object>>();
-        retorno.addAll(getMapList(queryadm));
-        retorno.addAll(getMapList(querylic));
-        retorno.addAll(getMapList(querylei));
-        retorno.addAll(getMapList(querycargo));
-        retorno.addAll(getMapList(querydeslig));
-        retorno.addAll(getMapList(queryaposent));
-        retorno.addAll(getMapList(queryreadapt));
-        retorno.addAll(getMapList(queryrecond));
-        retorno.addAll(getMapList(queryreintegracao));
-        retorno.addAll(getMapList(querypensao));
-        retorno.addAll(getMapList(querypensionista));
-        retorno.addAll(getMapList(querydesinacao));
-        retorno.addAll(getMapList(querycess));
-        retorno.addAll(getMapList(queryDisp));
-        retorno.addAll(getMapList(queryAprov));
+        switch (vinculo) {
+            case 1:
+                retorno.addAll(getMapList(queryadm));
+                retorno.addAll(getMapList(querylic));
+                retorno.addAll(getMapList(querylei));
+                retorno.addAll(getMapList(querycargo));
+                retorno.addAll(getMapList(querydeslig));
+                retorno.addAll(getMapList(queryaposent));
+                retorno.addAll(getMapList(queryreadapt));
+                retorno.addAll(getMapList(queryrecond));
+                retorno.addAll(getMapList(queryreintegracao));
+                retorno.addAll(getMapList(querypensao));
+                retorno.addAll(getMapList(querypensionista));
+                retorno.addAll(getMapList(querydesinacao));
+                retorno.addAll(getMapList(querycess));
+                retorno.addAll(getMapList(queryDisp));
+                retorno.addAll(getMapList(queryAprov));
+                break;
+            case 2:
+                retorno.addAll(getMapList(queryadm));
+                break;
+            case 3:
+                retorno.addAll(getMapList(querylei));
+                break;
+            case 4:
+                retorno.addAll(getMapList(querycargo));
+                break;
+            case 5:
+                retorno.addAll(getMapList(querylic));
+                break;
+            case 6:
+                retorno.addAll(getMapList(querydeslig));
+                break;
+            case 7:
+                retorno.addAll(getMapList(queryaposent));
+                break;
+            case 8:
+                retorno.addAll(getMapList(queryreadapt));
+                break;
+            case 9:
+                retorno.addAll(getMapList(queryrecond));
+                break;
+            case 10:
+                retorno.addAll(getMapList(queryreintegracao));
+                break;
+            case 11:
+                retorno.addAll(getMapList(querypensao));
+                break;
+            case 12:
+                retorno.addAll(getMapList(querypensionista));
+                break;
+            case 13:
+                retorno.addAll(getMapList(querydesinacao));
+                break;
+            case 14:
+                retorno.addAll(getMapList(querycess));
+                break;
+            case 15:
+                retorno.addAll(getMapList(queryDisp));
+                break;
+            case 16:
+                retorno.addAll(getMapList(queryDisp));
+                break;
+
+        }
+
 
         return retorno;
     }

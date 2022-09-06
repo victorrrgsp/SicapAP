@@ -5,7 +5,6 @@ import br.gov.to.tce.model.ap.relacional.Ato;
 import com.example.sicapweb.repository.geral.AtoRepository;
 import com.example.sicapweb.util.PaginacaoUtil;
 import com.example.sicapweb.web.controller.DefaultController;
-import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -25,13 +24,13 @@ public class AtoController extends DefaultController<Ato>  {
 
     @GetMapping(path="/{searchParams}/{tipoParams}/pagination")
     public ResponseEntity<PaginacaoUtil<Ato>> listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
-        PaginacaoUtil<Ato> paginacaoUtil = atoRepository.buscaPaginada(pageable,searchParams,tipoParams);
+        PaginacaoUtil<Ato> paginacaoUtil = atoRepository.buscaPaginadaAtos(pageable,searchParams,tipoParams);
         return ResponseEntity.ok().body(paginacaoUtil);
     }
 
     @GetMapping(path = "/vinculos/{id}")
     public ResponseEntity<List<HashMap<String,Object>>> listVinculos(@PathVariable BigInteger id ){
-        List<HashMap<String,Object>> LISTVINCULOS =atoRepository.buscaVinculos(id);
+        List<HashMap<String,Object>> LISTVINCULOS =atoRepository.buscaVinculos(id,1);
         return ResponseEntity.ok().body(LISTVINCULOS);
     }
 
