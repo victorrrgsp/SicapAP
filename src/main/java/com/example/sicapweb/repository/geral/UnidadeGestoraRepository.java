@@ -198,4 +198,17 @@ public class UnidadeGestoraRepository extends DefaultRepository<UnidadeGestora, 
             return result;
 
     }
+
+    public List<UnidadeGestora> findAllWithEnvioConcursos() {
+
+        var result = getEntityManager().createNativeQuery(
+                "select distinct UG.* \n" +
+                        " from ConcursoEnvio env \n" +
+                        " join Edital ed on env.idEdital= ed.id \n" +
+                        " join InfoRemessa inf on ed.chave=inf.chave and inf.idUnidadeGestora <> '00000000000000'  \n" +
+                        " join SICAPAP21.dbo.UnidadeGestora UG on UG.id = inf.idUnidadeGestora \n" ,UnidadeGestora.class).getResultList();
+        return result;
+
+    }
+
 }

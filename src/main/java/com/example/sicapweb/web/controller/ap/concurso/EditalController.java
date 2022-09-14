@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -19,10 +20,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.math.BigInteger;
 import java.net.URI;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import  com.example.sicapweb.exception.InvalitInsert;
 @RestController
@@ -202,6 +202,25 @@ public class EditalController extends DefaultController<Edital> {
         return ResponseEntity.noContent().build();
     }
 
+    @CrossOrigin
+    @Transactional
+    @GetMapping(path = {"/getenvios"})
+    public ResponseEntity<List<HashMap<String,Object>>> BuscaTotal(
+            @RequestParam(required = false) List<String> Ug ,
+            @RequestParam(required = false) List<Integer> Fase ,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate dataInico,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate dataFim,
+            @RequestParam(required = false) Integer Status
+    ){
+        Fase = ifNull(Fase, Arrays.asList(new Integer[]{-1}));
+        Ug           = ifNull(Ug, Arrays.asList(new String[]{"todos"}));
+        List<HashMap<String,Object>> Listatotal = concursoEnvioRepository.buscaTotalNaoPaginada(Ug,Fase,dataInico,dataFim,Status);
+        return ResponseEntity.ok().body(Listatotal);
+    }
+
+    <T> T ifNull(T obj, T seNull){
+        return obj = obj == null?seNull:obj;
+    }
 
 
 }

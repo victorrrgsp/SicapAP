@@ -35,6 +35,12 @@ public class UnidadeGestoraController {
         return ResponseEntity.ok().body(list);
     }
 
+    @CrossOrigin
+    @GetMapping(path = "/findAllWithConcursos")
+    public ResponseEntity<List<UnidadeGestora>> findAllWithConcursos() {
+        List<UnidadeGestora> list = unidadeGestoraRepository.findAllWithEnvioConcursos();
+        return ResponseEntity.ok().body(list);
+    }
 
     @CrossOrigin
     @GetMapping(path = {"/todos"})

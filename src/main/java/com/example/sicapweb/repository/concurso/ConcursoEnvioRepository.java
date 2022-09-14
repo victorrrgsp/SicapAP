@@ -6,6 +6,8 @@ import com.example.sicapweb.exception.InvalitInsert;
 import com.example.sicapweb.model.ConcursoEnvioAssRetorno;
 import com.example.sicapweb.repository.DefaultRepository;
 import com.example.sicapweb.util.PaginacaoUtil;
+import org.hibernate.query.internal.NativeQueryImpl;
+import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
@@ -15,6 +17,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 public class ConcursoEnvioRepository extends DefaultRepository<ConcursoEnvio, BigInteger> {
@@ -144,66 +147,50 @@ public class ConcursoEnvioRepository extends DefaultRepository<ConcursoEnvio, Bi
     }
 
 
-    public List<HashMap<String,Object>> buscaTotalNaoPaginada(String searchParams, List<String> ug, List<Integer> tipoRegistro , LocalDate dataInico, LocalDate dataFim, Integer Ststuss){
+    public List<HashMap<String,Object>> buscaTotalNaoPaginada( List<String> ug, List<Integer> fase , LocalDate dataInico, LocalDate dataFim, Integer Ststuss){
 
         var query = getEntityManager().createNativeQuery(
-                        "with AdmEnvioAssinatura1 as\n" +
-                                "         (select ROW_NUMBER() over(partition by idEnvio order by data_assinatura) as rank, idEnvio ,data_assinatura\n" +
-                                "          from SICAPAP21..AdmEnvioAssinatura\n" +
-                                "        )\n" +
-                                "select\n" +
-                                "    ad.*,\n" +
-                                "    UG.nome as nomeUg,\n" +
-                                "    UGorigen.nome as nomeUgOrigem,\n" +
-                                "    adA.data_assinatura\n" +
-                                "from AdmEnvio ad\n" +
-                                "     join SICAPAP21.dbo.UnidadeGestora UG on UG.id = ad.unidadeGestora\n" +
-                                "     join SICAPAP21.dbo.UnidadeGestora UGorigen on UGorigen.id = ad.orgaoOrigem\n" +
-                                "     left join AdmEnvioAssinatura1 adA on adA.idEnvio = ad.id and adA.rank = 1\n" +
-                                "where (ad.unidadeGestora in :ug or 'todos' in :ug ) \n"+
-                                "     and (ad.tipoRegistro in :TipoRegistro or -1 in :TipoRegistro )\n" +
-                                "     and ((adA.data_assinatura between :dataInico and :dataFim) or (:dataInico is null or :dataFim is null))\n" +
-                                "     and ad.unidadeGestora <> '00000000000000'"+
-                                "     and ( :status is null or ad.status = :status) "
+                        "with ConcursoEnvioassinatura1 as                                       (select ROW_NUMBER() over(partition by idEnvio order by data_assinatura) as rank, idEnvio ,data_assinatura\n" +
+                                "                                         from SICAPAP21..ConcursoEnvioAssinatura\n" +
+                                "                                        )\n" +
+                                "                                select\n" +
+                                "                                   concenv.fase,\n" +
+                                "                                   concenv.processo,\n" +
+                                "                                   case when ed.complementoNumero is not null then  ed.numeroEdital+'-'+ed.complementoNumero else ed.numeroEdital end  numeroEdital,\n" +
+                                "                                    inf.nomeUnidade as nomeUg,\n" +
+                                "                                   coalesce(ug.nome,inf.nomeUnidade) as nomeUgOrigem,\n" +
+                                "                                   concenv.status,\n" +
+                                "                                    adA.data_assinatura DataAssinatura \n" +
+                                "                                from ConcursoEnvio concenv \n" +
+                                "                                    join Edital ed on concenv.idEdital= ed.id\n" +
+                                "                                    join InfoRemessa inf on ed.chave=inf.chave and inf.idUnidadeGestora <> '00000000000000'\n" +
+                                "                                     left join SICAPAP21.dbo.UnidadeGestora UG on UG.id = concenv.orgaoorigem\n" +
+                                "                                     left join ConcursoEnvioassinatura1 adA on adA.idEnvio = concenv.id and adA.rank = 1\n" +
+                                "                                where (inf.idUnidadeGestora in :ug or 'todos' in :ug )\n" +
+                                "                                     and (concenv.fase in :fase or -1 in :fase )\n" +
+                                "                                     and ((adA.data_assinatura between :dataInico and :dataFim) or (:dataInico is null or :dataFim is null) or adA.data_assinatura is null) " +
+                                "\n" +
+                                "                                     and ( :status = -1 or concenv.status = :status) "
                 )
                 .setParameter("ug" ,ug)
-                .setParameter("TipoRegistro" ,tipoRegistro)
+                .setParameter("fase" ,fase)
                 .setParameter("dataInico" ,dataInico)
                 .setParameter("status" ,Ststuss)
                 .setParameter("dataFim" ,dataFim);
-        List<Object[]> list = query.getResultList();
         List<HashMap<String,Object>> retorno = new ArrayList<HashMap<String,Object>>();
 
-        list.forEach(envio ->{
-            var aux = new HashMap<String,Object>();
-            //aux.put("id", envio[0] );
-            aux.put("TipoRegistro",this.getTipoByValue((Integer)envio[1]));
-            //aux.put("UnidadeGestora", envio[2] );
-            aux.put("processo", envio[3] );
-            {
-                var status = Arrays.asList(AdmEnvio.Status.values());
-                aux.put("status",
-                        status
-                                .stream()
-                                .filter(stat -> stat.getValor() == (Integer)envio[4])
-                                .findFirst()
-                                .get()
-                );
-            }
-            //aux.put("orgaoOrigem", envio[5] );
-            //aux.put("idMovimentacoes", envio[6] );
-            aux.put("Complemento", envio[7] );
-            aux.put("nomeUg", envio[9] );
-            aux.put("nomeUgOrigem", envio[10] );
-            aux.put("DataAsinatura", envio[11] );
-            retorno.add(aux);
-        });
+        retorno=getMapList(query);
+        retorno=  retorno.stream().map( hashmap -> {
+            hashmap.put("fase",getFaseByValue(hashmap.get("fase")).toString().toUpperCase() )   ;
+            hashmap.put("status",geStatusByValue(hashmap.get("status")).toString().toUpperCase() )   ;
+            return hashmap;
+        } ).collect(Collectors.toList());
         return retorno;
 
 
     }
 
-    public static ConcursoEnvio.Fase getTipoByValue(Integer value){
+    public static ConcursoEnvio.Fase getFaseByValue(Object value){
         var tipos = Arrays.asList(ConcursoEnvio.Fase.values());
         return tipos
                 .stream()
@@ -212,6 +199,20 @@ public class ConcursoEnvioRepository extends DefaultRepository<ConcursoEnvio, Bi
                 .get()
                 ;
     }
+
+    public static ConcursoEnvio.Status geStatusByValue(Object value){
+        var tipos = Arrays.asList(ConcursoEnvio.Status.values());
+        return tipos
+                .stream()
+                .filter(tipo -> tipo.getValor() == value)
+                .findFirst()
+                .get()
+                ;
+    }
+    private List<HashMap<String,Object>> getMapList(Query query) {
+        return   ( (NativeQueryImpl) query).setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE).getResultList();
+    }
+
 
 
 }
