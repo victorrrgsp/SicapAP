@@ -66,15 +66,13 @@ public class ConcessaoRevisaoReformaController extends DefaultController<Documen
     @CrossOrigin
     @GetMapping(path = "/{searchParams}/{tipoParams}/pagination")
     public ResponseEntity<PaginacaoUtil<AposentadoriaDTO>> listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
-        PaginacaoUtil<AposentadoriaDTO> paginacaoUtil = aposentadoriaRepository.buscaPaginadaRevisaoReforma(pageable, searchParams, tipoParams);
-        return ResponseEntity.ok().body(paginacaoUtil);
+        return ResponseEntity.ok().body(aposentadoriaRepository.buscaPaginadaRevisaoReforma(pageable, searchParams, tipoParams));
     }
 
     @CrossOrigin
     @GetMapping(path = {"/{id}"})
     public ResponseEntity<?> findById(@PathVariable BigInteger id) {
-        Aposentadoria list = aposentadoriaRepository.findById(id);
-        return ResponseEntity.ok().body(list);
+        return ResponseEntity.ok().body(aposentadoriaRepository.findById(id));
     }
 
     @CrossOrigin
@@ -123,8 +121,7 @@ public class ConcessaoRevisaoReformaController extends DefaultController<Documen
     @CrossOrigin
     @GetMapping(path = {"getSituacao/{id}"})
     public ResponseEntity<?> findSituacao(@PathVariable BigInteger id) {
-        Integer situacao = documentoAposentadoriaRepository.findSituacao("documentoAposentadoria", "idAposentadoria", id, "'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'", "N", "S", "N", "S");
-        return ResponseEntity.ok().body(situacao);
+        return ResponseEntity.ok().body(documentoAposentadoriaRepository.findSituacao("documentoAposentadoria", "idAposentadoria", id, "'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'", "N", "S", "N", "S"));
     }
 
     @CrossOrigin
@@ -170,16 +167,14 @@ public class ConcessaoRevisaoReformaController extends DefaultController<Documen
     @CrossOrigin
     @GetMapping(path = {"anexos/{inciso}/{id}"})
     public ResponseEntity<?> findByDocumento(@PathVariable String inciso, @PathVariable BigInteger id) {
-        DocumentoAposentadoria list = documentoAposentadoriaRepository.buscarDocumentoRevisaoReforma(inciso, id).get(0);
-        return ResponseEntity.ok().body(list);
+        return ResponseEntity.ok().body(documentoAposentadoriaRepository.buscarDocumentoRevisaoReforma(inciso, id));
     }
 
     @CrossOrigin
     @Transactional
     @DeleteMapping(value = {"/{id}"})
-    public ResponseEntity<?> delete(@PathVariable BigInteger id) {
-        documentoAposentadoriaRepository.delete(id);
-        return ResponseEntity.noContent().build();
+    public void delete(@PathVariable BigInteger id) {
+        documentoAposentadoriaRepository.delete(id); 
     }
 
     @CrossOrigin

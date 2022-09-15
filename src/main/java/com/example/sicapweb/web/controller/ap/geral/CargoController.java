@@ -91,8 +91,7 @@ public class CargoController  extends DefaultController<Cargo> {
     @CrossOrigin
     @Transactional
     @DeleteMapping(value = {"/{id}"})
-    public ResponseEntity<?> delete(@PathVariable BigInteger id) {
-        cargoRepository.deleteRestrito(id);
-        return ResponseEntity.noContent().build();
+    public void delete(@PathVariable BigInteger id) {
+        cargoRepository.deleteRestrito(id); 
     }
 }

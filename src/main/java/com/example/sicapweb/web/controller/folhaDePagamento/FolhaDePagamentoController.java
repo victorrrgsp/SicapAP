@@ -28,9 +28,8 @@ import java.math.BigInteger;
     @CrossOrigin
     @Transactional
     @DeleteMapping(value = {"/{id}"})
-    public ResponseEntity<?> delete(@PathVariable BigInteger id) {
-        folhaDePagamentoRepository.deleteRestrito(id);
-        return ResponseEntity.noContent().build();
+    public void delete(@PathVariable BigInteger id) {
+        folhaDePagamentoRepository.deleteRestrito(id); 
     }
 
         @CrossOrigin

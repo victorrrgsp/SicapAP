@@ -66,17 +66,14 @@ public class ConcessaoReadaptacaoController extends DefaultController<DocumentoR
     @CrossOrigin
     @GetMapping(path = "/{searchParams}/{tipoParams}/pagination")
     public ResponseEntity<PaginacaoUtil<ReadaptacaoDTO>> listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
-        PaginacaoUtil<ReadaptacaoDTO> paginacaoUtil =
-                readaptacaoRepository
-                        .buscaPaginadaReadaptacao(pageable, searchParams, tipoParams);
-        return ResponseEntity.ok().body(paginacaoUtil);
+        return ResponseEntity.ok().body(readaptacaoRepository
+                .buscaPaginadaReadaptacao(pageable, searchParams, tipoParams));
     }
 
     @CrossOrigin
     @GetMapping(path = {"/{id}"})
     public ResponseEntity<?> findById(@PathVariable BigInteger id) {
-        Readaptacao list = readaptacaoRepository.findById(id);
-        return ResponseEntity.ok().body(list);
+        return ResponseEntity.ok().body(readaptacaoRepository.findById(id));
     }
 
     @CrossOrigin
@@ -123,8 +120,7 @@ public class ConcessaoReadaptacaoController extends DefaultController<DocumentoR
     @CrossOrigin
     @GetMapping(path = {"getSituacao/{id}"})
     public ResponseEntity<?> findSituacao(@PathVariable BigInteger id) {
-        Integer situacao = documentoReadaptacaoRepository.findSituacao("documentoReadaptacao", "idReadaptacao", id, "'I - Seção V', 'II - Seção V', 'VI - Seção V'");
-        return ResponseEntity.ok().body(situacao);
+        return ResponseEntity.ok().body(documentoReadaptacaoRepository.findSituacao("documentoReadaptacao", "idReadaptacao", id, "'I - Seção V', 'II - Seção V', 'VI - Seção V'"));
     }
 
     @CrossOrigin
@@ -154,16 +150,14 @@ public class ConcessaoReadaptacaoController extends DefaultController<DocumentoR
     @CrossOrigin
     @GetMapping(path = {"anexos/{inciso}/{id}"})
     public ResponseEntity<?> findByDocumento(@PathVariable String inciso, @PathVariable BigInteger id) {
-        DocumentoReadaptacao list = documentoReadaptacaoRepository.buscarDocumentoReadaptacao(inciso, id).get(0);
-        return ResponseEntity.ok().body(list);
+        return ResponseEntity.ok().body(documentoReadaptacaoRepository.buscarDocumentoReadaptacao(inciso, id));
     }
 
     @CrossOrigin
     @Transactional
     @DeleteMapping(value = {"/{id}"})
-    public ResponseEntity<?> delete(@PathVariable BigInteger id) {
-        documentoReadaptacaoRepository.delete(id);
-        return ResponseEntity.noContent().build();
+    public void delete(@PathVariable BigInteger id) {
+        documentoReadaptacaoRepository.delete(id); 
     }
 
     @CrossOrigin

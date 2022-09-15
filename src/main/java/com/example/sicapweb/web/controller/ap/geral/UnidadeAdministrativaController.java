@@ -83,10 +83,10 @@ public class UnidadeAdministrativaController  extends DefaultController<UnidadeA
     @CrossOrigin
     @Transactional
     @DeleteMapping(value = {"/{id}"})
-    public ResponseEntity<?> delete(@PathVariable BigInteger id) {
+    public void delete(@PathVariable BigInteger id) {
         List<Lotacao> list=lotacaoRepository.buscarLotacaoPorUA(id);
-        if (list!=null) throw new InvalitInsert("Existem lotaçoes pertencentes a essa unidade administrativa!");
-        unidadeAdministrativaRepository.deleteRestrito(id);
-        return ResponseEntity.noContent().build();
+        if (list!=null) 
+            throw new InvalitInsert("Existem lotaçoes pertencentes a essa unidade administrativa!");
+        unidadeAdministrativaRepository.deleteRestrito(id); 
     }
 }

@@ -77,9 +77,8 @@ public class AtoController extends DefaultController<Ato>  {
     }
     @Transactional
     @DeleteMapping(value = {"/{id}"})
-    public ResponseEntity<?> delete(@PathVariable BigInteger id) {
-        atoRepository.deleteRestrito(id);
-        return ResponseEntity.noContent().build();
+    public void delete(@PathVariable BigInteger id) {
+        atoRepository.deleteRestrito(id); 
     }
 
 }

@@ -16,19 +16,18 @@ public class DocumentoPensaoRepository extends DefaultRepository<DocumentoPensao
         super(em);
     }
 
-    public List<DocumentoPensao> buscarDocumentoPensao(String coluna, BigInteger idPensao) {
-
-        return getEntityManager().createNativeQuery(
-                "select * from DocumentoPensao where revisao = 'N' and inciso = '"
-                        + coluna + "' and idPensao = " + idPensao, DocumentoPensao.class)
-                .getResultList();
+    public DocumentoPensao buscarDocumentoPensao(String coluna, BigInteger idPensao) {
+        return getEntityManager().createQuery(
+                        "select o from DocumentoPensao o where o.revisao = 'N' and o.inciso = '"
+                                + coluna + "' and o.pensao.id = " + idPensao, DocumentoPensao.class)
+                .setMaxResults(1).getSingleResult();
     }
 
-    public List<DocumentoPensao> buscarDocumentoPensaoRevisao(String coluna, BigInteger idPensao) {
-        return getEntityManager().createNativeQuery(
-                        "select * from DocumentoPensao where revisao = 'S' and inciso = '"
-                                + coluna + "' and idPensao = " + idPensao, DocumentoPensao.class)
-                .getResultList();
+    public DocumentoPensao buscarDocumentoPensaoRevisao(String coluna, BigInteger idPensao) {
+        return getEntityManager().createQuery(
+                        "select o from DocumentoPensao o where o.revisao = 'S' and o.inciso = '"
+                                + coluna + "' and o.pensao.id = " + idPensao, DocumentoPensao.class)
+                .setMaxResults(1).getSingleResult();
     }
 
     public List<Object> buscarDocumentos(BigInteger idEnvio) {

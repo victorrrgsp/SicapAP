@@ -16,11 +16,11 @@ public class DocumentoAproveitamentoRepository extends DefaultRepository<Documen
         super(em);
     }
 
-    public List<DocumentoAproveitamento> buscarDocumentoAproveitamento(String coluna, BigInteger idAproveitamento) {
-        return getEntityManager().createNativeQuery(
-                "select * from DocumentoAproveitamento where inciso = '"
-                        + coluna + "' and idAproveitamento = " + idAproveitamento, DocumentoAproveitamento.class)
-                .getResultList();
+    public DocumentoAproveitamento buscarDocumentoAproveitamento(String coluna, BigInteger idAproveitamento) {
+        return getEntityManager().createQuery(
+                "select o from DocumentoAproveitamento o where o.inciso = '"
+                        + coluna + "' and o.aproveitamento.id = " + idAproveitamento, DocumentoAproveitamento.class)
+                .setMaxResults(1).getSingleResult();
     }
 
     public Integer findSituacao(String entidade, String pk ,BigInteger id, String incisos) {

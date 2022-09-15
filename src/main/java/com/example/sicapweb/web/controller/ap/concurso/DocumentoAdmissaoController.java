@@ -144,11 +144,10 @@ public class DocumentoAdmissaoController extends DefaultController<DocumentoAdmi
     @CrossOrigin
     @Transactional
     @DeleteMapping(value = {"/{id}"})
-    public ResponseEntity<?> delete(@PathVariable BigInteger id) {
+    public void delete(@PathVariable BigInteger id) {
         DocumentoAdmissao documentoAdmissao = documentoAdmissaoRepository.findById(id);
         if (documentoAdmissao.getDocumentoCastorId()!=null ) throw new RuntimeException("remova  primeiro o documento antes de excluir a aprovado!!");
-        documentoAdmissaoRepository.delete(id);
-        return ResponseEntity.noContent().build();
+        documentoAdmissaoRepository.delete(id); 
     }
 
 }

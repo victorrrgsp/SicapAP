@@ -107,9 +107,8 @@ public class LeiController extends DefaultController<Lei> {
     @CrossOrigin
     @Transactional
     @DeleteMapping(value = {"/{id}"})
-    public ResponseEntity<?> delete(@PathVariable BigInteger id) {
-        leiRepository.delete(id);
-        return ResponseEntity.noContent().build();
+    public void delete(@PathVariable BigInteger id) {
+        leiRepository.delete(id); 
     }
 
 

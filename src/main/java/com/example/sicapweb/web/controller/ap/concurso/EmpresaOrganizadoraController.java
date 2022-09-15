@@ -85,9 +85,8 @@ public class EmpresaOrganizadoraController extends DefaultController<EmpresaOrga
     @CrossOrigin
     @Transactional
     @DeleteMapping(value = {"/{id}"})
-    public ResponseEntity<?> delete(@PathVariable BigInteger id) {
-        empresaOrganizadoraRepository.delete(id);
-        return ResponseEntity.noContent().build();
+    public void delete(@PathVariable BigInteger id) {
+        empresaOrganizadoraRepository.delete(id); 
     }
 }
 

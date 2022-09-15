@@ -1,33 +1,30 @@
 package com.example.sicapweb.web.controller.ap.concurso;
 
-import br.gov.to.tce.model.ap.concurso.*;
+import br.gov.to.tce.model.ap.concurso.AdmissaoEnvioAssinatura;
+import br.gov.to.tce.model.ap.concurso.EditalAprovado;
+import br.gov.to.tce.model.ap.concurso.ProcessoAdmissao;
 import br.gov.to.tce.model.ap.concurso.documento.DocumentoAdmissao;
 import br.gov.to.tce.util.Date;
 import com.example.sicapweb.exception.InvalitInsert;
 import com.example.sicapweb.model.AdmissaoEnvioAssRetorno;
-import com.example.sicapweb.model.ConcursoEnvioAssRetorno;
 import com.example.sicapweb.repository.concurso.AdmissaoEnvioAssinaturaRepository;
-import com.example.sicapweb.repository.concurso.ConcursoEnvioRepository;
 import com.example.sicapweb.repository.concurso.DocumentoAdmissaoRepository;
 import com.example.sicapweb.repository.concurso.ProcessoAdmissaoRepository;
 import com.example.sicapweb.security.User;
-import com.example.sicapweb.util.PaginacaoUtil;
 import com.example.sicapweb.service.AssinarCertificadoDigital;
+import com.example.sicapweb.util.PaginacaoUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import okhttp3.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URLDecoder;
@@ -62,16 +59,18 @@ public class AssinarAdmissaoController {
             PaginacaoUtil<AdmissaoEnvioAssRetorno> paginacaoUtilvazia= new PaginacaoUtil<AdmissaoEnvioAssRetorno>(0, 1, 1, 0, listavazia);
             return ResponseEntity.ok().body(paginacaoUtilvazia);
         }
-        PaginacaoUtil<AdmissaoEnvioAssRetorno> paginacaoUtil = processoAdmissaoRepository.buscarProcessosAguardandoAss(pageable,searchParams,tipoParams);
-        return ResponseEntity.ok().body(paginacaoUtil);
+        return ResponseEntity.ok().body(processoAdmissaoRepository.buscarProcessosAguardandoAss(pageable,searchParams,tipoParams));
     }
 
     @CrossOrigin
     @PostMapping(path="/iniciarAssinatura")
     public ResponseEntity<?> iniciarAssinatura(@RequestBody String certificado_mensagem_hash  ){
-        String respostaIniciarAssinatura=new String();
+        String respostaIniciarAssinatura = "";
         try {
             User userlogado = User.getUser(admissaoEnvioAssinaturaRepository.getRequest());
+            if (userlogado == null )
+                throw new Exception("nao encontrou usuario logado!!");
+
 
             JsonNode respostaJson = new ObjectMapper().readTree(certificado_mensagem_hash);
 
@@ -83,19 +82,14 @@ public class AssinarAdmissaoController {
 
             String hash = URLDecoder.decode(respostaJson.get("hashcertificado").asText(), StandardCharsets.UTF_8)  ;
 
+            if(!userlogado.getHashCertificado().equals(hash) )
+                throw new Exception("nao é o mesmo  certificado que esta logado!!");
+
             String assinatura = certificadoJson.get("validacaoAssinatura").get("dados").get("assinatura").asText();
 
-            if (userlogado == null ){
-                throw new Exception("nao encontrou usuario logado!!");
-            }
-            else if(!userlogado.getHashCertificado().equals(hash) ){
-                throw new Exception("nao é o mesmo  certificado que esta logado!!");
-            }
-            else {
-                respostaIniciarAssinatura = AssinarCertificadoDigital.inicializarAssinatura(certificado,Original);
-            }
 
 
+            respostaIniciarAssinatura = AssinarCertificadoDigital.inicializarAssinatura(certificado,Original);
 
 
         } catch (Exception e) {

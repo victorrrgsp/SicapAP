@@ -26,15 +26,13 @@ import java.math.BigInteger;
         @CrossOrigin
         @GetMapping(path="/{searchParams}/{tipoParams}/pagination")
         public ResponseEntity<PaginacaoUtil<Lotacao>> listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
-            PaginacaoUtil<Lotacao> paginacaoUtil = lotacaoRepository.buscaPaginada(pageable,searchParams,tipoParams);
-            return ResponseEntity.ok().body(paginacaoUtil);
+            return ResponseEntity.ok().body(lotacaoRepository.buscaPaginada(pageable,searchParams,tipoParams));
         }
 
         @CrossOrigin
         @GetMapping(path = {"/{id}"})
         public ResponseEntity<?> findById(@PathVariable BigInteger id) {
-            Lotacao list = lotacaoRepository.findById(id);
-            return ResponseEntity.ok().body(list);
+            return ResponseEntity.ok().body(lotacaoRepository.findById(id));
         }
 
         @CrossOrigin
@@ -51,9 +49,8 @@ import java.math.BigInteger;
         @CrossOrigin
         @Transactional
         @DeleteMapping(value = {"/{id}"})
-        public ResponseEntity<?> delete(@PathVariable BigInteger id) {
-            lotacaoRepository.deleteRestrito(id);
-            return ResponseEntity.noContent().build();
+        public void delete(@PathVariable BigInteger id) {
+            lotacaoRepository.deleteRestrito(id); 
         }
 
     }

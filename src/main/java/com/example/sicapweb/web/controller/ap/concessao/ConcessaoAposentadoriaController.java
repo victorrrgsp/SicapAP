@@ -176,23 +176,20 @@ public class ConcessaoAposentadoriaController extends DefaultController<Document
     @CrossOrigin
     @GetMapping(path = {"anexos/{inciso}/{id}"})
     public ResponseEntity<?> findByDocumento(@PathVariable String inciso, @PathVariable BigInteger id) {
-        DocumentoAposentadoria list = documentoAposentadoriaRepository.buscarDocumentoAposentadoria(inciso, id).get(0);
-        return ResponseEntity.ok().body(list);
+        return ResponseEntity.ok().body(documentoAposentadoriaRepository.buscarDocumentoAposentadoria(inciso, id));
     }
 
     @CrossOrigin
     @Transactional
     @DeleteMapping(value = {"/{id}"})
-    public ResponseEntity<?> delete(@PathVariable BigInteger id) {
-        documentoAposentadoriaRepository.delete(id);
-        return ResponseEntity.noContent().build();
+    public void delete(@PathVariable BigInteger id) {
+        documentoAposentadoriaRepository.delete(id); 
     }
 
     @CrossOrigin
     @PostMapping("/enviarGestor/{id}")
     public ResponseEntity<?> enviarGestorAssinar(@PathVariable BigInteger id) {
-        AdmEnvio admEnvio = preencherEnvio(id);
-        admEnvioRepository.save(admEnvio);
+        admEnvioRepository.save(preencherEnvio(id));
         return ResponseEntity.ok().body("Ok");
     }
 

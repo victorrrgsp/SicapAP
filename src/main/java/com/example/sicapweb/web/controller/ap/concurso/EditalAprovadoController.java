@@ -92,8 +92,7 @@ public class EditalAprovadoController extends DefaultController<EditalAprovado> 
     @CrossOrigin
     @Transactional
     @DeleteMapping(value = {"/{id}"})
-    public ResponseEntity<?> delete(@PathVariable BigInteger id) {
-        editalAprovadoRepository.delete(id);
-        return ResponseEntity.noContent().build();
+    public void delete(@PathVariable BigInteger id) {
+        editalAprovadoRepository.delete(id); 
     }
 }

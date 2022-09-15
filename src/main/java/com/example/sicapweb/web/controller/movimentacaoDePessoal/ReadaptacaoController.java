@@ -33,9 +33,8 @@ import org.springframework.web.bind.annotation.*;
         @CrossOrigin
         @Transactional
         @DeleteMapping(value = {"/{id}"})
-        public ResponseEntity<?> delete(@PathVariable BigInteger id) {
-            readaptacaoRepository.deleteRestrito(id);
-            return ResponseEntity.noContent().build();
+        public void delete(@PathVariable BigInteger id) {
+            readaptacaoRepository.deleteRestrito(id); 
         }
 
         @CrossOrigin

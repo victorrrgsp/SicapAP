@@ -16,11 +16,11 @@ public class DocumentoAposentadoriaRepository extends DefaultRepository<Document
         super(em);
     }
 
-    public List<DocumentoAposentadoria> buscarDocumentoAposentadoria(String coluna, BigInteger idAposentadoria) {
-        return getEntityManager().createNativeQuery(
-                        "select * from DocumentoAposentadoria where inciso = '"
-                                + coluna + "' and idAposentadoria = " + idAposentadoria, DocumentoAposentadoria.class)
-                .getResultList();
+    public DocumentoAposentadoria buscarDocumentoAposentadoria(String coluna, BigInteger idAposentadoria) {
+        return getEntityManager().createQuery(
+                        "select o from DocumentoAposentadoria o where o.inciso = '"
+                                + coluna + "' and o.aposentadoria.id = " + idAposentadoria, DocumentoAposentadoria.class)
+                .setMaxResults(1).getSingleResult();
     }
 
     public Integer findSituacao(String entidade, String pk, BigInteger id, String incisos, String reserva, String reforma, String reversao, String revisao) {
@@ -30,46 +30,47 @@ public class DocumentoAposentadoriaRepository extends DefaultRepository<Document
 
     }
 
-    public List<DocumentoAposentadoria> buscarDocumentoAposentadoriaReserva(String coluna, BigInteger idAposentadoria) {
-        return getEntityManager().createNativeQuery(
-                        "select * from DocumentoAposentadoria where reserva = 'S' and inciso = '"
-                                + coluna + "' and idAposentadoria = " + idAposentadoria, DocumentoAposentadoria.class)
-                .getResultList();
+    public DocumentoAposentadoria buscarDocumentoAposentadoriaReserva(String coluna, BigInteger idAposentadoria) {
+        return getEntityManager().createQuery(
+                        "select o from DocumentoAposentadoria o where o.reserva = 'S' and o.inciso = '"
+                                + coluna + "' and o.aposentadoria.id = " + idAposentadoria, DocumentoAposentadoria.class)
+                .setMaxResults(1).getSingleResult();
     }
 
-    public List<DocumentoAposentadoria> buscarDocumentoAposentadoriaReforma(String coluna, BigInteger idAposentadoria) {
-        return getEntityManager().createNativeQuery(
-                        "select * from DocumentoAposentadoria where reforma = 'S' and inciso = '"
-                                + coluna + "' and idAposentadoria = " + idAposentadoria, DocumentoAposentadoria.class)
-                .getResultList();
+    public DocumentoAposentadoria buscarDocumentoAposentadoriaReforma(String coluna, BigInteger idAposentadoria) {
+        return getEntityManager().createQuery(
+                        "select o from DocumentoAposentadoria o where o.reserva = 'S' and o.inciso = '"
+                                + coluna + "' and o.aposentadoria.id = " + idAposentadoria, DocumentoAposentadoria.class)
+                .setMaxResults(1).getSingleResult();
     }
 
-    public List<DocumentoAposentadoria> buscarDocumentoAposentadoriaRevisao(String coluna, BigInteger idAposentadoria) {
-        return getEntityManager().createNativeQuery(
-                        "select * from DocumentoAposentadoria where revisao = 'S' and inciso = '"
-                                + coluna + "' and idAposentadoria = " + idAposentadoria, DocumentoAposentadoria.class)
-                .getResultList();
+    public DocumentoAposentadoria buscarDocumentoAposentadoriaRevisao(String coluna, BigInteger idAposentadoria) {
+        return getEntityManager().createQuery(
+                        "select o from DocumentoAposentadoria o where o.reserva = 'S' and o.inciso = '"
+                                + coluna + "' and o.aposentadoria.id = " + idAposentadoria, DocumentoAposentadoria.class)
+                .setMaxResults(1).getSingleResult();
     }
 
-    public List<DocumentoAposentadoria> buscarDocumentoRevisaoReserva(String coluna, BigInteger idAposentadoria) {
-        return getEntityManager().createNativeQuery(
-                        "select * from DocumentoAposentadoria where revisao = 'S' and reserva = 'S' and inciso = '"
-                                + coluna + "' and idAposentadoria = " + idAposentadoria, DocumentoAposentadoria.class)
-                .getResultList();
+    public DocumentoAposentadoria buscarDocumentoRevisaoReforma(String coluna, BigInteger idAposentadoria) {
+        return getEntityManager().createQuery(
+                        "select o from DocumentoAposentadoria o where o.revisao = 'S' and " +
+                                "o.reforma = 'S' and o.inciso = '"
+                                + coluna + "' and o.aposentadoria.id = " + idAposentadoria, DocumentoAposentadoria.class)
+                .setMaxResults(1).getSingleResult();
     }
 
-    public List<DocumentoAposentadoria> buscarDocumentoRevisaoReforma(String coluna, BigInteger idAposentadoria) {
-        return getEntityManager().createNativeQuery(
-                        "select * from DocumentoAposentadoria where revisao = 'S' and reforma = 'S' and inciso = '"
-                                + coluna + "' and idAposentadoria = " + idAposentadoria, DocumentoAposentadoria.class)
-                .getResultList();
+    public DocumentoAposentadoria buscarDocumentoRevisaoReserva(String coluna, BigInteger idAposentadoria) {
+        return getEntityManager().createQuery(
+                        "select o from DocumentoAposentadoria o where o.revisao = 'S' and o.reserva = 'S' and o.inciso = '"
+                                + coluna + "' and o.aposentadoria.id = " + idAposentadoria, DocumentoAposentadoria.class)
+                .setMaxResults(1).getSingleResult();
     }
 
-    public List<DocumentoAposentadoria> buscarDocumentoAposentadoriaReversao(String coluna, BigInteger idAposentadoria) {
-        return getEntityManager().createNativeQuery(
-                        "select * from DocumentoAposentadoria where reversao = 'S' and inciso = '"
-                                + coluna + "' and idAposentadoria = " + idAposentadoria, DocumentoAposentadoria.class)
-                .getResultList();
+    public DocumentoAposentadoria buscarDocumentoAposentadoriaReversao(String coluna, BigInteger idAposentadoria) {
+        return getEntityManager().createQuery(
+                    "select o from DocumentoAposentadoria o where o.reversao = 'S' and o.inciso = '"
+                            + coluna + "' and o.aposentadoria.id = " + idAposentadoria, DocumentoAposentadoria.class)
+            .setMaxResults(1).getSingleResult();
     }
 
     public List<Object> buscarDocumentos(BigInteger idEnvio) {

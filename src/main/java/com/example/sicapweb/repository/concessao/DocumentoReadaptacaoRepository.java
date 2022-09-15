@@ -16,11 +16,12 @@ public class DocumentoReadaptacaoRepository extends DefaultRepository<DocumentoR
         super(em);
     }
 
-    public List<DocumentoReadaptacao> buscarDocumentoReadaptacao(String coluna, BigInteger idReadaptacao) {
-        return getEntityManager().createNativeQuery(
-                "select * from DocumentoReadaptacao where inciso = '"
-                        + coluna + "' and idReadaptacao = " + idReadaptacao, DocumentoReadaptacao.class)
-                .getResultList();
+
+    public DocumentoReadaptacao buscarDocumentoReadaptacao(String coluna, BigInteger idReadaptacao) {
+        return getEntityManager().createQuery(
+                        "select o from DocumentoReadaptacao o where o.inciso = '"
+                                + coluna + "' and o.readaptacao.id = " + idReadaptacao, DocumentoReadaptacao.class)
+                .setMaxResults(1).getSingleResult();
     }
 
     public List<Object> buscarDocumentos(BigInteger idEnvio) {

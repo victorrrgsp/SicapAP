@@ -23,14 +23,12 @@ import java.math.BigInteger;
         @CrossOrigin
         @GetMapping(path="/{searchParams}/{tipoParams}/pagination")
         public ResponseEntity<PaginacaoUtil<Servidor>> listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
-            PaginacaoUtil<Servidor> paginacaoUtil = servidorRepository.buscaPaginada(pageable,searchParams,tipoParams);
-            return ResponseEntity.ok().body(paginacaoUtil);
+            return ResponseEntity.ok().body(servidorRepository.buscaPaginada(pageable,searchParams,tipoParams));
         }
         @CrossOrigin
         @GetMapping(path = {"/{id}"})
-        public ResponseEntity<?> findById(@PathVariable BigInteger id) {
-            Servidor list = servidorRepository.findById(id);
-            return ResponseEntity.ok().body(list);
+        public ResponseEntity<?> findById(@PathVariable BigInteger id) { 
+            return ResponseEntity.ok().body(servidorRepository.findById(id));
         }
         @CrossOrigin
         @Transactional
@@ -39,12 +37,12 @@ import java.math.BigInteger;
             servidor.setId(id);
             InfoRemessa chave = servidorRepository.findById(id).getChave();
             servidor.setCpfServidor(servidor.getCpfServidor().replace(".", "").replace("-", "").replace("/", ""));
-            if(servidor.getCpfConjuge() != null) {
+            if(servidor.getCpfConjuge() != null) 
                 servidor.setCpfConjuge(servidor.getCpfConjuge().replace(".", "").replace("-", "").replace("/", ""));
-            }
-            if(servidor.getCpfMae() != null) {
+             
+            if(servidor.getCpfMae() != null) 
                 servidor.setCpfMae(servidor.getCpfMae().replace(".", "").replace("-", "").replace("/", ""));
-            }
+             
             servidor.setChave(chave);
             servidorRepository.update(servidor);
             return ResponseEntity.noContent().build();
@@ -58,9 +56,8 @@ import java.math.BigInteger;
         @CrossOrigin
         @Transactional
         @DeleteMapping(value = {"/{id}"})
-        public ResponseEntity<?> delete(@PathVariable BigInteger id) {
-            servidorRepository.deleteRestrito(id);
-            return ResponseEntity.noContent().build();
+        public void delete(@PathVariable BigInteger id) {
+            servidorRepository.deleteRestrito(id); 
         }
 
     }

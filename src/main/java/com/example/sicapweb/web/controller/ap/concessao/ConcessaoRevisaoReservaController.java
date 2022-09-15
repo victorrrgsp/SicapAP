@@ -173,16 +173,14 @@ public class ConcessaoRevisaoReservaController extends DefaultController<Documen
     @CrossOrigin
     @GetMapping(path = {"anexos/{inciso}/{id}"})
     public ResponseEntity<?> findByDocumento(@PathVariable String inciso, @PathVariable BigInteger id) {
-        DocumentoAposentadoria list = documentoAposentadoriaRepository.buscarDocumentoRevisaoReserva(inciso, id).get(0);
-        return ResponseEntity.ok().body(list);
+        return ResponseEntity.ok().body(documentoAposentadoriaRepository.buscarDocumentoRevisaoReserva(inciso, id));
     }
 
     @CrossOrigin
     @Transactional
     @DeleteMapping(value = {"/{id}"})
-    public ResponseEntity<?> delete(@PathVariable BigInteger id) {
-        documentoAposentadoriaRepository.delete(id);
-        return ResponseEntity.noContent().build();
+    public void delete(@PathVariable BigInteger id) {
+        documentoAposentadoriaRepository.delete(id); 
     }
 
     @CrossOrigin

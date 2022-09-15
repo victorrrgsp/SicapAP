@@ -59,9 +59,8 @@ import java.util.List;
         @CrossOrigin
         @Transactional
         @DeleteMapping(value = {"/{id}"})
-        public ResponseEntity<?> delete(@PathVariable BigInteger id) {
-            admissaoRepository.deleteRestrito(id);
-            return ResponseEntity.noContent().build();
+        public void delete(@PathVariable BigInteger id) {
+            admissaoRepository.deleteRestrito(id); 
         }
         @CrossOrigin
         @Transactional

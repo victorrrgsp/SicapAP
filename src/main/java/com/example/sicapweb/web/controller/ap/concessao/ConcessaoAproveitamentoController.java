@@ -73,8 +73,7 @@ public class ConcessaoAproveitamentoController extends DefaultController<Documen
     @CrossOrigin
     @GetMapping(path = {"/{id}"})
     public ResponseEntity<?> findById(@PathVariable BigInteger id) {
-        Aproveitamento list = aproveitamentoRepository.findById(id);
-        return ResponseEntity.ok().body(list);
+        return ResponseEntity.ok().body(aproveitamentoRepository.findById(id));
     }
 
     @CrossOrigin
@@ -121,8 +120,7 @@ public class ConcessaoAproveitamentoController extends DefaultController<Documen
     @CrossOrigin
     @GetMapping(path = {"getSituacao/{id}"})
     public ResponseEntity<?> findSituacao(@PathVariable BigInteger id) {
-        Integer situacao = documentoAproveitamentoRepository.findSituacao("documentoAproveitamento", "idAproveitamento", id, "'I - Seção V', 'II - Seção V', 'V - Seção V', 'VI - Seção V'");
-        return ResponseEntity.ok().body(situacao);
+        return ResponseEntity.ok().body(documentoAproveitamentoRepository.findSituacao("documentoAproveitamento", "idAproveitamento", id, "'I - Seção V', 'II - Seção V', 'V - Seção V', 'VI - Seção V'"));
     }
 
     @CrossOrigin
@@ -159,23 +157,20 @@ public class ConcessaoAproveitamentoController extends DefaultController<Documen
     @CrossOrigin
     @GetMapping(path = {"anexos/{inciso}/{id}"})
     public ResponseEntity<?> findByDocumento(@PathVariable String inciso, @PathVariable BigInteger id) {
-        DocumentoAproveitamento list = documentoAproveitamentoRepository.buscarDocumentoAproveitamento(inciso, id).get(0);
-        return ResponseEntity.ok().body(list);
+        return ResponseEntity.ok().body(documentoAproveitamentoRepository.buscarDocumentoAproveitamento(inciso, id));
     }
 
     @CrossOrigin
     @Transactional
     @DeleteMapping(value = {"/{id}"})
-    public ResponseEntity<?> delete(@PathVariable BigInteger id) {
-        documentoAproveitamentoRepository.delete(id);
-        return ResponseEntity.noContent().build();
+    public void delete(@PathVariable BigInteger id) {
+        documentoAproveitamentoRepository.delete(id); 
     }
 
     @CrossOrigin
     @PostMapping("/enviarGestor/{id}")
     public ResponseEntity<?> enviarGestorAssinar(@PathVariable BigInteger id, @RequestParam(value = "Ug", required = false) String ug) {
-        AdmEnvio admEnvio = preencherEnvio(id, ug);
-        admEnvioRepository.save(admEnvio);
+        admEnvioRepository.save(preencherEnvio(id, ug));
         return ResponseEntity.ok().body("Ok");
     }
 
@@ -185,9 +180,9 @@ public class ConcessaoAproveitamentoController extends DefaultController<Documen
         admEnvio.setTipoRegistro(AdmEnvio.TipoRegistro.APROVEITAMENTO.getValor());
         admEnvio.setUnidadeGestora(aproveitamento.getChave().getIdUnidadeGestora());
         admEnvio.setStatus(AdmEnvio.Status.AGUARDANDOASSINATURA.getValor());
-        if (ug != null && !ug.equals("")) {
+        if (ug != null && !ug.equals(""))
             admEnvio.setOrgaoOrigem(ug);
-        }
+
         admEnvio.setIdMovimentacao(id);
         admEnvio.setComplemento("Conforme PORTARIA: " + aproveitamento.getAto().getNumeroAto() + " De: " + aproveitamento.getAto().getDataPublicacao());
         admEnvio.setAdmissao(aproveitamento.getAdmissao());

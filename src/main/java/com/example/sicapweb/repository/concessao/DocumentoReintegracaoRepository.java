@@ -16,11 +16,11 @@ public class DocumentoReintegracaoRepository extends DefaultRepository<Documento
         super(em);
     }
 
-    public List<DocumentoReintegracao> buscarDocumentoReintegracao(String coluna, BigInteger idReintegracao) {
-        return getEntityManager().createNativeQuery(
-                "select * from DocumentoReintegracao where inciso = '"
-                        + coluna + "' and idReintegracao = " + idReintegracao, DocumentoReintegracao.class)
-                .getResultList();
+    public DocumentoReintegracao buscarDocumentoReintegracao(String coluna, BigInteger idReintegracao) {
+        return getEntityManager().createQuery(
+                        "select o from DocumentoReintegracao o where o.inciso = '"
+                                + coluna + "' and o.reintegracao.id = " + idReintegracao, DocumentoReintegracao.class)
+                .setMaxResults(1).getSingleResult();
     }
 
     public List<Object> buscarDocumentos(BigInteger idEnvio) {

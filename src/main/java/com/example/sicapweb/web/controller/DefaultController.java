@@ -133,7 +133,7 @@ public abstract class DefaultController<T> {
     @CrossOrigin
     @Transactional
     @DeleteMapping(value = {"/{id}"})
-    public ResponseEntity<?> delete(@PathVariable BigInteger id) {
+    public void delete(@PathVariable BigInteger id) {
         try {
             JayReflection.executeMethod(clazz,
                     Arrays.asList(EntityManager.class),
@@ -143,7 +143,6 @@ public abstract class DefaultController<T> {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return ResponseEntity.noContent().build();
     }
 
     @CrossOrigin

@@ -231,8 +231,7 @@ public class DocumentoConcursoEditalController extends DefaultController<Documen
     @CrossOrigin
     @Transactional
     @DeleteMapping(value = {"/{id}"})
-    public ResponseEntity<?> delete(@PathVariable BigInteger id) {
-        documentoEditalRepository.delete(id);
-        return ResponseEntity.noContent().build();
+    public void delete(@PathVariable BigInteger id) {
+        documentoEditalRepository.delete(id); 
     }
 }

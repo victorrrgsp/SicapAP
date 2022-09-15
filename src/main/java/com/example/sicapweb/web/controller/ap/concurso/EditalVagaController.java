@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.math.BigInteger;
-import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -38,30 +37,25 @@ public class EditalVagaController extends DefaultController<EditalVaga> {
     @CrossOrigin
     @GetMapping(path="/{searchParams}/{tipoParams}/pagination")
     public ResponseEntity<PaginacaoUtil<EditalVaga>> listVagas(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
-        
-        PaginacaoUtil<EditalVaga> paginacaoUtil = editalVagaRepository.buscaPaginada(pageable,searchParams,tipoParams);
-        return ResponseEntity.ok().body(paginacaoUtil);
+                 return ResponseEntity.ok().body(editalVagaRepository.buscaPaginada(pageable,searchParams,tipoParams));
     }
 
     @CrossOrigin
     @GetMapping(path = {"/{id}"})
     public ResponseEntity<?> findById(@PathVariable BigInteger id) {
-        EditalVaga list = editalVagaRepository.findById(id);
-        return ResponseEntity.ok().body(list);
+        return ResponseEntity.ok().body(editalVagaRepository.findById(id));
     }
 
     @CrossOrigin
     @GetMapping("/buscar/{id}")
     public ResponseEntity<List<EditalVaga>> findVagasByIdEdital(@PathVariable Integer id) {
-        List<EditalVaga> list = editalVagaRepository.buscarVagasPorEdital(id);
-        return ResponseEntity.ok().body(list);
+        return ResponseEntity.ok().body(editalVagaRepository.buscarVagasPorEdital(id));
     }
 
     @CrossOrigin
     @GetMapping("/todos")
     public ResponseEntity<List<EditalVaga>> findVagas(){
-        List<EditalVaga> list = editalVagaRepository.findAll();
-        return ResponseEntity.ok().body(list);
+        return ResponseEntity.ok().body(editalVagaRepository.findAll());
     }
 
     @CrossOrigin
@@ -73,27 +67,33 @@ public class EditalVagaController extends DefaultController<EditalVaga> {
             editalVaga.setUnidadeAdministrativa(unidadeAdministrativaRepository.buscarUnidadePorcodigo(editalVaga.codigoUnidadeAdministrativa));
             editalVaga.setCargo(cargoRepository.buscarCargoPorcodigo(editalVaga.codigoCargo));
             EditalVaga mesmocodigo = editalVagaRepository.buscarVagasPorCodigo(editalVaga.getCodigoVaga());
-            if (mesmocodigo!=null) throw  new InvalitInsert("Ja existe vaga com esse codigo!!");
+
+            if (mesmocodigo!=null)
+                throw  new InvalitInsert("Ja existe vaga com esse codigo!!");
+
             editalVagaRepository.save(editalVaga);
-            URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(editalVaga.getId()).toUri();
-            return ResponseEntity.created(uri).body(editalVaga);
+
+            return ResponseEntity.created(ServletUriComponentsBuilder.
+                    fromCurrentRequest().path("/{id}").
+                    buildAndExpand(editalVaga.getId()).
+                    toUri()).body(editalVaga);
     }
 
     @CrossOrigin
     @Transactional
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.PUT)
-    public ResponseEntity<EditalVaga> update(@RequestBody EditalVaga editalVaga, @PathVariable BigInteger id){
+    public void update(@RequestBody EditalVaga editalVaga, @PathVariable BigInteger id){
         try {
-            
             editalVaga.setId(id);
             editalVaga.setChave(editalVagaRepository.buscarPrimeiraRemessa());
             editalVaga.setEdital(editalRepository.buscarEditalPorNumero(editalVaga.getNumeroEdital(),editalVaga.getComplementoEdital() ));
             editalVaga.setUnidadeAdministrativa(unidadeAdministrativaRepository.buscarUnidadePorcodigo(editalVaga.codigoUnidadeAdministrativa));
             editalVaga.setCargo(cargoRepository.buscarCargoPorcodigo(editalVaga.codigoCargo));
             EditalVaga mesmocodigo = editalVagaRepository.buscarVagasPorCodigo(editalVaga.getCodigoVaga());
-            if (mesmocodigo!=null)  if (! id.equals(mesmocodigo.getId())  ) throw  new InvalitInsert("Ja existe vaga com esse codigo!!");
+            if (mesmocodigo!=null && ! id.equals(mesmocodigo.getId()) )
+                throw  new InvalitInsert("Ja existe vaga com esse codigo!!");
             editalVagaRepository.update(editalVaga);
-            return ResponseEntity.noContent().build();
+
         } catch (Exception e) {
             throw new InvalitInsert("Erro na ATALIZACAO de dados, por favor cheque os canpos enviados ");
             //TODO: handle exception
@@ -103,8 +103,7 @@ public class EditalVagaController extends DefaultController<EditalVaga> {
     @CrossOrigin
     @Transactional
     @DeleteMapping(value = {"/{id}"})
-    public ResponseEntity<?> delete(@PathVariable BigInteger id) {
+    public void delete(@PathVariable BigInteger id) {
         editalVagaRepository.delete(id);
-        return ResponseEntity.noContent().build();
     }
 }

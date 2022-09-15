@@ -16,11 +16,11 @@ public class DocumentoReconducaoRepository extends DefaultRepository<DocumentoRe
         super(em);
     }
 
-    public List<DocumentoReconducao> buscarDocumentooReconducao(String coluna, BigInteger idReconducao) {
-        return getEntityManager().createNativeQuery(
-                "select * from DocumentoReconducao where inciso = '"
-                        + coluna + "' and idReconducao = " + idReconducao, DocumentoReconducao.class)
-                .getResultList();
+    public DocumentoReconducao buscarDocumentoReconducao(String coluna, BigInteger idReconducao) {
+        return getEntityManager().createQuery(
+                        "select o from DocumentoReconducao o where o.inciso = '"
+                                + coluna + "' and o.reconducao.id = " + idReconducao, DocumentoReconducao.class)
+                .setMaxResults(1).getSingleResult();
     }
 
     public List<Object> buscarDocumentos(BigInteger idEnvio) {

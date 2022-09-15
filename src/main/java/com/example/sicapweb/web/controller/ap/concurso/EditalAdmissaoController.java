@@ -134,13 +134,10 @@ public class EditalAdmissaoController {
     @CrossOrigin
     @Transactional
     @DeleteMapping(value = {"/processos/{id}"})
-    public ResponseEntity<?> delete(@PathVariable BigInteger id) {
+    public void delete(@PathVariable BigInteger id) {
         ProcessoAdmissao processoAdmissao = processoAdmissaoRepository.findById(id);
-        if (processoAdmissao!= null) {
-            if(processoAdmissao.getStatus()==1){
-                processoAdmissaoRepository.delete(id);
-            }
-        }
-        return ResponseEntity.noContent().build();
+        if (processoAdmissao!= null && processoAdmissao.getStatus()==1) 
+            processoAdmissaoRepository.delete(id);
+             
     }
 }

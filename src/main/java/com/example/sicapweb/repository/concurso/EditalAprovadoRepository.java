@@ -1,12 +1,7 @@
 package com.example.sicapweb.repository.concurso;
 
-import br.gov.to.tce.model.UnidadeGestora;
-import br.gov.to.tce.model.ap.concurso.Edital;
 import br.gov.to.tce.model.ap.concurso.EditalAprovado;
-import br.gov.to.tce.model.ap.concurso.EditalVaga;
-import br.gov.to.tce.model.ap.concurso.EmpresaOrganizadora;
 import com.example.sicapweb.model.EditalAprovadoConcurso;
-import com.example.sicapweb.model.EditalConcurso;
 import com.example.sicapweb.repository.DefaultRepository;
 import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
@@ -84,7 +79,10 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
                         "             from EditalAprovado a  join infoRemessa i on a.chave = i.chave  and i.idUnidadeGestora = '"+User.getUser(super.request).getUnidadeGestora().getId()+"'  group by " +
                         "                a.cpf,a.numeroInscricao , i.idUnidadeGestora " +
                         "                         ) " +
-                        "select   count(1) from EditalAprovado a join infoRemessa i on a.chave = i.chave join edt b on a.id= b.max_id and i.idUnidadeGestora=b.idUnidadeGestora where 1=1 " + search);
+                        "select   count(1) " +
+                        "from EditalAprovado a " +
+                        "join infoRemessa i on a.chave = i.chave join edt b on a.id= b.max_id and " +
+                        "i.idUnidadeGestora=b.idUnidadeGestora where 1=1 " + search);
         return (Integer) query.getSingleResult();
     }
 

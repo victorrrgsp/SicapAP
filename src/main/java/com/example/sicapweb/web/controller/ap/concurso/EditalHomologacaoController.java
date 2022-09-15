@@ -95,8 +95,7 @@ public class EditalHomologacaoController extends DefaultController<EditalHomolog
     @CrossOrigin
     @Transactional
     @DeleteMapping(value = {"/{id}"})
-    public ResponseEntity<?> delete(@PathVariable BigInteger id) {
-        editalHomologacaoRepository.delete(id);
-        return ResponseEntity.noContent().build();
+    public void delete(@PathVariable BigInteger id) {
+        editalHomologacaoRepository.delete(id); 
     }
 }
