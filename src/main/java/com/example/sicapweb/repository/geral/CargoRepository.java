@@ -4,6 +4,7 @@ import br.gov.to.tce.model.ap.estatico.CargoNome;
 import br.gov.to.tce.model.ap.relacional.Cargo;
 import br.gov.to.tce.model.ap.relacional.UnidadeAdministrativa;
 import com.example.sicapweb.repository.DefaultRepository;
+import com.example.sicapweb.security.User;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -21,7 +22,7 @@ public class CargoRepository extends DefaultRepository<Cargo, BigInteger> {
     }
 
     public Cargo buscarCargoPorcodigo(String codigo) {
-        List<Cargo> list = getEntityManager().createNativeQuery("select * from Cargo ed" +
+        List<Cargo> list = getEntityManager().createNativeQuery("select ed.* from Cargo ed join InfoRemessa i on ed.chave = i.chave and i.idUnidadeGestora='"+ User.getUser(super.request).getUnidadeGestora().getId()+"'"+
                 " where codigoCargo = '" + codigo + "'", Cargo.class).getResultList();
         return list.get(0);
     }

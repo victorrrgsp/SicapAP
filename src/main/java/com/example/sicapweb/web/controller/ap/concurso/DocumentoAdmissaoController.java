@@ -20,7 +20,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.math.BigInteger;
 import java.net.URI;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -117,7 +116,7 @@ public class DocumentoAdmissaoController extends DefaultController<DocumentoAdmi
             novo.setAdmissao(documentoAdmissao.getAdmissao());
             novo.setEditalAprovado(documentoAdmissao.getEditalAprovado());
             novo.setOpcaoDesistencia(documentoAdmissao.getOpcaoDesistencia());
-            novo.setProcessoAdmissao(documentoAdmissao.getProcessoAdmissao());
+            novo.setAdmissaoEnvio(documentoAdmissao.getAdmissaoEnvio());
             documentoAdmissaoRepository.save(novo);
         }
         return ResponseEntity.noContent().build();

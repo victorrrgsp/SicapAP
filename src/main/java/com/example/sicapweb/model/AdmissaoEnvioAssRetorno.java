@@ -11,6 +11,9 @@ public class AdmissaoEnvioAssRetorno {
     private BigInteger id;
     private String numeroEdital;
 
+
+    private Integer numeroEnvio;
+
     private Date dtcriacao;
 
     private Edital edital;
@@ -89,5 +92,13 @@ public class AdmissaoEnvioAssRetorno {
 
     public void setEdital(Edital edital) {
         this.edital = edital;
+    }
+
+    public Integer getNumeroEnvio() {
+        return numeroEnvio;
+    }
+
+    public void setNumeroEnvio(Integer numeroEnvio) {
+        this.numeroEnvio = numeroEnvio;
     }
 }

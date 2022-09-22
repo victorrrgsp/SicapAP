@@ -4,6 +4,7 @@ import br.gov.to.tce.model.ap.concurso.Edital;
 import br.gov.to.tce.model.ap.concurso.EditalAprovado;
 import br.gov.to.tce.model.ap.concurso.EditalVaga;
 import com.example.sicapweb.exception.InvalitInsert;
+import com.example.sicapweb.repository.concurso.DocumentoAdmissaoRepository;
 import com.example.sicapweb.repository.concurso.EditalAprovadoRepository;
 import com.example.sicapweb.repository.concurso.EditalVagaRepository;
 import com.example.sicapweb.util.PaginacaoUtil;
@@ -28,6 +29,10 @@ public class EditalAprovadoController extends DefaultController<EditalAprovado> 
 
     @Autowired
     private EditalVagaRepository editalVagaRepository;
+
+    @Autowired
+    private DocumentoAdmissaoRepository documentoAdmissaoRepository;
+
 
     @CrossOrigin
     @GetMapping(path="/{searchParams}/{tipoParams}/pagination")
@@ -93,6 +98,7 @@ public class EditalAprovadoController extends DefaultController<EditalAprovado> 
     @Transactional
     @DeleteMapping(value = {"/{id}"})
     public void delete(@PathVariable BigInteger id) {
-        editalAprovadoRepository.delete(id); 
+        if (documentoAdmissaoRepository.getDocumenttosAdmissaoByIdAprovado(id).size()>0) throw new RuntimeException("Aprovado Vinculado a um documento. Excluia o documento antes de Excluir o aprovado!");
+        editalAprovadoRepository.delete(id);
     }
 }

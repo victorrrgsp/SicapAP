@@ -1,7 +1,6 @@
 package com.example.sicapweb.repository.concurso;
 
-import br.gov.to.tce.model.ap.concurso.EditalVaga;
-import br.gov.to.tce.model.ap.concurso.ProcessoAdmissao;
+import br.gov.to.tce.model.ap.concurso.AdmissaoEnvio;
 import com.example.sicapweb.model.AdmissaoEnvioAssRetorno;
 import com.example.sicapweb.repository.DefaultRepository;
 import com.example.sicapweb.security.User;
@@ -10,15 +9,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
-import javax.persistence.Query;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
 @Repository
-public class ProcessoAdmissaoRepository  extends DefaultRepository<ProcessoAdmissao, BigInteger>  {
+public class AdmissaoEnvioRepository extends DefaultRepository<AdmissaoEnvio, BigInteger>  {
 
-    public ProcessoAdmissaoRepository(EntityManager em) {
+    public AdmissaoEnvioRepository(EntityManager em) {
         super(em);
     }
 
@@ -51,9 +49,9 @@ public class ProcessoAdmissaoRepository  extends DefaultRepository<ProcessoAdmis
         search = getSearch(searchParams, tipoParams);
         String campo = String.valueOf(pageable.getSort()).replace(":", "");
 
-        List<ProcessoAdmissao> list = getEntityManager()
-                .createNativeQuery("select a.* from ProcessoAdmissao a " +
-                        "where  a.cnpjEmpresaOrganizadora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, ProcessoAdmissao.class)
+        List<AdmissaoEnvio> list = getEntityManager()
+                .createNativeQuery("select a.* from AdmissaoEnvio a  where  a.cnpjUnidadeGestora='" + User.getUser(super.request).getUnidadeGestora().getId() +"' "+
+                        " and   1=1 " + search + " ORDER BY " + campo, AdmissaoEnvio.class)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();
@@ -71,8 +69,9 @@ public class ProcessoAdmissaoRepository  extends DefaultRepository<ProcessoAdmis
             pac.setStatus(list.get(i).getStatus());
             pac.setEdital(list.get(i).getEdital());
             pac.setProcesso(list.get(i).getProcesso());
+            pac.setNumeroEnvio(list.get(i).getNumeroEnvio());
             Integer qt = (Integer)  getEntityManager().createNativeQuery("select count(*) from DocumentoAdmissao a " +
-                    "where status > 0  and  a.idProcessoAdmissao = "+ pac.getId()+ "").getSingleResult();
+                    "where status > 0  and  a.idEnvio = "+ pac.getId()+ "").getSingleResult();
             pac.setQuantidade(qt);
             listc.add(pac);
         }
@@ -81,9 +80,8 @@ public class ProcessoAdmissaoRepository  extends DefaultRepository<ProcessoAdmis
     }
 
     public Integer countProcessos() {
-        Query query = getEntityManager().createNativeQuery("select count(*) from ProcessoAdmissao a " +
-                "where   a.cnpjEmpresaOrganizadora = '"+ User.getUser(super.request).getUnidadeGestora().getId()+ "'");
-        return (Integer) query.getSingleResult();
+        return  (Integer)getEntityManager().createNativeQuery("select count(*) from AdmissaoEnvio a  where a.cnpjUnidadeGestora='" + User.getUser(super.request).getUnidadeGestora().getId() +"' "
+                ).getSingleResult();
     }
 
 
@@ -94,9 +92,9 @@ public class ProcessoAdmissaoRepository  extends DefaultRepository<ProcessoAdmis
         search = getSearch(searchParams, tipoParams);
         String campo = String.valueOf(pageable.getSort()).replace(":", "");
 
-        List<ProcessoAdmissao> list = getEntityManager()
-                .createNativeQuery("select a.* from ProcessoAdmissao a " +
-                        "where status=2 and not exists(select 1 from AdmissaoEnvioAssinatura ass  where  ass.idProcesso=a.id)  and a.status=2 and  a.cnpjEmpresaOrganizadora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, ProcessoAdmissao.class)
+        List<AdmissaoEnvio> list = getEntityManager()
+                .createNativeQuery("select a.* from AdmissaoEnvio a where  a.cnpjUnidadeGestora='" + User.getUser(super.request).getUnidadeGestora().getId() +"' "+
+                        " and  status=2 and not exists(select 1 from AdmissaoEnvioAssinatura ass  where  ass.idEnvio=a.id)  and a.status=2 " + search + " ORDER BY " + campo, AdmissaoEnvio.class)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();
@@ -113,8 +111,9 @@ public class ProcessoAdmissaoRepository  extends DefaultRepository<ProcessoAdmis
             pac.setDtcriacao(list.get(i).getDataCriacao());
             pac.setStatus(list.get(i).getStatus());
             pac.setEdital(list.get(i).getEdital());
+            pac.setNumeroEnvio(list.get(i).getNumeroEnvio());
             Integer qt = (Integer)  getEntityManager().createNativeQuery("select count(*) from DocumentoAdmissao a " +
-                    "where status > 0 and    a.idProcessoAdmissao = "+ pac.getId()+ "").getSingleResult();
+                    "where status > 0 and    a.idEnvio = "+ pac.getId()+ "").getSingleResult();
             pac.setQuantidade(qt);
             listc.add(pac);
         }
@@ -125,15 +124,13 @@ public class ProcessoAdmissaoRepository  extends DefaultRepository<ProcessoAdmis
 
 
     public Integer countProcessosAguardandoAss() {
-        Query query = getEntityManager().createNativeQuery("select count(*) from ProcessoAdmissao a " +
-                "where a.status=2 and   a.cnpjEmpresaOrganizadora = '"+ User.getUser(super.request).getUnidadeGestora().getId()+ "'");
-        return (Integer) query.getSingleResult();
+        return (Integer) getEntityManager().createNativeQuery("select count(*) from AdmissaoEnvio a where  a.cnpjUnidadeGestora='" + User.getUser(super.request).getUnidadeGestora().getId() +"' "+
+                " and  a.status=2 ").getSingleResult();
     }
 
-    public List<ProcessoAdmissao> GetEmAbertoByEdital(BigInteger idedital){
-        Query query = getEntityManager().createNativeQuery("select top 1 a.* from ProcessoAdmissao a " +
-                "where a.processo is null and   a.cnpjEmpresaOrganizadora = '"+ User.getUser(super.request).getUnidadeGestora().getId()+ "'and a.idEdital ="+idedital,ProcessoAdmissao.class);
-        return  (List<ProcessoAdmissao>) query.getResultList();
+    public List<AdmissaoEnvio> GetEmAbertoByEdital(BigInteger idedital){
+        return  getEntityManager().createNativeQuery("select top 1 a.* from AdmissaoEnvio a where  a.cnpjUnidadeGestora='" + User.getUser(super.request).getUnidadeGestora().getId() +"' "+
+                " and  a.processo is null and   a.idEdital ="+idedital, AdmissaoEnvio.class).getResultList();
 
     }
 
@@ -149,7 +146,7 @@ public class ProcessoAdmissaoRepository  extends DefaultRepository<ProcessoAdmis
 
                     "select  ev.id idvaga,ev.codigoVaga, c.nomeCargo, ev.especialidadeVaga,  ev.tipoConcorrencia,  cast(ev.quantidade as INTEGER) quantidade , count(1) qt_aprov, min( cast(classificacao as INTEGER)) min_classif, " +
                             "        max(cast(classificacao as INTEGER)) max_classif,  sum(case when da.status=1 then 1 else 0 end) ct_nao_anexados " +
-                            "from dbo.ProcessoAdmissao pa  join dbo.DocumentoAdmissao da on pa.id=da.idProcessoAdmissao   and da.status> 0 " +
+                            "from dbo.AdmissaoEnvio pa  join dbo.DocumentoAdmissao da on pa.id=da.idEnvio   and da.status> 0 " +
                             "join dbo.EditalAprovado EA on da.idAprovado = ea.id " +
                             "join dbo.EditalVaga EV on ea.idEditalVaga = ev.id " +
                             "join dbo.Cargo c on ev.idCargo = c.id " +
@@ -214,6 +211,12 @@ public class ProcessoAdmissaoRepository  extends DefaultRepository<ProcessoAdmis
         } catch (Exception e) {
             throw  new RuntimeException(e.getMessage());
         }
+    }
+
+
+    public Integer getLastNumeroEnvioByEdital(BigInteger idEdital){
+        return (Integer) getEntityManager().createNativeQuery("select top 1 ( a.numeroEnvio+1) from AdmissaoEnvio a  " +
+                "where  a.idEdital ="+idEdital+ " order by  numeroEnvio desc ").getSingleResult();
     }
 
 }

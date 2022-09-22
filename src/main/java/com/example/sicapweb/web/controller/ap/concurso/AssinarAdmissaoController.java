@@ -1,15 +1,15 @@
 package com.example.sicapweb.web.controller.ap.concurso;
 
+import br.gov.to.tce.model.ap.concurso.AdmissaoEnvio;
 import br.gov.to.tce.model.ap.concurso.AdmissaoEnvioAssinatura;
 import br.gov.to.tce.model.ap.concurso.EditalAprovado;
-import br.gov.to.tce.model.ap.concurso.ProcessoAdmissao;
 import br.gov.to.tce.model.ap.concurso.documento.DocumentoAdmissao;
 import br.gov.to.tce.util.Date;
 import com.example.sicapweb.exception.InvalitInsert;
 import com.example.sicapweb.model.AdmissaoEnvioAssRetorno;
 import com.example.sicapweb.repository.concurso.AdmissaoEnvioAssinaturaRepository;
 import com.example.sicapweb.repository.concurso.DocumentoAdmissaoRepository;
-import com.example.sicapweb.repository.concurso.ProcessoAdmissaoRepository;
+import com.example.sicapweb.repository.concurso.AdmissaoEnvioRepository;
 import com.example.sicapweb.security.User;
 import com.example.sicapweb.service.AssinarCertificadoDigital;
 import com.example.sicapweb.util.PaginacaoUtil;
@@ -40,7 +40,7 @@ import java.util.List;
 @RequestMapping("/assinarAdmissao")
 public class AssinarAdmissaoController {
     @Autowired
-    private ProcessoAdmissaoRepository processoAdmissaoRepository;
+    private AdmissaoEnvioRepository admissaoEnvioRepository;
 
     @Autowired
     private AdmissaoEnvioAssinaturaRepository admissaoEnvioAssinaturaRepository;
@@ -53,13 +53,13 @@ public class AssinarAdmissaoController {
     @CrossOrigin
     @GetMapping(path="/{searchParams}/{tipoParams}/pagination")
     public ResponseEntity<PaginacaoUtil<AdmissaoEnvioAssRetorno>> listaAProcessosAguardandoAss(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
-        User userlogado = User.getUser(processoAdmissaoRepository.getRequest());
+        User userlogado = User.getUser(admissaoEnvioRepository.getRequest());
         if (userlogado.getCargo().getValor()!=4 ){
             List<AdmissaoEnvioAssRetorno> listavazia= new ArrayList<>() ;
             PaginacaoUtil<AdmissaoEnvioAssRetorno> paginacaoUtilvazia= new PaginacaoUtil<AdmissaoEnvioAssRetorno>(0, 1, 1, 0, listavazia);
             return ResponseEntity.ok().body(paginacaoUtilvazia);
         }
-        return ResponseEntity.ok().body(processoAdmissaoRepository.buscarProcessosAguardandoAss(pageable,searchParams,tipoParams));
+        return ResponseEntity.ok().body(admissaoEnvioRepository.buscarProcessosAguardandoAss(pageable,searchParams,tipoParams));
     }
 
     @CrossOrigin
@@ -124,7 +124,7 @@ public class AssinarAdmissaoController {
     @Transactional( rollbackFor = Exception.class)
     @PostMapping
     public ResponseEntity<?> AssinarAdmissao(@RequestBody String hashassinante_hashAssinado )  throws JsonProcessingException,Exception {
-        User userlogado = User.getUser(processoAdmissaoRepository.getRequest());
+        User userlogado = User.getUser(admissaoEnvioRepository.getRequest());
         // try {
         if (userlogado != null) {
             if (userlogado.getCargo().getValor() !=4 ) throw new InvalitInsert("Apenas o gestor da unidade gestora pode assinar envios!!");
@@ -149,7 +149,7 @@ public class AssinarAdmissaoController {
                     //  Concurso
                     BigInteger idenvio = (BigInteger) aux.get("id").bigIntegerValue();
                     System.out.println("idenvio: " + idenvio);
-                    ProcessoAdmissao envio = (ProcessoAdmissao) processoAdmissaoRepository.findById(idenvio);
+                    AdmissaoEnvio envio = (AdmissaoEnvio) admissaoEnvioRepository.findById(idenvio);
                     if (envio!=null ){
 
                         AdmissaoEnvioAssinatura  novo = new AdmissaoEnvioAssinatura();
@@ -157,7 +157,7 @@ public class AssinarAdmissaoController {
                         novo.setCpf(User.getUser(admissaoEnvioAssinaturaRepository.getRequest()).getCpf());
                         ServletRequestAttributes getIp = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
                         novo.setIp(getIp.getRequest().getRemoteAddr());
-                        novo.setProcessoAdmissao(envio);
+                        novo.setAdmissaoEnvio(envio);
                         LocalDateTime dt =LocalDateTime.now();
                         novo.setData_Assinatura(Date.from(dt.atZone(ZoneId.systemDefault()).toInstant()));
                         novo.setHashAssinante(hashassinante);
@@ -302,8 +302,8 @@ public class AssinarAdmissaoController {
 
                             //atualiza o campo processo no envio com o numero e ano do processo econtas
                             envio.setProcesso(procnumero+"/"+ano);
-                            envio.setStatus(ProcessoAdmissao.Status.concluido.getValor());
-                            processoAdmissaoRepository.update(envio);
+                            envio.setStatus(AdmissaoEnvio.Status.concluido.getValor());
+                            admissaoEnvioRepository.update(envio);
                         } else {
                             throw new Exception("erro:id do protocolo não foi gerado!");
                         }

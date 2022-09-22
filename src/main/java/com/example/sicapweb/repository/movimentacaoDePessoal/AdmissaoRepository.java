@@ -111,7 +111,7 @@ public class AdmissaoRepository extends DefaultRepository<Admissao, BigInteger> 
                 nc.setSitCadAprovado("Aprovado Cadastrado");
                 nc.setVaga(ea.get(0).getEditalVaga().getCargo().getCargoNome().getNome());
                 Integer enviado = (Integer) getEntityManager().createNativeQuery("select count(*) from DocumentoAdmissao a " +
-                        "where  a.idAdmissao = "+list.get(i).getId()+ "").getSingleResult();
+                        "where  status >0 and  a.idAdmissao = "+list.get(i).getId()+ "").getSingleResult();
                 if (enviado > 0 ){
 
                     nc.setSituacaoNomeacao("Aprovado anexado");

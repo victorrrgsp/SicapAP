@@ -2,6 +2,7 @@ package com.example.sicapweb.web.controller.ap.concurso;
 
 import br.gov.to.tce.model.ap.concurso.EditalVaga;
 import com.example.sicapweb.exception.InvalitInsert;
+import com.example.sicapweb.repository.concurso.DocumentoAdmissaoRepository;
 import com.example.sicapweb.repository.concurso.EditalRepository;
 import com.example.sicapweb.repository.concurso.EditalVagaRepository;
 import com.example.sicapweb.repository.geral.CargoRepository;
@@ -33,6 +34,7 @@ public class EditalVagaController extends DefaultController<EditalVaga> {
 
     @Autowired
     private CargoRepository cargoRepository;
+
 
     @CrossOrigin
     @GetMapping(path="/{searchParams}/{tipoParams}/pagination")
@@ -104,6 +106,8 @@ public class EditalVagaController extends DefaultController<EditalVaga> {
     @Transactional
     @DeleteMapping(value = {"/{id}"})
     public void delete(@PathVariable BigInteger id) {
+
         editalVagaRepository.delete(id);
+
     }
 }
