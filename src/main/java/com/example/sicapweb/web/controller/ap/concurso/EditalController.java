@@ -50,6 +50,13 @@ public class EditalController extends DefaultController<Edital> {
     }
 
     @CrossOrigin
+    @GetMapping(path = {"/homologar"})
+    public ResponseEntity<List<Edital>> findAllHomologar() {
+        List<Edital> list = editalRepository.findAllAHomologar();
+        return ResponseEntity.ok().body(list);
+    }
+
+    @CrossOrigin
     @GetMapping(path = {"/{id}"})
     public ResponseEntity<?> findById(@PathVariable BigInteger id) {
         Edital list = editalRepository.findById(id);
