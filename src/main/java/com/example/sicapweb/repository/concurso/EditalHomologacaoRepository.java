@@ -57,13 +57,13 @@ public class EditalHomologacaoRepository extends DefaultRepository<EditalHomolog
         List<EditalHomologacao> list = getEntityManager()
                 .createNativeQuery("select a.* from EditalHomologacao a " +
                         "join Edital e on a.idEdital = e.id " +
-                        "join  ConcursoEnvio env on a.idEdital = env.idEdital  and env.fase=1 and env.status=2 " +
+                        "join  ConcursoEnvio env on a.idEdital = env.idEdital  and env.fase=1 and env.status in (2,4) " +
                         "join InfoRemessa i on a.chave = i.chave " +
                         "where   i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, EditalHomologacao.class)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();
-        long totalRegistros = countEditaishomologa();
+        long totalRegistros = countEditaishomologa(search);
         long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
         List<EditalHomologaConcurso> listc= new ArrayList<EditalHomologaConcurso>() ;
         for(Integer i= 0; i < list.size(); i++){
@@ -82,10 +82,12 @@ public class EditalHomologacaoRepository extends DefaultRepository<EditalHomolog
         return new PaginacaoUtil<EditalHomologaConcurso>(tamanho, pagina, totalPaginas, totalRegistros, listc);
     }
 
-    public Integer countEditaishomologa() {
-        Query query = getEntityManager().createNativeQuery("select count(*) from EditalHomologacao a " +
-                "join InfoRemessa i on a.chave = i.chave " +
-                "where   i.idUnidadeGestora= '"+ User.getUser(super.request).getUnidadeGestora().getId()+ "'");
+    public Integer countEditaishomologa(String search) {
+        Query query = getEntityManager().createNativeQuery("select count1) from EditalHomologacao a " +
+                "join Edital e on a.idEdital = e.id " +
+                        "join  ConcursoEnvio env on a.idEdital = env.idEdital  and env.fase=1 and env.status in (2,4) " +
+                        "join InfoRemessa i on a.chave = i.chave " +
+                        "where   i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' " + search);
         return (Integer) query.getSingleResult();
     }
 
