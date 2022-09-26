@@ -161,7 +161,7 @@ public class DocumentoConcursoHomologacaoController extends DefaultController<Ed
     @CrossOrigin
     @Transactional
     @PutMapping("/anexos/excluir/{id}" )
-    public ResponseEntity<?> ExcluirDocumento( @PathVariable BigInteger id) {
+    public void ExcluirDocumento( @PathVariable BigInteger id) {
         DocumentoEditalHomologacao documentoEditalHomologacao = documentoEditalHomologacaoRepository.findById(id);
         if (documentoEditalHomologacao != null ){
             documentoEditalHomologacao.setStatus(DocumentoEditalHomologacao.Status.NaoInformado.getValor());
@@ -171,7 +171,6 @@ public class DocumentoConcursoHomologacaoController extends DefaultController<Ed
             documentoEditalHomologacao.setData_altr(LocalDateTime.now());
             documentoEditalHomologacaoRepository.update(documentoEditalHomologacao);
         }
-        return ResponseEntity.noContent().build();
     }
 
     @CrossOrigin

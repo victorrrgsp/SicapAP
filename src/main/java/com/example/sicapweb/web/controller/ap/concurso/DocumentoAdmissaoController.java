@@ -101,7 +101,7 @@ public class DocumentoAdmissaoController extends DefaultController<DocumentoAdmi
     @CrossOrigin
     @Transactional
     @PutMapping("/upload/excluir/{id}" )
-    public ResponseEntity<?> ExcluirDocumentoAdmissao( @PathVariable BigInteger id) {
+    public void ExcluirDocumentoAdmissao( @PathVariable BigInteger id) {
         DocumentoAdmissao documentoAdmissao = documentoAdmissaoRepository.findById(id);
         if (documentoAdmissao != null ){
             documentoAdmissao.setStatus(DocumentoAdmissao.Status.ExcluidoDocumento.getValor());
@@ -119,7 +119,6 @@ public class DocumentoAdmissaoController extends DefaultController<DocumentoAdmi
             novo.setAdmissaoEnvio(documentoAdmissao.getAdmissaoEnvio());
             documentoAdmissaoRepository.save(novo);
         }
-        return ResponseEntity.noContent().build();
     }
 
 

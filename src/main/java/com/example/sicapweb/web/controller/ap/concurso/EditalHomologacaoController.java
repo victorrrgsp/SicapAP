@@ -60,12 +60,11 @@ public class EditalHomologacaoController extends DefaultController<EditalHomolog
     @CrossOrigin
     @Transactional
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.PUT)
-    public ResponseEntity<EditalHomologacao> update(@RequestBody EditalHomologacao editalHomologacao, @PathVariable BigInteger id) {
+    public void update(@RequestBody EditalHomologacao editalHomologacao, @PathVariable BigInteger id) {
         editalHomologacao.setChave(editalRepository.buscarPrimeiraRemessa());
         editalHomologacao.setId(id);
         //edital.setEmpresaOrganizadora(empresaOrganizadoraRepository.buscaEmpresaPorCnpj(edital.getCnpjEmpresaOrganizadora()));
         editalHomologacaoRepository.update(editalHomologacao);
-        return ResponseEntity.noContent().build();
     }
 
 

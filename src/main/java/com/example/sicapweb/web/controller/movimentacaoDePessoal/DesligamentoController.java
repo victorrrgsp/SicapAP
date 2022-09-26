@@ -48,7 +48,7 @@ import java.math.BigInteger;
     @CrossOrigin
     @Transactional
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.PUT)
-    public ResponseEntity<Desligamento> update(@RequestBody Desligamento desligamento, @PathVariable BigInteger id) {
+    public void update(@RequestBody Desligamento desligamento, @PathVariable BigInteger id) {
         InfoRemessa chave = desligamentoRepository.findById(id).getChave();
        // InfoRemessa chave = desligamentoRepository.findById(id).getAdmissao().getChave();
         desligamento.setChave(chave);
@@ -58,7 +58,6 @@ import java.math.BigInteger;
         desligamento.setAto(atoRepository.findById(desligamento.getAto().getId()));
         desligamento.setAdmissao(admissaoRepository.findById(desligamento.getAdmissao().getId()));
         desligamentoRepository.update(desligamento);
-        return ResponseEntity.noContent().build();
     }
 
     }

@@ -33,7 +33,7 @@ import java.math.BigInteger;
         @CrossOrigin
         @Transactional
         @RequestMapping(value = {"/{id}"}, method = RequestMethod.PUT)
-        public ResponseEntity<Servidor> update(@RequestBody Servidor servidor, @PathVariable BigInteger id) {
+        public  void update(@RequestBody Servidor servidor, @PathVariable BigInteger id) {
             servidor.setId(id);
             InfoRemessa chave = servidorRepository.findById(id).getChave();
             servidor.setCpfServidor(servidor.getCpfServidor().replace(".", "").replace("-", "").replace("/", ""));
@@ -45,7 +45,6 @@ import java.math.BigInteger;
              
             servidor.setChave(chave);
             servidorRepository.update(servidor);
-            return ResponseEntity.noContent().build();
         }
         @CrossOrigin
         @GetMapping(path = {"/findByCpf/{cpf}"})

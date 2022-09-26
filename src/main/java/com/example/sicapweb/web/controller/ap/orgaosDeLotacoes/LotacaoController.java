@@ -38,13 +38,12 @@ import java.math.BigInteger;
         @CrossOrigin
         @Transactional
         @RequestMapping(value = {"/{id}"}, method = RequestMethod.PUT)
-        public ResponseEntity<Lotacao> update(@RequestBody Lotacao lotacao, @PathVariable BigInteger id) {
+        public void update(@RequestBody Lotacao lotacao, @PathVariable BigInteger id) {
             InfoRemessa chave = lotacaoRepository.findById(id).getChave();
             lotacao.setUnidadeAdministrativa(unidadeAdministrativaRepository.buscarUnidadePorcodigo(lotacao.codigoUnidadeAdministrativa));
             lotacao.setId(id);
             lotacao.setChave(chave);
             lotacaoRepository.update(lotacao);
-            return ResponseEntity.noContent().build();
         }
         @CrossOrigin
         @Transactional

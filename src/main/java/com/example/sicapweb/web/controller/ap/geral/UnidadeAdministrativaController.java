@@ -71,14 +71,13 @@ public class UnidadeAdministrativaController  extends DefaultController<UnidadeA
     @CrossOrigin
     @Transactional
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.PUT)
-    public ResponseEntity<UnidadeAdministrativa> update(@RequestBody UnidadeAdministrativa unidadeAdministrativa, @PathVariable BigInteger id) {
+    public void update(@RequestBody UnidadeAdministrativa unidadeAdministrativa, @PathVariable BigInteger id) {
         InfoRemessa chave = unidadeAdministrativaRepository.findById(id).getChave();
         unidadeAdministrativa.setCodigoUnidadeAdministrativa(unidadeAdministrativa.getCodigoUnidadeAdministrativa().replace("/", ""));
         unidadeAdministrativa.setCnpj(unidadeAdministrativa.getCnpj().replace(".", "").replace("-", "").replace("/", ""));
         unidadeAdministrativa.setId(id);
         unidadeAdministrativa.setChave(chave);
         unidadeAdministrativaRepository.update(unidadeAdministrativa);
-        return ResponseEntity.noContent().build();
     }
     @CrossOrigin
     @Transactional

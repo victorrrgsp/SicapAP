@@ -41,7 +41,7 @@ import java.math.BigInteger;
         @CrossOrigin
         @Transactional
         @RequestMapping(value = {"/{id}"}, method = RequestMethod.PUT)
-        public ResponseEntity<FolhaPagamento> update(@RequestBody FolhaPagamento folhaPagamento, @PathVariable BigInteger id) {
+        public void update(@RequestBody FolhaPagamento folhaPagamento, @PathVariable BigInteger id) {
 
             InfoRemessa chave = folhaDePagamentoRepository.findById(id).getChave();
             folhaPagamento.setChave(chave);
@@ -49,7 +49,6 @@ import java.math.BigInteger;
             folhaPagamento.setAdmissao(admissaoRepository.findById(folhaPagamento.getAdmissao().getId()));
             folhaPagamento.setFolhaItem(folhaItemRepository.findById(folhaPagamento.getFolhaItem().getId()));
             folhaDePagamentoRepository.update(folhaPagamento);
-            return ResponseEntity.noContent().build();
         }
 
     }

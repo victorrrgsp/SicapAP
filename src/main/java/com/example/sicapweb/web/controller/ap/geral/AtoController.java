@@ -66,14 +66,13 @@ public class AtoController extends DefaultController<Ato>  {
     }
     @Transactional
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.PUT)
-    public ResponseEntity<Ato> update(@RequestBody Ato ato, @PathVariable BigInteger id) {
+    public void update(@RequestBody Ato ato, @PathVariable BigInteger id) {
         InfoRemessa chave = atoRepository.findById(id).getChave();
         ato.setNumeroAto(ato.getNumeroAto().replace("/", ""));
         ato.setCnpjUgPublicacao(ato.getCnpjUgPublicacao().replace(".", "").replace("-", "").replace("/", ""));
         ato.setId(id);
         ato.setChave(chave);
         atoRepository.update(ato);
-        return ResponseEntity.noContent().build();
     }
     @Transactional
     @DeleteMapping(value = {"/{id}"})

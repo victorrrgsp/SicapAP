@@ -72,7 +72,7 @@ public class CargoController  extends DefaultController<Cargo> {
     }
     @CrossOrigin
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.PUT)
-    public ResponseEntity<Cargo> update(@RequestBody Cargo cargo, @PathVariable BigInteger id) {
+    public void update(@RequestBody Cargo cargo, @PathVariable BigInteger id) {
 
         InfoRemessa chave = cargoRepository.findById(id).getChave();
         cargo.setLei(leiRepository.findById(cargo.getLei().getId()));
@@ -80,7 +80,6 @@ public class CargoController  extends DefaultController<Cargo> {
         cargo.setId(id);
         cargo.setChave(chave);
         cargoRepository.update(cargo);
-        return ResponseEntity.noContent().build();
     }
     @CrossOrigin
     @GetMapping(path = {"/todos"})

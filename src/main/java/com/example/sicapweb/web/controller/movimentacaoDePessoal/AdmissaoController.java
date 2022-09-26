@@ -65,7 +65,7 @@ import java.util.List;
         @CrossOrigin
         @Transactional
         @RequestMapping(value = {"/{id}"}, method = RequestMethod.PUT)
-        public ResponseEntity<Admissao> update(@RequestBody Admissao admissao, @PathVariable BigInteger id) {
+        public void update(@RequestBody Admissao admissao, @PathVariable BigInteger id) {
             admissao.setId(id);
             InfoRemessa chave = admissaoRepository.findById(id).getChave();
             if(admissao.getCpfServidor() != null) {
@@ -91,7 +91,6 @@ import java.util.List;
 
             admissao.setChave(chave);
             admissaoRepository.update(admissao);
-            return ResponseEntity.noContent().build();
         }
         }
 

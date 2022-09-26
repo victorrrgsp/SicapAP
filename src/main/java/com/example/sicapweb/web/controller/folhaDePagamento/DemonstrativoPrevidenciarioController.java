@@ -35,13 +35,12 @@ import java.math.BigInteger;
         @CrossOrigin
         @Transactional
         @RequestMapping(value = {"/{id}"}, method = RequestMethod.PUT)
-        public ResponseEntity<DemonstrativoPrevidenciario> update(@RequestBody DemonstrativoPrevidenciario demonstrativoPrevidenciario, @PathVariable BigInteger id) {
+        public void update(@RequestBody DemonstrativoPrevidenciario demonstrativoPrevidenciario, @PathVariable BigInteger id) {
 
             InfoRemessa chave = demonstrativoPrevidenciarioRepository.findById(id).getChave();
             demonstrativoPrevidenciario.setChave(chave);
             demonstrativoPrevidenciario.setId(id);
             demonstrativoPrevidenciarioRepository.update(demonstrativoPrevidenciario);
-            return ResponseEntity.noContent().build();
         }
 
     }

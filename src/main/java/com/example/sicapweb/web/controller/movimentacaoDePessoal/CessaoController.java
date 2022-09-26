@@ -43,7 +43,7 @@ import org.springframework.web.bind.annotation.*;
         @CrossOrigin
         @Transactional
         @RequestMapping(value = {"/{id}"}, method = RequestMethod.PUT)
-        public ResponseEntity<Cessao> update(@RequestBody Cessao cessao, @PathVariable BigInteger id) {
+        public void update(@RequestBody Cessao cessao, @PathVariable BigInteger id) {
 
             InfoRemessa chave = cessaoRepository.findById(id).getChave();
             cessao.setChave(chave);
@@ -53,7 +53,6 @@ import org.springframework.web.bind.annotation.*;
             cessao.setAdmissao(admissaoRepository.findById(cessao.getAdmissao().getId()));
             
             cessaoRepository.update(cessao);
-            return ResponseEntity.noContent().build();
         }
 
     }

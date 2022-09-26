@@ -45,7 +45,7 @@ import org.springframework.web.bind.annotation.*;
         @CrossOrigin
         @Transactional
         @RequestMapping(value = {"/{id}"}, method = RequestMethod.PUT)
-        public ResponseEntity<Licenca> update(@RequestBody Licenca licenca, @PathVariable BigInteger id) {
+        public void update(@RequestBody Licenca licenca, @PathVariable BigInteger id) {
 
             InfoRemessa chave = licencaRepository.findById(id).getChave();
             licenca.setChave(chave);
@@ -54,7 +54,6 @@ import org.springframework.web.bind.annotation.*;
             
             licenca.setAdmissao(admissaoRepository.findById(licenca.getAdmissao().getId()));
             licencaRepository.update(licenca);
-            return ResponseEntity.noContent().build();
         }
     }
 

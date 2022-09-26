@@ -71,7 +71,7 @@ public class EditalAprovadoController extends DefaultController<EditalAprovado> 
     @CrossOrigin
     @Transactional
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.PUT)
-    public ResponseEntity<EditalAprovado> update(@RequestBody EditalAprovado editalAprovado, @PathVariable BigInteger id){
+    public void update(@RequestBody EditalAprovado editalAprovado, @PathVariable BigInteger id){
         editalAprovado.setId(id);
         editalAprovado.setChave(editalAprovadoRepository.buscarPrimeiraRemessa());
         editalAprovado.setEditalVaga(editalVagaRepository.buscarVagasPorCodigo(editalAprovado.getCodigoVaga()));
@@ -91,7 +91,6 @@ public class EditalAprovadoController extends DefaultController<EditalAprovado> 
 
 
         editalAprovadoRepository.update(editalAprovado);
-        return ResponseEntity.noContent().build();
     }
 
     @CrossOrigin

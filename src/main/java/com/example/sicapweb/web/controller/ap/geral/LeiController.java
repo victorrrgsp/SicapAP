@@ -89,7 +89,7 @@ public class LeiController extends DefaultController<Lei> {
     @CrossOrigin
     @Transactional
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.PUT)
-    public ResponseEntity<Lei> update(@RequestBody Lei lei, @PathVariable BigInteger id) {
+    public void update(@RequestBody Lei lei, @PathVariable BigInteger id) {
         try {
             
             lei.setChave(atoRepository.buscarPrimeiraRemessa());
@@ -97,7 +97,6 @@ public class LeiController extends DefaultController<Lei> {
             lei.setId(id);
             
             leiRepository.update(lei);
-            return ResponseEntity.noContent().build();
         } catch (Exception e) {
             throw new InvalitInsert("Erro na insersao de dados, por favor cheque os campos enviados ");
             //TODO: handle exception

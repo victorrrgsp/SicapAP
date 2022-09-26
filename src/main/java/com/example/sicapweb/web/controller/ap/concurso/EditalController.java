@@ -96,7 +96,7 @@ public class EditalController extends DefaultController<Edital> {
     @CrossOrigin
     @Transactional
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.PUT)
-    public ResponseEntity<Edital> update(@RequestBody Edital edital, @PathVariable BigInteger id) {
+    public void update(@RequestBody Edital edital, @PathVariable BigInteger id) {
         edital.setInfoRemessa(editalRepository.buscarPrimeiraRemessa());
         edital.setId(id);
         Edital e =editalRepository.buscarEditalPorNumero(edital.getNumeroEdital(),edital.getComplementoNumero());
@@ -112,7 +112,6 @@ public class EditalController extends DefaultController<Edital> {
             }
 
             editalRepository.update(edital);
-            return ResponseEntity.noContent().build();
 
         } else {
             throw new InvalitInsert("ja existe o edital!!");

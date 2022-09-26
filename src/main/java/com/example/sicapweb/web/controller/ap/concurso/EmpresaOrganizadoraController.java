@@ -62,7 +62,7 @@ public class EmpresaOrganizadoraController extends DefaultController<EmpresaOrga
     @CrossOrigin
     @Transactional
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.PUT)
-    public ResponseEntity<EmpresaOrganizadora> update(@RequestBody EmpresaOrganizadora empresaOrganizadora, @PathVariable BigInteger id){
+    public void update(@RequestBody EmpresaOrganizadora empresaOrganizadora, @PathVariable BigInteger id){
         empresaOrganizadora.setId(id);
         empresaOrganizadora.setCnpjEmpresaOrganizadora(empresaOrganizadora.getCnpjEmpresaOrganizadora().replace(".", "").replace("-", "").replace("/", ""));
         empresaOrganizadora.setChave(empresaOrganizadoraRepository.buscarPrimeiraRemessa());
@@ -72,7 +72,6 @@ public class EmpresaOrganizadoraController extends DefaultController<EmpresaOrga
              throw new InvalitInsert("ja existe uma empresa organizadora com esse cnpj!!");
         }
         empresaOrganizadoraRepository.update(empresaOrganizadora);
-        return ResponseEntity.noContent().build();
     }
 
     @CrossOrigin

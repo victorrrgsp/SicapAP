@@ -36,14 +36,13 @@ import org.springframework.web.bind.annotation.*;
         @CrossOrigin
         @Transactional
         @RequestMapping(value = {"/{id}"}, method = RequestMethod.PUT)
-        public ResponseEntity<FolhaItem> update(@RequestBody FolhaItem folhaItem, @PathVariable BigInteger id) {
+        public void update(@RequestBody FolhaItem folhaItem, @PathVariable BigInteger id) {
 
             InfoRemessa chave = folhaItemRepository.findById(id).getChave();
             folhaItem.setChave(chave);
             folhaItem.setId(id);
             folhaItem.setFolhaItemESocial(folhaItemESocialRepository.findByCodigo(folhaItem.getCodigoFolhaItemESocial()));
             folhaItemRepository.update(folhaItem);
-            return ResponseEntity.noContent().build();
         }
         @CrossOrigin
         @GetMapping(path="/all")
