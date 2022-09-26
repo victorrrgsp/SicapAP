@@ -83,7 +83,7 @@ public class EditalHomologacaoRepository extends DefaultRepository<EditalHomolog
     }
 
     public Integer countEditaishomologa(String search) {
-        Query query = getEntityManager().createNativeQuery("select count1) from EditalHomologacao a " +
+        Query query = getEntityManager().createNativeQuery("select count(1) from EditalHomologacao a " +
                 "join Edital e on a.idEdital = e.id " +
                         "join  ConcursoEnvio env on a.idEdital = env.idEdital  and env.fase=1 and env.status in (2,4) " +
                         "join InfoRemessa i on a.chave = i.chave " +
