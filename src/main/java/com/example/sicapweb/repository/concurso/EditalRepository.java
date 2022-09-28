@@ -43,16 +43,7 @@ public class EditalRepository extends DefaultRepository<Edital, BigInteger> {
                 else if (arrayOfStrings[0].equals("veiculoPublicacao"))
                     search = " and a." + arrayOfStrings[0] + " LIKE '%" + arrayOfStrings[1] + "%'  ";
                 else if (arrayOfStrings[0].equals("dataPublicacao")) {
-//                    String dateInString = "07/06-2013";
-//                    try {
-//                        Date date = DateUtils.parseDate(  arrayOfStrings[1].substring(1,arrayOfStrings[1].length()-1), new String[]{"dd-MM-yyyy", "yyyy-MM-dd"});
-//                    }catch (Exception e){
-//                        e.printStackTrace();
-//                    }
-                    //  .withResolverStyle(ResolverStyle.STRICT); // para não aceitar datas inválidas
                     LocalDate data = LocalDate.parse((arrayOfStrings[1] ), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-
-
                     search = " and a." + arrayOfStrings[0] + " = '" + data.format(DateTimeFormatter.ofPattern("d/MM/uuuu"))+ "'  ";
                 }
                 else
@@ -273,22 +264,15 @@ public class EditalRepository extends DefaultRepository<Edital, BigInteger> {
 
 
     public Integer GetQuantidadePorNumeroEdital(String numeroEdital,String complemento) {
-        String vcomplemento ="";
-        if (complemento==null|| complemento.isEmpty() ) {
-            vcomplemento="001";
-        }
-        else {
-            vcomplemento=complemento;
-        }
-        Integer CT = (Integer)getEntityManager().createNativeQuery("with edt as ( " +
+
+        return (Integer) getEntityManager().createNativeQuery("with edt as ( " +
                 "        select dataPublicacao,dataInicioInscricoes,dataFimInscricoes,numeroEdital,complementoNumero,prazoValidade,veiculoPublicacao, cnpjEmpresaOrganizadora,c.id,max(a.id)  max_id " +
                 "             from Edital a  join infoRemessa i on a.chave = i.chave and  a.tipoEdital =1  and i.idUnidadeGestora = '"+User.getUser(super.request).getUnidadeGestora().getId()+"' " +
-                "  and a.numeroEdital ='"+ numeroEdital+"'  and  isnull(a.complementoNumero,'001') = '"+ vcomplemento+"'   left  join ConcursoEnvio c on a.id = c.idEdital and c.fase=1  group by " +
+                "  and a.numeroEdital ='"+ numeroEdital+"'  and  isnull(a.complementoNumero,'001') = '"+ ((complemento==null|| complemento.isEmpty() ) ? "001" : complemento)+"'   left  join ConcursoEnvio c on a.id = c.idEdital and c.fase=1  group by " +
                 "                dataPublicacao,dataInicioInscricoes,dataFimInscricoes,numeroEdital,complementoNumero,prazoValidade,veiculoPublicacao, cnpjEmpresaOrganizadora,c.id " +
                 "                         ) " +
                 "select  count(1)  from Edital a join edt b on a.id= b.max_id where 1=1 " )
                 .getSingleResult();
-        return CT;
     }
 
     public List<Edital> findAllAHomologar() {

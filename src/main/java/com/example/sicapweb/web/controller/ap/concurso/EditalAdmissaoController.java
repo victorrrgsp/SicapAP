@@ -2,7 +2,6 @@ package com.example.sicapweb.web.controller.ap.concurso;
 
 import br.gov.to.tce.model.ap.concurso.AdmissaoEnvio;
 import br.gov.to.tce.model.ap.concurso.ConcursoEnvio;
-import br.gov.to.tce.util.Envio;
 import com.example.sicapweb.exception.InvalitInsert;
 import com.example.sicapweb.model.EditalFinalizado;
 import com.example.sicapweb.model.NomeacaoConcurso;
@@ -48,7 +47,7 @@ public class EditalAdmissaoController {
     @CrossOrigin
     @GetMapping(path="/aprovados/{searchParams}/{tipoParams}/pagination")
     public ResponseEntity<PaginacaoUtil<EditalAprovadoConcurso>> listaprov(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
-        PaginacaoUtil<EditalAprovadoConcurso> paginacaoUtil = editalAprovadoRepository.buscaPaginadaAprovados(pageable,searchParams,tipoParams);
+        PaginacaoUtil<EditalAprovadoConcurso> paginacaoUtil = editalAprovadoRepository.buscaPaginadaAprovadosDto(pageable,searchParams,tipoParams);
         return ResponseEntity.ok().body(paginacaoUtil);
     }
 

@@ -41,12 +41,12 @@ public class ConcursoEnvioRepository extends DefaultRepository<ConcursoEnvio, Bi
     }
 
     public ConcursoEnvio buscarEnvioFAse1PorEditalassinado(BigInteger idEdital) {
-        List<ConcursoEnvio> lc=  getEntityManager().createNativeQuery(
+        List<ConcursoEnvio> ListaConcursoFase1Assinada=  getEntityManager().createNativeQuery(
                         "select  ev.* from ConcursoEnvio ev "+
                                 " where fase=1 and status in (2,3,4) and  idEdital = " + idEdital+ " order by dataEnvio desc ", ConcursoEnvio.class)
                 .getResultList();
-        if (lc.size() ==1 ) { return lc.get(0); }
-        else if (lc.size() > 1 ) {
+        if (ListaConcursoFase1Assinada.size() ==1 ) { return ListaConcursoFase1Assinada.get(0); }
+        else if (ListaConcursoFase1Assinada.size() > 1 ) {
             throw new InvalitInsert("Encontrou mais de um processo pai para o envio da homologação!! ");
         }
         return null;
@@ -93,14 +93,16 @@ public class ConcursoEnvioRepository extends DefaultRepository<ConcursoEnvio, Bi
 
         List<ConcursoEnvioAssRetorno> listc= new ArrayList<ConcursoEnvioAssRetorno>() ;
         for(Integer i= 0; i < list.size(); i++){
-            ConcursoEnvioAssRetorno pac =new ConcursoEnvioAssRetorno();
-            pac.setConcursoEnvio(list.get(i));
-            Integer qt = (Integer)  getEntityManager().createNativeQuery("select count(*) from ConcursoEnvioAssinatura a " +
+            ConcursoEnvioAssRetorno dtoConcursoAssinado =new ConcursoEnvioAssRetorno();
+            dtoConcursoAssinado.setConcursoEnvio(list.get(i));
+            Integer quantidadeAssinaturasPorIdEdital = (Integer)  getEntityManager().createNativeQuery("select count(*) from ConcursoEnvioAssinatura a " +
                     "where   a.idEnvio = "+ list.get(i).getId()+ "").getSingleResult();
-            if (qt ==0 ){
-                pac.setStatusAssinatura(1);
-            }else  pac.setStatusAssinatura(2);
-          listc.add(pac);
+            if (quantidadeAssinaturasPorIdEdital == 0) {
+                dtoConcursoAssinado.setStatusAssinatura(1);
+            } else {
+                dtoConcursoAssinado.setStatusAssinatura(2);
+            }
+            listc.add(dtoConcursoAssinado);
         }
 
         return new PaginacaoUtil<ConcursoEnvioAssRetorno>(tamanho, pagina, totalPaginas, totalRegistros, listc);
@@ -109,43 +111,43 @@ public class ConcursoEnvioRepository extends DefaultRepository<ConcursoEnvio, Bi
 
 
     public Integer countEnviosAguardandoAss(String search) {
-        Query query = getEntityManager().createNativeQuery("select count(*) from ConcursoEnvio a " +
-                " where not exists(select 1 from ConcursoEnvioAssinatura ass  where  ass.idEnvio=a.id) " + search);
-        return (Integer) query.getSingleResult();
+        return  (Integer) getEntityManager().createNativeQuery("select count(*) from ConcursoEnvio a " +
+                " where not exists(select 1 from ConcursoEnvioAssinatura ass  where  ass.idEnvio=a.id) " + search).getSingleResult();
     }
 
     public List<Map<String, Integer>> getProcessosEcontas(Integer numEdital, Integer anoEdital, String ug){
-        List<Map<String, Integer>> retorno = new ArrayList<Map<String, Integer>>();
-        Query query = getEntityManager().createNativeQuery("SELECT " +
-                "                        distinct p.processo_numero, p.processo_ano " +
-                "                   FROM " +
-                "                          SCP..processo p " +
-                " INNER JOIN SCP..ProcEdital pe on p.processo_numero = pe.NumProc and p.processo_ano = pe.AnoProc " +
-                "                    INNER JOIN SCP..assunto a on a.assunto_classe_assunto = p.processo_assunto_classe_assunto " +
-                "                                            and a.assunto_codigo = p.processo_assunto_codigo " +
-                "                                            and a.id = :assunto " +
-                "                    INNER JOIN Cadun..vwPessoaGeral pj ON (pj.id = p.id_entidade_origem) OR (pj.id = p.id_entidade_vinc) " +
-                "                   WHERE pj.cnpj = :cnpj " +
-                "   AND p.processo_assunto_codigo = 6" +
-                "   AND p.processo_assunto_classe_assunto = 8 " +
-                "   AND pe.NumEdital = :numeroedital and pe.AnoEdital = :anoedital");
-        query.setParameter("cnpj",ug);
-        query.setParameter("numeroedital",numEdital);
-        query.setParameter("anoedital",anoEdital);
-        query.setParameter("assunto",64);
-        List<Object[]> list  = query.getResultList();
-        for (Object[] obj :list){
-            Map<String, Integer> mapa = new HashMap<String, Integer>();
+        try {
+            List<Map<String, Integer>> processosEcontas = new ArrayList<Map<String, Integer>>();
+            Query query = getEntityManager().createNativeQuery("SELECT " +
+                    "                        distinct p.processo_numero, p.processo_ano " +
+                    "                   FROM " +
+                    "                          SCP..processo p " +
+                    " INNER JOIN SCP..ProcEdital pe on p.processo_numero = pe.NumProc and p.processo_ano = pe.AnoProc " +
+                    "                    INNER JOIN SCP..assunto a on a.assunto_classe_assunto = p.processo_assunto_classe_assunto " +
+                    "                                            and a.assunto_codigo = p.processo_assunto_codigo " +
+                    "                                            and a.id = :assunto " +
+                    "                    INNER JOIN Cadun..vwPessoaGeral pj ON (pj.id = p.id_entidade_origem) OR (pj.id = p.id_entidade_vinc) " +
+                    "                   WHERE pj.cnpj = :cnpj " +
+                    "   AND p.processo_assunto_codigo = 6" +
+                    "   AND p.processo_assunto_classe_assunto = 8 " +
+                    "   AND pe.NumEdital = :numeroedital and pe.AnoEdital = :anoedital");
+            query.setParameter("cnpj", ug);
+            query.setParameter("numeroedital", numEdital);
+            query.setParameter("anoedital", anoEdital);
+            query.setParameter("assunto", 64);
+            List<Object[]> list = query.getResultList();
+            for (Object[] obj : list) {
+                Map<String, Integer> processoEcontas = new HashMap<String, Integer>();
 
-            mapa.put("processo_numero", (Integer) obj[0]);
-            mapa.put("processo_ano", (Integer) obj[1]);
-            retorno.add(mapa);
+                processoEcontas.put("processo_numero", (Integer) obj[0]);
+                processoEcontas.put("processo_ano", (Integer) obj[1]);
+                processosEcontas.add(processoEcontas);
+            }
+            return processosEcontas;
+        } catch (RuntimeException e){
+            throw new RuntimeException("problema ao buscar processos no econtas pra esse edital!!");
         }
-        return retorno;
-
-
     }
-
 
     public List<HashMap<String,Object>> buscaTotalNaoPaginada( List<String> ug, List<Integer> fase , LocalDate dataInico, LocalDate dataFim, Integer Ststuss){
 
@@ -191,8 +193,7 @@ public class ConcursoEnvioRepository extends DefaultRepository<ConcursoEnvio, Bi
     }
 
     public static ConcursoEnvio.Fase getFaseByValue(Object value){
-        var tipos = Arrays.asList(ConcursoEnvio.Fase.values());
-        return tipos
+        return Arrays.asList(ConcursoEnvio.Fase.values())
                 .stream()
                 .filter(tipo -> tipo.getValor() == value)
                 .findFirst()
@@ -201,8 +202,7 @@ public class ConcursoEnvioRepository extends DefaultRepository<ConcursoEnvio, Bi
     }
 
     public static ConcursoEnvio.Status geStatusByValue(Object value){
-        var tipos = Arrays.asList(ConcursoEnvio.Status.values());
-        return tipos
+        return Arrays.asList(ConcursoEnvio.Status.values())
                 .stream()
                 .filter(tipo -> tipo.getValor() == value)
                 .findFirst()

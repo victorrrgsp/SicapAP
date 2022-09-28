@@ -22,17 +22,15 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
 
     public String getSearch(String searchParams, Integer tipoParams) {
         String search = "";
-        //monta pesquisa search
         if (searchParams.length() > 3) {
-            List<String> lparam =  new ArrayList(Arrays.asList(searchParams.split("&")));
-            for (String param : lparam){
+            List<String> lparam = new ArrayList(Arrays.asList(searchParams.split("&")));
+            for (String param : lparam) {
                 if (tipoParams == 0) { //entra para tratar a string
                     String arrayOfStrings[] = param.split("=");
-                    if (arrayOfStrings[0].equals("cpf")){
-                        search = search + " AND a." + arrayOfStrings[0]  + " = '" + arrayOfStrings[1] + "'  ";
-                    }
-                    else if (arrayOfStrings[0].equals("idEdital")) {
-                        search = search + " AND b." + arrayOfStrings[0]  + " = " + arrayOfStrings[1] + "  ";
+                    if (arrayOfStrings[0].equals("cpf")) {
+                        search = search + " AND a." + arrayOfStrings[0] + " = '" + arrayOfStrings[1] + "'  ";
+                    } else if (arrayOfStrings[0].equals("idEdital")) {
+                        search = search + " AND b." + arrayOfStrings[0] + " = " + arrayOfStrings[1] + "  ";
                     }
 
                 } else {
@@ -42,59 +40,51 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
         }
         return search;
     }
+
     public PaginacaoUtil<EditalAprovado> buscaPaginada(Pageable pageable, String searchParams, Integer tipoParams) {
 
         int pagina = Integer.valueOf(pageable.getPageNumber());
         int tamanho = Integer.valueOf(pageable.getPageSize());
         String search = "";
-
-        //monta pesquisa search
-        search = "";
-
-        //retirar os : do Sort pageable
         String campo = String.valueOf(pageable.getSort()).replace(":", "");
 
-        List<EditalAprovado> list = getEntityManager()
+        List<EditalAprovado> listAprovados = getEntityManager()
                 .createNativeQuery("with edt as ( " +
                         "        select a.cpf,a.numeroInscricao, i.idUnidadeGestora ,max(a.id)  max_id " +
-                        "             from EditalAprovado a  join infoRemessa i on a.chave = i.chave  and i.idUnidadeGestora = '"+User.getUser(super.request).getUnidadeGestora().getId()+"'  group by " +
+                        "             from EditalAprovado a  join infoRemessa i on a.chave = i.chave  and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "'  group by " +
                         "                a.cpf,a.numeroInscricao , i.idUnidadeGestora " +
                         "                         ) " +
                         "select   a.* from EditalAprovado a  join infoRemessa i on a.chave = i.chave join edt b on a.id= b.max_id and i.idUnidadeGestora=b.idUnidadeGestora where 1=1 " + search + " ORDER BY " + campo, EditalAprovado.class)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();
-
-        long totalRegistros = countAprov( search);
+        long totalRegistros = quantidadeAprovados(search);
         long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
-
-        return new PaginacaoUtil<EditalAprovado>(tamanho, pagina, totalPaginas, totalRegistros, list);
+        return new PaginacaoUtil<>(tamanho, pagina, totalPaginas, totalRegistros, listAprovados);
     }
 
-    public Integer countAprov(String search) {
-
-        Query query =    getEntityManager()
+    public Integer quantidadeAprovados(String search) {
+        return (Integer) getEntityManager()
                 .createNativeQuery("with edt as ( " +
                         "        select a.cpf,a.numeroInscricao, i.idUnidadeGestora ,max(a.id)  max_id " +
-                        "             from EditalAprovado a  join infoRemessa i on a.chave = i.chave  and i.idUnidadeGestora = '"+User.getUser(super.request).getUnidadeGestora().getId()+"'  group by " +
+                        "             from EditalAprovado a  join infoRemessa i on a.chave = i.chave  and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "'  group by " +
                         "                a.cpf,a.numeroInscricao , i.idUnidadeGestora " +
                         "                         ) " +
                         "select   count(1) " +
                         "from EditalAprovado a " +
                         "join infoRemessa i on a.chave = i.chave join edt b on a.id= b.max_id and " +
-                        "i.idUnidadeGestora=b.idUnidadeGestora where 1=1 " + search);
-        return (Integer) query.getSingleResult();
+                        "i.idUnidadeGestora=b.idUnidadeGestora where 1=1 " + search).getSingleResult();
     }
 
 
-    public PaginacaoUtil<EditalAprovadoConcurso> buscaPaginadaAprovados(Pageable pageable, String searchParams, Integer tipoParams) {
+    public PaginacaoUtil<EditalAprovadoConcurso> buscaPaginadaAprovadosDto(Pageable pageable, String searchParams, Integer tipoParams) {
 
         int pagina = Integer.valueOf(pageable.getPageNumber());
         int tamanho = Integer.valueOf(pageable.getPageSize());
         String campo = String.valueOf(pageable.getSort()).replace(":", "");
-        String search = getSearch(searchParams,tipoParams);
+        String search = getSearch(searchParams, tipoParams);
 
-         List<EditalAprovado> list = getEntityManager()
+        List<EditalAprovado> listAprovados = getEntityManager()
                 .createNativeQuery("with  Admissao1 as " +
                         "(select a.* from Admissao a join InfoRemessa i on a.chave = i.chave and i.idUnidadeGestora=:ug and a.tipoAdmissao=1 ), " +
                         "  Servidor1 as " +
@@ -102,41 +92,34 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
                         "      Aprovado as " +
                         "(select a.* from EditalAprovado a join InfoRemessa i on a.chave = i.chave and i.idUnidadeGestora=:ug )" +
                         " " +
-                        "select distinct a.* from Aprovado  a join EditalVaga b on a.idEditalVaga = b.id where (select count(1) from  Admissao1 ad join Servidor1 s  on  ad.idServidor = s.id and s.cpfServidor = a.cpf )=0  "+search  + " ORDER BY " + campo, EditalAprovado.class)
-                .setParameter("ug",User.getUser(super.request).getUnidadeGestora().getId())
+                        "select distinct a.* from Aprovado  a join EditalVaga b on a.idEditalVaga = b.id where (select count(1) from  Admissao1 ad join Servidor1 s  on  ad.idServidor = s.id and s.cpfServidor = a.cpf )=0  " + search + " ORDER BY " + campo, EditalAprovado.class)
+                .setParameter("ug", User.getUser(super.request).getUnidadeGestora().getId())
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();
-        long totalRegistros = countAprovados(search);
+        long totalRegistros = countAprovadosSemAdmissao(search);
         long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
-        List<EditalAprovadoConcurso> listc= new ArrayList<EditalAprovadoConcurso>() ;
-        for(Integer i= 0; i < list.size(); i++){
+        List<EditalAprovadoConcurso> listaAprovadosDto = new ArrayList<EditalAprovadoConcurso>();
+        for (Integer i = 0; i < listAprovados.size(); i++) {
             EditalAprovadoConcurso editalAprovadoConcurso = new EditalAprovadoConcurso();
-            editalAprovadoConcurso.setEditalVaga(list.get(i).getEditalVaga());
-            editalAprovadoConcurso.setNome(list.get(i).getNome());
-            editalAprovadoConcurso.setNumeroEdital(list.get(i).getNumeroEdital());
-            editalAprovadoConcurso.setClassificacao(list.get(i).getClassificacao());
-            editalAprovadoConcurso.setCodigoVaga(list.get(i).getCodigoVaga());
-            editalAprovadoConcurso.setCpf(list.get(i).getCpf());
-            editalAprovadoConcurso.setEditalaprovado(list.get(i));
-            Integer enviado = (Integer) getEntityManager().createNativeQuery("select count(*) from DocumentoAdmissao a " +
-                    "where status > 0 and  a.idAprovado = "+list.get(i).getId()+ "").getSingleResult();
-            if (enviado > 0 ){
-                editalAprovadoConcurso.setSituacao("Aprovado Anexado");
-            }
-            else
-            {
-                editalAprovadoConcurso.setSituacao("Apto para Envio!");
-            }
-
-            listc.add(editalAprovadoConcurso);
+            editalAprovadoConcurso.setEditalVaga(listAprovados.get(i).getEditalVaga());
+            editalAprovadoConcurso.setNome(listAprovados.get(i).getNome());
+            editalAprovadoConcurso.setNumeroEdital(listAprovados.get(i).getNumeroEdital());
+            editalAprovadoConcurso.setClassificacao(listAprovados.get(i).getClassificacao());
+            editalAprovadoConcurso.setCodigoVaga(listAprovados.get(i).getCodigoVaga());
+            editalAprovadoConcurso.setCpf(listAprovados.get(i).getCpf());
+            editalAprovadoConcurso.setEditalaprovado(listAprovados.get(i));
+            Integer quantidadeDocumentosEnviadosDoAprovado = (Integer) getEntityManager().createNativeQuery("select count(*) from DocumentoAdmissao a " +
+                    "where status > 0 and  a.idAprovado = " + listAprovados.get(i).getId() + "").getSingleResult();
+            editalAprovadoConcurso.setSituacao( (quantidadeDocumentosEnviadosDoAprovado > 0) ?  "Aprovado Anexado" : "Apto para Envio!" );
+            listaAprovadosDto.add(editalAprovadoConcurso);
         }
-        return new PaginacaoUtil<EditalAprovadoConcurso>(tamanho, pagina, totalPaginas, totalRegistros, listc);
+        return new PaginacaoUtil<>(tamanho, pagina, totalPaginas, totalRegistros, listaAprovadosDto);
     }
 
-    public Integer countAprovados(String search) {
+    public Integer countAprovadosSemAdmissao(String search) {
 
-        Query query =    getEntityManager()
+        Query query = getEntityManager()
                 .createNativeQuery("with  Admissao1 as " +
                         "(select a.* from Admissao a join InfoRemessa i on a.chave = i.chave and i.idUnidadeGestora=:ug and a.tipoAdmissao=1 ), " +
                         "  Servidor1 as " +
@@ -144,67 +127,51 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
                         "      Aprovado as " +
                         "(select a.* from EditalAprovado a join InfoRemessa i on a.chave = i.chave and i.idUnidadeGestora=:ug )" +
                         " " +
-                        "select distinct count(1) from Aprovado a join EditalVaga b on a.idEditalVaga = b.id where (select count(1) from  Admissao1 ad join Servidor1 s  on  ad.idServidor = s.id and s.cpfServidor = a.cpf )=0  "+search )
-                .setParameter("ug",User.getUser(super.request).getUnidadeGestora().getId());
-              return (Integer) query.getSingleResult();
+                        "select distinct count(1) from Aprovado a join EditalVaga b on a.idEditalVaga = b.id where (select count(1) from  Admissao1 ad join Servidor1 s  on  ad.idServidor = s.id and s.cpfServidor = a.cpf )=0  " + search)
+                .setParameter("ug", User.getUser(super.request).getUnidadeGestora().getId());
+        return (Integer) query.getSingleResult();
     }
 
 
     public EditalAprovado buscarAprovadoPorCpf(String cpf) {
 
-        var query = getEntityManager().createNativeQuery(
-                "SELECT DISTINCT c.* "+
-                        "FROM EditalAprovado c "+
+        List<EditalAprovado> listaDeAprovadosPorCpf = getEntityManager().createNativeQuery(
+                "SELECT DISTINCT c.* " +
+                        "FROM EditalAprovado c " +
                         " join InfoRemessa  i on c.chave=i.chave " +
-                        " WHERE i.idUnidadeGestora = '"+User.getUser(super.request).getUnidadeGestora().getId()+ "'  and  c.cpf = '"+cpf+"' "
-                        ,EditalAprovado.class);
-        List<EditalAprovado> list = query.getResultList();
-        if (list.size()>0 ){
-            return list.get(0);
-        }
-        else{
-            return null;
-        }
+                        " WHERE i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "'  and  c.cpf = '" + cpf + "' "
+                , EditalAprovado.class).getResultList();
+        return (listaDeAprovadosPorCpf.size() > 0) ? listaDeAprovadosPorCpf.get(0) : null ;
     }
 
     public EditalAprovado buscarAprovadoPorInscricao(String inscricao) {
 
-        var query = getEntityManager().createNativeQuery(
-                "SELECT DISTINCT c.* "+
-                        "FROM EditalAprovado c "+
+        List<EditalAprovado> listaDeAprovdosPorInscricao =  getEntityManager().createNativeQuery(
+                "SELECT DISTINCT c.* " +
+                        "FROM EditalAprovado c " +
                         " join InfoRemessa  i on c.chave=i.chave " +
-                        " WHERE i.idUnidadeGestora = '"+User.getUser(super.request).getUnidadeGestora().getId()+ "'  and  c.numeroInscricao = '"+inscricao+"' "
-                ,EditalAprovado.class);
-        List<EditalAprovado> list = query.getResultList();
-        if (list.size()>0 ){
-            return list.get(0);
-        }
-        else{
-            return null;
-        }
+                        " WHERE i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "'  and  c.numeroInscricao = '" + inscricao + "' "
+                , EditalAprovado.class).getResultList();
+
+        return (listaDeAprovdosPorInscricao.size() > 0) ? listaDeAprovdosPorInscricao.get(0) : null ;
     }
 
-    public EditalAprovado buscarAprovadoPorClassificacaoConc(BigInteger idvaga, String Classificacao  ) {
+    public EditalAprovado buscarAprovadoPorClassificacaoConc(BigInteger idvaga, String Classificacao) {
 
-        var query = getEntityManager().createNativeQuery(
-                "SELECT DISTINCT c.* "+
-                        "FROM EditalAprovado c "+
+        List<EditalAprovado> listaDeAprovados = getEntityManager().createNativeQuery(
+                "SELECT DISTINCT c.* " +
+                        "FROM EditalAprovado c " +
                         " join InfoRemessa  i on c.chave=i.chave " +
-                        " WHERE idEditalVaga= "+idvaga+" and  c.classificacao =  '"+Classificacao+"' and i.idUnidadeGestora = '"+User.getUser(super.request).getUnidadeGestora().getId()+ "'   "
-                ,EditalAprovado.class);
-        List<EditalAprovado> list = query.getResultList();
-        if (list.size()>0 ){
-            return list.get(0);
-        }
-        else{
-            return null;
-        }
+                        " WHERE idEditalVaga= " + idvaga + " and  c.classificacao =  '" + Classificacao + "' and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "'   "
+                , EditalAprovado.class).getResultList();
+        return (listaDeAprovados.size() > 0) ? listaDeAprovados.get(0) : null ;
+
     }
 
 
-    public List<Map<String,Object>> buscarInfoReciboAdmissao(Integer procnumero, Integer procano) {
+    public List<Map<String, Object>> buscarInfoReciboAdmissao(Integer numeroProcesso, Integer anoProcesso) {
 
-        List<Map<String, Object>> retorno = new ArrayList<Map<String, Object>>();
+        List<Map<String, Object>> informacoesReciboAdmissao = new ArrayList<Map<String, Object>>();
 
         try {
 
@@ -216,8 +183,8 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
                             "  inner join SICAPAP21..EditalAprovado ed on docenv.idAprovado = ed.id " +
                             "  inner join cadun..vwPessoa p on a.cpf=p.cpf " +
                             "  inner join InfoRemessa i on ed.chave=i.chave  and env.cnpjEmpresaOrganizadora = i.idUnidadeGestora " +
-                            " inner join cadun..vwPessoaJuridica pj on i.idUnidadeGestora=pj.cnpj"+
-                            " where env.processo='"+procnumero+"/"+procano+ "'").getResultList();
+                            " inner join cadun..vwPessoaJuridica pj on i.idUnidadeGestora=pj.cnpj" +
+                            " where env.processo='" + numeroProcesso + "/" + anoProcesso + "'").getResultList();
 
 
             for (Object[] obj : list) {
@@ -233,17 +200,17 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
                 mapa.put("nomeMunicipio", (String) obj[6]);
                 mapa.put("nomeInteressado", (String) obj[7]);
                 mapa.put("cpfInteressado", (String) obj[8]);
-                retorno.add(mapa);
+                informacoesReciboAdmissao.add(mapa);
 
             }
             ;
 
-            return retorno;
+            return informacoesReciboAdmissao;
 
 
-        } catch (Exception e) {
-            return null;
+        } catch (RuntimeException e) {
+            throw new RuntimeException("problema ao gerar o recibo dos aprovados!!");
         }
-    }
 
+    }
 }

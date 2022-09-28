@@ -17,9 +17,9 @@ public class EmpresaOrganizadoraRepository extends DefaultRepository<EmpresaOrga
     }
 
     public EmpresaOrganizadora buscaEmpresaPorCnpj(String Cnpj) {
-        List<EmpresaOrganizadora> list = getEntityManager().createNativeQuery("select * from EmpresaOrganizadora ed" +
+        List<EmpresaOrganizadora> listaDeEmpresasPorCnpj = getEntityManager().createNativeQuery("select * from EmpresaOrganizadora ed" +
                 " where cnpjEmpresaOrganizadora = '" + Cnpj + "'    ", EmpresaOrganizadora.class).getResultList();
-        return list.get(0);
+        return (listaDeEmpresasPorCnpj.size()>0) ? listaDeEmpresasPorCnpj.get(0) : null ;
     }
 
 }

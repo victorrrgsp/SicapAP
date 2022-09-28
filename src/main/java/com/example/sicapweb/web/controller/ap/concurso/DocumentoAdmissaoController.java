@@ -65,7 +65,7 @@ public class DocumentoAdmissaoController extends DefaultController<DocumentoAdmi
     @CrossOrigin
     @GetMapping(path = {"/getOocumentosAprovados/{idproc}/pagination"})
     public ResponseEntity<PaginacaoUtil<DocumentoAdmissao>>  getOocumentosAprovados(Pageable pageable, @PathVariable BigInteger idproc) {
-        PaginacaoUtil<DocumentoAdmissao> paginacaoUtil = documentoAdmissaoRepository.buscaPaginadaApr(pageable,idproc) ;
+        PaginacaoUtil<DocumentoAdmissao> paginacaoUtil = documentoAdmissaoRepository.buscaPaginadaAprovadosSemAdmissao(pageable,idproc) ;
         return ResponseEntity.ok().body(paginacaoUtil);
     }
 
@@ -73,7 +73,7 @@ public class DocumentoAdmissaoController extends DefaultController<DocumentoAdmi
     @CrossOrigin
     @GetMapping(path = {"/getOocumentosAdmissoes/{idproc}/pagination"})
     public ResponseEntity<PaginacaoUtil<DocumentoAdmissao>> getOocumentosAmissoes(Pageable pageable, @PathVariable BigInteger idproc) {
-        PaginacaoUtil<DocumentoAdmissao> paginacaoUtil = documentoAdmissaoRepository.buscaPaginadaAdm(pageable,idproc) ;
+        PaginacaoUtil<DocumentoAdmissao> paginacaoUtil = documentoAdmissaoRepository.buscaPaginadaAprovadosComAdmissao(pageable,idproc) ;
         return ResponseEntity.ok().body(paginacaoUtil);
     }
 

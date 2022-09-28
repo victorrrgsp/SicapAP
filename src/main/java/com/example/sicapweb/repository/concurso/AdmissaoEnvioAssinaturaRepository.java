@@ -7,6 +7,7 @@ import br.gov.to.tce.util.Date;
 import com.example.sicapweb.exception.InvalitInsert;
 import com.example.sicapweb.repository.DefaultRepository;
 import com.example.sicapweb.service.ChampionRequest;
+import javassist.bytecode.stackmap.BasicBlock;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 
@@ -33,44 +34,42 @@ public class AdmissaoEnvioAssinaturaRepository  extends DefaultRepository<Admiss
         super(em);
     }
 
-    Integer idProtocolo;
-    public Integer insertProtocolo(String matricula, Integer ano, LocalDateTime dh_protocolo, Integer id_end_origem) throws NoSuchAlgorithmException {
-        idProtocolo=null;
-        Query query = entityManager.createNativeQuery(
-                "INSERT INTO SCP..PROTOCOLOS(ID_PROTOCOLO, ANO, DH_PROTOCOLO,MATRICULA,ID_ENT_ORIGEM,HASH) " +
-                        "VALUES (:ID_PROTOCOLO, :ANO, CONVERT(datetime2, '"+ dh_protocolo+"' ),:MATRICULA,:ID_ENT_ORIGEM,:HASH)");
 
-        Query query1 = entityManager.createNativeQuery(
-                "select coalesce(MAX(ID_PROTOCOLO), 0)+1 from SCP..PROTOCOLOS where ANO = YEAR(GETDATE()) "
-        );
-        //dh_protocolo
-        idProtocolo =  (Integer)query1.getSingleResult();
-        query.setParameter("ID_PROTOCOLO", idProtocolo);
-        query.setParameter("ANO", ano);
-        // query.setParameter("DH_PROTOCOLO", dh_protocolo);
-        query.setParameter("MATRICULA", matricula);
-        query.setParameter("ID_ENT_ORIGEM", id_end_origem);
-        MessageDigest md = MessageDigest.getInstance("MD5");
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
-        md.reset();
-        String hashdecoded= "^TC3T0"+ (simpleDateFormat.format(new Date()))+idProtocolo+"*000003*^";
-        byte[] hashdecodedbytes = hashdecoded.getBytes(Charset.forName("UTF-8"));
-        byte[] bytesOfDigest = md.digest(hashdecodedbytes);
-        String Hash = DatatypeConverter.printHexBinary(bytesOfDigest).substring(17,32).toUpperCase();
-        query.setParameter("HASH", Hash);
-        query.executeUpdate();
+    public Integer insertProtocolo(String matricula, Integer ano, LocalDateTime dh_protocolo, Integer id_end_origem)  {
+        Integer idProtocolo;
+        try{
 
-        //entityManager.flush();
+            Query query = entityManager.createNativeQuery(
+                    "INSERT INTO SCP..PROTOCOLOS(ID_PROTOCOLO, ANO, DH_PROTOCOLO,MATRICULA,ID_ENT_ORIGEM,HASH) " +
+                            "VALUES (:ID_PROTOCOLO, :ANO, CONVERT(datetime2, '"+ dh_protocolo+"' ),:MATRICULA,:ID_ENT_ORIGEM,:HASH)");
 
+            Query query1 = entityManager.createNativeQuery(
+                    " select coalesce(MAX(ID_PROTOCOLO), 0)+1 from SCP..PROTOCOLOS where ANO = YEAR(GETDATE()) "
+            );
+            idProtocolo =  (Integer)query1.getSingleResult();
+            query.setParameter("ID_PROTOCOLO", idProtocolo);
+            query.setParameter("ANO", ano);
+            query.setParameter("MATRICULA", matricula);
+            query.setParameter("ID_ENT_ORIGEM", id_end_origem);
+            query.setParameter("HASH", GenerateHashBase64fromProtocolo(idProtocolo));
+            query.executeUpdate();
 
+         } catch (RuntimeException e){
+            e.printStackTrace();
+            throw new InvalitInsert("problema ao inserir protocolo no econtas. Favor contate o administrador do sicap!");
+        } catch (NoSuchAlgorithmException a){
+            a.printStackTrace();
+            throw new InvalitInsert("problema ao codigo hash com base no id do protocolo . Favor contate o administrador do sicap!");
+        }
         return idProtocolo;
     }
 
 
-    public void insertProcesso(Integer procnumero, Integer ano, Integer anoreferencia,Integer processoNpai,Integer processoApai,
-                               Integer relatoria,String complemento, Integer assuntocodigo, Integer classeassunto,
-                               Integer idprotocolo, Integer entidadeorigem, Integer entidadevinculada, Integer  idassunto
-    ){
+    public void insertProcesso(Integer numeroProcesso, Integer anoProcesso, Integer anoReferencia,Integer numeroProcessoPai,Integer anoProcessoPai,
+                               Integer relatoria,String complemento, Integer assuntoCodigo, Integer classeAssunto,
+                               Integer idProtocolo, Integer entidadeOrigem, Integer entidadeVinculada, Integer  idAssunto
+    ) {
+        try{
         Query query = entityManager.createNativeQuery(
                 " INSERT INTO SCP..processo (" +
                         "                    processo_dtaass, processo_numero, processo_ano, pentids_ecodc_ccodg, pentids_ecodc_ccodc," +
@@ -108,139 +107,161 @@ public class AdmissaoEnvioAssinaturaRepository  extends DefaultRepository<Admiss
                         "                    :ano," +
                         "                    'S') ");
 
-        query.setParameter("procnumero",procnumero);
-        query.setParameter("ano",ano);
-        query.setParameter("anoreferencia",anoreferencia);
-        query.setParameter("processoNpai",processoNpai);
-        query.setParameter("processoApai",processoApai);
-        query.setParameter("relatoria",relatoria);
-        query.setParameter("complemento",complemento);
-        query.setParameter("assuntocodigo",assuntocodigo);
-        query.setParameter("classeassunto",classeassunto);
-        query.setParameter("idprotocolo",idprotocolo);
-        query.setParameter("entidadeorigem",entidadeorigem);
-        query.setParameter("entidadevinculada",entidadevinculada);
-        query.setParameter("idassunto",idassunto);
+        query.setParameter("procnumero", numeroProcesso);
+        query.setParameter("ano", anoProcesso);
+        query.setParameter("anoreferencia", anoReferencia);
+        query.setParameter("processoNpai", numeroProcessoPai);
+        query.setParameter("processoApai", anoProcessoPai);
+        query.setParameter("relatoria", relatoria);
+        query.setParameter("complemento", complemento);
+        query.setParameter("assuntocodigo", assuntoCodigo);
+        query.setParameter("classeassunto", classeAssunto);
+        query.setParameter("idprotocolo", idProtocolo);
+        query.setParameter("entidadeorigem", entidadeOrigem);
+        query.setParameter("entidadevinculada", entidadeVinculada);
+        query.setParameter("idassunto", idAssunto);
         query.executeUpdate();
-        //entityManager.flush();
-
-
+    } catch (RuntimeException e){
+            e.printStackTrace();
+            throw new InvalitInsert("problema ao inserir processo no econtas. Favor contate o administrador do sicap!");
+        }
     }
 
-    public void insertAndamentoProcesso(Integer procnumero, Integer ano){
-        Query query = entityManager.createNativeQuery("INSERT INTO SCP..ProcessoAndamento(NumProc,AnoProc,Descricao,DHinsert,IdDepto)" +
-                "                VALUES (:procnumero, :ano, 'AUTUACAO', GETDATE(), 55)");
-        query.setParameter("procnumero",procnumero);
-        query.setParameter("ano",ano);
-        query.executeUpdate();
-        //entityManager.flush();
+    public void insertAndamentoProcesso(Integer numeroProcesso, Integer anoProcesso){
+        try {
+            Query query = entityManager.createNativeQuery("INSERT INTO SCP..ProcessoAndamento(NumProc,AnoProc,Descricao,DHinsert,IdDepto)" +
+                    "                VALUES (:procnumero, :ano, 'AUTUACAO', GETDATE(), 55)");
+            query.setParameter("procnumero", numeroProcesso);
+            query.setParameter("ano", anoProcesso);
+            query.executeUpdate();
+        }catch (RuntimeException e){
+            e.printStackTrace();
+            throw new InvalitInsert("problema ao inserir andamento do processo no econtas. Favor contate o administrador do sicap!");
+        }
     }
 
 
-    public void insertPessoaInteressada(Integer procnumero, Integer ano, Integer idpessoa, Integer papel, Integer idcargo ){
+    public void insertPessoaInteressada(Integer numeroProcesso, Integer anoProcesso, Integer idPessoa, Integer papelEmProcesso, Integer idCargo ){
+        try {
         Query query = entityManager.createNativeQuery("INSERT INTO SCP..PESSOAS_PROCESSO (NUM_PROC, ANO_PROC, ID_PESSOA, ID_PAPEL, ID_CARGO)" +
                 "                VALUES (:procnumero , :ano , :idpessoa , :papel , :idcargo )");
-        query.setParameter("procnumero",procnumero);
-        query.setParameter("ano",ano);
-        query.setParameter("idpessoa",idpessoa);
-        query.setParameter("papel",papel);
-        query.setParameter("idcargo",idcargo);
+        query.setParameter("procnumero",numeroProcesso);
+        query.setParameter("ano",anoProcesso);
+        query.setParameter("idpessoa",idPessoa);
+        query.setParameter("papel",papelEmProcesso);
+        query.setParameter("idcargo",idCargo);
         query.executeUpdate();
+        }catch (RuntimeException e){
+            e.printStackTrace();
+            throw new InvalitInsert("problema ao inserir pessoa interessada do processo no econtas. Favor contate o administrador do sicap!");
+        }
     }
 
 
-    public void insertHist(Integer procnumero, Integer ano, String  deptoAutuacao){
-        Query query = entityManager.createNativeQuery("INSERT INTO SCP..hists" +
-                "(hcodp_pnumero, hcodp_pano, hists_data,hists_hora, hists_origem, hoent_ecodc_ccodg, hoent_ecodc_ccodc," +
-                "                         hoent_ecode, hdest_ldepto, hdest_llogin, hent_ecodc_ccodg, hent_ecodc_ccodc, hent_ecode, status," +
-                "                         hists_dest_resp, data_receb, hora_receb, data_env_depto, hora_env_depto)" +
-                "                         VALUES" +
-                "(:procnumero, :ano, GETDATE(), GETDATE(), 'ENTRA', 0,0, 0, 'COPRO', '000003', 0, 0, 0, 'U', '000003', GETDATE(), GETDATE(), DATEADD(millisecond,7,getdate()), DATEADD(millisecond,7,getdate()))");
-        query.setParameter("procnumero",procnumero);
-        query.setParameter("ano",ano);
-        query.executeUpdate();
+    public void insertHist(Integer numeroProcesso, Integer anoProcesso, String  deptoAutuacao){
+        try {
+            Query query = entityManager.createNativeQuery("INSERT INTO SCP..hists" +
+                    "(hcodp_pnumero, hcodp_pano, hists_data,hists_hora, hists_origem, hoent_ecodc_ccodg, hoent_ecodc_ccodc," +
+                    "                         hoent_ecode, hdest_ldepto, hdest_llogin, hent_ecodc_ccodg, hent_ecodc_ccodc, hent_ecode, status," +
+                    "                         hists_dest_resp, data_receb, hora_receb, data_env_depto, hora_env_depto)" +
+                    "                         VALUES" +
+                    "(:procnumero, :ano, GETDATE(), GETDATE(), 'ENTRA', 0,0, 0, 'COPRO', '000003', 0, 0, 0, 'U', '000003', GETDATE(), GETDATE(), DATEADD(millisecond,7,getdate()), DATEADD(millisecond,7,getdate()))");
+            query.setParameter("procnumero", numeroProcesso);
+            query.setParameter("ano", anoProcesso);
+            query.executeUpdate();
 
-        Query query1 = entityManager.createNativeQuery("INSERT INTO SCP..hists" +
-                "(hcodp_pnumero, hcodp_pano, hists_data,hists_hora, hists_origem, hoent_ecodc_ccodg, hoent_ecodc_ccodc," +
-                "                         hoent_ecode, hdest_ldepto, hdest_llogin, hent_ecodc_ccodg, hent_ecodc_ccodc, hent_ecode, status," +
-                "                         hists_dest_resp, data_receb, hora_receb)" +
-                "                         VALUES(" +
-                "                            :procnumero,:ano,DATEADD(millisecond,7,getdate()),DATEADD(millisecond,7,getdate()),'COPRO',0,0,0,:deptoAutuacao,'000003',0,0,0,'T','',null,null)");
+            Query query1 = entityManager.createNativeQuery("INSERT INTO SCP..hists" +
+                    "(hcodp_pnumero, hcodp_pano, hists_data,hists_hora, hists_origem, hoent_ecodc_ccodg, hoent_ecodc_ccodc," +
+                    "                         hoent_ecode, hdest_ldepto, hdest_llogin, hent_ecodc_ccodg, hent_ecodc_ccodc, hent_ecode, status," +
+                    "                         hists_dest_resp, data_receb, hora_receb)" +
+                    "                         VALUES(" +
+                    "                            :procnumero,:ano,DATEADD(millisecond,7,getdate()),DATEADD(millisecond,7,getdate()),'COPRO',0,0,0,:deptoAutuacao,'000003',0,0,0,'T','',null,null)");
 
-        query1.setParameter("procnumero",procnumero);
-        query1.setParameter("ano",ano);
-        query1.setParameter("deptoAutuacao",deptoAutuacao);
-        query1.executeUpdate();
-    }
-
-
-    BigDecimal idDocument;
-    public BigDecimal insertDocument(String tipodocumento,Integer procnumero, Integer ano, Integer evento ){
-        idDocument=null;
-        Query query = entityManager.createNativeQuery("INSERT INTO SCP..document(docmt_tipo,dcnproc_pnumero,dcnproc_pano,docmt_numero,docmt_ano,docmt_depto,docmt_excluido" +
-                ",docmt_data,docmt_hora,login_usr,docmt_is_assinado,docmt_depto_doc,sigiloso, num_evento)" +
-                "     VALUES (:tipodocumento,:procnumero,:ano,:numero,:ano,'COPRO','',getdate(),getdate(),'000003','S','COPRO','N', :evento)");
-        query.setParameter("tipodocumento",tipodocumento);
-        query.setParameter("procnumero",procnumero);
-        //vai  precisar usar SolicitarNumeroSND para gerar o numero
-        Integer idDocsnd = this.SolicitarNumeroSND(5,"COCAP",ano,"000003",null,"SICAP-AP");
-        if (idDocsnd == null) throw  new InvalitInsert("numero do documento não gerado!");
-        query.setParameter("numero",idDocsnd);
-        query.setParameter("ano",ano);
-        query.setParameter("evento",evento);
-        query.executeUpdate();
-        Query query2 = entityManager.createNativeQuery(
-                "SELECT @@IDENTITY ");
-
-        idDocument = (BigDecimal) query2.getSingleResult();
-
-        return idDocument;
-    }
-
-    Integer idDoc;
-    public Integer SolicitarNumeroSND(Integer tipo_doc, String CodDepartamento, Integer ano,String Emissor,String Assunto,String Sistema) {
-        idDoc=null;
-        Query query = entityManager.createNativeQuery("select coalesce(MAX(numero), 0)+1   as numero from Snd..documento where cod_tipo_documento = :tipo_doc  and cod_departamento = :CodDepartamento and ano= :ano ");
-        query.setParameter("tipo_doc",tipo_doc);
-        query.setParameter("CodDepartamento",CodDepartamento);
-        query.setParameter("ano",ano);
-        idDoc = (Integer) query.getSingleResult();
-
-        if (idDoc != null ){
-            Query query1 =entityManager.createNativeQuery(" insert into Snd..documento " +
-                    " (cod_tipo_documento, cod_departamento, numero , data_documento , data_gravacao , ano" +
-                    "  , matricula_emissor,  status ,  elaboradoPor )" +
-                    " values ( :tipo_doc,:CodDepartamento,:numero ,:data_documento , :data_gravacao, :ano" +
-                    " , :emissor , :status, cast( :elaboradoPor  as text )  ) ");
-
-            query1.setParameter("tipo_doc",tipo_doc);
-            query1.setParameter("CodDepartamento",CodDepartamento);
-            query1.setParameter("numero",idDoc);
-            LocalDateTime dt =LocalDateTime.now();
-            query1.setParameter("data_documento",dt);
-            query1.setParameter("data_gravacao",dt);
-            query1.setParameter("ano",ano);
-            query1.setParameter("emissor",Emissor);
-         //   query1.setParameter("assunto",Assunto);
-            query1.setParameter("status","CONFIRMADO");
-            query1.setParameter("elaboradoPor",   "Automatizado por Sistema de SICAP-AP"  );
+            query1.setParameter("procnumero", numeroProcesso);
+            query1.setParameter("ano", anoProcesso);
+            query1.setParameter("deptoAutuacao", deptoAutuacao);
             query1.executeUpdate();
-            return idDoc;
-        }
-        else {
-            return null;
+        } catch (RuntimeException e ){
+            e.printStackTrace();
+            throw new InvalitInsert("problema ao inserir historico do processo no econtas. Favor contate o administrador do sicap!");
+
         }
     }
 
 
-    public void insertArquivoDocument(BigDecimal id_documento, String arquivo, String  idDocumentoCastor   ){
-        Query query = entityManager.createNativeQuery(" insert into SCP..DOCUMENT_ARQUIVOS (ID_DOCUMENT,NOME_ARQ,DESCRICAO,DATA,LOGIN_INSERIU,EXCLUIDO,UUID_CAS)" +
-                "Values (:id_documento,:arquivo,:arquivo,GETDATE(),'000003','N',:idDocumentoCastor)");
-        query.setParameter("id_documento",id_documento);
-        query.setParameter("arquivo",arquivo);
-        query.setParameter("idDocumentoCastor",idDocumentoCastor);
-        query.executeUpdate();
 
+    public BigDecimal insertDocument(String tipoDocumento,Integer numeroProcesso, Integer anoProcesso, Integer eventoProcesso ){
+        BigDecimal idDocument;
+        try {
+            Query query = entityManager.createNativeQuery("INSERT INTO SCP..document(docmt_tipo,dcnproc_pnumero,dcnproc_pano,docmt_numero,docmt_ano,docmt_depto,docmt_excluido" +
+                    ",docmt_data,docmt_hora,login_usr,docmt_is_assinado,docmt_depto_doc,sigiloso, num_evento)" +
+                    "     VALUES (:tipodocumento,:procnumero,:ano,:numero,:ano,'COPRO','',getdate(),getdate(),'000003','S','COPRO','N', :evento)");
+            query.setParameter("tipodocumento", tipoDocumento);
+            query.setParameter("procnumero", numeroProcesso);
+            //vai  precisar usar SolicitarNumeroSND para gerar o numero
+            Integer idDocsnd = this.SolicitarNumeroSND(5, "COCAP", anoProcesso, "000003");
+            if (idDocsnd == null) throw new InvalitInsert("numero do documento não gerado!");
+            query.setParameter("numero", idDocsnd);
+            query.setParameter("ano", anoProcesso);
+            query.setParameter("evento", eventoProcesso);
+            query.executeUpdate();
+            idDocument = (BigDecimal) entityManager.createNativeQuery("SELECT @@IDENTITY ").getSingleResult();
+            if (idDocument==null) throw new InvalitInsert("Nao gerou documento tipo:"+tipoDocumento+" processo:"+numeroProcesso+'/'+anoProcesso);
+            return idDocument;
+        }catch (RuntimeException e ){
+            e.printStackTrace();
+            throw new InvalitInsert("problema ao inserir historico do processo no econtas. Favor contate o administrador do sicap!");
+
+        }
+    }
+
+    public Integer SolicitarNumeroSND(Integer tipoDoc, String codDepartamento, Integer ano,String Emissor) {
+        Integer idDoc ;
+        try {
+            Query queryQuePegaNovoNumero = entityManager.createNativeQuery("select coalesce(MAX(numero), 0)+1   as numero from Snd..documento where cod_tipo_documento = :tipo_doc  and cod_departamento = :CodDepartamento and ano= :ano ");
+            queryQuePegaNovoNumero.setParameter("tipo_doc", tipoDoc);
+            queryQuePegaNovoNumero.setParameter("CodDepartamento", codDepartamento);
+            queryQuePegaNovoNumero.setParameter("ano", ano);
+            idDoc = (Integer) queryQuePegaNovoNumero.getSingleResult();
+            if (idDoc != null) {
+                Query queryQueInseriEmDocumentos = entityManager.createNativeQuery(" insert into Snd..documento " +
+                        " (cod_tipo_documento, cod_departamento, numero , data_documento , data_gravacao , ano" +
+                        "  , matricula_emissor,  status ,  elaboradoPor )" +
+                        " values ( :tipo_doc,:CodDepartamento,:numero ,:data_documento , :data_gravacao, :ano" +
+                        " , :emissor , :status, cast( :elaboradoPor  as text )  ) ");
+
+                queryQueInseriEmDocumentos.setParameter("tipo_doc", tipoDoc);
+                queryQueInseriEmDocumentos.setParameter("CodDepartamento", codDepartamento);
+                queryQueInseriEmDocumentos.setParameter("numero", idDoc);
+                LocalDateTime dt = LocalDateTime.now();
+                queryQueInseriEmDocumentos.setParameter("data_documento", dt);
+                queryQueInseriEmDocumentos.setParameter("data_gravacao", dt);
+                queryQueInseriEmDocumentos.setParameter("ano", ano);
+                queryQueInseriEmDocumentos.setParameter("emissor", Emissor);
+                queryQueInseriEmDocumentos.setParameter("status", "CONFIRMADO");
+                queryQueInseriEmDocumentos.setParameter("elaboradoPor", "Automatizado por Sistema de SICAP-AP");
+                queryQueInseriEmDocumentos.executeUpdate();
+            }
+            return idDoc;
+        } catch (RuntimeException e ){
+            e.printStackTrace();
+            throw new InvalitInsert("problema ao gerar um numero novo de documento do processo no econtas. Favor contate o administrador do sicap!");
+        }
+    }
+
+
+    public void insertArquivoDocument(BigDecimal idDocumento, String arquivo, String  idDocumentoCastor   ){
+        try {
+            Query query = entityManager.createNativeQuery(" insert into SCP..DOCUMENT_ARQUIVOS (ID_DOCUMENT,NOME_ARQ,DESCRICAO,DATA,LOGIN_INSERIU,EXCLUIDO,UUID_CAS)" +
+                    "Values (:id_documento,:arquivo,:arquivo,GETDATE(),'000003','N',:idDocumentoCastor)");
+            query.setParameter("id_documento",idDocumento);
+            query.setParameter("arquivo",arquivo);
+            query.setParameter("idDocumentoCastor",idDocumentoCastor);
+            query.executeUpdate();
+        } catch (RuntimeException e ){
+            e.printStackTrace();
+            throw new InvalitInsert("problema ao inserir documento do processo no econtas. Favor contate o administrador do sicap!");
+        }
     }
 
     public Integer getEventoProcesso(Integer procnumero,Integer ano){
@@ -252,36 +273,41 @@ public class AdmissaoEnvioAssinaturaRepository  extends DefaultRepository<Admiss
 
     Integer idPessoa;
     public String insertCadunPessoaInterressada(String cpf , String nome) throws IOException, URISyntaxException {
-
-        ResponseEntity<String> e = ChampionRequest.salvarSimples(cpf, nome, "sicapap", "7ed46ae476e58c3884b6062787b6b43ca351b5d9c1b415ed1934ee5d4309dbdb", "08a64646a9343f7f5400906256d1f872400ae58ade2bb6c572ed19d7c9cdd73c");
-        return e.getBody();
-
+        return ChampionRequest.salvarSimples(cpf, nome, "sicapap",  "7ed46ae476e58c3884b6062787b6b43ca351b5d9c1b415ed1934ee5d4309dbdb", "08a64646a9343f7f5400906256d1f872400ae58ade2bb6c572ed19d7c9cdd73c").getBody();
     }
 
 
-    public Integer getidCADUNPF(String Cnpj){
-        List<Integer> cadunL = entityManager.createNativeQuery("SELECT  up.idPessoaFisica FROM Cadun..PessoaJuridica pj " +
+    public Integer getidCADUNPF(String Cnpj) {
+        List<Integer> ListIdPessoaFisica = entityManager.createNativeQuery("SELECT   up.idPessoaFisica FROM Cadun..PessoaJuridica pj " +
                 "                LEFT JOIN cadun..vwUnidadesPessoasCargos up on pj.cnpj = up.codunidadegestora and idCargo = 4 and dataFim is null " +
-                "                   WHERE pj.CNPJ ='"+Cnpj+ "' or pj.CodigoUnidadeGestora = '"+Cnpj+"' ").getResultList();
-        if (cadunL.size()>0) {
-            return    cadunL.get(0);
+                "                   WHERE pj.CNPJ ='" + Cnpj + "' or pj.CodigoUnidadeGestora = '" + Cnpj + "' ").getResultList();
+
+        if (ListIdPessoaFisica.size() > 0) {
+            return ListIdPessoaFisica.get(0);
+        }else{
+            throw new RuntimeException("não achou pessoa fisica no cadun!!");
         }
-        return null;
     }
 
-    public Integer getidCADUNPJ(String Cnpj){
-        Query query= entityManager.createNativeQuery("SELECT  up.idPessoaJuridica FROM Cadun..PessoaJuridica pj " +
+    public Integer getidCADUNPJ(String cnpj) {
+        List<Integer> ListIdPessoaJuridica = entityManager.createNativeQuery("SELECT  up.idPessoaJuridica FROM Cadun..PessoaJuridica pj " +
                 "                LEFT JOIN cadun..vwUnidadesPessoasCargos up on pj.cnpj = up.codunidadegestora and idCargo = 4 and dataFim is null " +
-                "                   WHERE pj.CNPJ ='"+Cnpj+ "' or pj.CodigoUnidadeGestora = '"+Cnpj+"' ");
-        List<Integer> cadunL = query.getResultList();
-        if (cadunL.size()>0) {
-
-                return    cadunL.get(0);
-
+                "                   WHERE pj.CNPJ ='" + cnpj + "' or pj.CodigoUnidadeGestora = '" + cnpj + "' ").getResultList();
+        if (ListIdPessoaJuridica.size() > 0) {
+            return ListIdPessoaJuridica.get(0);
+        }else{
+            throw new RuntimeException("não achou pessoa juridica no cadun!!");
         }
-        return null;
     }
 
-
+    private String GenerateHashBase64fromProtocolo(Integer idProtocolo) throws NoSuchAlgorithmException {
+        MessageDigest md = MessageDigest.getInstance("MD5");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+        md.reset();
+        String hashdecoded= "^TC3T0"+ (simpleDateFormat.format(new Date()))+idProtocolo+"*000003*^";
+        byte[] hashdecodedbytes = hashdecoded.getBytes(Charset.forName("UTF-8"));
+        byte[] bytesOfDigest = md.digest(hashdecodedbytes);
+        return DatatypeConverter.printHexBinary(bytesOfDigest).substring(17,32).toUpperCase();
+    }
 
 }

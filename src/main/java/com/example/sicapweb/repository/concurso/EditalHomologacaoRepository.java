@@ -47,23 +47,18 @@ public class EditalHomologacaoRepository extends DefaultRepository<EditalHomolog
     public PaginacaoUtil<EditalHomologaConcurso> buscaPaginadaEditaisHomologa(Pageable pageable, String searchParams, Integer tipoParams) {
         int pagina = Integer.valueOf(pageable.getPageNumber());
         int tamanho = Integer.valueOf(pageable.getPageSize());
-        String search = "";
-        //monta pesquisa search
-        search = getSearch(searchParams, tipoParams);
-        //retirar os : do Sort pageable
-        String campo = String.valueOf(pageable.getSort()).replace(":", "");
-
-
+        String filtro =  getSearch(searchParams, tipoParams);
+        String campoOrderby = String.valueOf(pageable.getSort()).replace(":", "");
         List<EditalHomologacao> list = getEntityManager()
                 .createNativeQuery("select a.* from EditalHomologacao a " +
                         "join Edital e on a.idEdital = e.id " +
                         "join  ConcursoEnvio env on a.idEdital = env.idEdital  and env.fase=1 and env.status in (2,4) " +
                         "join InfoRemessa i on a.chave = i.chave " +
-                        "where   i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, EditalHomologacao.class)
+                        "where   i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' " + filtro + " ORDER BY " + campoOrderby, EditalHomologacao.class)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();
-        long totalRegistros = countEditaishomologa(search);
+        long totalRegistros = countEditaishomologa(filtro);
         long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
         List<EditalHomologaConcurso> listc= new ArrayList<EditalHomologaConcurso>() ;
         for(Integer i= 0; i < list.size(); i++){
@@ -79,7 +74,7 @@ public class EditalHomologacaoRepository extends DefaultRepository<EditalHomolog
             editalHomologaConcurso.setVeiculoPublicacao(list.get(i).getVeiculoPublicacao());
             listc.add(editalHomologaConcurso);
         }
-        return new PaginacaoUtil<EditalHomologaConcurso>(tamanho, pagina, totalPaginas, totalRegistros, listc);
+        return new PaginacaoUtil<>(tamanho, pagina, totalPaginas, totalRegistros, listc);
     }
 
     public Integer countEditaishomologa(String search) {

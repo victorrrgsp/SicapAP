@@ -1,6 +1,7 @@
 package com.example.sicapweb.repository.concurso;
 
 import br.gov.to.tce.model.ap.concurso.AdmissaoEnvio;
+import br.gov.to.tce.model.ap.concurso.EditalVaga;
 import com.example.sicapweb.model.AdmissaoEnvioAssRetorno;
 import com.example.sicapweb.repository.DefaultRepository;
 import com.example.sicapweb.security.User;
@@ -9,9 +10,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 public class AdmissaoEnvioRepository extends DefaultRepository<AdmissaoEnvio, BigInteger>  {
@@ -55,35 +58,30 @@ public class AdmissaoEnvioRepository extends DefaultRepository<AdmissaoEnvio, Bi
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();
-
-
-        long totalRegistros = countProcessos();
+        long totalRegistros = countProcessos(search);
         long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
-
-        List<AdmissaoEnvioAssRetorno> listc= new ArrayList<AdmissaoEnvioAssRetorno>() ;
+        List<AdmissaoEnvioAssRetorno> listDtosAdmissaoRetorno= new ArrayList<AdmissaoEnvioAssRetorno>() ;
         for(Integer i= 0; i < list.size(); i++){
-            AdmissaoEnvioAssRetorno pac =new AdmissaoEnvioAssRetorno();
-            pac.setNumeroEdital(list.get(i).getEdital().getNumeroEdital());
-            pac.setId(list.get(i).getId());
-            pac.setDtcriacao(list.get(i).getDataCriacao());
-            pac.setStatus(list.get(i).getStatus());
-            pac.setEdital(list.get(i).getEdital());
-            pac.setProcesso(list.get(i).getProcesso());
-            pac.setNumeroEnvio(list.get(i).getNumeroEnvio());
-            Integer qt = (Integer)  getEntityManager().createNativeQuery("select count(*) from DocumentoAdmissao a " +
-                    "where status > 0  and  a.idEnvio = "+ pac.getId()+ "").getSingleResult();
-            pac.setQuantidade(qt);
-            listc.add(pac);
+            AdmissaoEnvioAssRetorno dtoAssinaturaEnvio =new AdmissaoEnvioAssRetorno();
+            dtoAssinaturaEnvio.setNumeroEdital(list.get(i).getEdital().getNumeroEdital());
+            dtoAssinaturaEnvio.setId(list.get(i).getId());
+            dtoAssinaturaEnvio.setDtcriacao(list.get(i).getDataCriacao());
+            dtoAssinaturaEnvio.setStatus(list.get(i).getStatus());
+            dtoAssinaturaEnvio.setEdital(list.get(i).getEdital());
+            dtoAssinaturaEnvio.setProcesso(list.get(i).getProcesso());
+            dtoAssinaturaEnvio.setNumeroEnvio(list.get(i).getNumeroEnvio());
+            dtoAssinaturaEnvio.setQuantidade((Integer)  getEntityManager().createNativeQuery("select count(*) from DocumentoAdmissao a " +
+                    "where status > 0  and  a.idEnvio = "+ dtoAssinaturaEnvio.getId()+ "").getSingleResult());
+            listDtosAdmissaoRetorno.add(dtoAssinaturaEnvio);
         }
 
-        return new PaginacaoUtil<AdmissaoEnvioAssRetorno>(tamanho, pagina, totalPaginas, totalRegistros, listc);
+        return new PaginacaoUtil<AdmissaoEnvioAssRetorno>(tamanho, pagina, totalPaginas, totalRegistros, listDtosAdmissaoRetorno);
     }
 
-    public Integer countProcessos() {
-        return  (Integer)getEntityManager().createNativeQuery("select count(*) from AdmissaoEnvio a  where a.cnpjUnidadeGestora='" + User.getUser(super.request).getUnidadeGestora().getId() +"' "
+    public Integer countProcessos(String search) {
+        return  (Integer)getEntityManager().createNativeQuery("select count(*) from AdmissaoEnvio a  where a.cnpjUnidadeGestora='" + User.getUser(super.request).getUnidadeGestora().getId() +"' "+search
                 ).getSingleResult();
     }
-
 
     public PaginacaoUtil<AdmissaoEnvioAssRetorno> buscarProcessosAguardandoAss(Pageable pageable, String searchParams, Integer tipoParams) {
         int pagina = Integer.valueOf(pageable.getPageNumber());
@@ -100,45 +98,43 @@ public class AdmissaoEnvioRepository extends DefaultRepository<AdmissaoEnvio, Bi
                 .getResultList();
 
 
-        long totalRegistros = countProcessosAguardandoAss();
+        long totalRegistros = countProcessosAguardandoAss(search);
         long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
 
-        List<AdmissaoEnvioAssRetorno> listc= new ArrayList<AdmissaoEnvioAssRetorno>() ;
+        List<AdmissaoEnvioAssRetorno> listDtosAdmissaoRetorno= new ArrayList<AdmissaoEnvioAssRetorno>() ;
         for(Integer i= 0; i < list.size(); i++){
-            AdmissaoEnvioAssRetorno pac =new AdmissaoEnvioAssRetorno();
-            pac.setNumeroEdital(list.get(i).getEdital().getNumeroEdital());
-            pac.setId(list.get(i).getId());
-            pac.setDtcriacao(list.get(i).getDataCriacao());
-            pac.setStatus(list.get(i).getStatus());
-            pac.setEdital(list.get(i).getEdital());
-            pac.setNumeroEnvio(list.get(i).getNumeroEnvio());
-            Integer qt = (Integer)  getEntityManager().createNativeQuery("select count(*) from DocumentoAdmissao a " +
-                    "where status > 0 and    a.idEnvio = "+ pac.getId()+ "").getSingleResult();
-            pac.setQuantidade(qt);
-            listc.add(pac);
+            AdmissaoEnvioAssRetorno dtoAssinaturaEnvio =new AdmissaoEnvioAssRetorno();
+            dtoAssinaturaEnvio.setNumeroEdital(list.get(i).getEdital().getNumeroEdital());
+            dtoAssinaturaEnvio.setId(list.get(i).getId());
+            dtoAssinaturaEnvio.setDtcriacao(list.get(i).getDataCriacao());
+            dtoAssinaturaEnvio.setStatus(list.get(i).getStatus());
+            dtoAssinaturaEnvio.setEdital(list.get(i).getEdital());
+            dtoAssinaturaEnvio.setNumeroEnvio(list.get(i).getNumeroEnvio());
+            dtoAssinaturaEnvio.setQuantidade((Integer)  getEntityManager().createNativeQuery("select count(*) from DocumentoAdmissao a " +
+                    "where status > 0 and    a.idEnvio = "+ dtoAssinaturaEnvio.getId()+ "").getSingleResult());
+            listDtosAdmissaoRetorno.add(dtoAssinaturaEnvio);
         }
 
-        return new PaginacaoUtil<AdmissaoEnvioAssRetorno>(tamanho, pagina, totalPaginas, totalRegistros, listc);
+        return new PaginacaoUtil<AdmissaoEnvioAssRetorno>(tamanho, pagina, totalPaginas, totalRegistros, listDtosAdmissaoRetorno);
     }
 
 
 
-    public Integer countProcessosAguardandoAss() {
+    public Integer countProcessosAguardandoAss(String search) {
         return (Integer) getEntityManager().createNativeQuery("select count(*) from AdmissaoEnvio a where  a.cnpjUnidadeGestora='" + User.getUser(super.request).getUnidadeGestora().getId() +"' "+
-                " and  a.status=2 ").getSingleResult();
+                " and  a.status=2 "+search).getSingleResult();
     }
 
     public List<AdmissaoEnvio> GetEmAbertoByEdital(BigInteger idedital){
-        return  getEntityManager().createNativeQuery("select top 1 a.* from AdmissaoEnvio a where  a.cnpjUnidadeGestora='" + User.getUser(super.request).getUnidadeGestora().getId() +"' "+
-                " and  a.processo is null and   a.idEdital ="+idedital, AdmissaoEnvio.class).getResultList();
-
+            return getEntityManager().createNativeQuery("select top 1 a.* from AdmissaoEnvio a where  a.cnpjUnidadeGestora='" + User.getUser(super.request).getUnidadeGestora().getId() + "' " +
+                    " and  a.processo is null and   a.idEdital =" + idedital, AdmissaoEnvio.class).getResultList();
     }
 
 
 
     public List<Map<String,Object>> getValidInfoEnvio(BigInteger idEdital) {
 
-        List<Map<String, Object>> retorno = new ArrayList<Map<String, Object>>();
+        List<Map<String, Object>> validacoesVagaAprovado = new ArrayList<Map<String, Object>>();
 
         try {
 
@@ -156,67 +152,52 @@ public class AdmissaoEnvioRepository extends DefaultRepository<AdmissaoEnvio, Bi
 
             for (Object[] obj : list) {
 
-                Map<String, Object> mapa = new HashMap<String, Object>();
+                Map<String, Object> vagaAprovado = new HashMap<String, Object>();
 
-                mapa.put("idvaga", (BigDecimal) obj[0]);
-                mapa.put("codigoVaga", (String) obj[1]);
-                mapa.put("nomeCargo", (String) obj[2]);
-                mapa.put("especialidadeVaga", (String) obj[3]);
-                mapa.put("tipoConcorrencia", (Integer) obj[4]);
-                mapa.put("quantidade", (Integer) obj[5]);
-                mapa.put("qt_aprov", (Integer) obj[6]);
-                mapa.put("min_classif", (Integer) obj[7]);
-                mapa.put("max_classif", (Integer) obj[8]);
-                mapa.put("ct_nao_anexados", (Integer) obj[9]);
-                String descricao_tipo ="";
-                switch ( ((Integer)mapa.get("tipoConcorrencia")) ){
-                    case 1:
-                        descricao_tipo="Geral";
-                        break;
-                    case 2:
-                        descricao_tipo="PNE";
-                        break;
-                    case 3:
-                        descricao_tipo="Cota racial";
-                        break;
-                    default:
-                        descricao_tipo="Outros";
+                vagaAprovado.put("idvaga",  obj[0]);
+                vagaAprovado.put("codigoVaga",  obj[1]);
+                vagaAprovado.put("nomeCargo",  obj[2]);
+                vagaAprovado.put("especialidadeVaga",  obj[3]);
+                vagaAprovado.put("tipoConcorrencia",  obj[4]);
+                vagaAprovado.put("quantidade",  obj[5]);
+                vagaAprovado.put("qt_aprov",  obj[6]);
+                vagaAprovado.put("min_classif", obj[7]);
+                vagaAprovado.put("max_classif",  obj[8]);
+                vagaAprovado.put("ct_nao_anexados",  obj[9]);
 
+                String nomeTipoConcorrencia =  Arrays.stream(EditalVaga.TipoConcorrencia.values()).filter(tipoConcorrencia -> tipoConcorrencia.getValor()==vagaAprovado.get("tipoConcorrencia")).collect( Collectors.toList()).get(0).name();
+
+                if ( ((Integer)vagaAprovado.get("quantidade")) <  ((Integer)vagaAprovado.get("max_classif"))  ){
+                    vagaAprovado.put("valido",  false);
+                    vagaAprovado.put("ocorrencia",  " o numero de aprovados axcedeu o limite estipulado da vaga de codigo "+(vagaAprovado.get("codigoVaga"))+"-"+(vagaAprovado.get("nomeCargo"))+"-" +nomeTipoConcorrencia );
+                } else if (((Integer)vagaAprovado.get("ct_nao_anexados")) > 0 ){
+                    vagaAprovado.put("valido", false);
+                    vagaAprovado.put("ocorrencia",  "A vaga de codigo "+(vagaAprovado.get("codigoVaga"))+"-"+(vagaAprovado.get("nomeCargo"))+"-" +nomeTipoConcorrencia+" tem aprovados ao qual não foi anexado documentos!! " );
                 }
-                if ( ((Integer)mapa.get("quantidade")) <  ((Integer)mapa.get("max_classif"))  ){
-                    mapa.put("valido", (Boolean) false);
-                    mapa.put("ocorrencia", (String) " o numero de aprovados axcedeu o limite estipulado da vaga de codigo "+((String)mapa.get("codigoVaga"))+"-"+((String)mapa.get("nomeCargo"))+"-" +descricao_tipo );
-                } else if (((Integer)mapa.get("ct_nao_anexados")) > 0 ){
-                    mapa.put("valido", (Boolean) false);
-                    mapa.put("ocorrencia", (String) "A vaga de codigo "+((String)mapa.get("codigoVaga"))+"-"+((String)mapa.get("nomeCargo"))+"-" +descricao_tipo+" tem aprovados ao qual não foi anexado documentos!! " );
-                }
-                else if ( ((Integer)mapa.get("max_classif")) >   ((Integer)mapa.get("qt_aprov"))   ){
-                    mapa.put("valido", (Boolean) false);
-                    mapa.put("ocorrencia", (String) "A vaga de codigo "+((String)mapa.get("codigoVaga"))+"-"+((String)mapa.get("nomeCargo"))+"-" +descricao_tipo+" não tem os classificados na ordem de classificacão!! " );
+                else if ( ((Integer)vagaAprovado.get("max_classif")) >   ((Integer)vagaAprovado.get("qt_aprov"))   ){
+                    vagaAprovado.put("valido",  false);
+                    vagaAprovado.put("ocorrencia",  "A vaga de codigo "+(vagaAprovado.get("codigoVaga"))+"-"+(vagaAprovado.get("nomeCargo"))+"-" +nomeTipoConcorrencia+" não tem os classificados na ordem de classificacão!! " );
                 }
                 else{
-                    mapa.put("valido", (Boolean) true);
-                    mapa.put("ocorrencia", (String) "");
+                    vagaAprovado.put("valido",  true);
+                    vagaAprovado.put("ocorrencia", "");
                 }
-
-
-                retorno.add(mapa);
-
+                validacoesVagaAprovado.add(vagaAprovado);
             }
-            ;
-
-            return retorno;
-
+            return validacoesVagaAprovado;
 
         } catch (Exception e) {
-            throw  new RuntimeException(e.getMessage());
+            throw  new RuntimeException("Problema ao validão aprovados e vagas!! entre em contato com o administrador do Sicap AP!!");
         }
     }
 
-
     public Integer getLastNumeroEnvioByEdital(BigInteger idEdital){
-        return (Integer) getEntityManager().createNativeQuery("select top 1 ( a.numeroEnvio+1) from AdmissaoEnvio a  " +
-                "where  a.idEdital ="+idEdital+ " order by  numeroEnvio desc ").getSingleResult();
+        try {
+            return (Integer) getEntityManager().createNativeQuery("select top 1 ( a.numeroEnvio+1) from AdmissaoEnvio a  " +
+                    "where  a.idEdital =" + idEdital + " order by  numeroEnvio desc ").getSingleResult();
+        } catch (NoResultException e){
+            return 1;
+        }
     }
 
 }
