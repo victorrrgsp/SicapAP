@@ -69,11 +69,11 @@ public class AssinarConcursoController {
     @CrossOrigin
     @GetMapping(path = "/{searchParams}/{tipoParams}/pagination")
     public ResponseEntity<PaginacaoUtil<ConcursoEnvioAssRetorno>> listaAEnviosAguardandoAss(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
-//        if (User.getUser(concursoEnvioAssinaturaRepository.getRequest()).getCargo().getValor() != 4) {
-//            List<ConcursoEnvioAssRetorno> listavazia = new ArrayList<>();
-//            PaginacaoUtil<ConcursoEnvioAssRetorno> paginacaoUtilvazia = new PaginacaoUtil<ConcursoEnvioAssRetorno>(0, 1, 1, 0, listavazia);
-//            return ResponseEntity.ok().body(paginacaoUtilvazia);
-//        }
+        if (User.getUser(concursoEnvioAssinaturaRepository.getRequest()).getCargo().getValor() != 4) {
+            List<ConcursoEnvioAssRetorno> listavazia = new ArrayList<>();
+            PaginacaoUtil<ConcursoEnvioAssRetorno> paginacaoUtilvazia = new PaginacaoUtil<>(0, 1, 1, 0, listavazia);
+            return ResponseEntity.ok().body(paginacaoUtilvazia);
+        }
         PaginacaoUtil<ConcursoEnvioAssRetorno> paginacaoUtil = concursoEnvioRepository.buscarEnviosAguardandoAss(pageable, searchParams, tipoParams);
         return ResponseEntity.ok().body(paginacaoUtil);
     }
@@ -82,7 +82,7 @@ public class AssinarConcursoController {
     @Transactional(rollbackFor = Exception.class)
     @PostMapping
     public ResponseEntity<?> AssinarConcurso(@RequestBody String hashassinante_hashAssinado) throws JsonProcessingException, Exception {
-//        validaUsuarioAssinante();
+        validaUsuarioAssinante();
         JsonNode requestJson = new ObjectMapper().readTree(hashassinante_hashAssinado);
         String hashassinante = URLDecoder.decode(requestJson.get("hashassinante").asText(), StandardCharsets.UTF_8);
         String hashassinado = URLDecoder.decode(requestJson.get("hashassinado").asText(), StandardCharsets.UTF_8);
