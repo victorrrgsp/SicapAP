@@ -1,8 +1,11 @@
 package com.example.sicapweb.service;
 
+import br.gov.to.tce.validation.Validation;
+import com.example.sicapweb.exception.InvalitInsert;
 import okhttp3.*;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.Base64;
 
 public class AssinarCertificadoDigital {
@@ -10,27 +13,31 @@ public class AssinarCertificadoDigital {
     public static String inicializarAssinatura(String certificado, String original) throws IOException {
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
+            try{
+            MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
+            RequestBody body = RequestBody.create(mediaType, "certificado=" + certificado + "&original=" + original);
 
-        MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
-        RequestBody body = RequestBody.create(mediaType, "certificado=" + certificado + "&original=" + original);
-
-       // System.out.println("body: "+body.toString());
-        Request request = new Request.Builder()
-                .url("https://app.tce.to.gov.br/assinador/app/controllers/?&c=TCE_Assinador_AssinadorWeb&m=inicializarAssinatura")
-                .method("POST", body)
-                .addHeader("Accept", "application/json")
-                .addHeader("Content-Type", "application/x-www-form-urlencoded")
-                .addHeader("Referer", "https://app.tce.to.gov.br/")
-                .build();
+            // System.out.println("body: "+body.toString());
+            Request request = new Request.Builder()
+                    .url("https://app.tce.to.gov.br/assinador/app/controllers/?&c=TCE_Assinador_AssinadorWeb&m=inicializarAssinatura")
+                    .method("POST", body)
+                    .addHeader("Accept", "application/json")
+                    .addHeader("Content-Type", "application/x-www-form-urlencoded")
+                    .addHeader("Referer", "https://app.tce.to.gov.br/")
+                    .build();
 
         Response response = client.newCall(request).execute();
         String resposta = response.body().string();
         return resposta;
+            } catch (SocketTimeoutException e){
+                throw  new InvalitInsert(" Servidor Assinatura digital não respondeu!!");
+            }
     }
 
     public static String FinalizarAssinatura(String desafio, String assinatura, String original) throws IOException {
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
+        try{
         MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
         RequestBody body = RequestBody.create(mediaType, "desafio=" + desafio + "&assinatura=" + assinatura + "&original=" + original);
         Request request = new Request.Builder()
@@ -44,6 +51,9 @@ public class AssinarCertificadoDigital {
         Response response = client.newCall(request).execute();
         String resposta = response.body().string();
         return resposta;
+        } catch (SocketTimeoutException e){
+            throw  new InvalitInsert(" Servidor Assinatura digital não respondeu!!");
+        }
     }
 
 

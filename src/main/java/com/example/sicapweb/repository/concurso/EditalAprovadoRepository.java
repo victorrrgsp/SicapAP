@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import java.math.BigInteger;
 import java.util.*;
@@ -134,38 +135,51 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
 
 
     public EditalAprovado buscarAprovadoPorCpf(String cpf) {
-
-        List<EditalAprovado> listaDeAprovadosPorCpf = getEntityManager().createNativeQuery(
-                "SELECT DISTINCT c.* " +
+        try{
+        return (EditalAprovado) getEntityManager().createNativeQuery(
+                "SELECT  c.* " +
                         "FROM EditalAprovado c " +
-                        " join InfoRemessa  i on c.chave=i.chave " +
-                        " WHERE i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "'  and  c.cpf = '" + cpf + "' "
-                , EditalAprovado.class).getResultList();
-        return (listaDeAprovadosPorCpf.size() > 0) ? listaDeAprovadosPorCpf.get(0) : null ;
+                        " join InfoRemessa  i on c.chave=i.chave  and  i.idUnidadeGestora = :ug " +
+                        " WHERE   c.cpf = :cpf  "
+                , EditalAprovado.class)
+                .setParameter("cpf",cpf)
+                .setParameter("ug",User.getUser(super.request).getUnidadeGestora().getId()).setMaxResults(1).getSingleResult();
+        }catch (NoResultException e){
+            return null;
+        }
     }
 
     public EditalAprovado buscarAprovadoPorInscricao(String inscricao) {
+        try {
 
-        List<EditalAprovado> listaDeAprovdosPorInscricao =  getEntityManager().createNativeQuery(
-                "SELECT DISTINCT c.* " +
-                        "FROM EditalAprovado c " +
-                        " join InfoRemessa  i on c.chave=i.chave " +
-                        " WHERE i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "'  and  c.numeroInscricao = '" + inscricao + "' "
-                , EditalAprovado.class).getResultList();
-
-        return (listaDeAprovdosPorInscricao.size() > 0) ? listaDeAprovdosPorInscricao.get(0) : null ;
+            return  (EditalAprovado) getEntityManager().createNativeQuery(
+                            "SELECT  c.* " +
+                                    "FROM EditalAprovado c " +
+                                    " join InfoRemessa  i on c.chave=i.chave and i.idUnidadeGestora= :ug " +
+                                    " WHERE   c.numeroInscricao = :inscricao "
+                            , EditalAprovado.class)
+                    .setParameter("inscricao",inscricao)
+                    .setParameter("ug",User.getUser(super.request).getUnidadeGestora().getId())
+                    .setMaxResults(1).getSingleResult();
+        }catch (NoResultException e){
+            return null;
+        }
     }
 
     public EditalAprovado buscarAprovadoPorClassificacaoConc(BigInteger idvaga, String Classificacao) {
-
-        List<EditalAprovado> listaDeAprovados = getEntityManager().createNativeQuery(
-                "SELECT DISTINCT c.* " +
-                        "FROM EditalAprovado c " +
-                        " join InfoRemessa  i on c.chave=i.chave " +
-                        " WHERE idEditalVaga= " + idvaga + " and  c.classificacao =  '" + Classificacao + "' and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "'   "
-                , EditalAprovado.class).getResultList();
-        return (listaDeAprovados.size() > 0) ? listaDeAprovados.get(0) : null ;
-
+        try{
+        return (EditalAprovado) getEntityManager().createNativeQuery(
+                "SELECT  ea.* " +
+                        "FROM EditalAprovado ea " +
+                        " join InfoRemessa  i on ea.chave =i.chave and i.idUnidadeGestora =  :ug " +
+                        " WHERE ea.idEditalVaga= :idvaga and  ea.classificacao = :classificacao    "
+                , EditalAprovado.class)
+                .setParameter("idvaga",idvaga)
+                .setParameter("classificacao",Classificacao)
+                .setParameter("ug",User.getUser(super.request).getUnidadeGestora().getId()).setMaxResults(1).getSingleResult();
+        }catch (NoResultException e){
+            return null;
+        }
     }
 
 
@@ -175,7 +189,7 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
 
         try {
 
-            List<Object[]> list = entityManager.createNativeQuery(
+            List<Object[]> InformacoesInteressadosAdmissao = entityManager.createNativeQuery(
                     "select p.nome NomeResponsavel,p.cpf CpfResponsavel,a.data_assinatura DataAssinatura, null NumeroEdital, i.nomeUnidade , i.idUnidadeGestora , pj.nomeMunicipio  , ed.nome , ed.cpf from " +
                             " AdmissaoEnvioAssinatura a" +
                             "  inner join SICAPAP21..AdmissaoEnvio env on a.idEnvio= env.id" +
@@ -187,19 +201,19 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
                             " where env.processo='" + numeroProcesso + "/" + anoProcesso + "'").getResultList();
 
 
-            for (Object[] obj : list) {
+            for (Object[] informacaoInteressadoAdmissao : InformacoesInteressadosAdmissao) {
 
                 Map<String, Object> mapa = new HashMap<String, Object>();
 
-                mapa.put("NomeResponsavel", (String) obj[0]);
-                mapa.put("CpfResponsavel", (String) obj[1]);
-                mapa.put("DataAssinatura", (String) obj[2]);
-                mapa.put("NumeroEdital", (String) obj[3]);
-                mapa.put("nomeUnidade", (String) obj[4]);
-                mapa.put("idUnidadeGestora", (String) obj[5]);
-                mapa.put("nomeMunicipio", (String) obj[6]);
-                mapa.put("nomeInteressado", (String) obj[7]);
-                mapa.put("cpfInteressado", (String) obj[8]);
+                mapa.put("NomeResponsavel",  informacaoInteressadoAdmissao[0]);
+                mapa.put("CpfResponsavel", informacaoInteressadoAdmissao[1]);
+                mapa.put("DataAssinatura", informacaoInteressadoAdmissao[2]);
+                mapa.put("NumeroEdital",  informacaoInteressadoAdmissao[3]);
+                mapa.put("nomeUnidade", informacaoInteressadoAdmissao[4]);
+                mapa.put("idUnidadeGestora", informacaoInteressadoAdmissao[5]);
+                mapa.put("nomeMunicipio",  informacaoInteressadoAdmissao[6]);
+                mapa.put("nomeInteressado",  informacaoInteressadoAdmissao[7]);
+                mapa.put("cpfInteressado",  informacaoInteressadoAdmissao[8]);
                 informacoesReciboAdmissao.add(mapa);
 
             }
@@ -211,6 +225,5 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
         } catch (RuntimeException e) {
             throw new RuntimeException("problema ao gerar o recibo dos aprovados!!");
         }
-
     }
 }

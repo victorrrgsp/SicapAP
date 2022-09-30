@@ -5,6 +5,7 @@ import com.example.sicapweb.repository.DefaultRepository;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -17,9 +18,13 @@ public class EmpresaOrganizadoraRepository extends DefaultRepository<EmpresaOrga
     }
 
     public EmpresaOrganizadora buscaEmpresaPorCnpj(String Cnpj) {
-        List<EmpresaOrganizadora> listaDeEmpresasPorCnpj = getEntityManager().createNativeQuery("select * from EmpresaOrganizadora ed" +
-                " where cnpjEmpresaOrganizadora = '" + Cnpj + "'    ", EmpresaOrganizadora.class).getResultList();
-        return (listaDeEmpresasPorCnpj.size()>0) ? listaDeEmpresasPorCnpj.get(0) : null ;
+        try{
+            return (EmpresaOrganizadora) getEntityManager().createNativeQuery("select a.* from EmpresaOrganizadora a " +
+                    " where a.cnpjEmpresaOrganizadora = :cnpj     ", EmpresaOrganizadora.class).setMaxResults(1).setParameter("cnpj",Cnpj).setMaxResults(1).getSingleResult();
+        }catch (
+                NoResultException e){
+            return null;
+        }
     }
 
 }

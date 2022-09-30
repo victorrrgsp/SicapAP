@@ -77,7 +77,7 @@ public class EditalController extends DefaultController<Edital> {
         edital.setInfoRemessa(editalRepository.buscarPrimeiraRemessa());
         Edital e =editalRepository.buscarEditalPorNumero(edital.getNumeroEdital(),edital.getComplementoNumero());
 
-        if (e == null) {
+        if (e ==null) {
             if  ( Integer.valueOf(edital.getNumeroEdital().substring(edital.getNumeroEdital().length()-4)) <1990 ||  Integer.valueOf(edital.getNumeroEdital().substring(edital.getNumeroEdital().length()-4)) > (LocalDateTime.now().getYear() +5) ) {
                 throw new InvalitInsert("não é um número de Edital valido. Os ultinmos 4 digitos correspondem ao ano do edital !!");
             }
@@ -87,16 +87,16 @@ public class EditalController extends DefaultController<Edital> {
             } else if (edital.getNumeroEdital().isEmpty() || edital.getCnpjEmpresaOrganizadora().isEmpty() || edital.getPrazoValidade().isEmpty() || edital.getVeiculoPublicacao().isEmpty()) {
                 throw new InvalitInsert("favor envie todos os campos obrigatorios preenchidos!!");
             }
-            editalRepository.save(edital);
 
+            editalRepository.save(edital);
             URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(edital.getId()).toUri();
             return ResponseEntity.created(uri).body(edital);
-
         } else {
 
         throw new InvalitInsert("ja existe o edital!!");
 
         }
+
 
     }
 
@@ -108,16 +108,14 @@ public class EditalController extends DefaultController<Edital> {
         edital.setId(id);
         Edital e =editalRepository.buscarEditalPorNumero(edital.getNumeroEdital(),edital.getComplementoNumero());
 
-        if (e == null || edital.getId() == id) {
+        if ((e ==null) || edital.getId() == id) {
             if  ( Integer.valueOf(edital.getNumeroEdital().substring(edital.getNumeroEdital().length()-4)) <1990 ||  Integer.valueOf(edital.getNumeroEdital().substring(edital.getNumeroEdital().length()-4)) > (LocalDateTime.now().getYear() +5) ) {
                 throw new InvalitInsert("não é um numero de Edital valido. Os ultinmos 4 digitos correspondem ao ano do edital !!");
             }
-
             ConcursoEnvio envio = concursoEnvioRepository.buscarEnvioFAse1PorEditalassinado(id);
             if(envio != null){
-                if (envio.getStatus()==3) throw new InvalitInsert("Edital não pode ser alterado pois ja foi enviado processo no econtas !!");
+                if (envio.getStatus()==ConcursoEnvio.Status.Aguardandoassinatura.getValor()) throw new InvalitInsert("Edital não pode ser alterado pois ja foi enviado processo no econtas !!");
             }
-
             editalRepository.update(edital);
 
         } else {
@@ -151,7 +149,6 @@ public class EditalController extends DefaultController<Edital> {
                 if (proc.length()>0){
                     novo.setProcesso(proc);
                     novo.setStatus(ConcursoEnvio.Status.Desambiguado.getValor());
-
                 }else{
                     novo.setStatus(ConcursoEnvio.Status.Pendente.getValor());
                 }

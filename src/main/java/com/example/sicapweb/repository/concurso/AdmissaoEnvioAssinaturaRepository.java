@@ -1,19 +1,14 @@
 package com.example.sicapweb.repository.concurso;
 
 import br.gov.to.tce.model.ap.concurso.AdmissaoEnvioAssinatura;
-import br.gov.to.tce.model.ap.concurso.EditalAprovado;
-import br.gov.to.tce.model.ap.concurso.documento.DocumentoAdmissao;
 import br.gov.to.tce.util.Date;
 import com.example.sicapweb.exception.InvalitInsert;
 import com.example.sicapweb.repository.DefaultRepository;
 import com.example.sicapweb.service.ChampionRequest;
-import javassist.bytecode.stackmap.BasicBlock;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
-import javax.persistence.Entity;
 import javax.persistence.EntityManager;
-import javax.persistence.Lob;
 import javax.persistence.Query;
 import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
@@ -30,6 +25,11 @@ import java.util.List;
 @Repository
 public class AdmissaoEnvioAssinaturaRepository  extends DefaultRepository<AdmissaoEnvioAssinatura, BigInteger>
 {
+    @Value("${sso.oauth2.client_id}")
+    private String sso_client_id;
+
+    @Value("${sso.oauth2.client_secret}")
+    private String sso_client_secret;
     public AdmissaoEnvioAssinaturaRepository(EntityManager em) {
         super(em);
     }
@@ -199,7 +199,7 @@ public class AdmissaoEnvioAssinaturaRepository  extends DefaultRepository<Admiss
             query.setParameter("tipodocumento", tipoDocumento);
             query.setParameter("procnumero", numeroProcesso);
             //vai  precisar usar SolicitarNumeroSND para gerar o numero
-            Integer idDocsnd = this.SolicitarNumeroSND(5, "COCAP", anoProcesso, "000003");
+            Integer idDocsnd = this.SolicitarNumeroDocumentoAoSistemaSND(5, "COCAP", anoProcesso, "000003");
             if (idDocsnd == null) throw new InvalitInsert("numero do documento não gerado!");
             query.setParameter("numero", idDocsnd);
             query.setParameter("ano", anoProcesso);
@@ -215,7 +215,7 @@ public class AdmissaoEnvioAssinaturaRepository  extends DefaultRepository<Admiss
         }
     }
 
-    public Integer SolicitarNumeroSND(Integer tipoDoc, String codDepartamento, Integer ano,String Emissor) {
+    public Integer SolicitarNumeroDocumentoAoSistemaSND(Integer tipoDoc, String codDepartamento, Integer ano, String Emissor) {
         Integer idDoc ;
         try {
             Query queryQuePegaNovoNumero = entityManager.createNativeQuery("select coalesce(MAX(numero), 0)+1   as numero from Snd..documento where cod_tipo_documento = :tipo_doc  and cod_departamento = :CodDepartamento and ano= :ano ");
@@ -264,16 +264,8 @@ public class AdmissaoEnvioAssinaturaRepository  extends DefaultRepository<Admiss
         }
     }
 
-    public Integer getEventoProcesso(Integer procnumero,Integer ano){
-        Query query = entityManager.createNativeQuery(" Select coalesce(MAX(ID_PROTOCOLO), 0)+1 from SCP..document d WHERE d.dcnproc_pano = :ano AND d.dcnproc_pnumero = :procnumero");
-        query.setParameter("procnumero",procnumero);
-        query.setParameter("ano",ano);
-        return (Integer) query.getSingleResult();
-    }
-
-    Integer idPessoa;
     public String insertCadunPessoaInterressada(String cpf , String nome) throws IOException, URISyntaxException {
-        return ChampionRequest.salvarSimples(cpf, nome, "sicapap",  "7ed46ae476e58c3884b6062787b6b43ca351b5d9c1b415ed1934ee5d4309dbdb", "08a64646a9343f7f5400906256d1f872400ae58ade2bb6c572ed19d7c9cdd73c").getBody();
+        return ChampionRequest.salvarSimples(cpf, nome, "sicapap",  sso_client_id, sso_client_secret).getBody();
     }
 
 

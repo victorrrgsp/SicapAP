@@ -25,16 +25,16 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/assinarAdmissao")
@@ -48,7 +48,18 @@ public class AssinarAdmissaoController {
     @Autowired
     private DocumentoAdmissaoRepository documentoAdmissaoRepository;
 
+    private final Integer arquivosPorDoc =100;
 
+    private final Integer relatorio=70;
+
+    private final String  deptoAutuacao = "COCAP";
+
+    private final String matricula = "000003";
+    private final Integer  idAssunto = 8;
+    private final Integer assuntoCodigo = 1;
+    private final Integer classeAssunto  = 8;
+
+    private final  String tipoDocumento="TA";
 
     @CrossOrigin
     @GetMapping(path="/{searchParams}/{tipoParams}/pagination")
@@ -68,35 +79,17 @@ public class AssinarAdmissaoController {
         String respostaIniciarAssinatura = "";
         try {
             User userlogado = User.getUser(admissaoEnvioAssinaturaRepository.getRequest());
-            if (userlogado == null )
-                throw new Exception("nao encontrou usuario logado!!");
-
-
             JsonNode respostaJson = new ObjectMapper().readTree(certificado_mensagem_hash);
-
             JsonNode certificadoJson = new ObjectMapper().readTree(userlogado.getCertificado());
-
             String certificado = respostaJson.get("certificado").asText();
-
             String Original =  respostaJson.get("original").asText();
-
             String hash = URLDecoder.decode(respostaJson.get("hashcertificado").asText(), StandardCharsets.UTF_8)  ;
-
-            if(!userlogado.getHashCertificado().equals(hash) )
-                throw new Exception("nao é o mesmo  certificado que esta logado!!");
-
-            String assinatura = certificadoJson.get("validacaoAssinatura").get("dados").get("assinatura").asText();
-
-
-
+            if(!userlogado.getHashCertificado().equals(hash) )  throw new Exception("nao é o mesmo  certificado que esta logado!!");
             respostaIniciarAssinatura = AssinarCertificadoDigital.inicializarAssinatura(certificado,Original);
-
-
         } catch (Exception e) {
             e.printStackTrace();
             return  ResponseEntity.badRequest().body(e.getMessage());
         }
-
         return ResponseEntity.ok().body(respostaIniciarAssinatura);
     }
 
@@ -123,211 +116,122 @@ public class AssinarAdmissaoController {
     @CrossOrigin
     @Transactional( rollbackFor = Exception.class)
     @PostMapping
-    public ResponseEntity<?> AssinarAdmissao(@RequestBody String hashassinante_hashAssinado )  throws JsonProcessingException,Exception {
-        User userlogado = User.getUser(admissaoEnvioRepository.getRequest());
-        // try {
-        if (userlogado != null) {
-            if (userlogado.getCargo().getValor() !=4 ) throw new InvalitInsert("Apenas o gestor da unidade gestora pode assinar envios!!");
-            if (userlogado.getUnidadeGestora().getId().equals("00000000000000") ) throw new InvalitInsert("Não assina envios na ug de teste!!");
+    public ResponseEntity<?> AssinarAdmissao(@RequestBody String hashassinante_hashAssinado )  throws Exception {
+            validaUsuarioAssinante();
             JsonNode requestJson = new ObjectMapper().readTree(hashassinante_hashAssinado);
             String hashassinante =  URLDecoder.decode(requestJson.get("hashassinante").asText(), StandardCharsets.UTF_8);
             String hashassinado =  URLDecoder.decode(requestJson.get("hashassinado").asText(), StandardCharsets.UTF_8);
             String processosBase64Decoded = new String(Base64.getDecoder().decode(hashassinante.getBytes()));
-            ArrayNode arrayNodeproc = (ArrayNode) new ObjectMapper().readTree(processosBase64Decoded);
-            Iterator<JsonNode> itrproc = arrayNodeproc.elements();
-            System.out.println("hashassinante:"+hashassinante);
-            System.out.println("hashassinado:"+hashassinado);
-
-            if (arrayNodeproc.isArray()) {
-                while (itrproc.hasNext()) {
-                    JsonNode aux = itrproc.next();
-                    System.out.println("id: " + aux.get("id").asText());
-                    System.out.println("edital.id: " + aux.get("edital").get("id").asText());
-
+            ArrayNode arrayNodeprocesso = (ArrayNode) new ObjectMapper().readTree(processosBase64Decoded);
+            Iterator<JsonNode> iteradorDosProcessosEnviados = arrayNodeprocesso.elements();
+            if (arrayNodeprocesso.isArray()) {
+                while (iteradorDosProcessosEnviados.hasNext()) {
+                    JsonNode currentEnvioJsonNode = iteradorDosProcessosEnviados.next();
                     // para cada envio adiciona uma linha na tabela de assinatura com o mesmo hash assinado e assinante
-
-                    //  Concurso
-                    BigInteger idenvio = (BigInteger) aux.get("id").bigIntegerValue();
-                    System.out.println("idenvio: " + idenvio);
-                    AdmissaoEnvio envio = (AdmissaoEnvio) admissaoEnvioRepository.findById(idenvio);
+                    BigInteger idenvio =  currentEnvioJsonNode.get("id").bigIntegerValue();
+                    AdmissaoEnvio envio =  admissaoEnvioRepository.findById(idenvio);
                     if (envio!=null ){
-
-                        AdmissaoEnvioAssinatura  novo = new AdmissaoEnvioAssinatura();
-                        novo.setIdCargo(User.getUser(admissaoEnvioAssinaturaRepository.getRequest()).getCargo().getValor());
-                        novo.setCpf(User.getUser(admissaoEnvioAssinaturaRepository.getRequest()).getCpf());
+                        AdmissaoEnvioAssinatura  novoAssinaturaAdmissao = new AdmissaoEnvioAssinatura();
+                        novoAssinaturaAdmissao.setIdCargo(User.getUser(admissaoEnvioAssinaturaRepository.getRequest()).getCargo().getValor());
+                        novoAssinaturaAdmissao.setCpf(User.getUser(admissaoEnvioAssinaturaRepository.getRequest()).getCpf());
                         ServletRequestAttributes getIp = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
-                        novo.setIp(getIp.getRequest().getRemoteAddr());
-                        novo.setAdmissaoEnvio(envio);
-                        LocalDateTime dt =LocalDateTime.now();
-                        novo.setData_Assinatura(Date.from(dt.atZone(ZoneId.systemDefault()).toInstant()));
-                        novo.setHashAssinante(hashassinante);
-                        novo.setHashAssinado(hashassinado);
-                        admissaoEnvioAssinaturaRepository.save(novo);
+                        novoAssinaturaAdmissao.setIp(getIp.getRequest().getRemoteAddr());
+                        novoAssinaturaAdmissao.setAdmissaoEnvio(envio);
+                        LocalDateTime dataHoraAssinatura =LocalDateTime.now();
+                        novoAssinaturaAdmissao.setData_Assinatura(Date.from(dataHoraAssinatura.atZone(ZoneId.systemDefault()).toInstant()));
+                        novoAssinaturaAdmissao.setHashAssinante(hashassinante);
+                        novoAssinaturaAdmissao.setHashAssinado(hashassinado);
+                        admissaoEnvioAssinaturaRepository.save(novoAssinaturaAdmissao);
                         //coleta dados do cadun sobre o id  do responsavel da ug e o id da pessoa juridica
                         String Cnpj = User.getUser(admissaoEnvioAssinaturaRepository.getRequest()).getUnidadeGestora().getId();
                         Integer origem =   admissaoEnvioAssinaturaRepository.getidCADUNPJ(Cnpj);
-
-                        Integer vinculada = admissaoEnvioAssinaturaRepository.getidCADUNPJ(Cnpj);
                         Integer responsavel = admissaoEnvioAssinaturaRepository.getidCADUNPF(Cnpj);
-                        Integer responsavel_solicitante = admissaoEnvioAssinaturaRepository.getidCADUNPF(Cnpj);
-                        Integer solicitante = admissaoEnvioAssinaturaRepository.getidCADUNPJ(Cnpj);
-                        LocalDateTime dh_protocolo= LocalDateTime.now();
-                        String matricula = "000003";
-                        Integer idassunto = null ;
-                        Integer assuntocodigo = null ;
-                        Integer classeassunto  = null;
-                        String deptoAutuacao = "";
-                        String tipodocumento = "";
-                        Integer id_entidade_vinculada = null;
-                       // if (envio.getOrgaoorigem() != null) {
-                            id_entidade_vinculada = null;
-                                    //concursoEnvioAssinaturaRepository.getidCADUNPJ(envio.getOrgaoorigem());
-                        //}
-
-                        idassunto = 8;
-                        assuntocodigo = 1;
-                        classeassunto = 8;
-                        deptoAutuacao = "COCAP";
-                        tipodocumento = "TA";
-                        Integer idprotocolo =admissaoEnvioAssinaturaRepository.insertProtocolo(matricula,dh_protocolo.getYear(),dh_protocolo,origem);
-                        if (idprotocolo != null )
-                        {
-                            //prepara  variaveis de processo
-                            Integer procnumero = idprotocolo;
-                            Integer ProcessoNpai= null;
-                            Integer ProcessoApai= null;
-                            if (envio.getProcessoPai() != null) {
-                                String[] pc =envio.getProcessoPai().split("/");
-                                ProcessoNpai = Integer.valueOf(pc[0]) ;
-                                ProcessoApai = Integer.valueOf(pc[1]) ;
-                            }
-                            Integer ano = dh_protocolo.getYear();
-                            Integer anoreferencia = Integer.valueOf(envio.getEdital().getNumeroEdital().substring(envio.getEdital().getNumeroEdital().length() - 4));
-                            Integer relatorio =70;
-                            String complemento=null;
-                            Integer evento = 1;
-                            Integer numEdital=null;
-                            Integer anoEdital=null;
-                            numEdital = Integer.valueOf(envio.getEdital().getNumeroEdital().substring(0, envio.getEdital().getNumeroEdital().length() - 4));
-                            anoEdital = Integer.valueOf(envio.getEdital().getNumeroEdital().substring(envio.getEdital().getNumeroEdital().length() - 4));
-                            admissaoEnvioAssinaturaRepository.insertProcesso(procnumero,ano,anoEdital,ProcessoNpai , ProcessoApai ,relatorio, complemento ,assuntocodigo ,classeassunto , idprotocolo , origem, id_entidade_vinculada,idassunto );
-                            admissaoEnvioAssinaturaRepository.insertAndamentoProcesso(procnumero,ano);
-                            admissaoEnvioAssinaturaRepository.insertPessoaInteressada(procnumero,ano, responsavel , 1,4  );
-                            admissaoEnvioAssinaturaRepository.insertHist(procnumero,ano,deptoAutuacao);
-                            // começa a inserir os documentos dos aprovados emposados
-                            List<DocumentoAdmissao> lcomadm  = documentoAdmissaoRepository.getAprovadosComAdmissao(envio.getId());
-                            Integer contador = 1;
-                            Integer ArquivosPorDocs =100;
-                            Integer ContadorEvento =1;
-                            BigDecimal id_Document = null;
-                            for (DocumentoAdmissao doc :  lcomadm ){
-                                EditalAprovado aprov = doc.getEditalAprovado();
-                                String cpfAprovado = aprov.getCpf();
-                                String nomeAprovado = aprov.getNome();
-                                //sera necessario gerar a chave atravez do metodo id_Document 'exec cadun.dbo.obterCodigoNovaPessoa'
-                                String  StringResponseCadunsalvasimples = admissaoEnvioAssinaturaRepository.insertCadunPessoaInterressada(cpfAprovado,nomeAprovado);
-                                JsonNode JsonesponseCadunsalvasimples = new ObjectMapper().readTree(StringResponseCadunsalvasimples);
-                                Integer codigopessoa =  JsonesponseCadunsalvasimples.get("id").asInt();
-                                String mensagemPessao = JsonesponseCadunsalvasimples.get("msg").asText();
-                                if (codigopessoa ==null) throw new InvalitInsert("Não gerou codigo de pessoa fisica do interessado "+nomeAprovado+" no cadun!");
-                                if (codigopessoa.equals(0)) throw new InvalitInsert("erro:"+mensagemPessao+", cpf: "+cpfAprovado+" nome: "+nomeAprovado);
-                                if ( contador ==1){
-
-                                    id_Document = admissaoEnvioAssinaturaRepository.insertDocument(tipodocumento,procnumero,ano, ContadorEvento );
-                                    if (id_Document==null ) throw new InvalitInsert("Nao gerou documento tipo:"+tipodocumento+" processo:"+procnumero+'/'+ano);
-                                }
-                                admissaoEnvioAssinaturaRepository.insertPessoaInteressada(procnumero,ano, codigopessoa , 2,0  );
-                                admissaoEnvioAssinaturaRepository.insertArquivoDocument(  id_Document , nomeAprovado, doc.getDocumentoCastorId() ) ;
-
-                                if (contador ==  ArquivosPorDocs){
-                                    contador= 0;
-                                    ContadorEvento++;
-                                }
-                                contador++;
-                            }
-
-
-                            // começa a inserir os documentos dos aprovados nao emposados
-                             lcomadm  = documentoAdmissaoRepository.getAprovadosSemAdmissao(envio.getId());
-                             contador = 1;
-                             ArquivosPorDocs =100;
-                             if (!ContadorEvento.equals(1)){
-                                 ContadorEvento =ContadorEvento+1;
-                             }
-                            for (DocumentoAdmissao doc :  lcomadm ){
-                                EditalAprovado aprov = doc.getEditalAprovado();
-                                String Descricao="";
-                                switch (doc.getOpcaoDesistencia().intValue() ){
-                                    case  1:
-                                        Descricao="Desistência";
-                                        break;
-                                    case 2:
-                                        Descricao="Não comparecimento";
-                                        break;
-                                    case 3:
-                                        Descricao="Pediu prorrogação";
-                                        break;
-                                    case 4:
-                                        Descricao="Documentação insatisfatória";
-                                        break;
-                                }
-
-
-                                String cpfAprovado = aprov.getCpf();
-                                String nomeAprovado = aprov.getNome();
-                                //sera necessario gerar a chave atravez do metodo id_Document 'exec cadun.dbo.obterCodigoNovaPessoa'
-                                String  StringResponseCadunsalvasimples = admissaoEnvioAssinaturaRepository.insertCadunPessoaInterressada(cpfAprovado,nomeAprovado);
-                                JsonNode JsonesponseCadunsalvasimples = new ObjectMapper().readTree(StringResponseCadunsalvasimples);
-                                Integer codigopessoa =  JsonesponseCadunsalvasimples.get("id").asInt();
-                                String mensagemPessao = JsonesponseCadunsalvasimples.get("msg").asText();
-                                if (codigopessoa.equals(0)) throw new InvalitInsert("erro:"+mensagemPessao+", cpf: "+cpfAprovado+" nome: "+nomeAprovado);
-                                if (codigopessoa ==null) throw new InvalitInsert("Não gerou codigo de pessoa fisica do interessado "+nomeAprovado+" no cadun!");
-                                nomeAprovado = aprov.getNome()+"-"+Descricao;
-                                if ( contador ==1){
-                                    id_Document = admissaoEnvioAssinaturaRepository.insertDocument(tipodocumento,procnumero,ano, ContadorEvento );
-                                    if (id_Document==null ) throw new InvalitInsert("Nao gerou documento tipo:"+tipodocumento+" processo:"+procnumero+'/'+ano);
-                                }
-                                admissaoEnvioAssinaturaRepository.insertPessoaInteressada(procnumero,ano, codigopessoa , 2,0  );
-                                admissaoEnvioAssinaturaRepository.insertArquivoDocument(  id_Document , nomeAprovado, doc.getDocumentoCastorId() ) ;
-
-                                if (contador ==  ArquivosPorDocs){
-                                    contador= 0;
-                                    ContadorEvento++;
-                                }
-                                contador++;
-                            }
-
-
-
-
-                            //atualiza o campo processo no envio com o numero e ano do processo econtas
-                            envio.setProcesso(procnumero+"/"+ano);
-                            envio.setStatus(AdmissaoEnvio.Status.concluido.getValor());
-                            admissaoEnvioRepository.update(envio);
-                        } else {
-                            throw new Exception("erro:id do protocolo não foi gerado!");
+                        LocalDateTime dataHoraDoprotocolo= LocalDateTime.now();
+                        Integer idprotocolo =admissaoEnvioAssinaturaRepository.insertProtocolo(matricula,dataHoraDoprotocolo.getYear(),dataHoraDoprotocolo,origem);
+                        //prepara  variaveis de processo
+                        Integer numeroProcesso = idprotocolo;
+                        Integer anoProcesso = dataHoraDoprotocolo.getYear();
+                        Integer numeroProcessoPai= null;
+                        Integer AnoProcessoPai= null;
+                        if (envio.getProcessoPai() != null) {
+                            String[] pc =envio.getProcessoPai().split("/");
+                            numeroProcessoPai = Integer.valueOf(pc[0]) ;
+                            AnoProcessoPai = Integer.valueOf(pc[1]) ;
+                        } else{
+                            throw  new RuntimeException("não encontrou registro do processo do edital no envio!!");
                         }
+                        Integer anoReferencia = Integer.valueOf(envio.getEdital().getNumeroEdital().substring(envio.getEdital().getNumeroEdital().length() - 4));
+                        admissaoEnvioAssinaturaRepository.insertProcesso(numeroProcesso,anoProcesso,anoReferencia,numeroProcessoPai , AnoProcessoPai ,relatorio, "" ,assuntoCodigo ,classeAssunto , idprotocolo , origem, null,idAssunto );
+                        admissaoEnvioAssinaturaRepository.insertAndamentoProcesso(numeroProcesso,anoProcesso);
+                        admissaoEnvioAssinaturaRepository.insertPessoaInteressada(numeroProcesso,anoProcesso, responsavel , 1,4  );
+                        admissaoEnvioAssinaturaRepository.insertHist(numeroProcesso,anoProcesso,deptoAutuacao);
+                        // inserir os documentos dos aprovados emposados
+                        List<DocumentoAdmissao> listaDeDocumentosAprovadosComNomeacao  = documentoAdmissaoRepository.getAprovadosComAdmissao(envio.getId());
+                        GravarArquivosDeAprovadosNoProcesso(listaDeDocumentosAprovadosComNomeacao,numeroProcesso,anoProcesso);
+
+                        //  inserir os documentos dos aprovados nao emposados
+                        List<DocumentoAdmissao> listaDeDocumentosAprovadosSemNomeacao  = documentoAdmissaoRepository.getAprovadosSemAdmissao(envio.getId());
+                        GravarArquivosDeAprovadosNoProcesso(listaDeDocumentosAprovadosSemNomeacao,numeroProcesso,anoProcesso);
+
+                        //atualiza o campo processo no envio com o numero e ano do processo econtas
+                        envio.setProcesso(numeroProcesso+"/"+anoProcesso);
+                        envio.setStatus(AdmissaoEnvio.Status.concluido.getValor());
+                        admissaoEnvioRepository.update(envio);
                    }
                     else{
-                        throw new Exception("erro:id do envio não encontrado!");
+                        throw new Exception("envio não encontrado!");
                     }
-
                 }
             }
-          //  throw new Exception("em manutenção!!");
-        } else {
-            System.out.println("erro:não encontrou usuario logado!!");
-            throw new Exception("erro:não encontrou usuario logado!!");
-        }
-
-        // }catch(Exception e){
-        //    System.out.println("[falha]: " + e.toString());
-        //    e.printStackTrace();
-        //    return ResponseEntity.badRequest().body(e.getMessage());
-        //}
 
         return ResponseEntity.ok().body("OK");
     }
 
+
+
+    private void GravarArquivosDeAprovadosNoProcesso(List<DocumentoAdmissao> listaDeDocumentosAprovados, Integer numeroProcesso,Integer anoProcesso ) throws IOException, URISyntaxException {
+        String responseCadunsalvasimples;
+        Integer codigoPessoa;
+        Integer contadorArquivosGravadosPorDocumento=1;
+        Integer ContadorEvento =1;
+        BigDecimal idDocument=null;
+        for (DocumentoAdmissao documentoAdmissao :  listaDeDocumentosAprovados ){
+            EditalAprovado aprovado = documentoAdmissao.getEditalAprovado();
+            String cpfAprovado = aprovado.getCpf();
+            String nomeAprovado = aprovado.getNome()+( (documentoAdmissao.getOpcaoDesistencia() ==null) ? "-" :  Arrays.stream(DocumentoAdmissao.opcaoDesistencia.values()).filter(opcaoDesistencia1 -> opcaoDesistencia1.getValor().intValue()==documentoAdmissao.getOpcaoDesistencia().intValue() ).collect(Collectors.toList()).get(0).getLabel());
+            //sera necessario gerar a chave atravez do metodo id_Document 'exec cadun.dbo.obterCodigoNovaPessoa'
+            responseCadunsalvasimples = admissaoEnvioAssinaturaRepository.insertCadunPessoaInterressada(cpfAprovado,nomeAprovado);
+            codigoPessoa=ValidaPessoaRetornadaCadun(responseCadunsalvasimples,cpfAprovado,nomeAprovado);
+            if ( contadorArquivosGravadosPorDocumento ==1){
+                idDocument = admissaoEnvioAssinaturaRepository.insertDocument(tipoDocumento,numeroProcesso,anoProcesso, ContadorEvento );
+            }
+            admissaoEnvioAssinaturaRepository.insertPessoaInteressada(numeroProcesso,anoProcesso, codigoPessoa , 2,0  );
+            admissaoEnvioAssinaturaRepository.insertArquivoDocument(  idDocument , nomeAprovado, documentoAdmissao.getDocumentoCastorId() ) ;
+            if (contadorArquivosGravadosPorDocumento ==  arquivosPorDoc){
+                contadorArquivosGravadosPorDocumento= 0;
+                ContadorEvento++;
+            }
+            contadorArquivosGravadosPorDocumento++;
+        }
+    }
+
+    private Integer ValidaPessoaRetornadaCadun(String StringResponseCadunsalvasimples,String cpfAprovado,String nomeAprovado) throws JsonProcessingException {
+        JsonNode JsonesponseCadunsalvasimples = new ObjectMapper().readTree(StringResponseCadunsalvasimples);
+        Integer codigoPessoa =  JsonesponseCadunsalvasimples.get("id").asInt();
+        String mensagemPessoa = JsonesponseCadunsalvasimples.get("msg").asText();
+        if (codigoPessoa.equals(0)) throw new InvalitInsert("erro:"+mensagemPessoa+", cpf: "+cpfAprovado+" nome: "+nomeAprovado);
+        if (codigoPessoa ==null) throw new InvalitInsert("Não gerou codigo de pessoa fisica do interessado "+nomeAprovado+" no cadun!");
+        return codigoPessoa;
+    }
+
+    private void validaUsuarioAssinante(){
+        User userlogado = User.getUser(admissaoEnvioRepository.getRequest());
+        if (userlogado != null) {
+            if (userlogado.getCargo().getValor() !=4 ) throw new RuntimeException("Apenas o gestor da unidade gestora pode assinar envios!!");
+            if (userlogado.getUnidadeGestora().getId().equals("00000000000000") ) throw new RuntimeException("Não assina envios na ug de teste!!");
+        }else{
+            throw new RuntimeException("não encontrou usuario logado!!");
+        }
+    }
 
 }

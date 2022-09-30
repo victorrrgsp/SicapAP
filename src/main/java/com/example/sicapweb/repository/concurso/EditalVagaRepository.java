@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import java.math.BigInteger;
 import java.util.List;
@@ -19,11 +20,6 @@ public class EditalVagaRepository extends DefaultRepository<EditalVaga, BigInteg
     public EditalVagaRepository(EntityManager em) {
         super(em);
     }
-
-
-
-
-
     public PaginacaoUtil<EditalVaga> buscaPaginada(Pageable pageable, String searchParams, Integer tipoParams) {
 
         int pagina = Integer.valueOf(pageable.getPageNumber());
@@ -84,18 +80,16 @@ public class EditalVagaRepository extends DefaultRepository<EditalVaga, BigInteg
     }
 
     public EditalVaga buscarVagasPorCodigo(String codigo) {
-        List<EditalVaga> list = getEntityManager().createNativeQuery(
-                "with edt as ( " +
-                        "        select a.codigoVaga, i.idUnidadeGestora ,max(a.id)  max_id " +
-                        "             from EditalVaga a  join infoRemessa i on a.chave = i.chave  and i.idUnidadeGestora = '"+User.getUser(super.request).getUnidadeGestora().getId()+"'  group by " +
-                        "                a.codigoVaga, i.idUnidadeGestora " +
-                        "                         ) " +
-                        "select   a.* from EditalVaga a join infoRemessa i on a.chave = i.chave join edt b on a.id= b.max_id and i.idUnidadeGestora=b.idUnidadeGestora where 1=1 "+
-                " and a.codigoVaga = '" + codigo + "'    ", EditalVaga.class).getResultList();
-        if (list.size()>0 ){
-            return list.get(0);
-        }
-        else{
+        try{
+            return  (EditalVaga) getEntityManager().createNativeQuery(
+                    "with edt as ( " +
+                            "        select a.codigoVaga, i.idUnidadeGestora ,max(a.id)  max_id " +
+                            "             from EditalVaga a  join infoRemessa i on a.chave = i.chave  and i.idUnidadeGestora = '"+User.getUser(super.request).getUnidadeGestora().getId()+"'  group by " +
+                            "                a.codigoVaga, i.idUnidadeGestora " +
+                            "                         ) " +
+                            "select   a.* from EditalVaga a join infoRemessa i on a.chave = i.chave join edt b on a.id= b.max_id and i.idUnidadeGestora=b.idUnidadeGestora where 1=1 "+
+                            " and a.codigoVaga = '" + codigo + "'    ", EditalVaga.class).setMaxResults(1).getSingleResult();
+        }catch (NoResultException e){
             return null;
         }
     }

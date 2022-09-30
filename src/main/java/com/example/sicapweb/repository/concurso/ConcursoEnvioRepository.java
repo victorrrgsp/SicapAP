@@ -5,6 +5,7 @@ import br.gov.to.tce.model.ap.concurso.ConcursoEnvio;
 import com.example.sicapweb.exception.InvalitInsert;
 import com.example.sicapweb.model.ConcursoEnvioAssRetorno;
 import com.example.sicapweb.repository.DefaultRepository;
+import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
 import org.hibernate.query.internal.NativeQueryImpl;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
@@ -29,7 +30,7 @@ public class ConcursoEnvioRepository extends DefaultRepository<ConcursoEnvio, Bi
     public List<ConcursoEnvio> buscarEnvioFAse1PorEdital(BigInteger idEdital) {
         return  getEntityManager().createNativeQuery(
                         "select ev.* from ConcursoEnvio ev "+
-                               " where fase=1 and  idEdital = " + idEdital, ConcursoEnvio.class)
+                                " where fase=1 and  idEdital = " + idEdital, ConcursoEnvio.class)
                 .getResultList();
     }
 
@@ -81,31 +82,26 @@ public class ConcursoEnvioRepository extends DefaultRepository<ConcursoEnvio, Bi
         String campo = String.valueOf(pageable.getSort()).replace(":", "");
 
         List<ConcursoEnvio> list = getEntityManager()
-                .createNativeQuery("select a.* from ConcursoEnvio a " +
-                        " where status=3 and  not exists(select 1 from ConcursoEnvioAssinatura ass  where  ass.idEnvio=a.id) " + search + " ORDER BY " + campo, ConcursoEnvio.class)
+                .createNativeQuery("select a.* from ConcursoEnvio a  " +
+                        " where status=3 and " +
+                        "  exists(select 1 from Edital ed join InfoRemessa i on ed.chave = i.chave and i.idUnidadeGestora = :ug where  ed.id = a.idEdital  ) and  not exists(select 1 from ConcursoEnvioAssinatura ass  where  ass.idEnvio=a.id) " + search + " ORDER BY " + campo, ConcursoEnvio.class)
+                .setParameter("ug", User.getUser(super.request).getUnidadeGestora().getId())
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();
 
-
         long totalRegistros = countEnviosAguardandoAss(search);
         long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
-
         List<ConcursoEnvioAssRetorno> listc= new ArrayList<ConcursoEnvioAssRetorno>() ;
         for(Integer i= 0; i < list.size(); i++){
             ConcursoEnvioAssRetorno dtoConcursoAssinado =new ConcursoEnvioAssRetorno();
             dtoConcursoAssinado.setConcursoEnvio(list.get(i));
             Integer quantidadeAssinaturasPorIdEdital = (Integer)  getEntityManager().createNativeQuery("select count(*) from ConcursoEnvioAssinatura a " +
                     "where   a.idEnvio = "+ list.get(i).getId()+ "").getSingleResult();
-            if (quantidadeAssinaturasPorIdEdital == 0) {
-                dtoConcursoAssinado.setStatusAssinatura(1);
-            } else {
-                dtoConcursoAssinado.setStatusAssinatura(2);
-            }
+            dtoConcursoAssinado.setStatusAssinatura( (quantidadeAssinaturasPorIdEdital == 0) ? ConcursoEnvioAssRetorno.Status.Pendente.getValor() : ConcursoEnvioAssRetorno.Status.Assinado.getValor()  );
             listc.add(dtoConcursoAssinado);
         }
-
-        return new PaginacaoUtil<ConcursoEnvioAssRetorno>(tamanho, pagina, totalPaginas, totalRegistros, listc);
+        return new PaginacaoUtil<>(tamanho, pagina, totalPaginas, totalRegistros, listc);
     }
 
 

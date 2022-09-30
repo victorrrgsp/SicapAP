@@ -44,7 +44,6 @@ public class ConcursoEnvioAssinaturaRepository  extends DefaultRepository<Concur
             query.setParameter("ANO", ano);
             query.setParameter("MATRICULA", matricula);
             query.setParameter("ID_ENT_ORIGEM", id_end_origem);
-
             query.setParameter("HASH", GenerateHashBase64fromProtocolo(idProtocolo));
             query.executeUpdate();
         }catch (RuntimeException e){
@@ -209,6 +208,7 @@ public class ConcursoEnvioAssinaturaRepository  extends DefaultRepository<Concur
             query.executeUpdate();
             idDocument = (BigDecimal) entityManager.createNativeQuery(
                     "SELECT @@IDENTITY ").getSingleResult();
+            if (idDocument == null) throw  new InvalitInsert("não inseriu registro do documento!!");
         } catch (RuntimeException e){
             e.printStackTrace();
             throw new InvalitInsert("problema ao inserir documento do processo no econtas. Favor contate o administrador do sicap!");

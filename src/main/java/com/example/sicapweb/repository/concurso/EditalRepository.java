@@ -9,11 +9,14 @@ import com.example.sicapweb.repository.DefaultRepository;
 import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
 import org.apache.commons.lang3.time.DateUtils;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
+import javax.swing.text.html.Option;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.text.ParseException;
@@ -90,7 +93,6 @@ public class EditalRepository extends DefaultRepository<Edital, BigInteger> {
             editalConcurso.setVeiculoPublicacao(list.get(i).getVeiculoPublicacao());
             editalConcurso.setCnpjEmpresaOrganizadora(list.get(i).getCnpjEmpresaOrganizadora());
            if  ( list.get(i).getCnpjEmpresaOrganizadora()!=null ) {
-               try {
                    List<EmpresaOrganizadora> leo =  getEntityManager()
                            .createNativeQuery("select a.* from empresaOrganizadora a  join infoRemessa i on a.chave=i.chave and i.idUnidadeGestora = :ug  where  cnpjEmpresaOrganizadora='" + list.get(i).getCnpjEmpresaOrganizadora() + "'", EmpresaOrganizadora.class)
                            .setParameter("ug",User.getUser(super.getRequest()).getUnidadeGestora().getId() )
@@ -101,9 +103,6 @@ public class EditalRepository extends DefaultRepository<Edital, BigInteger> {
                    editalConcurso.setNomEmpresaOrganizadora(eo.getNome());
                    editalConcurso.setValorContratacao(eo.getValor());
                    }
-               }catch (Exception e ){
-
-               }
 
            }
             listc.add(editalConcurso);
@@ -142,41 +141,32 @@ public class EditalRepository extends DefaultRepository<Edital, BigInteger> {
     }
 
     public Integer countEditais(String search) {
-        Query query = getEntityManager().createNativeQuery("with edt as (\n" +
+        return (Integer) getEntityManager().createNativeQuery("with edt as (\n" +
                 "        select dataPublicacao,dataInicioInscricoes,dataFimInscricoes,numeroEdital,complementoNumero,prazoValidade,veiculoPublicacao, cnpjEmpresaOrganizadora,c.id,max(a.id)  max_id\n" +
                 "             from Edital a  join infoRemessa i on a.chave = i.chave and  a.tipoEdital =1  and i.idUnidadeGestora = '"+User.getUser(super.request).getUnidadeGestora().getId()+"'  left  join ConcursoEnvio c on a.id = c.idEdital  and c.fase=1 group by\n" +
                 "                dataPublicacao,dataInicioInscricoes,dataFimInscricoes,numeroEdital,complementoNumero,prazoValidade,veiculoPublicacao, cnpjEmpresaOrganizadora,c.id " +
                 "                         )\n" +
-                "select   count(1) from Edital a join edt b on a.id= b.max_id where 1=1 " + search);
-        return (Integer) query.getSingleResult();
+                "select   count(1) from Edital a join edt b on a.id= b.max_id where 1=1 " + search).getSingleResult();
     }
     public Edital buscarEditalPorNumero(String numeroEdital,String complementoNumero) {
-        String vcomplemento ="";
-        if (complementoNumero==null|| complementoNumero.isEmpty() ) {
-            vcomplemento="001";
-        }
-        else {
-            vcomplemento=complementoNumero;
-        }
-        List<Edital> list = getEntityManager().createNativeQuery(
-                "with edt as (\n" +
-                        "        select dataPublicacao,dataInicioInscricoes,dataFimInscricoes,numeroEdital,complementoNumero,prazoValidade,veiculoPublicacao, cnpjEmpresaOrganizadora,max(id)  max_id\n" +
-                        "             from Edital a  join infoRemessa i on a.chave = i.chave and  a.tipoEdital =1  and i.idUnidadeGestora = '"+User.getUser(super.request).getUnidadeGestora().getId()+"' group by\n" +
-                        "                dataPublicacao,dataInicioInscricoes,dataFimInscricoes,numeroEdital,complementoNumero,prazoValidade,veiculoPublicacao, cnpjEmpresaOrganizadora\n" +
-                        "                         )\n" +
-                        "select   a.* from Edital a join edt b on a.id= b.max_id where  a.numeroEdital='"+numeroEdital+"' and  isnull(a.complementoNumero,'001') =  '"+vcomplemento+"'"  , Edital.class).getResultList();
-        if (list.size()>0 ){
-            return list.get(0);
-        }
-        else {
+        String vcomplemento = (complementoNumero == null || complementoNumero.isEmpty()) ? "001" : complementoNumero;
+        try {
+            return (Edital) getEntityManager().createNativeQuery(
+                    " with edt as (\n" +
+                            "        select dataPublicacao,dataInicioInscricoes,dataFimInscricoes,numeroEdital,complementoNumero,prazoValidade,veiculoPublicacao, cnpjEmpresaOrganizadora,max(id)  max_id\n" +
+                            "             from Edital a  join infoRemessa i on a.chave = i.chave and  a.tipoEdital =1  and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' group by\n" +
+                            "                dataPublicacao,dataInicioInscricoes,dataFimInscricoes,numeroEdital,complementoNumero,prazoValidade,veiculoPublicacao, cnpjEmpresaOrganizadora\n" +
+                            "                         )\n" +
+                            "select a.* from Edital a join edt b on a.id= b.max_id where  a.numeroEdital='" + numeroEdital + "' and  isnull(a.complementoNumero,'001') =  '" + vcomplemento + "'", Edital.class).setMaxResults(1).getSingleResult();
+        }catch (NoResultException e){
             return null;
         }
+
     }
 
     public List<Edital> buscarEditaisNaoHomologados() {
-        List<Edital> list = getEntityManager().createNativeQuery("select * from Edital ed where " +
-                "not exists (select * from EditalHomologacao eh where ed.id = eh.idEdital)", Edital.class).getResultList();
-        return list;
+        return getEntityManager().createNativeQuery("select ed.* from Edital ed where " +
+                " not exists(select 1 from EditalHomologacao  eh where ed.id = eh.idEdital   )", Edital.class).getResultList();
     }
 
 
@@ -197,26 +187,20 @@ public class EditalRepository extends DefaultRepository<Edital, BigInteger> {
                 .setMaxResults(tamanho)
                 .getResultList();
 
-
         long totalRegistros = list.size();
         long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
-        List<EditalFinalizado> listc= new ArrayList<EditalFinalizado>() ;
+        List<EditalFinalizado> listaDeEditaisFinalisados= new ArrayList<EditalFinalizado>() ;
         for(Integer i= 0; i < list.size(); i++){
-            EditalFinalizado edf =new EditalFinalizado();
-            edf.setNumeroEdital(list.get(i).getNumeroEdital());
-            edf.setProcesso(null);
-            edf.setData(list.get(i).getDataPublicacao());
-            edf.setEdital((Edital)list.get(i));
-            List<ConcursoEnvio> leo =  getEntityManager()
-                    .createNativeQuery("select E.* from ConcursoEnvio E where  e.fase=1 and e.Status in (2,4) and  idEdital=" + list.get(i).getId() + "", ConcursoEnvio.class)
-                    .getResultList();
-            if (leo.size()>0){
-                ConcursoEnvio eo = leo.get(0);
-                edf.setProcesso(eo.getProcesso());
-            }
-            listc.add(edf);
+            EditalFinalizado editalFinalizado =new EditalFinalizado();
+            editalFinalizado.setNumeroEdital(list.get(i).getNumeroEdital());
+            editalFinalizado.setData(list.get(i).getDataPublicacao());
+            editalFinalizado.setEdital((Edital)list.get(i));
+            List<ConcursoEnvio> listaDeEnviosEdital =   getEntityManager()
+                    .createNativeQuery("select E.* from ConcursoEnvio E where  e.fase=1 and e.Status in (2,4) and  idEdital=" + list.get(i).getId() + "", ConcursoEnvio.class).setMaxResults(1) .getResultList();
+            editalFinalizado.setProcesso((listaDeEnviosEdital.size()>0) ? listaDeEnviosEdital.get(0).getProcesso() : null );
+            listaDeEditaisFinalisados.add(editalFinalizado);
         }
-        return new PaginacaoUtil<EditalFinalizado>(tamanho, pagina, totalPaginas, totalRegistros, listc);
+        return new PaginacaoUtil<>(tamanho, pagina, totalPaginas, totalRegistros, listaDeEditaisFinalisados);
     }
 
 
@@ -278,8 +262,8 @@ public class EditalRepository extends DefaultRepository<Edital, BigInteger> {
     public List<Edital> findAllAHomologar() {
         return getEntityManager().createNativeQuery(
                 "with edt as (\n" +
-                        "                        select dataPublicacao,dataInicioInscricoes,dataFimInscricoes,numeroEdital,complementoNumero,prazoValidade,veiculoPublicacao, cnpjEmpresaOrganizadora,c.id,max(a.id)  max_id\n" +
-                        "                                    from Edital a   join ConcursoEnvio c on a.id=c.idEdital and c.fase=1  join infoRemessa i on a.chave = i.chave and  a.tipoEdital =1  and  i.idUnidadeGestora =  '"+User.getUser(super.request).getUnidadeGestora().getId()+"'     group by\n" +
+                        "                        select dataPublicacao,dataInicioInscricoes,dataFimInscricoes,numeroEdital,complementoNumero,prazoValidade,veiculoPublicacao, cnpjEmpresaOrganizadora,c.id,max(a.id)  max_id \n" +
+                        "                                    from Edital a   join ConcursoEnvio c on a.id=c.idEdital and c.fase=1  join infoRemessa i on a.chave = i.chave and  a.tipoEdital =1  and  i.idUnidadeGestora =  '"+User.getUser(super.request).getUnidadeGestora().getId()+"'     group by \n" +
                         "                                        dataPublicacao,dataInicioInscricoes,dataFimInscricoes,numeroEdital,complementoNumero,prazoValidade,veiculoPublicacao, cnpjEmpresaOrganizadora,c.id\n" +
                         "\n" +
                         "                                                 )\n" +
