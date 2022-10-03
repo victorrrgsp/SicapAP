@@ -21,6 +21,6 @@ public class UsuarioRepository extends DefaultRepository<Cargo, BigInteger> {
                 "from AutenticacaoAssinatura..usuario a  " +
                 "join AutenticacaoAssinatura..UsuarioAplicacao b on a.CPF = b.Usuario " +
                 "join UnidadeGestoraCadun c on UnidadeGestora = cnpj " +
-                "where cpf=  '"+codigo+"' and Aplicacao = "+ sistema).getResultList();
+                "where cpf=  '"+codigo+"' and cargo in (4,5,3,32,362) and Aplicacao = "+ sistema).getResultList();
     }
 }
