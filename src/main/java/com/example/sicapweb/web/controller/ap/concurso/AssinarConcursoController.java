@@ -74,8 +74,7 @@ public class AssinarConcursoController {
             PaginacaoUtil<ConcursoEnvioAssRetorno> paginacaoUtilvazia = new PaginacaoUtil<>(0, 1, 1, 0, listavazia);
             return ResponseEntity.ok().body(paginacaoUtilvazia);
         }
-        PaginacaoUtil<ConcursoEnvioAssRetorno> paginacaoUtil = concursoEnvioRepository.buscarEnviosAguardandoAss(pageable, searchParams, tipoParams);
-        return ResponseEntity.ok().body(paginacaoUtil);
+        return ResponseEntity.ok().body(concursoEnvioRepository.buscarEnviosAguardandoAss(pageable, searchParams, tipoParams));
     }
 
     @CrossOrigin
@@ -245,7 +244,7 @@ public class AssinarConcursoController {
     private void GravaDocumentosFaseEdital(ConcursoEnvio envio, BigDecimal idDocumento) {
         List<DocumentoEdital> listaDeDocumentosEdital = documentoEditalRepository.buscarDocumentosEdital("'I','II','III','IV','V','VI','VII','VIII','IX','IX.I','X','sem'", envio.getEdital().getId());
         if (listaDeDocumentosEdital.stream().filter(documentoEdital -> !documentoEdital.getInciso().equals("sem")).collect(Collectors.toList()).size() < 11)
-            throw new InvalitInsert("não encontrou documentos todos documentos obrigatorio anexados!!");
+            throw new InvalitInsert("não encontrou todos documentos obrigatorio anexados!!");
         String Arquivo = "";
         for (DocumentoEdital documentoEdital : listaDeDocumentosEdital) {
             Arquivo = concursoEnvioAssinaturaRepository.GetDescricaoArquivoEdital(documentoEdital.getInciso(), envio.getFase());
@@ -254,9 +253,9 @@ public class AssinarConcursoController {
     }
 
     private void GravaDocumentosFaseHomologacao(ConcursoEnvio envio, BigDecimal idDocumento){
-        List<DocumentoEditalHomologacao> listaDeDocumentosHomologacaoConcurso = documentoEditalHomologacaoRepository.buscarDocumentosEditalHomologacao("'XI','XII','XIII','XIV','XV','sem'", envio.getEdital().getId());
-        if (listaDeDocumentosHomologacaoConcurso.stream().filter(documentohomologacao -> !documentohomologacao.getInciso().equals("sem")).collect(Collectors.toList()).size() < 5)
-            throw new InvalitInsert("não encontrou documentos todos documentos obrigatorio anexados!!");
+        List<DocumentoEditalHomologacao> listaDeDocumentosHomologacaoConcurso = documentoEditalHomologacaoRepository.buscarDocumentosEditalHomologacao("'XII','XIII','XIV','XV','sem'", envio.getEdital().getId());
+        if (listaDeDocumentosHomologacaoConcurso.stream().filter(documentohomologacao ->  !documentohomologacao.getInciso().equals("sem")).collect(Collectors.toList()).size() < 4)
+            throw new InvalitInsert("não encontrou todos documentos obrigatorio anexados!!");
         String Arquivo = "";
         for (DocumentoEditalHomologacao doc : listaDeDocumentosHomologacaoConcurso) {
             Arquivo = concursoEnvioAssinaturaRepository.GetDescricaoArquivoEdital(doc.getInciso(), envio.getFase());
@@ -265,7 +264,8 @@ public class AssinarConcursoController {
     }
 
     private void ValidaEnvio(ConcursoEnvio envio ){
-        if (envio ==null ) throw new InvalitInsert("Envio não encontrado!!");
+        if (envio ==null )
+            throw new InvalitInsert("Envio não encontrado!!");
         if (envio.getStatus() == ConcursoEnvio.Status.Concluido.getValor())
             throw new InvalitInsert("Envio ja Assinado!!");
     }

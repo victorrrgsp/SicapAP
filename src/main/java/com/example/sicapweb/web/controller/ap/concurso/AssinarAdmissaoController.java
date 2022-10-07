@@ -2,6 +2,7 @@ package com.example.sicapweb.web.controller.ap.concurso;
 
 import br.gov.to.tce.model.ap.concurso.AdmissaoEnvio;
 import br.gov.to.tce.model.ap.concurso.AdmissaoEnvioAssinatura;
+import br.gov.to.tce.model.ap.concurso.ConcursoEnvio;
 import br.gov.to.tce.model.ap.concurso.EditalAprovado;
 import br.gov.to.tce.model.ap.concurso.documento.DocumentoAdmissao;
 import br.gov.to.tce.util.Date;
@@ -64,8 +65,7 @@ public class AssinarAdmissaoController {
     @CrossOrigin
     @GetMapping(path="/{searchParams}/{tipoParams}/pagination")
     public ResponseEntity<PaginacaoUtil<AdmissaoEnvioAssRetorno>> listaAProcessosAguardandoAss(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
-        User userlogado = User.getUser(admissaoEnvioRepository.getRequest());
-        if (userlogado.getCargo().getValor()!=4 ){
+        if (User.getUser(admissaoEnvioRepository.getRequest()).getCargo().getValor()!=4 ){
             List<AdmissaoEnvioAssRetorno> listavazia= new ArrayList<>() ;
             PaginacaoUtil<AdmissaoEnvioAssRetorno> paginacaoUtilvazia= new PaginacaoUtil<AdmissaoEnvioAssRetorno>(0, 1, 1, 0, listavazia);
             return ResponseEntity.ok().body(paginacaoUtilvazia);
@@ -76,7 +76,6 @@ public class AssinarAdmissaoController {
     @CrossOrigin
     @PostMapping(path="/iniciarAssinatura")
     public ResponseEntity<?> iniciarAssinatura(@RequestBody String certificado_mensagem_hash  ){
-        String respostaIniciarAssinatura = "";
         try {
             User userlogado = User.getUser(admissaoEnvioAssinaturaRepository.getRequest());
             JsonNode respostaJson = new ObjectMapper().readTree(certificado_mensagem_hash);
@@ -85,31 +84,27 @@ public class AssinarAdmissaoController {
             String Original =  respostaJson.get("original").asText();
             String hash = URLDecoder.decode(respostaJson.get("hashcertificado").asText(), StandardCharsets.UTF_8)  ;
             if(!userlogado.getHashCertificado().equals(hash) )  throw new Exception("nao é o mesmo  certificado que esta logado!!");
-            respostaIniciarAssinatura = AssinarCertificadoDigital.inicializarAssinatura(certificado,Original);
+            return ResponseEntity.ok().body(AssinarCertificadoDigital.inicializarAssinatura(certificado,Original));
         } catch (Exception e) {
             e.printStackTrace();
             return  ResponseEntity.badRequest().body(e.getMessage());
         }
-        return ResponseEntity.ok().body(respostaIniciarAssinatura);
     }
 
     @CrossOrigin
     @PostMapping(path="/finalizarAssinatura")
     public ResponseEntity<?> finalizarAssinatura(@RequestBody String desafio_assinatura_mensagem  ){
-        String respostaFinalizarAssinatura=new String();
-
         try {
             JsonNode respostaJson = new ObjectMapper().readTree(desafio_assinatura_mensagem);
             String desafio=respostaJson.get("desafio").asText();
             String assinatura=respostaJson.get("assinatura").asText();
             String mensagem=respostaJson.get("original").asText();
-            respostaFinalizarAssinatura = AssinarCertificadoDigital.FinalizarAssinatura(desafio,assinatura,mensagem);
-
+            return ResponseEntity.ok().body(AssinarCertificadoDigital.FinalizarAssinatura(desafio,assinatura,mensagem));
         } catch(Exception e ){
             e.printStackTrace();
             return ResponseEntity.badRequest().body(e.getMessage());
         }
-        return ResponseEntity.ok().body(respostaFinalizarAssinatura);
+
     }
 
 
@@ -117,72 +112,39 @@ public class AssinarAdmissaoController {
     @Transactional( rollbackFor = Exception.class)
     @PostMapping
     public ResponseEntity<?> AssinarAdmissao(@RequestBody String hashassinante_hashAssinado )  throws Exception {
-            validaUsuarioAssinante();
-            JsonNode requestJson = new ObjectMapper().readTree(hashassinante_hashAssinado);
-            String hashassinante =  URLDecoder.decode(requestJson.get("hashassinante").asText(), StandardCharsets.UTF_8);
-            String hashassinado =  URLDecoder.decode(requestJson.get("hashassinado").asText(), StandardCharsets.UTF_8);
-            String processosBase64Decoded = new String(Base64.getDecoder().decode(hashassinante.getBytes()));
-            ArrayNode arrayNodeprocesso = (ArrayNode) new ObjectMapper().readTree(processosBase64Decoded);
-            Iterator<JsonNode> iteradorDosProcessosEnviados = arrayNodeprocesso.elements();
-            if (arrayNodeprocesso.isArray()) {
-                while (iteradorDosProcessosEnviados.hasNext()) {
-                    JsonNode currentEnvioJsonNode = iteradorDosProcessosEnviados.next();
-                    // para cada envio adiciona uma linha na tabela de assinatura com o mesmo hash assinado e assinante
-                    BigInteger idenvio =  currentEnvioJsonNode.get("id").bigIntegerValue();
-                    AdmissaoEnvio envio =  admissaoEnvioRepository.findById(idenvio);
-                    if (envio!=null ){
-                        AdmissaoEnvioAssinatura  novoAssinaturaAdmissao = new AdmissaoEnvioAssinatura();
-                        novoAssinaturaAdmissao.setIdCargo(User.getUser(admissaoEnvioAssinaturaRepository.getRequest()).getCargo().getValor());
-                        novoAssinaturaAdmissao.setCpf(User.getUser(admissaoEnvioAssinaturaRepository.getRequest()).getCpf());
-                        ServletRequestAttributes getIp = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
-                        novoAssinaturaAdmissao.setIp(getIp.getRequest().getRemoteAddr());
-                        novoAssinaturaAdmissao.setAdmissaoEnvio(envio);
-                        LocalDateTime dataHoraAssinatura =LocalDateTime.now();
-                        novoAssinaturaAdmissao.setData_Assinatura(Date.from(dataHoraAssinatura.atZone(ZoneId.systemDefault()).toInstant()));
-                        novoAssinaturaAdmissao.setHashAssinante(hashassinante);
-                        novoAssinaturaAdmissao.setHashAssinado(hashassinado);
-                        admissaoEnvioAssinaturaRepository.save(novoAssinaturaAdmissao);
-                        //coleta dados do cadun sobre o id  do responsavel da ug e o id da pessoa juridica
-                        String Cnpj = User.getUser(admissaoEnvioAssinaturaRepository.getRequest()).getUnidadeGestora().getId();
-                        Integer origem =   admissaoEnvioAssinaturaRepository.getidCADUNPJ(Cnpj);
-                        Integer responsavel = admissaoEnvioAssinaturaRepository.getidCADUNPF(Cnpj);
-                        LocalDateTime dataHoraDoprotocolo= LocalDateTime.now();
-                        Integer idprotocolo =admissaoEnvioAssinaturaRepository.insertProtocolo(matricula,dataHoraDoprotocolo.getYear(),dataHoraDoprotocolo,origem);
-                        //prepara  variaveis de processo
-                        Integer numeroProcesso = idprotocolo;
-                        Integer anoProcesso = dataHoraDoprotocolo.getYear();
-                        Integer numeroProcessoPai= null;
-                        Integer AnoProcessoPai= null;
-                        if (envio.getProcessoPai() != null) {
-                            String[] pc =envio.getProcessoPai().split("/");
-                            numeroProcessoPai = Integer.valueOf(pc[0]) ;
-                            AnoProcessoPai = Integer.valueOf(pc[1]) ;
-                        } else{
-                            throw  new RuntimeException("não encontrou registro do processo do edital no envio!!");
-                        }
-                        Integer anoReferencia = Integer.valueOf(envio.getEdital().getNumeroEdital().substring(envio.getEdital().getNumeroEdital().length() - 4));
-                        admissaoEnvioAssinaturaRepository.insertProcesso(numeroProcesso,anoProcesso,anoReferencia,numeroProcessoPai , AnoProcessoPai ,relatorio, "" ,assuntoCodigo ,classeAssunto , idprotocolo , origem, null,idAssunto );
-                        admissaoEnvioAssinaturaRepository.insertAndamentoProcesso(numeroProcesso,anoProcesso);
-                        admissaoEnvioAssinaturaRepository.insertPessoaInteressada(numeroProcesso,anoProcesso, responsavel , 1,4  );
-                        admissaoEnvioAssinaturaRepository.insertHist(numeroProcesso,anoProcesso,deptoAutuacao);
-                        // inserir os documentos dos aprovados emposados
-                        List<DocumentoAdmissao> listaDeDocumentosAprovadosComNomeacao  = documentoAdmissaoRepository.getAprovadosComAdmissao(envio.getId());
-                        GravarArquivosDeAprovadosNoProcesso(listaDeDocumentosAprovadosComNomeacao,numeroProcesso,anoProcesso);
+        validaUsuarioAssinante();
+        JsonNode requestJson = new ObjectMapper().readTree(hashassinante_hashAssinado);
+        String hashassinante =  URLDecoder.decode(requestJson.get("hashassinante").asText(), StandardCharsets.UTF_8);
+        String hashassinado =  URLDecoder.decode(requestJson.get("hashassinado").asText(), StandardCharsets.UTF_8);
+        String processosBase64Decoded = new String(Base64.getDecoder().decode(hashassinante.getBytes()));
+        ArrayNode arrayNodeprocesso = (ArrayNode) new ObjectMapper().readTree(processosBase64Decoded);
+        Iterator<JsonNode> iteradorDosProcessosEnviados = arrayNodeprocesso.elements();
 
-                        //  inserir os documentos dos aprovados nao emposados
-                        List<DocumentoAdmissao> listaDeDocumentosAprovadosSemNomeacao  = documentoAdmissaoRepository.getAprovadosSemAdmissao(envio.getId());
-                        GravarArquivosDeAprovadosNoProcesso(listaDeDocumentosAprovadosSemNomeacao,numeroProcesso,anoProcesso);
+        if (arrayNodeprocesso.isArray()) {
+            while (iteradorDosProcessosEnviados.hasNext()) {
+                JsonNode currentEnvioJsonNode = iteradorDosProcessosEnviados.next();
+                // para cada envio adiciona uma linha na tabela de assinatura com o mesmo hash assinado e assinante
+                BigInteger idenvio =  currentEnvioJsonNode.get("id").bigIntegerValue();
+                AdmissaoEnvio envio =  admissaoEnvioRepository.findById(idenvio);
+                ValidaEnvio(envio);
+                AdmissaoEnvioAssinatura  novoAssinaturaAdmissao = new AdmissaoEnvioAssinatura();
+                novoAssinaturaAdmissao.setIdCargo(User.getUser(admissaoEnvioAssinaturaRepository.getRequest()).getCargo().getValor());
+                novoAssinaturaAdmissao.setCpf(User.getUser(admissaoEnvioAssinaturaRepository.getRequest()).getCpf());
+                ServletRequestAttributes getIp = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+                novoAssinaturaAdmissao.setIp(getIp.getRequest().getRemoteAddr());
+                novoAssinaturaAdmissao.setAdmissaoEnvio(envio);
+                LocalDateTime dataHoraAssinatura =LocalDateTime.now();
+                novoAssinaturaAdmissao.setData_Assinatura(Date.from(dataHoraAssinatura.atZone(ZoneId.systemDefault()).toInstant()));
+                novoAssinaturaAdmissao.setHashAssinante(hashassinante);
+                novoAssinaturaAdmissao.setHashAssinado(hashassinado);
+                admissaoEnvioAssinaturaRepository.save(novoAssinaturaAdmissao);
 
-                        //atualiza o campo processo no envio com o numero e ano do processo econtas
-                        envio.setProcesso(numeroProcesso+"/"+anoProcesso);
-                        envio.setStatus(AdmissaoEnvio.Status.concluido.getValor());
-                        admissaoEnvioRepository.update(envio);
-                   }
-                    else{
-                        throw new Exception("envio não encontrado!");
-                    }
-                }
+                GerarProcesso(envio);
+                //atualiza o campo processo no envio com o numero e ano do processo econtas
+                envio.setStatus(AdmissaoEnvio.Status.concluido.getValor());
+                admissaoEnvioRepository.update(envio);
             }
+        }
 
         return ResponseEntity.ok().body("OK");
     }
@@ -198,7 +160,7 @@ public class AssinarAdmissaoController {
         for (DocumentoAdmissao documentoAdmissao :  listaDeDocumentosAprovados ){
             EditalAprovado aprovado = documentoAdmissao.getEditalAprovado();
             String cpfAprovado = aprovado.getCpf();
-            String nomeAprovado = aprovado.getNome()+( (documentoAdmissao.getOpcaoDesistencia() ==null) ? "-" :  Arrays.stream(DocumentoAdmissao.opcaoDesistencia.values()).filter(opcaoDesistencia1 -> opcaoDesistencia1.getValor().intValue()==documentoAdmissao.getOpcaoDesistencia().intValue() ).collect(Collectors.toList()).get(0).getLabel());
+            String nomeAprovado = aprovado.getNome()+( (documentoAdmissao.getOpcaoDesistencia() ==null) ? "" :  Arrays.stream(DocumentoAdmissao.opcaoDesistencia.values()).filter(opcaoDesistencia1 -> opcaoDesistencia1.getValor().intValue()==documentoAdmissao.getOpcaoDesistencia().intValue() ).collect(Collectors.toList()).get(0).getLabel());
             //sera necessario gerar a chave atravez do metodo id_Document 'exec cadun.dbo.obterCodigoNovaPessoa'
             responseCadunsalvasimples = admissaoEnvioAssinaturaRepository.insertCadunPessoaInterressada(cpfAprovado,nomeAprovado);
             codigoPessoa=ValidaPessoaRetornadaCadun(responseCadunsalvasimples,cpfAprovado,nomeAprovado);
@@ -232,6 +194,53 @@ public class AssinarAdmissaoController {
         }else{
             throw new RuntimeException("não encontrou usuario logado!!");
         }
+    }
+
+
+    private void GerarProcesso(AdmissaoEnvio envio) throws IOException, URISyntaxException {
+        //coleta dados do cadun sobre o id  do responsavel da ug e o id da pessoa juridica
+        String Cnpj = User.getUser(admissaoEnvioAssinaturaRepository.getRequest()).getUnidadeGestora().getId();
+        Integer origem =   admissaoEnvioAssinaturaRepository.getidCADUNPJ(Cnpj);
+        Integer responsavel = admissaoEnvioAssinaturaRepository.getidCADUNPF(Cnpj);
+        LocalDateTime dataHoraDoprotocolo= LocalDateTime.now();
+        Integer idprotocolo =admissaoEnvioAssinaturaRepository.insertProtocolo(matricula,dataHoraDoprotocolo.getYear(),dataHoraDoprotocolo,origem);
+        //prepara  variaveis de processo
+        Integer numeroProcesso = idprotocolo;
+        Integer anoProcesso = dataHoraDoprotocolo.getYear();
+        Integer numeroProcessoPai= null;
+        Integer AnoProcessoPai= null;
+        if (envio.getProcessoPai() != null) {
+            String[] pc =envio.getProcessoPai().split("/");
+            numeroProcessoPai = Integer.valueOf(pc[0]) ;
+            AnoProcessoPai = Integer.valueOf(pc[1]) ;
+        } else{
+            throw new RuntimeException("não encontrou registro do processo do edital no envio!!");
+        }
+        Integer anoReferencia = Integer.valueOf(envio.getEdital().getNumeroEdital().substring(envio.getEdital().getNumeroEdital().length() - 4));
+        admissaoEnvioAssinaturaRepository.insertProcesso(numeroProcesso,anoProcesso,anoReferencia,numeroProcessoPai , AnoProcessoPai ,relatorio, "" ,assuntoCodigo ,classeAssunto , idprotocolo , origem, null,idAssunto );
+        admissaoEnvioAssinaturaRepository.insertAndamentoProcesso(numeroProcesso,anoProcesso);
+        admissaoEnvioAssinaturaRepository.insertPessoaInteressada(numeroProcesso,anoProcesso, responsavel , 1,4  );
+        admissaoEnvioAssinaturaRepository.insertHist(numeroProcesso,anoProcesso,deptoAutuacao);
+        // inserir os documentos dos aprovados emposados
+        List<DocumentoAdmissao> listaDeDocumentosAprovadosComNomeacao  = documentoAdmissaoRepository.getAprovadosComAdmissao(envio.getId());
+        GravarArquivosDeAprovadosNoProcesso(listaDeDocumentosAprovadosComNomeacao,numeroProcesso,anoProcesso);
+
+        //  inserir os documentos dos aprovados nao emposados
+        List<DocumentoAdmissao> listaDeDocumentosAprovadosSemNomeacao  = documentoAdmissaoRepository.getAprovadosSemAdmissao(envio.getId());
+        GravarArquivosDeAprovadosNoProcesso(listaDeDocumentosAprovadosSemNomeacao,numeroProcesso,anoProcesso);
+        envio.setProcesso(numeroProcesso+"/"+anoProcesso);
+    }
+
+
+    private void ValidaEnvio(AdmissaoEnvio envio ){
+        if (envio ==null )
+            throw new InvalitInsert("Envio não encontrado!!");
+        else if (envio.getStatus() == AdmissaoEnvio.Status.concluido.getValor())
+            throw new InvalitInsert("Envio ja Assinado!!");
+        else if (documentoAdmissaoRepository.getDocumenttosAdmissaoByIdEnvio(envio.getId()).size()==0 ) {
+            throw new InvalitInsert("Envio sem aprovados!!");
+        }
+
     }
 
 }
