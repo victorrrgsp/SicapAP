@@ -88,4 +88,12 @@ public class DocumentoAdmissaoRepository extends DefaultRepository<DocumentoAdmi
 
     }
 
+    public List<DocumentoAdmissao> getDocumenttosAdmissaoByIdEnvio(BigInteger id){
+        return getEntityManager()
+                .createNativeQuery("select a.* from DocumentoAdmissao a " +
+                        "where status>0 and a.idEnvio = " + id + " " + " ORDER BY id " , DocumentoAdmissao.class)
+                .getResultList();
+
+    }
+
 }
