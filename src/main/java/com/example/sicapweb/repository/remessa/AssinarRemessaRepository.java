@@ -2,18 +2,70 @@ package com.example.sicapweb.repository.remessa;
 
 import br.gov.to.tce.application.ApplicationException;
 import br.gov.to.tce.model.InfoRemessa;
+import br.gov.to.tce.util.JayReflection;
 import com.example.sicapweb.repository.DefaultRepository;
 import com.example.sicapweb.security.User;
+import com.example.sicapweb.util.PaginacaoUtil;
+import org.hibernate.query.internal.NativeQueryImpl;
+import org.hibernate.transform.AliasToEntityMapResultTransformer;
+import org.hibernate.transform.ResultTransformer;
+import org.hibernate.transform.Transformers;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.*;
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
-import java.util.Date;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.security.InvalidParameterException;
+import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 public class AssinarRemessaRepository extends DefaultRepository<String, String> {
     @PersistenceContext
     private EntityManager entityManager;
+
+    public  enum Tabela {
+        InfoRemessa(1,"InfoRemessa","br.gov.to.tce.repository"),
+        FolhaPagamento(2,"FolhaPagamento","br.gov.to.tce.repository.ap.folha"),
+        Admissao(3,"Admissao","br.gov.to.tce.repository.ap.pessoal"),
+        Cargo(4,"Cargo","br.gov.to.tce.repository.ap.relacional"),
+        Servidor(5,"Servidor","br.gov.to.tce.repository.ap.pessoal"),
+        Ato(6,"Ato","br.gov.to.tce.repository.ap.relacional"),
+        Lei(7,"Lei","br.gov.to.tce.repository.ap.relacional"),
+        UnidadeAdministrativa(8,"UnidadeAdministrativa","br.gov.to.tce.repository.ap.relacional"),
+        Lotacao(9,"Lotacao","br.gov.to.tce.repository.ap.relacional"),
+        Desligamento(10,"Desligamento","br.gov.to.tce.repository.ap.pessoal"),
+        Licenca(11,"Licenca","br.gov.to.tce.repository.ap.pessoal")
+        ;
+        private final int id;
+        private final String label;
+
+        private final String packageRepository;
+
+        Tabela(int id, String label,String packageRepository) {
+            this.id = id;
+            this.label = label;
+            this.packageRepository = packageRepository;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public String getLabel() {
+            return label;
+        }
+
+        public String getpackageRepository() {
+            return packageRepository;
+        }
+    }
 
     public AssinarRemessaRepository(EntityManager em) {
         super(em);
@@ -22,6 +74,8 @@ public class AssinarRemessaRepository extends DefaultRepository<String, String> 
     public AssinarRemessaRepository() {
 
     }
+
+
 
     public Object buscarResponsavelAssinatura(Integer tipoCargo, InfoRemessa infoRemessa) {
         try {
@@ -162,4 +216,110 @@ public class AssinarRemessaRepository extends DefaultRepository<String, String> 
         query.executeUpdate();
         entityManager.flush();
     }
+
+
+    public String getSearchDecoded(String searchParams) throws UnsupportedEncodingException {
+        String search = "";
+        if (searchParams.length() > 11) {
+            search =" where ";
+            String parametroBusca[] = searchParams.split("&");
+            search = search+"  " + parametroBusca[0].split("=")[1] + "  = '" + URLDecoder.decode(parametroBusca[1].split("=")[1], StandardCharsets.UTF_8.toString())     + "'  ";
+        }
+        return search;
+    }
+
+    public    PaginacaoUtil<HashMap<String,Object>> GetExtratoDadosRemessa(Pageable paginacaoFrontEnd  , Integer remessa, Integer exercicio, Integer idTabelaRemessa,String serachEncoded)   {
+       Query queryTabelaRemessa;
+        Query queryTabelaQuantidade;
+        String filtroWhere;
+        try{
+             filtroWhere = getSearchDecoded(serachEncoded);
+        }catch (UnsupportedEncodingException e){
+            e.printStackTrace();
+            throw  new RuntimeException("valor de coluna na busca errado !!");
+        }
+
+        String CaminhoCompletoRepository = Arrays.stream(Tabela.values()).filter(tabelaRepository -> tabelaRepository.getId()==idTabelaRemessa   ).map(   tabelaRepository -> tabelaRepository.getpackageRepository()+'.'+tabelaRepository.getLabel()+"Repository"  ).findFirst().get();
+        if (CaminhoCompletoRepository == null)
+            throw  new RuntimeException("id de tabela não encontrado ");
+        try{
+            queryTabelaRemessa= getEntityManager().createNativeQuery((String) JayReflection.executeStaticMethod(CaminhoCompletoRepository,"getQueryExtratoRemessa")+filtroWhere);
+            queryTabelaQuantidade = getEntityManager().createNativeQuery((String) JayReflection.executeStaticMethod(CaminhoCompletoRepository,"getQueryCountExtratoRemessa"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw  new RuntimeException("não encontrou consulta para buscar dados em tabela !!");
+        }
+
+
+        try {
+
+            queryTabelaRemessa.setParameter("remessa",remessa).setParameter("exercicio",exercicio).setParameter("ug",User.getUser(super.getRequest()).getUnidadeGestora().getId());
+
+            long totalRegistros = (Integer) queryTabelaQuantidade
+                        .setParameter("remessa",remessa)
+                    .setParameter("exercicio",exercicio)
+                    .setParameter("ug",User.getUser(super.getRequest()).getUnidadeGestora().getId()).getSingleResult();
+            int pagina = Integer.valueOf(paginacaoFrontEnd.getPageNumber());
+            int tamanhoPorPagina =  (filtroWhere.isEmpty())? Integer.valueOf(paginacaoFrontEnd.getPageSize()) : (int) totalRegistros ;
+            //libera a limitação de paginas para busca sem filtro where ou total registros inferior a quantidade de paginas
+            if (totalRegistros > tamanhoPorPagina  && filtroWhere.isEmpty() ){
+                queryTabelaRemessa.setFirstResult(pagina).setMaxResults(tamanhoPorPagina);
+            }
+            List<HashMap<String,Object>> ExtratoTabelaRemessa = getMapList( queryTabelaRemessa,tamanhoPorPagina,pagina );
+            long totalPaginas = (totalRegistros + (tamanhoPorPagina - 1)) / tamanhoPorPagina;
+            return new PaginacaoUtil<>(tamanhoPorPagina, pagina, totalPaginas, totalRegistros, ExtratoTabelaRemessa);
+        } catch (Exception e){
+            e.printStackTrace();
+            throw new RuntimeException("Problema ao rodar consulta pra tabela escolhida");
+        }
+
+    }
+
+    public List<HashMap<String,Object>> getResumoGeralRemessa(Integer remessa,Integer exercicio){
+
+        List<HashMap<String,Object>> resumoGeralRemessa = Arrays.stream(Tabela.values()).map( itemTabela -> {
+
+            try {
+                HashMap<String, Object> item = new LinkedHashMap<>();
+                item.put("idtabela",itemTabela.getId());
+                item.put("tabela",itemTabela.getLabel());
+                Query queryTabelaQuantidade = getEntityManager().createNativeQuery((String) JayReflection.executeStaticMethod(itemTabela.getpackageRepository()+'.'+itemTabela.getLabel()+"Repository","getQueryCountExtratoRemessa"));
+                queryTabelaQuantidade.setParameter("remessa",remessa)
+                        .setParameter("exercicio",exercicio)
+                        .setParameter("ug",User.getUser(super.getRequest()).getUnidadeGestora().getId());
+                item.put("quantidade",(Integer) queryTabelaQuantidade.getSingleResult());
+                return item;
+            } catch (Exception e) {
+                return null;
+            }
+        }).collect(Collectors.toList());
+
+        return resumoGeralRemessa;
+    }
+
+    private List<HashMap<String,Object>> getMapList(Query query,int tamanho,  int pagina) {
+        return   ( (NativeQueryImpl) query
+        ).setResultTransformer(new ResultTransformer(){
+                    @Override
+                    public Object transformTuple(Object[] tuples, String[] aliases) {
+                        Map result = new LinkedHashMap(tuples.length);
+
+                        for (int i = 0; i < tuples.length; ++i) {
+                            String alias = aliases[i];
+                            if (alias != null) {
+                                result.put(alias, tuples[i]);
+                            }
+                        }
+
+                        return result;
+                    }
+                    @Override
+                    public List transformList(List list) {
+                        return list;
+                    }
+                })
+                .getResultList();
+    }
+
+
 }
