@@ -134,16 +134,16 @@ public class ConcessaoPensaoController extends DefaultController<DocumentoPensao
                 "Requerimento de pensão devidamente preenchido e assinado pelo beneficiário", "", "Sim"));
         list.add(new Inciso("III", "Certidão de óbito ou declaração judicial",
                 "Certidão de óbito ou declaração judicial em caso de morte presumida", "", "Sim"));
-        list.add(new Inciso("IV", "Certidão de casamento ou documento de união estável",
+        list.add(new Inciso("IV", "Certidão de casamento ou documento probatório de união estável",
                 "Certidão de casamento ou documento de união estável", "", "Sim"));
         list.add(new Inciso("V", "Certidão de nascimento dos filhos ou dependentes legais",
                 "Certidão de nascimento dos filhos ou dependentes legais", "", "Não"));
         list.add(new Inciso("VI", "Comprovação de dependência econômica do beneficiário",
                 "Comprovação de dependência econômica do beneficiário, caso não se enquadre na dependência direta", "", "Não"));
-        list.add(new Inciso("VII", "Certidão de tempo de contribuição do servidor falecido",
-                "Certidão de tempo de contribuição do servidor falecido, no caso de este se encontrar em atividade quando do falecimento", "", "Não"));
-        list.add(new Inciso("VIII", "Cálculo dos proventos da pensão",
-                "Cálculo dos proventos da pensão concedida nos termos do art. 40, § 2 º ou do § 7º, incisos I e II da Constituição Federal, com a indicação dos beneficiários e percentuais atribuídos a cada um deles", "", "Sim"));
+        list.add(new Inciso("VII", "Comprovação de incapacidade física ou mental do beneficiário",
+                "Comprovação de incapacidade física ou mental do beneficiário, acompanhada do termo de tutela ou curatela, se for o caso", "", "Não"));
+        list.add(new Inciso("VIII", "Certidão do tempo de contribuição do servidor falecido",
+                "Certidão do tempo de contribuição do servidor falecido, no caso de este se encontrar em atividade quando do falecimento", "", "Sim"));
         list.add(new Inciso("IX", "Cálculo dos proventos da pensão",
                 "Cálculo dos proventos da pensão concedida nos termos do art. 40, § 2 º ou do § 7º, incisos I e II da Constituição Federal, com a indicação dos beneficiários e percentuais atribuídos a cada um deles", "", "Sim"));
         list.add(new Inciso("X", "Último contracheque",
