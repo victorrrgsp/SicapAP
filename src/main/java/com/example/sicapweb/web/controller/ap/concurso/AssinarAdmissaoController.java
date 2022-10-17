@@ -111,7 +111,7 @@ public class AssinarAdmissaoController {
     @CrossOrigin
     @Transactional( rollbackFor = Exception.class)
     @PostMapping
-    public ResponseEntity<?> AssinarAdmissao(@RequestBody String hashassinante_hashAssinado )  throws Exception {
+    public ResponseEntity<?> assinarAdmissao(@RequestBody String hashassinante_hashAssinado )  throws Exception {
         validaUsuarioAssinante();
         JsonNode requestJson = new ObjectMapper().readTree(hashassinante_hashAssinado);
         String hashassinante =  URLDecoder.decode(requestJson.get("hashassinante").asText(), StandardCharsets.UTF_8);
@@ -126,7 +126,7 @@ public class AssinarAdmissaoController {
                 // para cada envio adiciona uma linha na tabela de assinatura com o mesmo hash assinado e assinante
                 BigInteger idenvio =  currentEnvioJsonNode.get("id").bigIntegerValue();
                 AdmissaoEnvio envio =  admissaoEnvioRepository.findById(idenvio);
-                ValidaEnvio(envio);
+                validaEnvio(envio);
                 AdmissaoEnvioAssinatura  novoAssinaturaAdmissao = new AdmissaoEnvioAssinatura();
                 novoAssinaturaAdmissao.setIdCargo(User.getUser(admissaoEnvioAssinaturaRepository.getRequest()).getCargo().getValor());
                 novoAssinaturaAdmissao.setCpf(User.getUser(admissaoEnvioAssinaturaRepository.getRequest()).getCpf());
@@ -139,7 +139,7 @@ public class AssinarAdmissaoController {
                 novoAssinaturaAdmissao.setHashAssinado(hashassinado);
                 admissaoEnvioAssinaturaRepository.save(novoAssinaturaAdmissao);
 
-                GerarProcesso(envio);
+                gerarProcesso(envio);
                 //atualiza o campo processo no envio com o numero e ano do processo econtas
                 envio.setStatus(AdmissaoEnvio.Status.concluido.getValor());
                 admissaoEnvioRepository.update(envio);
@@ -151,7 +151,7 @@ public class AssinarAdmissaoController {
 
 
 
-    private void GravarArquivosDeAprovadosNoProcesso(List<DocumentoAdmissao> listaDeDocumentosAprovados, Integer numeroProcesso,Integer anoProcesso ) throws IOException, URISyntaxException {
+    private void gravarArquivosDeAprovadosNoProcesso(List<DocumentoAdmissao> listaDeDocumentosAprovados, Integer numeroProcesso,Integer anoProcesso ) throws IOException, URISyntaxException {
         String responseCadunsalvasimples;
         Integer codigoPessoa;
         Integer contadorArquivosGravadosPorDocumento=1;
@@ -163,7 +163,7 @@ public class AssinarAdmissaoController {
             String nomeAprovado = aprovado.getNome()+( (documentoAdmissao.getOpcaoDesistencia() ==null) ? "" :  Arrays.stream(DocumentoAdmissao.opcaoDesistencia.values()).filter(opcaoDesistencia1 -> opcaoDesistencia1.getValor().intValue()==documentoAdmissao.getOpcaoDesistencia().intValue() ).collect(Collectors.toList()).get(0).getLabel());
             //sera necessario gerar a chave atravez do metodo id_Document 'exec cadun.dbo.obterCodigoNovaPessoa'
             responseCadunsalvasimples = admissaoEnvioAssinaturaRepository.insertCadunPessoaInterressada(cpfAprovado,nomeAprovado);
-            codigoPessoa=ValidaPessoaRetornadaCadun(responseCadunsalvasimples,cpfAprovado,nomeAprovado);
+            codigoPessoa=validaPessoaRetornadaCadun(responseCadunsalvasimples,cpfAprovado,nomeAprovado);
             if ( contadorArquivosGravadosPorDocumento ==1){
                 idDocument = admissaoEnvioAssinaturaRepository.insertDocument(tipoDocumento,numeroProcesso,anoProcesso, ContadorEvento );
             }
@@ -177,7 +177,7 @@ public class AssinarAdmissaoController {
         }
     }
 
-    private Integer ValidaPessoaRetornadaCadun(String StringResponseCadunsalvasimples,String cpfAprovado,String nomeAprovado) throws JsonProcessingException {
+    private Integer validaPessoaRetornadaCadun(String StringResponseCadunsalvasimples,String cpfAprovado,String nomeAprovado) throws JsonProcessingException {
         JsonNode JsonesponseCadunsalvasimples = new ObjectMapper().readTree(StringResponseCadunsalvasimples);
         Integer codigoPessoa =  JsonesponseCadunsalvasimples.get("id").asInt();
         String mensagemPessoa = JsonesponseCadunsalvasimples.get("msg").asText();
@@ -197,7 +197,7 @@ public class AssinarAdmissaoController {
     }
 
 
-    private void GerarProcesso(AdmissaoEnvio envio) throws IOException, URISyntaxException {
+    private void gerarProcesso(AdmissaoEnvio envio) throws IOException, URISyntaxException {
         //coleta dados do cadun sobre o id  do responsavel da ug e o id da pessoa juridica
         String Cnpj = User.getUser(admissaoEnvioAssinaturaRepository.getRequest()).getUnidadeGestora().getId();
         Integer origem =   admissaoEnvioAssinaturaRepository.getidCADUNPJ(Cnpj);
@@ -223,16 +223,16 @@ public class AssinarAdmissaoController {
         admissaoEnvioAssinaturaRepository.insertHist(numeroProcesso,anoProcesso,deptoAutuacao);
         // inserir os documentos dos aprovados emposados
         List<DocumentoAdmissao> listaDeDocumentosAprovadosComNomeacao  = documentoAdmissaoRepository.getAprovadosComAdmissao(envio.getId());
-        GravarArquivosDeAprovadosNoProcesso(listaDeDocumentosAprovadosComNomeacao,numeroProcesso,anoProcesso);
+        gravarArquivosDeAprovadosNoProcesso(listaDeDocumentosAprovadosComNomeacao,numeroProcesso,anoProcesso);
 
         //  inserir os documentos dos aprovados nao emposados
         List<DocumentoAdmissao> listaDeDocumentosAprovadosSemNomeacao  = documentoAdmissaoRepository.getAprovadosSemAdmissao(envio.getId());
-        GravarArquivosDeAprovadosNoProcesso(listaDeDocumentosAprovadosSemNomeacao,numeroProcesso,anoProcesso);
+        gravarArquivosDeAprovadosNoProcesso(listaDeDocumentosAprovadosSemNomeacao,numeroProcesso,anoProcesso);
         envio.setProcesso(numeroProcesso+"/"+anoProcesso);
     }
 
 
-    private void ValidaEnvio(AdmissaoEnvio envio ){
+    private void validaEnvio(AdmissaoEnvio envio ){
         if (envio ==null )
             throw new InvalitInsert("Envio não encontrado!!");
         else if (envio.getStatus() == AdmissaoEnvio.Status.concluido.getValor())

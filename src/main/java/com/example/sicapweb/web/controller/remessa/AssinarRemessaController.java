@@ -1,9 +1,11 @@
 package com.example.sicapweb.web.controller.remessa;
 
 import br.gov.to.tce.model.InfoRemessa;
+import br.gov.to.tce.model.ap.folha.JustificativaGfip;
 import com.example.sicapweb.model.AdmissaoEnvioAssRetorno;
 import com.example.sicapweb.repository.remessa.AssinarRemessaRepository;
 import com.example.sicapweb.repository.remessa.GfipRepository;
+import com.example.sicapweb.repository.remessa.JustificativaGfipRepository;
 import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -43,6 +45,9 @@ public class AssinarRemessaController {
 
     @Autowired
     private AssinarRemessaRepository assinarRemessaRepository;
+
+    @Autowired
+    private JustificativaGfipRepository justificativaGfipRepository;
 
     @Autowired
     private GfipRepository gfipRepository;
@@ -116,9 +121,12 @@ public class AssinarRemessaController {
     public ResponseEntity<?> findDocumentos() {
         InfoRemessa infoRemessa = assinarRemessaRepository.buscarRemessaAberta();
         List<Integer> list = new ArrayList<>();
-        if (infoRemessa != null)
-            list = gfipRepository.findDocumentos(infoRemessa.getChave());
-        if (list.size() >= 3)
+
+        if (infoRemessa != null) {
+            list = gfipRepository.findDocumentos(infoRemessa.getChave() );
+        }
+
+        if (list.size() >= 3 || justificativaGfipRepository.buscaPorRemessa(infoRemessa.getRemessa(),infoRemessa.getExercicio()) != null)
             return ResponseEntity.ok().body("Ok");
         else
             return ResponseEntity.ok().body("pendente");
@@ -126,7 +134,7 @@ public class AssinarRemessaController {
 
     @CrossOrigin
     @PostMapping(path = {"/extratoDadosRemessa/pagination"})
-    public   ResponseEntity<PaginacaoUtil<HashMap<String,Object>>>  GetExtratoRemessa(Pageable pageable ,  @RequestBody String tabelaRemessa){
+    public   ResponseEntity<PaginacaoUtil<HashMap<String,Object>>>  getExtratoRemessa(Pageable pageable ,  @RequestBody String tabelaRemessa){
         try {
             JsonNode parametrosJson = new ObjectMapper().readTree(tabelaRemessa);
             Integer tabela = Integer.valueOf(parametrosJson.get("tabela").asText());

@@ -80,7 +80,7 @@ public class AssinarConcursoController {
     @CrossOrigin
     @Transactional(rollbackFor = Exception.class)
     @PostMapping
-    public ResponseEntity<?> AssinarConcurso(@RequestBody String hashassinante_hashAssinado) throws JsonProcessingException, Exception {
+    public ResponseEntity<?> assinarConcurso(@RequestBody String hashassinante_hashAssinado) throws JsonProcessingException, Exception {
         validaUsuarioAssinante();
         JsonNode requestJson = new ObjectMapper().readTree(hashassinante_hashAssinado);
         String hashassinante = URLDecoder.decode(requestJson.get("hashassinante").asText(), StandardCharsets.UTF_8);
@@ -96,7 +96,7 @@ public class AssinarConcursoController {
                 // para cada envio adiciona uma linha na tabela de assinatura com o mesmo hash assinado e assinante
                 BigInteger idenvio = aux.get("id").bigIntegerValue();
                 ConcursoEnvio envio = concursoEnvioRepository.findById(idenvio);
-                ValidaEnvio(envio);
+                validaEnvio(envio);
 
                 //gera assinatura do envio
                 ConcursoEnvioAssinatura novaAssinaturaConcurso = new ConcursoEnvioAssinatura();
@@ -109,7 +109,7 @@ public class AssinarConcursoController {
                 novaAssinaturaConcurso.setHashAssinado(hashassinado);
                 concursoEnvioAssinaturaRepository.save(novaAssinaturaConcurso);
 
-                GerarProcesso(envio);
+                gerarProcesso(envio);
                 envio.setStatus(ConcursoEnvio.Status.Concluido.getValor());
                 concursoEnvioRepository.update(envio);
             }
@@ -159,7 +159,7 @@ public class AssinarConcursoController {
 
 
 
-    private void GerarProcesso(ConcursoEnvio envio) throws NoSuchAlgorithmException {
+    private void gerarProcesso(ConcursoEnvio envio) throws NoSuchAlgorithmException {
         //coleta dados do cadun sobre o id  do responsavel da ug e o id da pessoa juridica
         String Cnpj = User.getUser(concursoEnvioAssinaturaRepository.getRequest()).getUnidadeGestora().getId();
         Integer origem = concursoEnvioAssinaturaRepository.getidCADUNPJ(Cnpj);
@@ -168,7 +168,7 @@ public class AssinarConcursoController {
         if (envio.getOrgaoorigem() != null) {
             id_entidade_vinculada = concursoEnvioAssinaturaRepository.getidCADUNPJ(envio.getOrgaoorigem());
         }
-        SetaParametrosDoProcessoPelaFaseDoConcurso(envio.getFase().intValue());
+        setaParametrosDoProcessoPelaFaseDoConcurso(envio.getFase().intValue());
         LocalDateTime dataHoraProtocolo = LocalDateTime.now();
         Integer idProtocolo = concursoEnvioAssinaturaRepository.insertProtocolo(matriculaSicapApNoEcontas, dataHoraProtocolo.getYear(), dataHoraProtocolo, origem);
 
@@ -186,7 +186,7 @@ public class AssinarConcursoController {
         complemento = envio.getComplemento();
         Integer numeroEdital = Integer.valueOf(envio.getEdital().getNumeroEdital().substring(0, envio.getEdital().getNumeroEdital().length() - 4));
         Integer anoEdital = Integer.valueOf(envio.getEdital().getNumeroEdital().substring(envio.getEdital().getNumeroEdital().length() - 4));
-        ValidaEdital(numeroEdital, anoEdital);
+        validaEdital(numeroEdital, anoEdital);
 
         //inseri informaçoes principaldo envio no econtas
         concursoEnvioAssinaturaRepository.insertProcesso(numeroProcesso, anoProcesso, anoEdital, numeroProcessoPai, anoProcessoPai, relatorio, complemento, assuntoCodigo, classeAssunto, idProtocolo, origem, id_entidade_vinculada, idAssunto);
@@ -195,15 +195,15 @@ public class AssinarConcursoController {
         concursoEnvioAssinaturaRepository.insertPessoaInteressada(numeroProcesso, anoProcesso, responsavel, 1, 4);
         concursoEnvioAssinaturaRepository.insertHist(numeroProcesso, anoProcesso, deptoAutuacao);
         BigDecimal idDocumento = concursoEnvioAssinaturaRepository.insertDocument(tipoDocumento, numeroProcesso, anoProcesso, eventoProcesso);
-        GravaDocumentos(envio,idDocumento);
+        gravaDocumentos(envio,idDocumento);
         envio.setProcesso(numeroProcesso + "/" + anoProcesso);
     }
 
-    private void GravaDocumentos(ConcursoEnvio envio,BigDecimal idDocumento){
+    private void gravaDocumentos(ConcursoEnvio envio,BigDecimal idDocumento){
         if (envio.getFase() == ConcursoEnvio.Fase.Edital.getValor()) {
-            GravaDocumentosFaseEdital(envio,idDocumento);
+            gravaDocumentosFaseEdital(envio,idDocumento);
         } else if (envio.getFase() == ConcursoEnvio.Fase.Homologacao.getValor()) {
-            GravaDocumentosFaseHomologacao(envio,idDocumento);
+            gravaDocumentosFaseHomologacao(envio,idDocumento);
         }
     }
 
@@ -219,13 +219,13 @@ public class AssinarConcursoController {
         }
     }
 
-    private void ValidaEdital(Integer numEdital, Integer anoEdital) {
+    private void validaEdital(Integer numEdital, Integer anoEdital) {
         if (numEdital == null || numEdital == 0) throw new InvalitInsert("numero do edital não esta no formato certo!");
         if (anoEdital == null || anoEdital < 1990)
             throw new InvalitInsert("numero do edital não esta no formato certo!");
     }
 
-    private void SetaParametrosDoProcessoPelaFaseDoConcurso(int fase) {
+    private void setaParametrosDoProcessoPelaFaseDoConcurso(int fase) {
         if (fase == ConcursoEnvio.Fase.Edital.getValor().intValue()) {
             idAssunto = 64;
             assuntoCodigo = 6;
@@ -241,7 +241,7 @@ public class AssinarConcursoController {
         }
     }
 
-    private void GravaDocumentosFaseEdital(ConcursoEnvio envio, BigDecimal idDocumento) {
+    private void gravaDocumentosFaseEdital(ConcursoEnvio envio, BigDecimal idDocumento) {
         List<DocumentoEdital> listaDeDocumentosEdital = documentoEditalRepository.buscarDocumentosEdital("'I','II','III','IV','V','VI','VII','VIII','IX','IX.I','X','sem'", envio.getEdital().getId());
         if (listaDeDocumentosEdital.stream().filter(documentoEdital -> !documentoEdital.getInciso().equals("sem")).collect(Collectors.toList()).size() < 11)
             throw new InvalitInsert("não encontrou todos documentos obrigatorio anexados!!");
@@ -252,7 +252,7 @@ public class AssinarConcursoController {
         }
     }
 
-    private void GravaDocumentosFaseHomologacao(ConcursoEnvio envio, BigDecimal idDocumento){
+    private void gravaDocumentosFaseHomologacao(ConcursoEnvio envio, BigDecimal idDocumento){
         List<DocumentoEditalHomologacao> listaDeDocumentosHomologacaoConcurso = documentoEditalHomologacaoRepository.buscarDocumentosEditalHomologacao("'XII','XIII','XIV','XV','sem'", envio.getEdital().getId());
         if (listaDeDocumentosHomologacaoConcurso.stream().filter(documentohomologacao ->  !documentohomologacao.getInciso().equals("sem")).collect(Collectors.toList()).size() < 4)
             throw new InvalitInsert("não encontrou todos documentos obrigatorio anexados!!");
@@ -263,7 +263,7 @@ public class AssinarConcursoController {
         }
     }
 
-    private void ValidaEnvio(ConcursoEnvio envio ){
+    private void validaEnvio(ConcursoEnvio envio ){
         if (envio ==null )
             throw new InvalitInsert("Envio não encontrado!!");
         if (envio.getStatus() == ConcursoEnvio.Status.Concluido.getValor())
