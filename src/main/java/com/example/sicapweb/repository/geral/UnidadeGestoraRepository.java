@@ -3,6 +3,7 @@ package com.example.sicapweb.repository.geral;
 import br.gov.to.tce.application.ApplicationException;
 import br.gov.to.tce.model.UnidadeGestora;
 import com.example.sicapweb.repository.DefaultRepository;
+import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
@@ -209,6 +210,14 @@ public class UnidadeGestoraRepository extends DefaultRepository<UnidadeGestora, 
                         " join SICAPAP21.dbo.UnidadeGestora UG on UG.id = inf.idUnidadeGestora \n" ,UnidadeGestora.class).getResultList();
         return result;
 
+    }
+
+    public Boolean EhUnidadeGestoraRpps(){
+        try {
+            return ( getEntityManager().createNativeQuery("select  1 from UnidadeGestoraRpps where cnpjRpps=:cnpj  ").setParameter("cnpj", User.getUser(super.getRequest()).getUnidadeGestora().getId() ).getResultList().size()>0) ;
+        }catch (RuntimeException e){
+            return false;
+        }
     }
 
 }

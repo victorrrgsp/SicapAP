@@ -3,6 +3,7 @@ package com.example.sicapweb.web.controller.remessa;
 import br.gov.to.tce.model.InfoRemessa;
 import br.gov.to.tce.model.ap.folha.JustificativaGfip;
 import com.example.sicapweb.model.AdmissaoEnvioAssRetorno;
+import com.example.sicapweb.repository.geral.UnidadeGestoraRepository;
 import com.example.sicapweb.repository.remessa.AssinarRemessaRepository;
 import com.example.sicapweb.repository.remessa.GfipRepository;
 import com.example.sicapweb.repository.remessa.JustificativaGfipRepository;
@@ -23,10 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpSession;
 import javax.validation.ValidationException;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 
 @Transactional
@@ -34,6 +32,9 @@ import java.util.Objects;
 @RestController
 @RequestMapping(value = "/assinarRemessa")
 public class AssinarRemessaController {
+
+    @Autowired
+    private UnidadeGestoraRepository unidadeGestoraRepository;
 
     public InfoRemessa info;
 
@@ -169,7 +170,7 @@ public class AssinarRemessaController {
             JsonNode parametrosJson = new ObjectMapper().readTree(tabelaRemessa);
             Integer remessa = Integer.valueOf(parametrosJson.get("remessa").asText());
             Integer exercicio = Integer.valueOf(parametrosJson.get("exercicio").asText());
-            return  ResponseEntity.ok().body(assinarRemessaRepository.getResumoGeralRemessa(remessa,exercicio));
+            return  ResponseEntity.ok().body(assinarRemessaRepository.getResumoGeralRemessa(remessa,exercicio, (unidadeGestoraRepository.EhUnidadeGestoraRpps())? Arrays.asList(AssinarRemessaRepository.Tabela.Admissao.getId()):new ArrayList<Integer>() ));
         }
         catch (NumberFormatException e){
             e.printStackTrace();

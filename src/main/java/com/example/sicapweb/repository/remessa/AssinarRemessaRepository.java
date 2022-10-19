@@ -6,6 +6,7 @@ import br.gov.to.tce.util.JayReflection;
 import com.example.sicapweb.repository.DefaultRepository;
 import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
+import com.example.sicapweb.util.StaticMethods;
 import org.hibernate.query.internal.NativeQueryImpl;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.hibernate.transform.ResultTransformer;
@@ -265,7 +266,7 @@ public class AssinarRemessaRepository extends DefaultRepository<String, String> 
             if (totalRegistros > tamanhoPorPagina  && filtroWhere.isEmpty() ){
                 queryTabelaRemessa.setFirstResult(pagina).setMaxResults(tamanhoPorPagina);
             }
-            List<HashMap<String,Object>> ExtratoTabelaRemessa = getMapList( queryTabelaRemessa,tamanhoPorPagina,pagina );
+            List<HashMap<String,Object>> ExtratoTabelaRemessa = StaticMethods.getMapListObjectToHashmap( queryTabelaRemessa );
             long totalPaginas = (totalRegistros + (tamanhoPorPagina - 1)) / tamanhoPorPagina;
             return new PaginacaoUtil<>(tamanhoPorPagina, pagina, totalPaginas, totalRegistros, ExtratoTabelaRemessa);
         } catch (Exception e){
@@ -275,9 +276,9 @@ public class AssinarRemessaRepository extends DefaultRepository<String, String> 
 
     }
 
-    public List<HashMap<String,Object>> getResumoGeralRemessa(Integer remessa,Integer exercicio){
+    public List<HashMap<String,Object>> getResumoGeralRemessa(Integer remessa,Integer exercicio,List<Integer> excluirListagem ){
 
-        List<HashMap<String,Object>> resumoGeralRemessa = Arrays.stream(Tabela.values()).map( itemTabela -> {
+        List<HashMap<String,Object>> resumoGeralRemessa = Arrays.stream(Tabela.values()).filter(item -> !excluirListagem.contains(item.getId()) ).map( itemTabela -> {
 
             try {
                 HashMap<String, Object> item = new LinkedHashMap<>();
@@ -295,30 +296,6 @@ public class AssinarRemessaRepository extends DefaultRepository<String, String> 
         }).collect(Collectors.toList());
 
         return resumoGeralRemessa;
-    }
-
-    private List<HashMap<String,Object>> getMapList(Query query,int tamanho,  int pagina) {
-        return   ( (NativeQueryImpl) query
-        ).setResultTransformer(new ResultTransformer(){
-                    @Override
-                    public Object transformTuple(Object[] tuples, String[] aliases) {
-                        Map result = new LinkedHashMap(tuples.length);
-
-                        for (int i = 0; i < tuples.length; ++i) {
-                            String alias = aliases[i];
-                            if (alias != null) {
-                                result.put(alias, tuples[i]);
-                            }
-                        }
-
-                        return result;
-                    }
-                    @Override
-                    public List transformList(List list) {
-                        return list;
-                    }
-                })
-                .getResultList();
     }
 
 
