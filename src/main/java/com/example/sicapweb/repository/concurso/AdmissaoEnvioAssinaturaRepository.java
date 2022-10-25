@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
@@ -51,7 +52,7 @@ public class AdmissaoEnvioAssinaturaRepository  extends DefaultRepository<Admiss
             query.setParameter("ANO", ano);
             query.setParameter("MATRICULA", matricula);
             query.setParameter("ID_ENT_ORIGEM", id_end_origem);
-            query.setParameter("HASH", GenerateHashBase64fromProtocolo(idProtocolo));
+            query.setParameter("HASH", generateHashBase64fromProtocolo(idProtocolo));
             query.executeUpdate();
 
          } catch (RuntimeException e){
@@ -210,8 +211,7 @@ public class AdmissaoEnvioAssinaturaRepository  extends DefaultRepository<Admiss
             return idDocument;
         }catch (RuntimeException e ){
             e.printStackTrace();
-            throw new InvalitInsert("problema ao inserir historico do processo no econtas. Favor contate o administrador do sicap!");
-
+            throw new InvalitInsert("problema ao inserir arquivo no processo do econtas. Favor contate o administrador do sicap!");
         }
     }
 
@@ -265,34 +265,46 @@ public class AdmissaoEnvioAssinaturaRepository  extends DefaultRepository<Admiss
     }
 
     public String insertCadunPessoaInterressada(String cpf , String nome) throws IOException, URISyntaxException {
-        return ChampionRequest.salvarSimples(cpf, nome, "sicapap",  sso_client_id, sso_client_secret).getBody();
+        try {
+            return ChampionRequest.salvarSimples(cpf, nome, "sicapap", sso_client_id, sso_client_secret).getBody();
+        }catch (RuntimeException e ){
+            e.printStackTrace();
+            throw new InvalitInsert("problema ao gravar interessado no cadun!!");
+        }
     }
 
 
-    public Integer getidCADUNPF(String Cnpj) {
-        List<Integer> ListIdPessoaFisica = entityManager.createNativeQuery("SELECT   up.idPessoaFisica FROM Cadun..PessoaJuridica pj " +
-                "                LEFT JOIN cadun..vwUnidadesPessoasCargos up on pj.cnpj = up.codunidadegestora and idCargo = 4 and dataFim is null " +
-                "                   WHERE pj.CNPJ ='" + Cnpj + "' or pj.CodigoUnidadeGestora = '" + Cnpj + "' ").getResultList();
-
-        if (ListIdPessoaFisica.size() > 0) {
-            return ListIdPessoaFisica.get(0);
-        }else{
+    public Integer getIdPessoaFisicaNoCadun(String Cnpj) {
+        try {
+            return (Integer) entityManager.createNativeQuery("SELECT   up.idPessoaFisica FROM Cadun..PessoaJuridica pj " +
+                    "                LEFT JOIN cadun..vwUnidadesPessoasCargos up on pj.cnpj = up.codunidadegestora and idCargo = 4 and dataFim is null " +
+                    "                   WHERE pj.CNPJ ='" + Cnpj + "' or pj.CodigoUnidadeGestora = '" + Cnpj + "' ").setMaxResults(1).getSingleResult();
+        }
+        catch (NoResultException r){
             throw new RuntimeException("não achou pessoa fisica no cadun!!");
         }
-    }
-
-    public Integer getidCADUNPJ(String cnpj) {
-        List<Integer> ListIdPessoaJuridica = entityManager.createNativeQuery("SELECT  up.idPessoaJuridica FROM Cadun..PessoaJuridica pj " +
-                "                LEFT JOIN cadun..vwUnidadesPessoasCargos up on pj.cnpj = up.codunidadegestora and idCargo = 4 and dataFim is null " +
-                "                   WHERE pj.CNPJ ='" + cnpj + "' or pj.CodigoUnidadeGestora = '" + cnpj + "' ").getResultList();
-        if (ListIdPessoaJuridica.size() > 0) {
-            return ListIdPessoaJuridica.get(0);
-        }else{
-            throw new RuntimeException("não achou pessoa juridica no cadun!!");
+        catch (RuntimeException e){
+            throw new RuntimeException("Problema ao consultar Pessoa fisica no Cadun. Favor entrar em contato com o respável pelo Cadun!! ");
         }
     }
 
-    private String GenerateHashBase64fromProtocolo(Integer idProtocolo) throws NoSuchAlgorithmException {
+    public Integer getIdPessoaJuridicaNoCadun(String cnpj) {
+        try {
+            return (Integer) entityManager.createNativeQuery("SELECT  up.idPessoaJuridica FROM Cadun..PessoaJuridica pj " +
+                    "                LEFT JOIN cadun..vwUnidadesPessoasCargos up on pj.cnpj = up.codunidadegestora and idCargo = 4 and dataFim is null " +
+                    "                   WHERE pj.CNPJ ='" + cnpj + "' or pj.CodigoUnidadeGestora = '" + cnpj + "' ")
+                    .setMaxResults(1)
+                    .getSingleResult();
+        }
+        catch (NoResultException r){
+            throw new RuntimeException("não achou pessoa Juridica no cadun!!");
+        }
+        catch (RuntimeException e){
+            throw new RuntimeException("Problema ao consultar Pessoa Juridica no Cadun. Favor entrar em contato com o respável pelo Cadun!! ");
+        }
+    }
+
+    private String generateHashBase64fromProtocolo(Integer idProtocolo) throws NoSuchAlgorithmException {
         MessageDigest md = MessageDigest.getInstance("MD5");
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
         md.reset();
@@ -300,6 +312,34 @@ public class AdmissaoEnvioAssinaturaRepository  extends DefaultRepository<Admiss
         byte[] hashdecodedbytes = hashdecoded.getBytes(Charset.forName("UTF-8"));
         byte[] bytesOfDigest = md.digest(hashdecodedbytes);
         return DatatypeConverter.printHexBinary(bytesOfDigest).substring(17,32).toUpperCase();
+    }
+
+    private Boolean ehInteressadoEmProcessoDecidido(String anoProcesso,String numeroProcesso, BigInteger idPessoaCadun ){
+        try{
+            return (
+                    getEntityManager().createNativeQuery(" with documetos as (select dcnproc_pnumero, dcnproc_pano " +
+                                    "                    from SCP.dbo.document " +
+                                    "                    where dcnproc_pnumero = :numeroProcesso " +
+                                    "                      and dcnproc_pano = :anoProcesso  " +
+                                    "                      and docmt_tipo_decisao = 'D'), " +
+                                    "      interessados as (select NUM_PROC, ANO_PROC\n" +
+                                    "                       from SCP.dbo.PESSOAS_PROCESSO " +
+                                    "                       where ID_PESSOA = :idPessoaCadun " +
+                                    "                         and NUM_PROC = :numeroProcesso " +
+                                    "                         and ANO_PROC = :anoProcesso  " +
+                                    "                         and ID_PAPEL = 2) " +
+                                    " select 1\n" +
+                                    " from interessados i\n" +
+                                    "          join documetos d on i.NUM_PROC = d.dcnproc_pnumero and i.ANO_PROC = d.dcnproc_pano")
+                            .setParameter("anoProcesso",anoProcesso)
+                            .setParameter("numeroProcesso",numeroProcesso)
+                            .setParameter("idPessoaCadun",idPessoaCadun)
+                            .getResultList().size() > 0
+            ) ;
+
+        }catch (RuntimeException e){
+            throw new RuntimeException("Problema ao consultar processo no eContas. Favor entrar em contato com o respável pelo econtas!! ");
+        }
     }
 
 }

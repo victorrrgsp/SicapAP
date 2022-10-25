@@ -32,9 +32,13 @@ public class AdmissaoRepository extends DefaultRepository<Admissao, BigInteger> 
                 if (tipoParams == 0) { //entra para tratar a string
                     String arrayOfStrings[] = param.split("=");
                     if (arrayOfStrings[0].equals("cpfServidor")){
-                        search = search + " AND " + arrayOfStrings[0]  + " = '" + arrayOfStrings[1] + "'  ";
-                    } else if (arrayOfStrings[0].equals("idAto")) {
-                        search = search + " AND " + arrayOfStrings[0]  + " = " + arrayOfStrings[1] + "  ";
+                        search = search + " AND s." + arrayOfStrings[0]  + " = '" + arrayOfStrings[1] + "'  ";
+                    }
+                    else if (arrayOfStrings[0].equals("numeroEdital")) {
+                        search = search + " AND c." + arrayOfStrings[0]  + " = '" + arrayOfStrings[1] + "'  ";
+                    }
+                    else if (arrayOfStrings[0].equals("idAto")) {
+                        search = search + " AND c." + arrayOfStrings[0]  + " = " + arrayOfStrings[1] + "  ";
                     }
 
                 } else {
@@ -42,22 +46,6 @@ public class AdmissaoRepository extends DefaultRepository<Admissao, BigInteger> 
                 }
             }
         }
-//            if (searchParams.length() > 3) {
-//                if (tipoParams == 0) { //entra para tratar a string
-//                    String arrayOfStrings[] = searchParams.split("=");
-//                    if (arrayOfStrings[0].equals("cpfServidor"))
-//                        search = " and s." + arrayOfStrings[0] + " = '" + arrayOfStrings[1] + "'  ";
-//                    else if (arrayOfStrings[0].equals("idedital1"))
-//
-//                       search="";
-//                    else if (arrayOfStrings[0].equals("dataPublicacao"))
-//                        search="";
-//                    else
-//                        search = " and " + arrayOfStrings[0] + " LIKE '%" + arrayOfStrings[1] + "%'  ";
-//                } else {
-//                    search = " and " + searchParams + "   ";
-//                }
-//            }
         return search;
     }
 
@@ -72,14 +60,14 @@ public class AdmissaoRepository extends DefaultRepository<Admissao, BigInteger> 
                 .createNativeQuery("with admissao1  as " +
                         "( select a.* from Admissao a  join InfoRemessa i on a.chave = i.chave and i.idUnidadeGestora = :ug and a.tipoAdmissao=1  ), " +
                         " servidor1 as ( select d.* from Servidor d  join InfoRemessa i on d.chave = i.chave and i.idUnidadeGestora = :ug  ) " +
-                        "select c.* from admissao1 c  join  servidor  s on   c.idServidor = s.id " + " " + search + " ORDER BY " + campo, Admissao.class)
+                        "select c.* from admissao1 c  join  servidor1  s on   c.idServidor = s.id " + " " + search + " ORDER BY " + campo, Admissao.class)
                 .setParameter("ug",User.getUser(super.request).getUnidadeGestora().getId())
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();
 
 
-            long totalRegistros = countAdmissoes(search);
+             long totalRegistros = countAdmissoes(search);
             long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
             List<NomeacaoConcurso> listc= new ArrayList<NomeacaoConcurso>() ;
             for(Integer i= 0; i < list.size(); i++){
@@ -91,37 +79,28 @@ public class AdmissaoRepository extends DefaultRepository<Admissao, BigInteger> 
                 nc.setAdmissao(list.get(i));
                 List<EditalAprovado> ea =  getEntityManager()
                         .createNativeQuery(" with vaga as ( " +
-                                "   select v.* from  EditalVaga v join InfoRemessa i  on v.chave=i.chave and i.idUnidadeGestora = :ug  and v.idCargo = :idcargo" +
+                                "   select v.* from  EditalVaga v   join InfoRemessa i  on v.chave=i.chave and i.idUnidadeGestora = :ug  join Cargo c  on v.idCargo=c.id  and   c.codigoCargo=:codigoCargo    " +
                                 "), " +
                                 "Aprovado as (" +
-                                "   select v.* from  EditalAprovado v join InfoRemessa i  on v.chave=i.chave and i.idUnidadeGestora = :ug and cpf= :cpf" +
+                                "  select v.* from  EditalAprovado v join InfoRemessa i  on v.chave=i.chave and i.idUnidadeGestora = :ug and cpf= :cpf and cast( v.numeroInscricao as int ) = cast (:numeroInscricao as int)  " +
                                 " ) " +
-                                "select a.* from EditalAprovado a " +
-                                "join EditalVaga b on a.idEditalVaga= b.id "  +
-                                " where   b.idCargo = :idcargo and   cpf= :cpf ", EditalAprovado.class)
+                                "select a.* from Aprovado a " +
+                                "join vaga b on a.idEditalVaga= b.id "  , EditalAprovado.class)
                         .setParameter("ug",User.getUser(super.request).getUnidadeGestora().getId())
-                        .setParameter("idcargo",list.get(i).getCargo().getId())
+                        .setParameter("codigoCargo",list.get(i).getCargo().getCodigoCargo())
+                        .setParameter("numeroInscricao",list.get(i).getNumeroInscricao())
                         .setParameter("cpf",nc.getCpf())
                         .getResultList();
 
             if (ea.size()>0 ){
                 nc.setEditalAprovado((EditalAprovado) ea.get(0) );
-
                 nc.setClassificacao(ea.get(0).getClassificacao());
                 nc.setSitCadAprovado("Aprovado Cadastrado");
                 nc.setVaga(ea.get(0).getEditalVaga().getCargo().getCargoNome().getNome());
                 Integer enviado = (Integer) getEntityManager().createNativeQuery("select count(*) from DocumentoAdmissao a " +
                         "where  status >0 and  a.idAdmissao = "+list.get(i).getId()+ "").getSingleResult();
-                if (enviado > 0 ){
-
-                    nc.setSituacaoNomeacao("Aprovado anexado");
-                }
-                else
-                {
-                    nc.setSituacaoNomeacao("Apto para envio!");
-                }
-            }
-            else
+                    nc.setSituacaoNomeacao((enviado > 0)?"Aprovado anexado" : "Apto para envio!");
+            } else
             {
                 nc.setSitCadAprovado("Aprovado não Cadastrado!");
                 nc.setSituacaoNomeacao("inapto para envio!");

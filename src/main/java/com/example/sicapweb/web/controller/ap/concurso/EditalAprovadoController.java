@@ -18,6 +18,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.math.BigInteger;
 import java.net.URI;
+import java.security.InvalidParameterException;
 import java.util.List;
 
 @RestController
@@ -54,6 +55,8 @@ public class EditalAprovadoController extends DefaultController<EditalAprovado> 
     @PostMapping
     public ResponseEntity<EditalAprovado> create(@RequestBody EditalAprovado editalAprovado) {
         editalAprovado.setChave(editalAprovadoRepository.buscarPrimeiraRemessa());
+        if (editalVagaRepository.buscarVagasPorCodigo(editalAprovado.getCodigoVaga()) ==null)
+            throw  new InvalidParameterException("Não encontrou vaga com esse codigo");
         editalAprovado.setEditalVaga(editalVagaRepository.buscarVagasPorCodigo(editalAprovado.getCodigoVaga()));
 
         EditalAprovado mesmocpf = editalAprovadoRepository.buscarAprovadoPorCpf(editalAprovado.getCpf());

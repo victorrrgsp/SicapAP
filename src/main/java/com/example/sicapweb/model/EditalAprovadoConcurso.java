@@ -1,7 +1,6 @@
 package com.example.sicapweb.model;
 
 import br.gov.to.tce.model.ap.concurso.EditalAprovado;
-import br.gov.to.tce.model.ap.concurso.EditalVaga;
 
 public class EditalAprovadoConcurso {
 
@@ -9,8 +8,7 @@ public class EditalAprovadoConcurso {
     private String numeroEdital;
     private String codigoVaga;
 
-    private EditalAprovado editalaprovado;
-    private EditalVaga editalVaga;
+    private EditalAprovado editalAprovado;
     private String cpf;
     private String nome;
     private String numeroInscricao;
@@ -20,10 +18,9 @@ public class EditalAprovadoConcurso {
     public EditalAprovadoConcurso() {
     }
 
-    public EditalAprovadoConcurso(String numeroEdital, String codigoVaga, EditalVaga editalVaga, String cpf, String nome, String numeroInscricao, String classificacao, String situacao) {
+    public EditalAprovadoConcurso(String numeroEdital, String codigoVaga,  String cpf, String nome, String numeroInscricao, String classificacao, String situacao) {
         this.numeroEdital = numeroEdital;
         this.codigoVaga = codigoVaga;
-        this.editalVaga = editalVaga;
         this.cpf = cpf;
         this.nome = nome;
         this.numeroInscricao = numeroInscricao;
@@ -47,13 +44,6 @@ public class EditalAprovadoConcurso {
         this.codigoVaga = codigoVaga;
     }
 
-    public EditalVaga getEditalVaga() {
-        return editalVaga;
-    }
-
-    public void setEditalVaga(EditalVaga editalVaga) {
-        this.editalVaga = editalVaga;
-    }
 
     public String getCpf() {
         return cpf;
@@ -95,11 +85,11 @@ public class EditalAprovadoConcurso {
         this.Situacao = situacao;
     }
 
-    public EditalAprovado getEditalaprovado() {
-        return editalaprovado;
+    public EditalAprovado getEditalAprovado() {
+        return editalAprovado;
     }
 
-    public void setEditalaprovado(EditalAprovado editalaprovado) {
-        this.editalaprovado = editalaprovado;
+    public void setEditalAprovado(EditalAprovado editalAprovado) {
+        this.editalAprovado = editalAprovado;
     }
 }

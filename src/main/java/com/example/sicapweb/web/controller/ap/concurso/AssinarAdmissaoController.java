@@ -2,7 +2,6 @@ package com.example.sicapweb.web.controller.ap.concurso;
 
 import br.gov.to.tce.model.ap.concurso.AdmissaoEnvio;
 import br.gov.to.tce.model.ap.concurso.AdmissaoEnvioAssinatura;
-import br.gov.to.tce.model.ap.concurso.ConcursoEnvio;
 import br.gov.to.tce.model.ap.concurso.EditalAprovado;
 import br.gov.to.tce.model.ap.concurso.documento.DocumentoAdmissao;
 import br.gov.to.tce.util.Date;
@@ -200,8 +199,8 @@ public class AssinarAdmissaoController {
     private void gerarProcesso(AdmissaoEnvio envio) throws IOException, URISyntaxException {
         //coleta dados do cadun sobre o id  do responsavel da ug e o id da pessoa juridica
         String Cnpj = User.getUser(admissaoEnvioAssinaturaRepository.getRequest()).getUnidadeGestora().getId();
-        Integer origem =   admissaoEnvioAssinaturaRepository.getidCADUNPJ(Cnpj);
-        Integer responsavel = admissaoEnvioAssinaturaRepository.getidCADUNPF(Cnpj);
+        Integer origem =   admissaoEnvioAssinaturaRepository.getIdPessoaJuridicaNoCadun(Cnpj);
+        Integer responsavel = admissaoEnvioAssinaturaRepository.getIdPessoaFisicaNoCadun(Cnpj);
         LocalDateTime dataHoraDoprotocolo= LocalDateTime.now();
         Integer idprotocolo =admissaoEnvioAssinaturaRepository.insertProtocolo(matricula,dataHoraDoprotocolo.getYear(),dataHoraDoprotocolo,origem);
         //prepara  variaveis de processo

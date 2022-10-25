@@ -29,9 +29,14 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
                 if (tipoParams == 0) { //entra para tratar a string
                     String arrayOfStrings[] = param.split("=");
                     if (arrayOfStrings[0].equals("cpf")) {
-                        search = search + " AND a." + arrayOfStrings[0] + " = '" + arrayOfStrings[1] + "'  ";
-                    } else if (arrayOfStrings[0].equals("idEdital")) {
-                        search = search + " AND b." + arrayOfStrings[0] + " = " + arrayOfStrings[1] + "  ";
+                        search = search + " AND     a." + arrayOfStrings[0] + " = '" + arrayOfStrings[1] + "'  ";
+                    } else if (arrayOfStrings[0].equals("numeroEdital")) {
+                        search = search + " AND   exists ( " +
+                                " select 1 " +
+                                " from EditalVaga ev " +
+                                "          join Edital e on " +
+                                "              ev.id = a.idEditalVaga and " +
+                                "              ev.idEdital = e.id and e.numeroEdital = '"+arrayOfStrings[1]+"' ) ";
                     }
 
                 } else {
@@ -55,7 +60,8 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
                         "             from EditalAprovado a  join infoRemessa i on a.chave = i.chave  and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "'  group by " +
                         "                a.cpf,a.numeroInscricao , i.idUnidadeGestora " +
                         "                         ) " +
-                        "select   a.* from EditalAprovado a  join infoRemessa i on a.chave = i.chave join edt b on a.id= b.max_id and i.idUnidadeGestora=b.idUnidadeGestora where 1=1 " + search + " ORDER BY " + campo, EditalAprovado.class)
+                        "select   a.* from EditalAprovado a  join infoRemessa i on a.chave = i.chave join edt b on a.id= b.max_id and i.idUnidadeGestora=b.idUnidadeGestora " +
+                        " where 1=1 " + search + " ORDER BY " + campo, EditalAprovado.class)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();
@@ -103,13 +109,12 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
         List<EditalAprovadoConcurso> listaAprovadosDto = new ArrayList<EditalAprovadoConcurso>();
         for (Integer i = 0; i < listAprovados.size(); i++) {
             EditalAprovadoConcurso editalAprovadoConcurso = new EditalAprovadoConcurso();
-            editalAprovadoConcurso.setEditalVaga(listAprovados.get(i).getEditalVaga());
             editalAprovadoConcurso.setNome(listAprovados.get(i).getNome());
             editalAprovadoConcurso.setNumeroEdital(listAprovados.get(i).getNumeroEdital());
             editalAprovadoConcurso.setClassificacao(listAprovados.get(i).getClassificacao());
             editalAprovadoConcurso.setCodigoVaga(listAprovados.get(i).getCodigoVaga());
             editalAprovadoConcurso.setCpf(listAprovados.get(i).getCpf());
-            editalAprovadoConcurso.setEditalaprovado(listAprovados.get(i));
+            editalAprovadoConcurso.setEditalAprovado(listAprovados.get(i));
             Integer quantidadeDocumentosEnviadosDoAprovado = (Integer) getEntityManager().createNativeQuery("select count(*) from DocumentoAdmissao a " +
                     "where status > 0 and  a.idAprovado = " + listAprovados.get(i).getId() + "").getSingleResult();
             editalAprovadoConcurso.setSituacao( (quantidadeDocumentosEnviadosDoAprovado > 0) ?  "Aprovado Anexado" : "Apto para Envio!" );

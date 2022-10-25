@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.validation.ValidationException;
 import java.math.BigInteger;
 import java.net.URI;
 import java.util.List;
@@ -111,16 +112,25 @@ public class EditalAdmissaoController {
         AdmissaoEnvio admissaoEnvio = admissaoEnvioRepository.findById(id);
         if (admissaoEnvio != null) {
             List<Map<String,Object>> la = admissaoEnvioRepository.getValidInfoEnvio(admissaoEnvio.getEdital().getId());
-            for (Map<String,Object> hashmap : la){
-                if (  !((Boolean)hashmap.get("valido"))  ) {
-                    throw new InvalitInsert( ((String)hashmap.get("ocorrencia")) );
+            if (la.size()>0) {
+                for (Map<String, Object> hashmap : la) {
+                    if (!((Boolean) hashmap.get("valido"))) {
+                        throw new InvalitInsert(((String) hashmap.get("ocorrencia")));
+                    }
                 }
+            }
+            else {
+                throw new InvalitInsert("não achou nenhum aprovado cadastrado!!");
             }
             admissaoEnvio.setStatus(AdmissaoEnvio.Status.aguardandoAssinatura.getValor());
             admissaoEnvioRepository.update(admissaoEnvio);
+            return ResponseEntity.ok().body(admissaoEnvio);
+        }
+        else{
+            throw new InvalitInsert("não achou envio!!");
         }
 
-        return ResponseEntity.ok().body(admissaoEnvio);
+
     }
 
     @CrossOrigin
@@ -136,7 +146,11 @@ public class EditalAdmissaoController {
     @DeleteMapping(value = {"/processos/{id}"})
     public void delete(@PathVariable BigInteger id) {
         AdmissaoEnvio admissaoEnvio = admissaoEnvioRepository.findById(id);
-        if (admissaoEnvio != null && admissaoEnvio.getStatus()==1)
+        if (admissaoEnvio==null)
+            throw new ValidationException("Não achou envio paara excluir!!");
+        else if  ( admissaoEnvio.getStatus()!=1)
+            throw new ValidationException("Envio ja foi enviado!!");
+        else
             admissaoEnvioRepository.delete(id);
              
     }
