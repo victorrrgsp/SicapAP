@@ -1,6 +1,7 @@
 package com.example.sicapweb.web.controller.ap.geral;
 
 import br.gov.to.tce.model.InfoRemessa;
+import br.gov.to.tce.model.ap.concurso.EmpresaOrganizadora;
 import br.gov.to.tce.model.ap.relacional.Lotacao;
 import br.gov.to.tce.model.ap.relacional.UnidadeAdministrativa;
 import com.example.sicapweb.exception.InvalitInsert;
@@ -13,8 +14,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.math.BigInteger;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 
@@ -66,6 +69,18 @@ public class UnidadeAdministrativaController  extends DefaultController<UnidadeA
     public ResponseEntity<?> findById(@PathVariable BigInteger id) {
         UnidadeAdministrativa list = unidadeAdministrativaRepository.findById(id);
         return ResponseEntity.ok().body(list);
+    }
+
+
+    @CrossOrigin
+    @Transactional
+    @PostMapping
+    public ResponseEntity<UnidadeAdministrativa> create(@RequestBody UnidadeAdministrativa unidadeAdministrativa) {
+        unidadeAdministrativa.setChave(unidadeAdministrativaRepository.buscarPrimeiraRemessa());
+        unidadeAdministrativa.setCnpj(unidadeAdministrativa.getCnpj().replace(".", "").replace("-", "").replace("/", ""));
+        unidadeAdministrativaRepository.save(unidadeAdministrativa);
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(unidadeAdministrativa.getId()).toUri();
+        return ResponseEntity.created(uri).body(unidadeAdministrativa);
     }
 
     @CrossOrigin
