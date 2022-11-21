@@ -2,6 +2,7 @@ package com.example.sicapweb.web.controller.ap.concessao;
 
 import br.gov.to.tce.model.adm.AdmEnvio;
 import br.gov.to.tce.model.ap.concessoes.DocumentoPensao;
+import br.gov.to.tce.model.ap.pessoal.Aposentadoria;
 import br.gov.to.tce.model.ap.pessoal.Pensao;
 import br.gov.to.tce.util.Date;
 import com.example.sicapweb.model.Inciso;
@@ -22,7 +23,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
@@ -66,7 +70,12 @@ public class ConcessaoPensaoController extends DefaultController<DocumentoPensao
     @CrossOrigin
     @GetMapping(path="/{searchParams}/{tipoParams}/pagination")
     public ResponseEntity<PaginacaoUtil<PensaoDTO>> listPensoes(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
-        return ResponseEntity.ok().body(pensaoRepository.buscaPaginadaPensao(pageable,searchParams,tipoParams));
+        PaginacaoUtil<PensaoDTO> paginacaoUtil = pensaoRepository.buscaPaginadaPensao(pageable,searchParams,tipoParams);
+        paginacaoUtil.getRegistros().forEach(registro -> {
+            if (registro.getStatus() == 1 && getProcessoAmbiguo(registro.getId()).getBody() != null)
+                registro.setStatus(0);
+        });
+        return ResponseEntity.ok().body(paginacaoUtil);
     }
 
     @CrossOrigin
@@ -202,5 +211,34 @@ public class ConcessaoPensaoController extends DefaultController<DocumentoPensao
         admEnvio.setComplemento("Conforme PORTARIA: " + pensao.getAto().getNumeroAto() + " De: " + pensao.getAto().getDataPublicacao());
         admEnvio.setAdmissao(pensao.getAdmissao());
         return admEnvio;
+    }
+
+    @CrossOrigin
+    @PostMapping("/vincularProcesso/{id}/{numero}/{ano}")
+    public ResponseEntity<?> vincularProcesso(@PathVariable BigInteger id, @PathVariable String numero, @PathVariable String ano) {
+        String processo = numero + "/" + ano;
+        AdmEnvio admEnvio = preencherEnvio(id);
+        admEnvio.setStatus(AdmEnvio.Status.CONCLUIDO.getValor());
+        admEnvio.setProcesso(processo);
+        admEnvioRepository.save(admEnvio);
+        return ResponseEntity.ok().body("Ok");
+    }
+
+    @CrossOrigin
+    @PostMapping("/buscarProcesso/{id}")
+    public ResponseEntity<?> getProcessoAmbiguo(@PathVariable BigInteger id) {
+        Pensao pensao = pensaoRepository.findById(id);
+        List<Object> processos = pensaoRepository.getProcessoApEcontas("77",
+                pensao.getAdmissao().getServidor().getCpfServidor(),
+                pensao.getChave().getIdUnidadeGestora());
+        return ResponseEntity.ok().body(processos);
+    }
+
+    @CrossOrigin
+    @GetMapping("/teste")
+    public void teste() throws ParseException {
+        java.util.Date data = new java.util.Date(2022, Calendar.JULY, 1);
+        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+        String strToDate = df.format(data);
     }
 }

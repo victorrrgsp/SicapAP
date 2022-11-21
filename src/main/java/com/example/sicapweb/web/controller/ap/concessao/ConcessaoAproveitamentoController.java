@@ -2,6 +2,7 @@ package com.example.sicapweb.web.controller.ap.concessao;
 
 import br.gov.to.tce.model.adm.AdmEnvio;
 import br.gov.to.tce.model.ap.concessoes.DocumentoAproveitamento;
+import br.gov.to.tce.model.ap.pessoal.Aposentadoria;
 import br.gov.to.tce.model.ap.pessoal.Aproveitamento;
 import br.gov.to.tce.util.Date;
 import com.example.sicapweb.model.Inciso;
@@ -67,6 +68,10 @@ public class ConcessaoAproveitamentoController extends DefaultController<Documen
     @GetMapping(path = "/{searchParams}/{tipoParams}/pagination")
     public ResponseEntity<PaginacaoUtil<AproveitamentoDTO>> listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
         PaginacaoUtil<AproveitamentoDTO> paginacaoUtil = aproveitamentoRepository.buscaPaginadaAproveitamento(pageable, searchParams, tipoParams);
+        paginacaoUtil.getRegistros().forEach(registro -> {
+            if (registro.getStatus() == 1 && getProcessoAmbiguo(registro.getId()).getBody() != null)
+                registro.setStatus(0);
+        });
         return ResponseEntity.ok().body(paginacaoUtil);
     }
 
@@ -187,5 +192,26 @@ public class ConcessaoAproveitamentoController extends DefaultController<Documen
         admEnvio.setComplemento("Conforme PORTARIA: " + aproveitamento.getAto().getNumeroAto() + " De: " + aproveitamento.getAto().getDataPublicacao());
         admEnvio.setAdmissao(aproveitamento.getAdmissao());
         return admEnvio;
+    }
+
+    @CrossOrigin
+    @PostMapping("/vincularProcesso/{id}/{numero}/{ano}")
+    public ResponseEntity<?> vincularProcesso(@PathVariable BigInteger id, @PathVariable String numero, @PathVariable String ano) {
+        String processo = numero + "/" + ano;
+        AdmEnvio admEnvio = preencherEnvio(id, null);
+        admEnvio.setStatus(AdmEnvio.Status.CONCLUIDO.getValor());
+        admEnvio.setProcesso(processo);
+        admEnvioRepository.save(admEnvio);
+        return ResponseEntity.ok().body("Ok");
+    }
+
+    @CrossOrigin
+    @PostMapping("/buscarProcesso/{id}")
+    public ResponseEntity<?> getProcessoAmbiguo(@PathVariable BigInteger id) {
+        Aproveitamento aproveitamento = aproveitamentoRepository.findById(id);
+        List<Object> processos = aproveitamentoRepository.getProcessoApEcontas("176",
+                aproveitamento.getAdmissao().getServidor().getCpfServidor(),
+                aproveitamento.getChave().getIdUnidadeGestora());
+        return ResponseEntity.ok().body(processos);
     }
 }

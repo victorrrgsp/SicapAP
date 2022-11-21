@@ -213,4 +213,31 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
             throw new ApplicationException(Util.removeEnters(e.getMessage()));
         }
     }
+
+    public List<Object> getProcessoApEcontas(String tipo, String cpf, String cnpj) {
+        try {
+            Query query = getEntityManager().createNativeQuery("" +
+                    "SELECT p.processo_numero, " +
+                    "       p.processo_ano " +
+                    "FROM SCP..PESSOAS_PROCESSO pp " +
+                    "         INNER JOIN SCP..processo p ON " +
+                    "    pp.NUM_PROC = p.processo_numero AND pp.ANO_PROC = p.processo_ano " +
+                    "         INNER JOIN SCP..assunto a on a.assunto_classe_assunto = p.processo_assunto_classe_assunto " +
+                    "    and a.assunto_codigo = p.processo_assunto_codigo " +
+                    "    and a.id = :tipo " +
+                    "         INNER JOIN Cadun..vwPessoaGeral pg ON pg.idpessoa = pp.ID_PESSOA " +
+                    "         INNER JOIN Cadun..vwPessoaGeral pj ON (pj.id = p.id_entidade_origem) OR (pj.id = p.id_entidade_vinc) " +
+                    "WHERE pg.cpf = :cpf " +
+                    "  AND pj.cnpj = :cnpj");
+
+            query.setParameter("tipo", tipo);
+            query.setParameter("cpf", cpf);
+            query.setParameter("cnpj", cnpj);
+
+            return buscarSQL(query, "p.processo_numero, p.processo_ano");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -22,6 +21,7 @@ public class AdmEnvioController extends DefaultController<AdmEnvio> {
     @Autowired
     private AdmEnvioRepository admEnvioRepository;
 
+    @CrossOrigin
     @GetMapping(path="/getByAdmissao/{idAdmissao}")
     public ResponseEntity<HashMap<String,Object>> listChaves(@PathVariable int idAdmissao) {
         return ResponseEntity.ok(admEnvioRepository.infoByRecibo(idAdmissao).get(0));

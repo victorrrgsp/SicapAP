@@ -68,6 +68,10 @@ public class ConcessaoAposentadoriaController extends DefaultController<Document
     @GetMapping(path = "/{searchParams}/{tipoParams}/pagination")
     public ResponseEntity<PaginacaoUtil<AposentadoriaDTO>> listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
         PaginacaoUtil<AposentadoriaDTO> paginacaoUtil = aposentadoriaRepository.buscaPaginadaAposentadorias(pageable, searchParams, tipoParams);
+        paginacaoUtil.getRegistros().forEach(registro -> {
+            if (registro.getStatus() == 1 && getProcessoAmbiguo(registro.getId()).getBody() != null)
+                registro.setStatus(0);
+        });
         return ResponseEntity.ok().body(paginacaoUtil);
     }
 
@@ -183,7 +187,7 @@ public class ConcessaoAposentadoriaController extends DefaultController<Document
     @Transactional
     @DeleteMapping(value = {"/{id}"})
     public void delete(@PathVariable BigInteger id) {
-        documentoAposentadoriaRepository.delete(id); 
+        documentoAposentadoriaRepository.delete(id);
     }
 
     @CrossOrigin
@@ -206,10 +210,24 @@ public class ConcessaoAposentadoriaController extends DefaultController<Document
         return admEnvio;
     }
 
-    // Método de teste para pegar o IP da máquina do usuário que está acessando o sistema
-    @GetMapping(path = {"/contato"})
-    public String getIp(HttpServletRequest request) throws UnknownHostException {
-        System.out.println(InetAddress.getLocalHost().getHostAddress());
-        return "page";
+    @CrossOrigin
+    @PostMapping("/vincularProcesso/{id}/{numero}/{ano}")
+    public ResponseEntity<?> vincularProcesso(@PathVariable BigInteger id, @PathVariable String numero, @PathVariable String ano) {
+        String processo = numero + "/" + ano;
+        AdmEnvio admEnvio = preencherEnvio(id);
+        admEnvio.setStatus(AdmEnvio.Status.CONCLUIDO.getValor());
+        admEnvio.setProcesso(processo);
+        admEnvioRepository.save(admEnvio);
+        return ResponseEntity.ok().body("Ok");
+    }
+
+    @CrossOrigin
+    @PostMapping("/buscarProcesso/{id}")
+    public ResponseEntity<?> getProcessoAmbiguo(@PathVariable BigInteger id) {
+        Aposentadoria aposentadoria = aposentadoriaRepository.findById(id);
+        List<Object> processos = aposentadoriaRepository.getProcessoApEcontas("71",
+                aposentadoria.getAdmissao().getServidor().getCpfServidor(),
+                aposentadoria.getChave().getIdUnidadeGestora());
+        return ResponseEntity.ok().body(processos);
     }
 }

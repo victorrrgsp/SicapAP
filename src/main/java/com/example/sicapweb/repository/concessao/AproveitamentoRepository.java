@@ -71,7 +71,7 @@ public class AproveitamentoRepository extends DefaultRepository<Aproveitamento, 
             aux.setNumeroAto((String)a[3]);
             aux.setStatus((Integer)a[4]);
             aux.setProcesso((String)a[5]);
-            aux.setId((BigDecimal) a[6]);
+            aux.setId((BigInteger) a[6]);
             aproveitamentoDTOArrayList.add(aux);
         });
 

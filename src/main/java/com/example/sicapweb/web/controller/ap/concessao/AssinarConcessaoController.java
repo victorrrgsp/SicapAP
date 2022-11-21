@@ -22,7 +22,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.InetAddress;
@@ -78,7 +77,7 @@ public class AssinarConcessaoController extends DefaultController<AdmEnvio> {
 
     @GetMapping(path = "/{searchParams}/{tipoParams}/pagination")
     public ResponseEntity<PaginacaoUtil<AdmEnvio>> listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
-        if (User.getUser(admEnvioRepository.getRequest()).getCargo().getValor() != 4) {
+        if (User.getUser(admEnvioRepository.getRequest()).getCargo().getValor() != 3) {
             return ResponseEntity.ok().body(null);
         } else {
             PaginacaoUtil<AdmEnvio> paginacaoUtil = admEnvioRepository.buscaPaginada(pageable, searchParams, tipoParams);
@@ -88,7 +87,7 @@ public class AssinarConcessaoController extends DefaultController<AdmEnvio> {
 
     @CrossOrigin
     @PostMapping(path = "/assinar")
-    public ResponseEntity<?> AssinarConcessorio(@RequestBody String hashassinante_hashAssinado) throws Exception {
+    public ResponseEntity<?> AssinarConcessorio(@RequestBody String hashassinante_hashAssinado) {
         try {
             JsonNode requestJson = new ObjectMapper().readTree(hashassinante_hashAssinado);
             String hashassinante = URLDecoder.decode(requestJson.get("hashassinante").asText(), StandardCharsets.UTF_8);
@@ -433,8 +432,8 @@ public class AssinarConcessaoController extends DefaultController<AdmEnvio> {
                 theMap.put("origem", ((HashMap) instituto).get("idPessoaJuridica"));
                 theMap.put("vinculada", ((HashMap) ugOrgaoOrigem).get("idPessoaJuridica"));
                 theMap.put("solicitante", ((HashMap) ug).get("idPessoaJuridica"));
-                theMap.put("responsavel", ((HashMap) instituto).get("idPessoaJuridica"));
-                theMap.put("responsavel_solicitante", ((HashMap) ug).get("idPessoaJuridica"));
+                theMap.put("responsavel", ((HashMap) instituto).get("idPessoaFisica"));
+                theMap.put("responsavel_solicitante", ((HashMap) ug).get("idPessoaFisica"));
             } else {
                 Object instituto = unidadeGestoraRepository.buscarDadosFundoOuInstituto(cnpj);
                 if (instituto == null) {
@@ -442,15 +441,15 @@ public class AssinarConcessaoController extends DefaultController<AdmEnvio> {
                     theMap.put("origem", ((HashMap) ug).get("idPessoaJuridica"));
                     theMap.put("vinculada", ((HashMap) ugOrgaoOrigem).get("idPessoaJuridica"));
                     theMap.put("solicitante", ((HashMap) ug).get("idPessoaJuridica"));
-                    theMap.put("responsavel", ((HashMap) ug).get("idPessoaJuridica"));
-                    theMap.put("responsavel_solicitante", ((HashMap) ug).get("idPessoaJuridica"));
+                    theMap.put("responsavel", ((HashMap) ug).get("idPessoaFisica"));
+                    theMap.put("responsavel_solicitante", ((HashMap) ug).get("idPessoaFisica"));
                 } else {
                     theMap.put("temInstituto", true);
                     theMap.put("origem", ((HashMap) instituto).get("idPessoaJuridica"));
                     theMap.put("vinculada", ((HashMap) ugOrgaoOrigem).get("idPessoaJuridica"));
                     theMap.put("solicitante", ((HashMap) ug).get("idPessoaJuridica"));
-                    theMap.put("responsavel", ((HashMap) instituto).get("idPessoaJuridica"));
-                    theMap.put("responsavel_solicitante", ((HashMap) ug).get("idPessoaJuridica"));
+                    theMap.put("responsavel", ((HashMap) instituto).get("idPessoaFisica"));
+                    theMap.put("responsavel_solicitante", ((HashMap) ug).get("idPessoaFisica"));
                 }
             }
             return theMap;

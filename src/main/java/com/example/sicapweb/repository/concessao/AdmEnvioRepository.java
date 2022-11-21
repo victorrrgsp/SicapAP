@@ -77,7 +77,7 @@ public class AdmEnvioRepository extends DefaultRepository<AdmEnvio, BigInteger> 
             aux.put("UnidadeGestora", (String) admEnvio[1]);
             aux.put("nomeEntidade", (String) admEnvio[2]);
             aux.put("nomeServidor", (String) admEnvio[3]);
-            aux.put("dataAssinatura", new Date(((Timestamp)admEnvio[5]).getTime()));
+            aux.put("dataAssinatura", new Date(((Timestamp) admEnvio[5]).getTime()));
             var tipoLabel = Arrays.stream(AdmEnvio.TipoRegistro.values()).filter(a -> a.getValor() == (int) admEnvio[4]).findFirst().get().getLabel();
             aux.put("tipoRegistro", tipoLabel.toUpperCase());
 
@@ -86,71 +86,72 @@ public class AdmEnvioRepository extends DefaultRepository<AdmEnvio, BigInteger> 
         return resutSet;
     }
 
-    public List<HashMap<String,Object>> buscaTotalNaoPaginada(String searchParams, List<String> ug, List<Integer> tipoRegistro , LocalDate dataInico, LocalDate dataFim,Integer Ststuss){
+    public List<HashMap<String, Object>> buscaTotalNaoPaginada(String searchParams, List<String> ug, List<Integer> tipoRegistro, LocalDate dataInico, LocalDate dataFim, Integer Ststuss) {
 
-                var query = getEntityManager().createNativeQuery(
-                                        "with AdmEnvioAssinatura1 as\n" +
-                                        "         (select ROW_NUMBER() over(partition by idEnvio order by data_assinatura) as rank, idEnvio ,data_assinatura\n" +
-                                        "          from SICAPAP21..AdmEnvioAssinatura\n" +
-                                        "        )\n" +
-                                        "select\n" +
-                                        "    ad.*,\n" +
-                                        "    UG.nome as nomeUg,\n" +
-                                        "    UGorigen.nome as nomeUgOrigem,\n" +
-                                        "    adA.data_assinatura\n" +
-                                        "from AdmEnvio ad\n" +
-                                        "     join SICAPAP21.dbo.UnidadeGestora UG on UG.id = ad.unidadeGestora\n" +
-                                        "     join SICAPAP21.dbo.UnidadeGestora UGorigen on UGorigen.id = ad.orgaoOrigem\n" +
-                                        "     left join AdmEnvioAssinatura1 adA on adA.idEnvio = ad.id and adA.rank = 1\n" +
-                                        "where (ad.unidadeGestora in :ug or 'todos' in :ug ) \n"+
-                                        "     and (ad.tipoRegistro in :TipoRegistro or -1 in :TipoRegistro )\n" +
-                                        "     and ((adA.data_assinatura between :dataInico and :dataFim) or (:dataInico is null or :dataFim is null))\n" +
-                                        "     and ad.unidadeGestora <> '00000000000000'"+
-                                        "     and ( :status is null or ad.status = :status) "
+        var query = getEntityManager().createNativeQuery(
+                        "with AdmEnvioAssinatura1 as\n" +
+                                "         (select ROW_NUMBER() over(partition by idEnvio order by data_assinatura) as rank, idEnvio ,data_assinatura\n" +
+                                "          from SICAPAP21..AdmEnvioAssinatura\n" +
+                                "        )\n" +
+                                "select\n" +
+                                "    ad.*,\n" +
+                                "    UG.nome as nomeUg,\n" +
+                                "    UGorigen.nome as nomeUgOrigem,\n" +
+                                "    adA.data_assinatura\n" +
+                                "from AdmEnvio ad\n" +
+                                "     join SICAPAP21.dbo.UnidadeGestora UG on UG.id = ad.unidadeGestora\n" +
+                                "     join SICAPAP21.dbo.UnidadeGestora UGorigen on UGorigen.id = ad.orgaoOrigem\n" +
+                                "     left join AdmEnvioAssinatura1 adA on adA.idEnvio = ad.id and adA.rank = 1\n" +
+                                "where (ad.unidadeGestora in :ug or 'todos' in :ug ) \n" +
+                                "     and (ad.tipoRegistro in :TipoRegistro or -1 in :TipoRegistro )\n" +
+                                "     and ((adA.data_assinatura between :dataInico and :dataFim) or (:dataInico is null or :dataFim is null))\n" +
+                                "     and ad.unidadeGestora <> '00000000000000'" +
+                                "     and ( :status is null or ad.status = :status) "
                 )
-                .setParameter("ug" ,ug)
-                .setParameter("TipoRegistro" ,tipoRegistro)
-                .setParameter("dataInico" ,dataInico)
-                .setParameter("status" ,Ststuss)
-                .setParameter("dataFim" ,dataFim);
+                .setParameter("ug", ug)
+                .setParameter("TipoRegistro", tipoRegistro)
+                .setParameter("dataInico", dataInico)
+                .setParameter("status", Ststuss)
+                .setParameter("dataFim", dataFim);
         List<Object[]> list = query.getResultList();
-        List<HashMap<String,Object>> retorno = new ArrayList<HashMap<String,Object>>();
+        List<HashMap<String, Object>> retorno = new ArrayList<HashMap<String, Object>>();
 
-        list.forEach(envio ->{
-            var aux = new HashMap<String,Object>();
+        list.forEach(envio -> {
+            var aux = new HashMap<String, Object>();
             //aux.put("id", envio[0] );
-            aux.put("TipoRegistro",this.getTipoByValue((Integer)envio[1]));
+            aux.put("TipoRegistro", this.getTipoByValue((Integer) envio[1]));
             //aux.put("UnidadeGestora", envio[2] );
-            aux.put("processo", envio[3] );
+            aux.put("processo", envio[3]);
             {
                 var status = Arrays.asList(AdmEnvio.Status.values());
                 aux.put("status",
-                            status
+                        status
                                 .stream()
-                                .filter(stat -> stat.getValor() == (Integer)envio[4])
+                                .filter(stat -> stat.getValor() == (Integer) envio[4])
                                 .findFirst()
                                 .get()
-                        );
+                );
             }
             //aux.put("orgaoOrigem", envio[5] );
             //aux.put("idMovimentacoes", envio[6] );
-            aux.put("Complemento", envio[7] );
-            aux.put("nomeUg", envio[9] );
-            aux.put("nomeUgOrigem", envio[10] );
-            aux.put("DataAsinatura", envio[11] );
+            aux.put("Complemento", envio[7]);
+            aux.put("nomeUg", envio[9]);
+            aux.put("nomeUgOrigem", envio[10]);
+            aux.put("DataAsinatura", envio[11]);
             retorno.add(aux);
         });
         return retorno;
 
 
     }
-    public static AdmEnvio.TipoRegistro getTipoByValue(Integer value){
+
+    public static AdmEnvio.TipoRegistro getTipoByValue(Integer value) {
         var tipos = Arrays.asList(AdmEnvio.TipoRegistro.values());
         return tipos
-                    .stream()
-                    .filter(tipo -> tipo.getValor() == value)
-                    .findFirst()
-                    .get();
+                .stream()
+                .filter(tipo -> tipo.getValor() == value)
+                .findFirst()
+                .get();
     }
 
 

@@ -8,7 +8,7 @@ import java.math.BigInteger;
 @Getter @Setter
 public class AproveitamentoDTO {
 
-    private BigDecimal id;
+    private BigInteger id;
     private String cpfServidor;
     private String nome;
     private String cargo;
