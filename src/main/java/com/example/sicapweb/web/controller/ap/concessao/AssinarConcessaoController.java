@@ -77,7 +77,7 @@ public class AssinarConcessaoController extends DefaultController<AdmEnvio> {
 
     @GetMapping(path = "/{searchParams}/{tipoParams}/pagination")
     public ResponseEntity<PaginacaoUtil<AdmEnvio>> listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
-        if (User.getUser(admEnvioRepository.getRequest()).getCargo().getValor() != 3) {
+        if (User.getUser(admEnvioRepository.getRequest()).getCargo().getValor() != 4) {
             return ResponseEntity.ok().body(null);
         } else {
             PaginacaoUtil<AdmEnvio> paginacaoUtil = admEnvioRepository.buscaPaginada(pageable, searchParams, tipoParams);
