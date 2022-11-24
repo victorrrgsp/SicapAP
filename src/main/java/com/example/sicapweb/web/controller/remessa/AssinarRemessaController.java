@@ -127,7 +127,7 @@ public class AssinarRemessaController {
             list = gfipRepository.findDocumentos(infoRemessa.getChave() );
         }
 
-        if (list.size() >= 3 || justificativaGfipRepository.buscaPorRemessa(infoRemessa.getRemessa(),infoRemessa.getExercicio()) != null)
+        if (list.size() >= 2 || justificativaGfipRepository.buscaPorRemessa(infoRemessa.getRemessa(),infoRemessa.getExercicio()) != null)
             return ResponseEntity.ok().body("Ok");
         else
             return ResponseEntity.ok().body("pendente");

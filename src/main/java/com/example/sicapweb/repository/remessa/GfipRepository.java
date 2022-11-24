@@ -118,7 +118,7 @@ public class GfipRepository extends DefaultRepository<Gfip, BigInteger> {
         return getEntityManager().createNativeQuery(
                 "select count(*) " +
                         "from SICAPAP21..DocumentoGfip " +
-                        "where tipo in ('GFIP', 'boletoGFIP', 'comprovanteGFIP') " +
+                        "where tipo in ('boletoGFIP', 'comprovanteGFIP') " +
                         "  and idInfoRemessa = '" + chave + "' " +
                         "group by tipo").getResultList();
     }
