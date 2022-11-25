@@ -43,6 +43,13 @@ public class UnidadeGestoraController {
     }
 
     @CrossOrigin
+    @GetMapping(path = "/findAllWithRegistros")
+    public ResponseEntity<List<UnidadeGestora>> findAllWithRegistros() {
+        List<UnidadeGestora> list = unidadeGestoraRepository.findAllWithRegistros();
+        return ResponseEntity.ok().body(list);
+    }
+
+    @CrossOrigin
     @GetMapping(path = {"/todos"})
     public ResponseEntity<List<UnidadeGestora>> findTodos() {
         List<UnidadeGestora> list = unidadeGestoraRepository.buscaTodasUnidadeGestora();

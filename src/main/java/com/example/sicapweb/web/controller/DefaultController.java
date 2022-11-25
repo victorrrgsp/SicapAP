@@ -37,6 +37,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 @Transactional
 @Controller
@@ -158,8 +159,8 @@ public abstract class DefaultController<T> {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
-            return ResponseEntity.ok().body(objeto.getNomeArquivo());
+            List<String> header = objeto.getHeaders().getHeaderValues("x-TCE-meta-Nome");
+            return ResponseEntity.ok().body(Objects.requireNonNullElse(objeto.getNomeArquivo(), header!=null?header.get(0): null  ));
         }
         return null;
     }
@@ -183,9 +184,11 @@ public abstract class DefaultController<T> {
         HttpHeaders headers = new HttpHeaders();
         headers.add("filename", objeto.getNomeArquivo());
 
+        List<String> header = objeto.getHeaders().getHeaderValues("x-TCE-meta-Nome");
+
         MimeType contentType = null;
         try {
-            contentType = MimeTypeUtils.parseMimeType(new File(objeto.getNomeArquivo()).toURL().openConnection().getContentType());
+            contentType = MimeTypeUtils.parseMimeType(new File(Objects.requireNonNullElse(objeto.getNomeArquivo(), header!=null?header.get(0): null   ) ).toURL().openConnection().getContentType());
         } catch (Exception e) {
             e.printStackTrace();
         }

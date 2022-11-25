@@ -172,6 +172,12 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
         return list.get(0);
     }
 
+    public InfoRemessa buscarPrimeiraRemessa(String cnpj) {
+        List<InfoRemessa> list = getEntityManager().createNativeQuery("select * from infoRemessa " +
+                "where remessa = 1 and exercicio = 2021 and idUnidadeGestora = '" + cnpj + "'", InfoRemessa.class).getResultList();
+        return list.get(0);
+    }
+
     public Object buscarResultadoUnico(Query query) throws ApplicationException {
         try{
             query.setMaxResults(1);

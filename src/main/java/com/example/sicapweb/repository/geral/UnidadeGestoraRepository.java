@@ -212,6 +212,20 @@ public class UnidadeGestoraRepository extends DefaultRepository<UnidadeGestora, 
 
     }
 
+
+    public List<UnidadeGestora> findAllWithRegistros() {
+
+        var result = getEntityManager().createNativeQuery(
+                "with  registros as (select idUnidadeGestora from RegistroPensao\n" +
+                        "    union " +
+                        "    select idUnidadeGestora from RegistroAdmissao " +
+                        "        union " +
+                        "      select idUnidadeGestora from RegistroAposentadoria) " +
+                        "select  distinct b.* from registros a join UnidadeGestora b on a.idUnidadeGestora=b.id " ,UnidadeGestora.class).getResultList();
+        return result;
+
+    }
+
     public Boolean EhUnidadeGestoraRpps(){
         try {
             return ( getEntityManager().createNativeQuery("select  1 from UnidadeGestoraRpps where cnpjRpps=:cnpj  ").setParameter("cnpj", User.getUser(super.getRequest()).getUnidadeGestora().getId() ).getResultList().size()>0) ;
