@@ -102,6 +102,17 @@ public class AtoRepository extends DefaultRepository<Ato, BigInteger> {
         return list.get(0);
     }
 
+
+    public Ato buscarAtoPorNumeroECnpj(String numero, Integer tipoAto, String idUnidadeGestora) {
+        try{
+            return getEntityManager().createQuery("select a from Ato a , InfoRemessa info  " +
+                    "where a.infoRemessa.chave=info.chave and info.idUnidadeGestora = '"+idUnidadeGestora+"' and  a.numeroAto = '"+numero+"' " +
+                    "and a.tipoAto = "+tipoAto+" order by a.id " ,Ato.class).setMaxResults(1).getSingleResult();
+        }catch (RuntimeException e){
+            return null;
+        }
+    }
+
     public List<HashMap<String,Object>> buscaVinculos(BigInteger  idato ,Integer vinculo){
         var queryadm = getEntityManager().createNativeQuery("WITH Adm AS (SELECT * FROM Admissao where idAto =:ato ) " +
                 " select distinct 'ADMISSÃO' TABELA,a.matriculaServidor , b.cpfServidor , b.nome  , convert(varchar, a.dataExercicio,103)  dataExercicio  from Adm A JOIN Servidor B  ON A.idServidor = B.id  ").setParameter("ato",idato);
