@@ -143,7 +143,7 @@ public class RegistroAdmissaoRepository  extends DefaultRepository<RegistroAdmis
                         "       s.cpfServidor       as cpfServidor,\n" +
                         "       s.nome              as nome,\n" +
                         "       'ADMISSÃO'     AS tipoMovimentacao,\n" +
-                        "       b.dataObito as dataMovimentacao,\n" +
+                        "       b.dataExercicio as dataMovimentacao,\n" +
                         "       c.nomeCargo         as nomeCargo,\n" +
                         "       o.numeroAto        as numeroAto,\n" +
                         "       o.tipoAto          as tipoAto,\n" +

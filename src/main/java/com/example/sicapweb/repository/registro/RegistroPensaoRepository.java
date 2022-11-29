@@ -175,7 +175,6 @@ public class RegistroPensaoRepository  extends DefaultRepository<RegistroPensao,
                                     "as (select count(1) ct   " +
                                     "                   from RegistroPensao " +
                                     "                   where idUnidadeGestora = :ug and cpfUsuarioCadastro=:cpfUsuario   and  (:cpfServidor is null or    :cpfServidor = cpfServidor) and dataCadastro  between  cast(:dtini as date) and cast(:dtfim as date) )  " +
-                                    "                  )" +
                                     " select ct  " +
                                     " from registros a")
                     .setParameter("ug", filtros.get("ug"))
