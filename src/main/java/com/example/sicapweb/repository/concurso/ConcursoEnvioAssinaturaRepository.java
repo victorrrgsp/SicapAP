@@ -165,14 +165,14 @@ public class ConcursoEnvioAssinaturaRepository  extends DefaultRepository<Concur
     }
 
 
-    public void insertHist(Integer numeroProcesso, Integer anoProcesso, String  deptoAutuacao){
+    public void insertHist(Integer numeroProcesso, Integer anoProcesso, String  deptoAutuacao, int idDeptoAutuacao){
         try {
             Query query = entityManager.createNativeQuery("INSERT INTO SCP..hists" +
                     "(hcodp_pnumero, hcodp_pano, hists_data,hists_hora, hists_origem, hoent_ecodc_ccodg, hoent_ecodc_ccodc," +
                     "                         hoent_ecode, hdest_ldepto, hdest_llogin, hent_ecodc_ccodg, hent_ecodc_ccodc, hent_ecode, status," +
-                    "                         hists_dest_resp, data_receb, hora_receb, data_env_depto, hora_env_depto)" +
+                    "                         hists_dest_resp, data_receb, hora_receb, data_env_depto, hora_env_depto,idDeptoOrigem , idDeptoDestino)" +
                     "                         VALUES" +
-                    "(:procnumero, :ano, GETDATE(), GETDATE(), 'ENTRA', 0,0, 0, 'COPRO', '000003', 0, 0, 0, 'U', '000003', GETDATE(), GETDATE(), DATEADD(millisecond,7,getdate()), DATEADD(millisecond,7,getdate()))");
+                    "(:procnumero, :ano, GETDATE(), GETDATE(), 'ENTRA', 0,0, 0, 'COPRO', '000003', 0, 0, 0, 'U', '000003', GETDATE(), GETDATE(), DATEADD(millisecond,7,getdate()), DATEADD(millisecond,7,getdate()),169,55)");
             query.setParameter("procnumero", numeroProcesso);
             query.setParameter("ano", anoProcesso);
             query.executeUpdate();
@@ -180,13 +180,14 @@ public class ConcursoEnvioAssinaturaRepository  extends DefaultRepository<Concur
             Query query1 = entityManager.createNativeQuery("INSERT INTO SCP..hists" +
                     "(hcodp_pnumero, hcodp_pano, hists_data,hists_hora, hists_origem, hoent_ecodc_ccodg, hoent_ecodc_ccodc," +
                     "                         hoent_ecode, hdest_ldepto, hdest_llogin, hent_ecodc_ccodg, hent_ecodc_ccodc, hent_ecode, status," +
-                    "                         hists_dest_resp, data_receb, hora_receb)" +
+                    "                         hists_dest_resp, data_receb, hora_receb,idDeptoOrigem , idDeptoDestino)" +
                     "                         VALUES(" +
-                    "                            :procnumero,:ano,DATEADD(millisecond,7,getdate()),DATEADD(millisecond,7,getdate()),'COPRO',0,0,0,:deptoAutuacao,'000003',0,0,0,'T','',null,null)");
+                    "                            :procnumero,:ano,DATEADD(millisecond,7,getdate()),DATEADD(millisecond,7,getdate()),'COPRO',0,0,0,:deptoAutuacao,'000003',0,0,0,'T','',null,null,55,:idDeptoAutuacao)");
 
             query1.setParameter("procnumero", numeroProcesso);
             query1.setParameter("ano", anoProcesso);
             query1.setParameter("deptoAutuacao", deptoAutuacao);
+            query1.setParameter("idDeptoAutuacao",idDeptoAutuacao);
             query1.executeUpdate();
         } catch (RuntimeException e){
             e.printStackTrace();
@@ -199,8 +200,8 @@ public class ConcursoEnvioAssinaturaRepository  extends DefaultRepository<Concur
         BigDecimal idDocument;
         try {
             Query query = entityManager.createNativeQuery("INSERT INTO SCP..document(docmt_tipo,dcnproc_pnumero,dcnproc_pano,docmt_numero,docmt_ano,docmt_depto,docmt_excluido" +
-                    ",docmt_data,docmt_hora,login_usr,docmt_is_assinado,docmt_depto_doc,sigiloso, num_evento)" +
-                    "     VALUES (:tipodocumento,:procnumero,:ano,:procnumero,:ano,'COPRO','',getdate(),getdate(),'000003','S','COPRO','N', :evento)");
+                    ",docmt_data,docmt_hora,login_usr,docmt_is_assinado,docmt_depto_doc,sigiloso, num_evento,idDeptoOrigem , idDeptoDestino)" +
+                    "     VALUES (:tipodocumento,:procnumero,:ano,:procnumero,:ano,'COPRO','',getdate(),getdate(),'000003','S','COPRO','N', :evento,55,55)");
             query.setParameter("tipodocumento", tipoDocumento);
             query.setParameter("procnumero", numeroProcesso);
             query.setParameter("ano", anoProcesso);

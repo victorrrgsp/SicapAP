@@ -60,6 +60,8 @@ public class AssinarConcursoController {
     private Integer assuntoCodigo;
     private Integer classeAssunto;
     private String deptoAutuacao = "";
+
+    private int iddeptoAutuacao ;
     private String tipoDocumento = "";
 
     private final Integer relatorio = 70;
@@ -193,7 +195,7 @@ public class AssinarConcursoController {
         concursoEnvioAssinaturaRepository.insertAndamentoProcesso(numeroProcesso, anoProcesso);
         concursoEnvioAssinaturaRepository.insertProcEdital(numeroProcesso, anoProcesso, numeroEdital, anoEdital);
         concursoEnvioAssinaturaRepository.insertPessoaInteressada(numeroProcesso, anoProcesso, responsavel, 1, 4);
-        concursoEnvioAssinaturaRepository.insertHist(numeroProcesso, anoProcesso, deptoAutuacao);
+        concursoEnvioAssinaturaRepository.insertHist(numeroProcesso, anoProcesso, deptoAutuacao,iddeptoAutuacao);
         BigDecimal idDocumento = concursoEnvioAssinaturaRepository.insertDocument(tipoDocumento, numeroProcesso, anoProcesso, eventoProcesso);
         gravaDocumentos(envio,idDocumento);
         envio.setProcesso(numeroProcesso + "/" + anoProcesso);
@@ -231,12 +233,14 @@ public class AssinarConcursoController {
             assuntoCodigo = 6;
             classeAssunto = 8;
             deptoAutuacao = "COCAP";
+            iddeptoAutuacao = 389;
             tipoDocumento = "TA";
         } else if (fase == ConcursoEnvio.Fase.Homologacao.getValor().intValue()) {
             idAssunto = 161;
             assuntoCodigo = 1;
             classeAssunto = 15;
             deptoAutuacao = "COREA";
+            iddeptoAutuacao=383;
             tipoDocumento = "HOMOL";
         }
     }

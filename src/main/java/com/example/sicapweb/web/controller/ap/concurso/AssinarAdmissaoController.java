@@ -54,6 +54,9 @@ public class AssinarAdmissaoController {
 
     private final String  deptoAutuacao = "COCAP";
 
+
+    private final int  iddeptoAutuacao =389;
+
     private final String matricula = "000003";
     private final Integer  idAssunto = 8;
     private final Integer assuntoCodigo = 1;
@@ -219,7 +222,7 @@ public class AssinarAdmissaoController {
         admissaoEnvioAssinaturaRepository.insertProcesso(numeroProcesso,anoProcesso,anoReferencia,numeroProcessoPai , AnoProcessoPai ,relatorio, "" ,assuntoCodigo ,classeAssunto , idprotocolo , origem, null,idAssunto );
         admissaoEnvioAssinaturaRepository.insertAndamentoProcesso(numeroProcesso,anoProcesso);
         admissaoEnvioAssinaturaRepository.insertPessoaInteressada(numeroProcesso,anoProcesso, responsavel , 1,4  );
-        admissaoEnvioAssinaturaRepository.insertHist(numeroProcesso,anoProcesso,deptoAutuacao);
+        admissaoEnvioAssinaturaRepository.insertHist(numeroProcesso,anoProcesso,deptoAutuacao,iddeptoAutuacao);
         // inserir os documentos dos aprovados emposados
         List<DocumentoAdmissao> listaDeDocumentosAprovadosComNomeacao  = documentoAdmissaoRepository.getAprovadosComAdmissao(envio.getId());
         gravarArquivosDeAprovadosNoProcesso(listaDeDocumentosAprovadosComNomeacao,numeroProcesso,anoProcesso);

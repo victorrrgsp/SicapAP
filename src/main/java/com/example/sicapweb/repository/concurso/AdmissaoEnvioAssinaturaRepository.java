@@ -159,14 +159,14 @@ public class AdmissaoEnvioAssinaturaRepository  extends DefaultRepository<Admiss
     }
 
 
-    public void insertHist(Integer numeroProcesso, Integer anoProcesso, String  deptoAutuacao){
+    public void insertHist(Integer numeroProcesso, Integer anoProcesso, String  deptoAutuacao,int idDeptAutuacao){
         try {
             Query query = entityManager.createNativeQuery("INSERT INTO SCP..hists" +
                     "(hcodp_pnumero, hcodp_pano, hists_data,hists_hora, hists_origem, hoent_ecodc_ccodg, hoent_ecodc_ccodc," +
                     "                         hoent_ecode, hdest_ldepto, hdest_llogin, hent_ecodc_ccodg, hent_ecodc_ccodc, hent_ecode, status," +
-                    "                         hists_dest_resp, data_receb, hora_receb, data_env_depto, hora_env_depto)" +
+                    "                         hists_dest_resp, data_receb, hora_receb, data_env_depto, hora_env_depto,idDeptoOrigem , idDeptoDestino)" +
                     "                         VALUES" +
-                    "(:procnumero, :ano, GETDATE(), GETDATE(), 'ENTRA', 0,0, 0, 'COPRO', '000003', 0, 0, 0, 'U', '000003', GETDATE(), GETDATE(), DATEADD(millisecond,7,getdate()), DATEADD(millisecond,7,getdate()))");
+                    "(:procnumero, :ano, GETDATE(), GETDATE(), 'ENTRA', 0,0, 0, 'COPRO', '000003', 0, 0, 0, 'U', '000003', GETDATE(), GETDATE(), DATEADD(millisecond,7,getdate()), DATEADD(millisecond,7,getdate()), 55, 55)");
             query.setParameter("procnumero", numeroProcesso);
             query.setParameter("ano", anoProcesso);
             query.executeUpdate();
@@ -174,13 +174,14 @@ public class AdmissaoEnvioAssinaturaRepository  extends DefaultRepository<Admiss
             Query query1 = entityManager.createNativeQuery("INSERT INTO SCP..hists" +
                     "(hcodp_pnumero, hcodp_pano, hists_data,hists_hora, hists_origem, hoent_ecodc_ccodg, hoent_ecodc_ccodc," +
                     "                         hoent_ecode, hdest_ldepto, hdest_llogin, hent_ecodc_ccodg, hent_ecodc_ccodc, hent_ecode, status," +
-                    "                         hists_dest_resp, data_receb, hora_receb)" +
+                    "                         hists_dest_resp, data_receb, hora_receb,idDeptoOrigem , idDeptoDestino)" +
                     "                         VALUES(" +
-                    "                            :procnumero,:ano,DATEADD(millisecond,7,getdate()),DATEADD(millisecond,7,getdate()),'COPRO',0,0,0,:deptoAutuacao,'000003',0,0,0,'T','',null,null)");
+                    "                            :procnumero,:ano,DATEADD(millisecond,7,getdate()),DATEADD(millisecond,7,getdate()),'COPRO',0,0,0,:deptoAutuacao,'000003',0,0,0,'T','',null,null,55,:idDeptAutuacao)");
 
             query1.setParameter("procnumero", numeroProcesso);
             query1.setParameter("ano", anoProcesso);
             query1.setParameter("deptoAutuacao", deptoAutuacao);
+            query1.setParameter("idDeptAutuacao",idDeptAutuacao);
             query1.executeUpdate();
         } catch (RuntimeException e ){
             e.printStackTrace();
@@ -195,8 +196,8 @@ public class AdmissaoEnvioAssinaturaRepository  extends DefaultRepository<Admiss
         BigDecimal idDocument;
         try {
             Query query = entityManager.createNativeQuery("INSERT INTO SCP..document(docmt_tipo,dcnproc_pnumero,dcnproc_pano,docmt_numero,docmt_ano,docmt_depto,docmt_excluido" +
-                    ",docmt_data,docmt_hora,login_usr,docmt_is_assinado,docmt_depto_doc,sigiloso, num_evento)" +
-                    "     VALUES (:tipodocumento,:procnumero,:ano,:numero,:ano,'COPRO','',getdate(),getdate(),'000003','S','COPRO','N', :evento)");
+                    ",docmt_data,docmt_hora,login_usr,docmt_is_assinado,docmt_depto_doc,sigiloso, num_evento,idDeptoOrigem , idDeptoDestino)" +
+                    "     VALUES (:tipodocumento,:procnumero,:ano,:numero,:ano,'COPRO','',getdate(),getdate(),'000003','S','COPRO','N', :evento,55,55)");
             query.setParameter("tipodocumento", tipoDocumento);
             query.setParameter("procnumero", numeroProcesso);
             //vai  precisar usar SolicitarNumeroSND para gerar o numero
@@ -207,7 +208,8 @@ public class AdmissaoEnvioAssinaturaRepository  extends DefaultRepository<Admiss
             query.setParameter("evento", eventoProcesso);
             query.executeUpdate();
             idDocument = (BigDecimal) entityManager.createNativeQuery("SELECT @@IDENTITY ").getSingleResult();
-            if (idDocument==null) throw new InvalitInsert("Nao gerou documento tipo:"+tipoDocumento+" processo:"+numeroProcesso+'/'+anoProcesso);
+            if (idDocument==null)
+                throw new InvalitInsert("Nao gerou documento tipo:"+tipoDocumento+" processo:"+numeroProcesso+'/'+anoProcesso);
             return idDocument;
         }catch (RuntimeException e ){
             e.printStackTrace();
@@ -312,34 +314,6 @@ public class AdmissaoEnvioAssinaturaRepository  extends DefaultRepository<Admiss
         byte[] hashdecodedbytes = hashdecoded.getBytes(Charset.forName("UTF-8"));
         byte[] bytesOfDigest = md.digest(hashdecodedbytes);
         return DatatypeConverter.printHexBinary(bytesOfDigest).substring(17,32).toUpperCase();
-    }
-
-    private Boolean ehInteressadoEmProcessoDecidido(String anoProcesso,String numeroProcesso, BigInteger idPessoaCadun ){
-        try{
-            return (
-                    getEntityManager().createNativeQuery(" with documetos as (select dcnproc_pnumero, dcnproc_pano " +
-                                    "                    from SCP.dbo.document " +
-                                    "                    where dcnproc_pnumero = :numeroProcesso " +
-                                    "                      and dcnproc_pano = :anoProcesso  " +
-                                    "                      and docmt_tipo_decisao = 'D'), " +
-                                    "      interessados as (select NUM_PROC, ANO_PROC\n" +
-                                    "                       from SCP.dbo.PESSOAS_PROCESSO " +
-                                    "                       where ID_PESSOA = :idPessoaCadun " +
-                                    "                         and NUM_PROC = :numeroProcesso " +
-                                    "                         and ANO_PROC = :anoProcesso  " +
-                                    "                         and ID_PAPEL = 2) " +
-                                    " select 1\n" +
-                                    " from interessados i\n" +
-                                    "          join documetos d on i.NUM_PROC = d.dcnproc_pnumero and i.ANO_PROC = d.dcnproc_pano")
-                            .setParameter("anoProcesso",anoProcesso)
-                            .setParameter("numeroProcesso",numeroProcesso)
-                            .setParameter("idPessoaCadun",idPessoaCadun)
-                            .getResultList().size() > 0
-            ) ;
-
-        }catch (RuntimeException e){
-            throw new RuntimeException("Problema ao consultar processo no eContas. Favor entrar em contato com o respável pelo econtas!! ");
-        }
     }
 
 }
