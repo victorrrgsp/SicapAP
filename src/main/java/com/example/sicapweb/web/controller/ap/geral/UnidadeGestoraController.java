@@ -55,6 +55,13 @@ public class UnidadeGestoraController {
         List<UnidadeGestora> list = unidadeGestoraRepository.buscaTodasUnidadeGestora();
         return ResponseEntity.ok().body(list);
     }
+
+    @CrossOrigin
+    @GetMapping(path = {"/todosOutros"})
+    public ResponseEntity<List<UnidadeGestora>> findTodosOutros() {
+        List<UnidadeGestora> list = unidadeGestoraRepository.buscaTodasOutraUnidadeGestora();
+        return ResponseEntity.ok().body(list);
+    }
     @CrossOrigin
     @GetMapping(path = {"/ugServidoresComSociedadePrivada"})
     public ResponseEntity<List<Object[]>> findUGServidoresComSociedadePrivada() {

@@ -39,6 +39,12 @@ public class UnidadeGestoraRepository extends DefaultRepository<UnidadeGestora, 
                 , UnidadeGestora.class).getResultList();
         return list;
     }
+    public List<UnidadeGestora> buscaTodasOutraUnidadeGestora() {
+        List<UnidadeGestora> list = entityManager.createNativeQuery(
+                "select * from UnidadeGestora where UnidadeGestora.id <> '"+ User.getUser(request).getUnidadeGestora().getId()+"' ORDER BY nome ASC"
+                ,UnidadeGestora.class).getResultList();
+        return list;
+    }
 
     public List<Object[]> buscaugServidoresComsociedade() {
         List<Object[]> list = entityManager.createNativeQuery("with servidores as(\n" +
