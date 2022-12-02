@@ -1,16 +1,11 @@
 package com.example.sicapweb.repository.remessa;
 
-import br.gov.to.tce.application.ApplicationException;
 import br.gov.to.tce.model.InfoRemessa;
 import br.gov.to.tce.util.JayReflection;
 import com.example.sicapweb.repository.DefaultRepository;
 import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
 import com.example.sicapweb.util.StaticMethods;
-import org.hibernate.query.internal.NativeQueryImpl;
-import org.hibernate.transform.AliasToEntityMapResultTransformer;
-import org.hibernate.transform.ResultTransformer;
-import org.hibernate.transform.Transformers;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
@@ -19,10 +14,6 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.security.InvalidParameterException;
-import java.sql.SQLException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -42,7 +33,23 @@ public class AssinarRemessaRepository extends DefaultRepository<String, String> 
         UnidadeAdministrativa(8,"UnidadeAdministrativa","br.gov.to.tce.repository.ap.relacional"),
         Lotacao(9,"Lotacao","br.gov.to.tce.repository.ap.relacional"),
         Desligamento(10,"Desligamento","br.gov.to.tce.repository.ap.pessoal"),
-        Licenca(11,"Licenca","br.gov.to.tce.repository.ap.pessoal")
+        Licenca(11,"Licenca","br.gov.to.tce.repository.ap.pessoal"),
+        Aprovado(12,"EditalAprovado","br.gov.to.tce.repository.ap.concurso"),
+        Cessao(13,"Cessao","br.gov.to.tce.repository.ap.pessoal"),
+        DemonstrativoPrevidenciario(14,"DemonstrativoPrevidenciario","br.gov.to.tce.repository.ap.folha"),
+        DesignacaoFuncao(15,"DesignacaoFuncao","br.gov.to.tce.repository.ap.pessoal"),
+        Disponibilidade(16,"Disponibilidade","br.gov.to.tce.repository.ap.pessoal"),
+        Edital(17,"Edital","br.gov.to.tce.repository.ap.concurso"),
+        FolhaItem(18,"FolhaItem","br.gov.to.tce.repository.ap.relacional"),
+        Pensao(19,"Pensao","br.gov.to.tce.repository.ap.pessoal"),
+        Pensionista(20,"Pensionista","br.gov.to.tce.repository.ap.pessoal"),
+        Readaptacao(21,"Readaptacao","br.gov.to.tce.repository.ap.pessoal"),
+        Reconducao(22,"Reconducao","br.gov.to.tce.repository.ap.pessoal"),
+        Reintegracao(23,"Reintegracao","br.gov.to.tce.repository.ap.pessoal"),
+        Aproveitamento(24,"Aproveitamento","br.gov.to.tce.repository.ap.pessoal"),
+        Aposentadoria(25,"Aposentadoria","br.gov.to.tce.repository.ap.pessoal"),
+        RecolhimentoPrevidenciario(26,"RecolhimentoPrevidenciario","br.gov.to.tce.repository.ap.folha"),
+        EmpresaOrganizadora(27,"EmpresaOrganizadora","br.gov.to.tce.repository.ap.concurso")
         ;
         private final int id;
         private final String label;
@@ -229,18 +236,18 @@ public class AssinarRemessaRepository extends DefaultRepository<String, String> 
         return search;
     }
 
-    public    PaginacaoUtil<HashMap<String,Object>> GetExtratoDadosRemessa(Pageable paginacaoFrontEnd  , Integer remessa, Integer exercicio, Integer idTabelaRemessa,String serachEncoded)   {
-       Query queryTabelaRemessa;
+    public    PaginacaoUtil<HashMap<String,Object>> getExtratoDadosRemessa(Pageable paginacaoFrontEnd  , Integer remessa, Integer exercicio, Integer idTabelaRemessa, String serachEncoded , boolean paraExportarExcell)   {
+        Query queryTabelaRemessa;
         Query queryTabelaQuantidade;
         String filtroWhere;
         try{
-             filtroWhere = getSearchDecoded(serachEncoded);
+            filtroWhere = getSearchDecoded(serachEncoded);
         }catch (UnsupportedEncodingException e){
             e.printStackTrace();
-            throw  new RuntimeException("valor de coluna na busca errado !!");
+            throw  new RuntimeException("valor incorreto de coluna na busca !!");
         }
 
-        String CaminhoCompletoRepository = Arrays.stream(Tabela.values()).filter(tabelaRepository -> tabelaRepository.getId()==idTabelaRemessa   ).map(   tabelaRepository -> tabelaRepository.getpackageRepository()+'.'+tabelaRepository.getLabel()+"Repository"  ).findFirst().get();
+        String CaminhoCompletoRepository = Arrays.stream(Tabela.values()).filter(tabelaRepository -> tabelaRepository.getId()==idTabelaRemessa).map(tabelaRepository -> tabelaRepository.getpackageRepository()+'.'+tabelaRepository.getLabel()+"Repository").findFirst().get();
         if (CaminhoCompletoRepository == null)
             throw  new RuntimeException("id de tabela não encontrado ");
         try{
@@ -251,29 +258,28 @@ public class AssinarRemessaRepository extends DefaultRepository<String, String> 
             throw  new RuntimeException("não encontrou consulta para buscar dados em tabela !!");
         }
 
-
         try {
 
             queryTabelaRemessa.setParameter("remessa",remessa).setParameter("exercicio",exercicio).setParameter("ug",User.getUser(super.getRequest()).getUnidadeGestora().getId());
 
             long totalRegistros = (Integer) queryTabelaQuantidade
-                        .setParameter("remessa",remessa)
+                    .setParameter("remessa",remessa)
                     .setParameter("exercicio",exercicio)
                     .setParameter("ug",User.getUser(super.getRequest()).getUnidadeGestora().getId()).getSingleResult();
             int pagina = Integer.valueOf(paginacaoFrontEnd.getPageNumber());
             int tamanhoPorPagina =  (filtroWhere.isEmpty())? Integer.valueOf(paginacaoFrontEnd.getPageSize()) : (int) totalRegistros ;
+
             //libera a limitação de paginas para busca sem filtro where ou total registros inferior a quantidade de paginas
-            if (totalRegistros > tamanhoPorPagina  && filtroWhere.isEmpty() ){
+            if (totalRegistros > tamanhoPorPagina  && filtroWhere.isEmpty() && !paraExportarExcell ){
                 queryTabelaRemessa.setFirstResult(pagina).setMaxResults(tamanhoPorPagina);
             }
-            List<HashMap<String,Object>> ExtratoTabelaRemessa = StaticMethods.getMapListObjectToHashmap( queryTabelaRemessa );
+            List<HashMap<String,Object>> ExtratoTabelaRemessa = StaticMethods.getHashmapFromQuery( queryTabelaRemessa );
             long totalPaginas = (totalRegistros + (tamanhoPorPagina - 1)) / tamanhoPorPagina;
             return new PaginacaoUtil<>(tamanhoPorPagina, pagina, totalPaginas, totalRegistros, ExtratoTabelaRemessa);
         } catch (Exception e){
             e.printStackTrace();
             throw new RuntimeException("Problema ao rodar consulta pra tabela escolhida");
         }
-
     }
 
     public List<HashMap<String,Object>> getResumoGeralRemessa(Integer remessa,Integer exercicio,List<Integer> excluirListagem ){
