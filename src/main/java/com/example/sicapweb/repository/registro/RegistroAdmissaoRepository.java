@@ -1,11 +1,7 @@
 package com.example.sicapweb.repository.registro;
 
-import br.gov.to.tce.model.ap.pessoal.Admissao;
-import br.gov.to.tce.model.ap.pessoal.Pensao;
 import br.gov.to.tce.model.ap.registro.RegistroAdmissao;
-import br.gov.to.tce.model.ap.registro.RegistroPensao;
 import com.example.sicapweb.repository.DefaultRepository;
-import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
 import com.example.sicapweb.util.StaticMethods;
 import org.springframework.data.domain.Pageable;
@@ -15,7 +11,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.math.BigInteger;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 @Repository
@@ -94,7 +89,7 @@ public class RegistroAdmissaoRepository  extends DefaultRepository<RegistroAdmis
             queryMovimentos.setFirstResult(pagina).setMaxResults(tamanho);
         }
         try{
-            return new PaginacaoUtil<>(tamanhoPorPagina, pagina, totalPaginas, totalRegistros, StaticMethods.getMapListObjectToHashmap(queryMovimentos));
+            return new PaginacaoUtil<>(tamanhoPorPagina, pagina, totalPaginas, totalRegistros, StaticMethods.getHashmapFromQuery(queryMovimentos));
         } catch (RuntimeException e ){
             throw  new RuntimeException("Problema ao consultar os movimentos para registro!!");
         }
@@ -169,7 +164,7 @@ public class RegistroAdmissaoRepository  extends DefaultRepository<RegistroAdmis
         }
 
         try{
-            return new PaginacaoUtil<>(tamanho, pagina, totalPaginas, totalRegistros, StaticMethods.getMapListObjectToHashmap(queryRegistroMovimentos));
+            return new PaginacaoUtil<>(tamanho, pagina, totalPaginas, totalRegistros, StaticMethods.getHashmapFromQuery(queryRegistroMovimentos));
         } catch (RuntimeException e ){
             throw  new RuntimeException("Problema ao consultar os registros!!");
         }

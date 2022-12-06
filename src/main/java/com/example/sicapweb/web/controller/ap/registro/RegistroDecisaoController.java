@@ -147,7 +147,8 @@ public class RegistroDecisaoController  {
     @GetMapping(path = "/autorizado")
     public ResponseEntity<String> autorizarRegistro( @RequestHeader("Authorization") String bearerToken ){
         HashMap<String,Object> userInfo = getInfoUserFromToken(bearerToken);
-        if (Objects.requireNonNullElse( userInfo.get("setor"),"").equals("DIRAP") ||  Set.of("josermc","marcusop","ewertonfs").contains(Objects.requireNonNullElse( userInfo.get("loginUsuario"),"")) )
+        if (Objects.requireNonNullElse( userInfo.get("setor"),"").equals("DIRAP")
+                ||  Set.of("josermc","marcusop","ewertonfs").contains(Objects.requireNonNullElse( userInfo.get("loginUsuario"),"")) )
             return ResponseEntity.ok().body(  "temAutorizacao");
         return ResponseEntity.ok().body("semAutorizacao");
     }
@@ -233,6 +234,7 @@ public class RegistroDecisaoController  {
 
     private void alterarMovimentacao(HashMap<String,Object> camposParaAlterar, Integer tipoRegistro ) throws ParseException {
         Registro.Tipo  tipoRegistroEnum =  Arrays.stream(Registro.Tipo.values()).filter(tipo -> tipo.getValor()==tipoRegistro).findFirst().get();
+        //Informaçoes que serão alterados no movimento
         String numeroAto = (String) camposParaAlterar.get("numeroAto");
         Integer tipoAto = (Integer)camposParaAlterar.get("tipoAto");
         String idUnidadeGestora = (String)camposParaAlterar.get("idUnidadeGestora");
@@ -241,7 +243,9 @@ public class RegistroDecisaoController  {
                 new java.sql.Date( (new SimpleDateFormat("yyyy-MM-dd" ))
                         .parse((String)camposParaAlterar.get("dataPublicacao")).getTime() );
         BigInteger idMovimentacao =   BigInteger.valueOf(((Integer)camposParaAlterar.get("idMovimentacao")).longValue());
+
         if  (this.tiposRegistrosNaTabelaAposentadoria.contains(tipoRegistroEnum)){
+            //movimentos derivados da tabela Aposentadoria
             Integer tipoAposentadoria = (Integer) camposParaAlterar.get("tipoAposentadoria");
             Aposentadoria aposentadoria = aposentadoriaRepository.findById(idMovimentacao);
             Ato atoPrecastrado = atoRepository.buscarAtoPorNumeroECnpj(numeroAto, tipoAto,idUnidadeGestora );
@@ -259,6 +263,7 @@ public class RegistroDecisaoController  {
             aposentadoriaRepository.update(aposentadoria);
 
         } else if (this.tiposRegistrosNaTabelaPensao.contains(tipoRegistroEnum)) {
+            //movimentos derivados da tabela Pensao
             Pensao pensao = pensaoRepository.findById(idMovimentacao);
             Ato atoPrecastrado = atoRepository.buscarAtoPorNumeroECnpj(numeroAto, tipoAto,idUnidadeGestora );
             if (atoPrecastrado ==null){
@@ -273,6 +278,7 @@ public class RegistroDecisaoController  {
             }
             pensaoRepository.update(pensao);
         } else if (this.tiposRegistrosNaTabelaAdmissao.contains(tipoRegistroEnum)) {
+            //movimentos derivados da tabela Admissao
             Admissao admissao = admissaoRepository.findById(idMovimentacao);
             Ato atoPrecastrado = atoRepository.buscarAtoPorNumeroECnpj(numeroAto, tipoAto,idUnidadeGestora );
             if (atoPrecastrado ==null){
@@ -294,6 +300,7 @@ public class RegistroDecisaoController  {
         HashMap<String,Object> infoMovimentacao= new HashMap<>();
         infoMovimentacao.put("assuntoProcessoEcontas",tipoRegistroEnum.getAssuntoProcessoEcontas());
         if  (this.tiposRegistrosNaTabelaAposentadoria.contains(tipoRegistroEnum) ){
+            //movimentos derivados da tabela Aposentadoria
             Aposentadoria aposentadoria = aposentadoriaRepository.findById(idMovimentacao);
             infoMovimentacao.put("cpf",aposentadoria.getCpfServidor());
             infoMovimentacao.put("cnpjUnidadeGestora",aposentadoria.getAdmissao().getChave().getIdUnidadeGestora());
@@ -304,6 +311,7 @@ public class RegistroDecisaoController  {
             }
         }
         else if (this.tiposRegistrosNaTabelaPensao.contains(tipoRegistroEnum)){
+            //movimentos derivados da tabela Aposentadoria
             Pensao pensao = pensaoRepository.findById(idMovimentacao);
             infoMovimentacao.put("cpf",pensao.getCpfServidor());
             infoMovimentacao.put("cnpjUnidadeGestora",pensao.getAdmissao().getChave().getIdUnidadeGestora());
@@ -314,6 +322,7 @@ public class RegistroDecisaoController  {
             }
         }
         else if (this.tiposRegistrosNaTabelaAdmissao.contains(tipoRegistroEnum)){
+            //movimentos derivados da tabela Admissão
             Admissao admissao = admissaoRepository.findById(idMovimentacao);
             infoMovimentacao.put("cpf",admissao.getServidor().getCpfServidor());
             infoMovimentacao.put("cnpjUnidadeGestora",admissao.getChave().getIdUnidadeGestora());
@@ -347,15 +356,8 @@ public class RegistroDecisaoController  {
         }
     }
 
-    public void validarUsuarioAcesso(HashMap<String,String> hashInfoUsuario){
-        if (hashInfoUsuario.get("cpfUsuario") ==null || hashInfoUsuario.get("LoginUsuario")==null )
-            throw new RuntimeException("problema nas informaçoes do usuario!!");
-    }
-
     public HashMap<String,Object> getInfoUserFromToken(String token){
         BigInteger idUsuario=getIdUsuarioFromToken(token.substring(7));
-        //BigInteger idUsuario=new BigInteger( String.valueOf( 5307));//waltenes dev
-        // BigInteger idUsuario=new BigInteger( String.valueOf( 229)); // waltenes prod
         HashMap<String,Object> infoUser = registroAposentadoriaRepository.getUserInfoFromIdUsuarioAutenticacao(idUsuario);
         infoUser.put("setor",registroAposentadoriaRepository.getUserSetorFromLoginNoEcontas(infoUser.get("loginUsuario").toString()));
         return infoUser;
