@@ -192,18 +192,20 @@ public class ConcessaoAposentadoriaController extends DefaultController<Document
 
     @CrossOrigin
     @PostMapping("/enviarGestor/{id}")
-    public ResponseEntity<?> enviarGestorAssinar(@PathVariable BigInteger id) {
-        admEnvioRepository.save(preencherEnvio(id));
+    public ResponseEntity<?> enviarGestorAssinar(@PathVariable BigInteger id,@RequestParam(value = "Ug", required = false) String ug) {
+        admEnvioRepository.save(preencherEnvio(id,ug));
         return ResponseEntity.ok().body("Ok");
     }
 
-    private AdmEnvio preencherEnvio(BigInteger id) {
+    private AdmEnvio preencherEnvio(BigInteger id,String ug) {
         Aposentadoria aposentadoria = aposentadoriaRepository.findById(id);
         AdmEnvio admEnvio = new AdmEnvio();
         admEnvio.setTipoRegistro(AdmEnvio.TipoRegistro.APOSENTADORIA.getValor());
         admEnvio.setUnidadeGestora(aposentadoria.getChave().getIdUnidadeGestora());
         admEnvio.setStatus(AdmEnvio.Status.AGUARDANDOASSINATURA.getValor());
-        admEnvio.setOrgaoOrigem(aposentadoria.getCnpjUnidadeGestoraOrigem());
+        if (ug != null && !ug.equals(""))
+            admEnvio.setOrgaoOrigem(ug);
+
         admEnvio.setIdMovimentacao(id);
         admEnvio.setComplemento("Conforme PORTARIA: " + aposentadoria.getAto().getNumeroAto() + " De: " + aposentadoria.getAto().getDataPublicacao());
         admEnvio.setAdmissao(aposentadoria.getAdmissao());
@@ -214,7 +216,7 @@ public class ConcessaoAposentadoriaController extends DefaultController<Document
     @PostMapping("/vincularProcesso/{id}/{numero}/{ano}")
     public ResponseEntity<?> vincularProcesso(@PathVariable BigInteger id, @PathVariable String numero, @PathVariable String ano) {
         String processo = numero + "/" + ano;
-        AdmEnvio admEnvio = preencherEnvio(id);
+        AdmEnvio admEnvio = preencherEnvio(id,null);
         admEnvio.setStatus(AdmEnvio.Status.CONCLUIDO.getValor());
         admEnvio.setProcesso(processo);
         admEnvioRepository.save(admEnvio);
