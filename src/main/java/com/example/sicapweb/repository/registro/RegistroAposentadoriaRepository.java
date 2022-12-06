@@ -1,7 +1,6 @@
 package com.example.sicapweb.repository.registro;
 
 
-import br.gov.to.tce.model.ap.pessoal.Aposentadoria;
 import br.gov.to.tce.model.ap.registro.Registro;
 import br.gov.to.tce.model.ap.registro.RegistroAposentadoria;
 import com.example.sicapweb.repository.DefaultRepository;
@@ -82,7 +81,7 @@ public class RegistroAposentadoriaRepository  extends DefaultRepository<Registro
             queryMovimentos.setFirstResult(pagina).setMaxResults(tamanho);
         }
         try{
-            return new PaginacaoUtil<>(tamanhoPorPagina, pagina, totalPaginas, totalRegistros, StaticMethods.getMapListObjectToHashmap(queryMovimentos));
+            return new PaginacaoUtil<>(tamanhoPorPagina, pagina, totalPaginas, totalRegistros, StaticMethods.getHashmapFromQuery(queryMovimentos));
         } catch (RuntimeException e ){
             throw  new RuntimeException("Problema ao consultar os movimentos para registro!!");
         }
@@ -155,7 +154,7 @@ public class RegistroAposentadoriaRepository  extends DefaultRepository<Registro
             queryRegistroMovimentos.setFirstResult(pagina).setMaxResults(tamanho);
         }
         try{
-            return new PaginacaoUtil<>(tamanho, pagina, totalPaginas, totalRegistros, StaticMethods.getMapListObjectToHashmap(queryRegistroMovimentos));
+            return new PaginacaoUtil<>(tamanho, pagina, totalPaginas, totalRegistros, StaticMethods.getHashmapFromQuery(queryRegistroMovimentos));
         } catch (RuntimeException e ){
             throw  new RuntimeException("Problema ao consultar os registros!!");
         }
@@ -233,7 +232,7 @@ public class RegistroAposentadoriaRepository  extends DefaultRepository<Registro
                             "  select id as id,codigo as cpfUsuario,login as loginUsuario " +
                             "from Autenticar.dbo.Usuario where id=:id ")
                     .setParameter("id",idIsuario).setMaxResults(1);
-            return  StaticMethods.getMapListObjectToHashmap(sqlAutenticacao).get(0);
+            return  StaticMethods.getHashmapFromQuery(sqlAutenticacao).get(0);
         }catch (RuntimeException e){
             throw new RuntimeException("problema na autenticação:não encontrou a id do usuario informado!!");
         }
@@ -269,7 +268,7 @@ public class RegistroAposentadoriaRepository  extends DefaultRepository<Registro
                     "join Cadun.dbo.vwPessoaJuridica f on a.id_entidade_origem= f.id  ")
                     .setParameter("Setor",userInfo.get("setor"))
                     .setParameter("Usuario",userInfo.get("loginUsuario"));
-            return  StaticMethods.getMapListObjectToHashmap(sqlProcessos);
+            return  StaticMethods.getHashmapFromQuery(sqlProcessos);
         } catch (RuntimeException e){
             throw new RuntimeException("não encontro os processos no econtas!!");
         }
@@ -320,7 +319,7 @@ public class RegistroAposentadoriaRepository  extends DefaultRepository<Registro
                     ")  ")
                     .setParameter("numeroProcesso",numeroProcesso)
                     .setParameter("anoProcesso",anoProcesso);
-            return  StaticMethods.getMapListObjectToHashmap(sqlProcessos);
+            return  StaticMethods.getHashmapFromQuery(sqlProcessos);
         }catch (RuntimeException e){
             throw new RuntimeException("não encontro os documentos iniciais e a decisão no processo no econtas!!");
         }

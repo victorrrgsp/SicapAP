@@ -196,7 +196,7 @@ public class AdmissaoEnvioAssinaturaRepository  extends DefaultRepository<Admiss
         BigDecimal idDocument;
         try {
             Query query = entityManager.createNativeQuery("INSERT INTO SCP..document(docmt_tipo,dcnproc_pnumero,dcnproc_pano,docmt_numero,docmt_ano,docmt_depto,docmt_excluido" +
-                    ",docmt_data,docmt_hora,login_usr,docmt_is_assinado,docmt_depto_doc,sigiloso, num_evento,idDeptoOrigem , idDeptoDestino)" +
+                    ",docmt_data,docmt_hora,login_usr,docmt_is_assinado,docmt_depto_doc,sigiloso, num_evento,idDeptoCriador , idDeptoJuntada)" +
                     "     VALUES (:tipodocumento,:procnumero,:ano,:numero,:ano,'COPRO','',getdate(),getdate(),'000003','S','COPRO','N', :evento,55,55)");
             query.setParameter("tipodocumento", tipoDocumento);
             query.setParameter("procnumero", numeroProcesso);

@@ -1,13 +1,12 @@
 package com.example.sicapweb.web.controller.remessa;
 
 import br.gov.to.tce.model.InfoRemessa;
-import br.gov.to.tce.model.ap.folha.JustificativaGfip;
-import com.example.sicapweb.model.AdmissaoEnvioAssRetorno;
 import com.example.sicapweb.repository.geral.UnidadeGestoraRepository;
 import com.example.sicapweb.repository.remessa.AssinarRemessaRepository;
 import com.example.sicapweb.repository.remessa.GfipRepository;
 import com.example.sicapweb.repository.remessa.JustificativaGfipRepository;
 import com.example.sicapweb.security.User;
+import com.example.sicapweb.util.ExcellExporter;
 import com.example.sicapweb.util.PaginacaoUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -15,19 +14,21 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.ValidationException;
-import java.io.UnsupportedEncodingException;
+import java.io.IOException;
 import java.util.*;
 
 
-@Transactional
+
 @Controller
 @RestController
 @RequestMapping(value = "/assinarRemessa")
@@ -133,6 +134,27 @@ public class AssinarRemessaController {
             return ResponseEntity.ok().body("pendente");
     }
 
+    @GetMapping(path = {"/extratoDadosRemessa/excell"})
+    public void getExcellFromTabelaRemessa(HttpServletResponse response, @RequestParam(name = "tabela") Integer tabela, @RequestParam(name = "remessa") Integer remessa, @RequestParam(name = "exercicio") Integer exercicio){
+        try {
+
+            String nomeTabela = Arrays.stream(AssinarRemessaRepository.Tabela.values()).filter(tabelaRepository -> tabelaRepository.getId()==tabela).map(tab -> tab.getLabel()).findFirst().get();
+
+            List<HashMap<String,Object>> dados =assinarRemessaRepository.getExtratoDadosRemessa(PageRequest.of(0,10),remessa,exercicio,tabela, "",true).getRegistros();
+
+            ExcellExporter ex =new ExcellExporter(dados,nomeTabela);
+
+            ex.export(response);
+        }catch (RuntimeException e){
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+
     @CrossOrigin
     @PostMapping(path = {"/extratoDadosRemessa/pagination"})
     public   ResponseEntity<PaginacaoUtil<HashMap<String,Object>>>  getExtratoRemessa(Pageable pageable ,  @RequestBody String tabelaRemessa){
@@ -142,7 +164,7 @@ public class AssinarRemessaController {
             Integer remessa = Integer.valueOf(parametrosJson.get("remessa").asText());
             Integer exercicio = Integer.valueOf(parametrosJson.get("exercicio").asText());
              String searchParams = parametrosJson.get("search").asText();
-            return  ResponseEntity.ok().body(assinarRemessaRepository.GetExtratoDadosRemessa(pageable,remessa,exercicio,tabela, searchParams));
+            return  ResponseEntity.ok().body(assinarRemessaRepository.getExtratoDadosRemessa(pageable,remessa,exercicio,tabela, searchParams,false));
         }
         catch (NumberFormatException e){
             e.printStackTrace();
@@ -159,9 +181,7 @@ public class AssinarRemessaController {
             e.printStackTrace();
             throw new ValidationException("problema no Extrato de dados da remessa. entre em contato com o Administrador do sicap!!");
         }
-
     }
-
 
     @CrossOrigin
     @PostMapping(path = {"/resumoExtratoDadosRemessa"})
@@ -188,7 +208,6 @@ public class AssinarRemessaController {
         }
 
     }
-
 
 
 

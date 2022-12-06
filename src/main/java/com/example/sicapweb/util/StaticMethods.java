@@ -12,7 +12,7 @@ import java.util.Map;
 public  class StaticMethods {
 
     // metodo usado para transformar o resultado de uma query de list<Objects[]> para List<Hashmap<String,Object>>, util para retornar uma tabela dinamica para o front
-    public static List<HashMap<String,Object>> getMapListObjectToHashmap(Query query) {
+    public static List<HashMap<String,Object>> getHashmapFromQuery(Query query) {
         return   ( (NativeQueryImpl) query
         ).setResultTransformer(new ResultTransformer(){
                     @Override
