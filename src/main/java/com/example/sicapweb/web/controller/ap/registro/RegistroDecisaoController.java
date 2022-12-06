@@ -148,7 +148,7 @@ public class RegistroDecisaoController  {
     public ResponseEntity<String> autorizarRegistro( @RequestHeader("Authorization") String bearerToken ){
         HashMap<String,Object> userInfo = getInfoUserFromToken(bearerToken);
         if (Objects.requireNonNullElse( userInfo.get("setor"),"").equals("DIRAP")
-                ||  Set.of("josermc","marcusop","ewertonfs").contains(Objects.requireNonNullElse( userInfo.get("loginUsuario"),"")) )
+                ||  Set.of("josermc","marcusop","ewertonfs","guilhermehsl","wesleyrl").contains(Objects.requireNonNullElse( userInfo.get("loginUsuario"),"")) )
             return ResponseEntity.ok().body(  "temAutorizacao");
         return ResponseEntity.ok().body("semAutorizacao");
     }
