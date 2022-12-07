@@ -187,6 +187,7 @@ public class ConcessaoReintegracaoController extends DefaultController<Documento
         if (ug != null && !ug.equals("")) {
             admEnvio.setOrgaoOrigem(ug);
         }
+
         admEnvio.setIdMovimentacao(id);
         admEnvio.setComplemento("Conforme PORTARIA: " + reintegracao.getAto().getNumeroAto() + " De: " + reintegracao.getAto().getDataPublicacao());
         admEnvio.setAdmissao(reintegracao.getAdmissao());
