@@ -13,6 +13,7 @@ import com.example.sicapweb.service.ChampionRequest;
 import com.example.sicapweb.service.SHA2;
 import com.example.sicapweb.util.PaginacaoUtil;
 import com.example.sicapweb.web.controller.DefaultController;
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -32,6 +33,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @CrossOrigin
 @RestController
@@ -95,12 +97,19 @@ public class AssinarConcessaoController extends DefaultController<AdmEnvio> {
             String processosBase64Decoded = new String(Base64.getDecoder().decode(hashassinante.getBytes()));
             ArrayNode arrayNodeproc = (ArrayNode) new ObjectMapper().readTree(processosBase64Decoded);
             Iterator<JsonNode> itrproc = arrayNodeproc.elements();
+            List<BigInteger> listaIds = new ArrayList<>();
 
             if (arrayNodeproc.isArray()) {
                 while (itrproc.hasNext()) {
                     JsonNode aux = itrproc.next();
+                    listaIds.add(aux.get("id").bigIntegerValue());
+                }
+
+                List<BigInteger> newIds = listaIds.stream().distinct().collect(Collectors.toList());
+
+                for (BigInteger id : newIds) {
                     // para cada envio adiciona uma linha na tabela de assinatura com o mesmo hash assinado e assinante
-                    AdmEnvio envio = admEnvioRepository.findById(aux.get("id").bigIntegerValue());
+                    AdmEnvio envio = admEnvioRepository.findById(id);
                     if (envio != null) {
                         AdmEnvioAssinatura admEnvioAssinatura = new AdmEnvioAssinatura();
                         admEnvioAssinatura.setIdCargo(User.getUser(admEnvioRepository.getRequest()).getCargo().getValor());
