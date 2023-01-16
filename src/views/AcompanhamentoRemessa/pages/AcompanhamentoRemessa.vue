@@ -286,10 +286,11 @@ export default {
   mounted() {
     this.isBusy = false;
     this.ActionFindExercicio().then();
-    this.pesquisar();
+    // this.pesquisar();
     this.pesquisarExercicios();
     this.pesquisarRemessas();
-
+    this.pesquisarRemesssa();
+    
     this.findAllUnidadeGestora().then(resp => {
       this.unidades = resp;
     });
@@ -327,9 +328,10 @@ export default {
           value: 0,
           text: "Todos",
         };
-        this.formdata.exercicio = 0;
+        this.formdata.exercicio = this.formdata.exercicios[0].value;
       });
     },
+    
     pesquisarRemessas() {
       api.get("/remessa/" + this.formdata.exercicio).then((resp) => {
 
@@ -343,7 +345,7 @@ export default {
           value: 0,
           text: "Todos",
         };
-        this.formdata.remessa = 0;
+        this.formdata.remessa = this.formdata.remessas[this.formdata.remessas.length-2].value;
       });
       this.filterSize();
     },
