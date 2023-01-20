@@ -91,13 +91,12 @@ public class AssinarRemessaRepository extends DefaultRepository<String, String> 
                     "select nome, cpf, max(status) status, max(data) data, CodigoCargo " +
                             "from (" +
                             "         select distinct pf.nome, pf.cpf, null status, null data, upc.CodigoCargo" +
-                            "         from cadun.dbo.UnidadePessoaCargo upc" +
-                            "                  join cadun.dbo.vwpessoa pf on pf.id = upc.CodigoPessoaFisica" +
-                            "                  join AutenticacaoAssinatura..UsuarioAplicacao ua on ua.Usuario = pf.cpf" +
-                            "         join Cadun.dbo.PessoaJuridica pj on upc.CodigoPessoaJuridica = pj.Codigo" +
-                            "         where upc.CodigoCargo in (:tipo)" +
+                            "         from cadun.dbo.vwUnidadesPessoasCargos upc" +
+                            "                  join cadun.dbo.vwpessoa pf on pf.id = upc.idPessoaFisica" +
+                            "                  join Cadun.dbo.PessoaJuridica pj on upc.idPessoaJuridica = pj.Codigo" +
+                            "         where upc.idCargo in (:tipo)" +
                             "           and (dataInicio <= :date and (datafim is null or datafim >= :date))" +
-                            "           and pj.CNPJ = :unidade and ua.Aplicacao = 29" +
+                            "           and pj.CNPJ = :unidade " +
                             "         union" +
                             "         select distinct pf.nome, pf.cpf, b.DataAssinatura, b.DataAssinatura, upc.CodigoCargo" +
                             "         from cadun.dbo.UnidadePessoaCargo upc" +
