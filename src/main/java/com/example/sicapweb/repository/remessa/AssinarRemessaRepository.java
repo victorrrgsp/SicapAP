@@ -88,9 +88,9 @@ public class AssinarRemessaRepository extends DefaultRepository<String, String> 
     public Object buscarResponsavelAssinatura(Integer tipoCargo, InfoRemessa infoRemessa) {
         try {
             Query query = entityManager.createNativeQuery(
-                    "select nome, cpf, max(status) status, max(data) data, CodigoCargo " +
+                    "select nome, cpf, max(status) status, max(data) data, idCargo as CodigoCargo " +
                             "from (" +
-                            "         select distinct pf.nome, pf.cpf, null status, null data, upc.CodigoCargo" +
+                            "         select distinct pf.nome, pf.cpf, null status, null data, upc.idCargo" +
                             "         from cadun.dbo.vwUnidadesPessoasCargos upc" +
                             "                  join cadun.dbo.vwpessoa pf on pf.id = upc.idPessoaFisica" +
                             "                  join Cadun.dbo.PessoaJuridica pj on upc.idPessoaJuridica = pj.Codigo" +
@@ -115,7 +115,7 @@ public class AssinarRemessaRepository extends DefaultRepository<String, String> 
                             "           and c.Bimestre = :remessa" +
                             "           and ua.Aplicacao = 29" +
                             "     ) as v " +
-                            "group by nome, cpf, CodigoCargo;");
+                            "group by nome, cpf, idCargo;");
             query.setParameter("tipo", tipoCargo);
             query.setParameter("date", new Date());
             query.setParameter("unidade", User.getUser(super.request).getUnidadeGestora().getId());
