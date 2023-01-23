@@ -140,35 +140,32 @@ public class AdmissaoEnvioRepository extends DefaultRepository<AdmissaoEnvio, Bi
 
             var query = entityManager.createNativeQuery(
 
-                    "select  ev.id idvaga,ev.codigoVaga, c.nomeCargo, ev.especialidadeVaga,  ev.tipoConcorrencia,  cast(ev.quantidade as INTEGER) quantidade , count(1) qt_aprov, min( cast(classificacao as INTEGER)) min_classif, " +
-                            "        max(cast(classificacao as INTEGER)) max_classif,  sum(case when da.status=1 then 1 else 0 end) ct_nao_anexados " +
-                            "from dbo.AdmissaoEnvio pa  join dbo.DocumentoAdmissao da on pa.id=da.idEnvio   and da.status> 0 " +
-                            "       join dbo.EditalAprovado EA on da.idAprovado = ea.id " +
-                            "       join dbo.EditalVaga EV on ea.idEditalVaga = ev.id " +
-                            "       join dbo.Cargo c on ev.idCargo = c.id " +
-                            "where pa.idEdital =:idEdital " +
-                            "group by ev.id ,ev.codigoVaga, c.nomeCargo, ev.especialidadeVaga,  ev.tipoConcorrencia, ev.quantidade ").setParameter("idEdital",idEdital);
+                    "select ev.id                                          idvaga,\n" +
+                            "       ev.codigoVaga,\n" +
+                            "       c.nomeCargo,\n" +
+                            "       ev.especialidadeVaga,\n" +
+                            "       ev.tipoConcorrencia,\n" +
+                            "       cast(ev.quantidade as INTEGER)                 quantidade,\n" +
+                            "       count(1)                                       qt_aprov,\n" +
+                            "       min(cast(classificacao as INTEGER))            min_classif,\n" +
+                            "       max(cast(classificacao as INTEGER))            max_classif,\n" +
+                            "       sum(case when da.status = 1 then 1 else 0 end) ct_nao_anexados,\n" +
+                            "       count(Desligamento.id)                         qt_aprovDesligado,\n" +
+                            "       count(da.opcaoDesistencia)                     qt_desistencia\n" +
+                            "from dbo.AdmissaoEnvio pa\n" +
+                            "         join dbo.DocumentoAdmissao da on pa.id = da.idEnvio and da.status > 0\n" +
+                            "         join dbo.EditalAprovado EA on da.idAprovado = ea.id\n" +
+                            "         join dbo.EditalVaga ev on ea.idEditalVaga = ev.id\n" +
+                            "         join dbo.Cargo c on ev.idCargo = c.id\n" +
+                            "         left join dbo.Admissao on da.idAdmissao = Admissao.id\n" +
+                            "         left join dbo.Desligamento on Admissao.id = Desligamento.idAdmissao\n" +
+                            "where pa.idEdital = :idEdital\n" +
+                            "group by ev.id, ev.codigoVaga, c.nomeCargo, ev.especialidadeVaga, ev.tipoConcorrencia, ev.quantidade").setParameter("idEdital",idEdital);
             List<Object[]> list = query.getResultList();
 
-            var query2 = entityManager.createNativeQuery("select ev.codigoVaga,\n" +
-                    "       count(Desligamento.id)                                       qt_aprov,\n" +
-                    "       min(cast( EA.classificacao as INTEGER))            min_classif,\n" +
-                    "       max(cast(EA.classificacao as INTEGER))            max_classif,\n" +
-                    "       sum(case when da.status = 1 then 1 else 0 end) ct_nao_anexados\n" +
-                    "from dbo.AdmissaoEnvio pa\n" +
-                    "         join dbo.DocumentoAdmissao da on pa.id = da.idEnvio and da.status > 0\n" +
-                    "         left join dbo.Admissao on da.idAdmissao = Admissao.id\n" +
-                    "         join dbo.EditalAprovado EA on da.idAprovado = ea.id\n" +
-                    "         join dbo.EditalVaga EV on ea.idEditalVaga = ev.id\n" +
-                    "         left join dbo.Desligamento on Admissao.id = Desligamento.idAdmissao\n" +
-                    "where pa.idEdital = :idEdital \n" +
-                    "group by ev.codigoVaga;\n").setParameter("idEdital",idEdital);
-            List<Object[]> list2  = query2.getResultList();
-            
 //            for (Object[] obj : list) {
             for (int i = 0; i < list.size(); i++) {
                 Object[] obj = list.get(i);
-                Object[] obj2 = list2.get(i);
 
                 Map<String, Object> vagaAprovado = new HashMap<String, Object>();
 
@@ -177,11 +174,12 @@ public class AdmissaoEnvioRepository extends DefaultRepository<AdmissaoEnvio, Bi
                 vagaAprovado.put("nomeCargo",  obj[2]);
                 vagaAprovado.put("especialidadeVaga",  obj[3]);
                 vagaAprovado.put("tipoConcorrencia",  obj[4]);
-                vagaAprovado.put("quantidade",  obj[5]);
+                //quantidade= qtVagas +(qtDesistencias + qtDesligados)
+                Integer aux = ((Integer) obj[5] + ((Integer) obj[10]) + ((Integer) obj[11]));
+                vagaAprovado.put("quantidade", aux);
                 vagaAprovado.put("qt_aprov",  obj[6]);
                 vagaAprovado.put("min_classif", obj[7]);
-                Integer aux = ((Integer) obj[8] + ((Integer) obj[6]) - ((Integer) obj2[2]));
-                vagaAprovado.put("max_classif",aux);
+                vagaAprovado.put("max_classif",obj[8]);
                 vagaAprovado.put("ct_nao_anexados",  obj[9]);
 
                 String nomeTipoConcorrencia =  Arrays.stream(EditalVaga.TipoConcorrencia.values()).filter(tipoConcorrencia -> tipoConcorrencia.getValor()==vagaAprovado.get("tipoConcorrencia")).collect( Collectors.toList()).get(0).name();
