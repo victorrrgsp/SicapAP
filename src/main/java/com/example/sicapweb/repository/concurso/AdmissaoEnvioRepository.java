@@ -151,17 +151,17 @@ public class AdmissaoEnvioRepository extends DefaultRepository<AdmissaoEnvio, Bi
             List<Object[]> list = query.getResultList();
 
             var query2 = entityManager.createNativeQuery("select ev.codigoVaga,\n" +
-                    "       count(1)                                       qt_aprov,\n" +
+                    "       count(Desligamento.id)                                       qt_aprov,\n" +
                     "       min(cast( EA.classificacao as INTEGER))            min_classif,\n" +
                     "       max(cast(EA.classificacao as INTEGER))            max_classif,\n" +
                     "       sum(case when da.status = 1 then 1 else 0 end) ct_nao_anexados\n" +
                     "from dbo.AdmissaoEnvio pa\n" +
                     "         join dbo.DocumentoAdmissao da on pa.id = da.idEnvio and da.status > 0\n" +
-                    "         join dbo.Admissao on da.idAdmissao = Admissao.id\n" +
+                    "         left join dbo.Admissao on da.idAdmissao = Admissao.id\n" +
                     "         join dbo.EditalAprovado EA on da.idAprovado = ea.id\n" +
                     "         join dbo.EditalVaga EV on ea.idEditalVaga = ev.id\n" +
                     "         left join dbo.Desligamento on Admissao.id = Desligamento.idAdmissao\n" +
-                    "where pa.idEdital = :idEdital and Desligamento.id is null\n" +
+                    "where pa.idEdital = :idEdital \n" +
                     "group by ev.codigoVaga;\n").setParameter("idEdital",idEdital);
             List<Object[]> list2  = query2.getResultList();
             
