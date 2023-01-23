@@ -104,6 +104,64 @@ public class EditalAdmissaoController {
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(admissaoEnvio.getClass()).toUri();
         return ResponseEntity.created(uri).body(admissaoEnvio);
     }
+    @CrossOrigin
+    @GetMapping("/teste")
+    public void teste() {
+        
+        List<Map<String,Object>> la ;
+        // String ids[] = {
+        //     "37463"
+        //     ,"37502"
+        //     ,"37597"
+        //     ,"37608"
+        //     ,"37618"
+        //     ,"37626"
+        //     ,"37631"
+        //     ,"37643"
+        //     ,"37646"
+        //     ,"37652"
+        //     ,"37898"
+        //     ,"38050"
+        //     ,"38053"
+        //     ,"38057"
+        //     ,"38100"
+        //     ,"38108"
+        //     ,"38111"
+        //     ,"38193"
+        //     ,"47010"
+        //     ,"48313"
+        //     ,"48945"
+        //     ,"49896"
+        //     ,"50241"
+        // };
+        // for (int i = 0; i < ids.length; i++) {
+            
+        // }
+        la = admissaoEnvioRepository.getValidInfoEnvio(new BigInteger("37463"));
+        la = admissaoEnvioRepository.getValidInfoEnvio(new BigInteger("37502"));
+        la = admissaoEnvioRepository.getValidInfoEnvio(new BigInteger("37597"));
+        la = admissaoEnvioRepository.getValidInfoEnvio(new BigInteger("37608"));
+        la = admissaoEnvioRepository.getValidInfoEnvio(new BigInteger("37618"));
+        la = admissaoEnvioRepository.getValidInfoEnvio(new BigInteger("37626"));
+        la = admissaoEnvioRepository.getValidInfoEnvio(new BigInteger("37631"));
+        la = admissaoEnvioRepository.getValidInfoEnvio(new BigInteger("37643"));
+        la = admissaoEnvioRepository.getValidInfoEnvio(new BigInteger("37646"));
+        la = admissaoEnvioRepository.getValidInfoEnvio(new BigInteger("37652"));
+        la = admissaoEnvioRepository.getValidInfoEnvio(new BigInteger("37898"));
+        la = admissaoEnvioRepository.getValidInfoEnvio(new BigInteger("38050"));
+        la = admissaoEnvioRepository.getValidInfoEnvio(new BigInteger("38053"));
+        la = admissaoEnvioRepository.getValidInfoEnvio(new BigInteger("38057"));
+        la = admissaoEnvioRepository.getValidInfoEnvio(new BigInteger("38100"));
+        la = admissaoEnvioRepository.getValidInfoEnvio(new BigInteger("38108"));
+        la = admissaoEnvioRepository.getValidInfoEnvio(new BigInteger("38111"));
+        la = admissaoEnvioRepository.getValidInfoEnvio(new BigInteger("38193"));
+        la = admissaoEnvioRepository.getValidInfoEnvio(new BigInteger("47010"));
+        la = admissaoEnvioRepository.getValidInfoEnvio(new BigInteger("48313"));
+        la = admissaoEnvioRepository.getValidInfoEnvio(new BigInteger("48945"));
+        la = admissaoEnvioRepository.getValidInfoEnvio(new BigInteger("49896"));
+        la = admissaoEnvioRepository.getValidInfoEnvio(new BigInteger("50241"));
+
+    }
 
     @CrossOrigin
     @Transactional
