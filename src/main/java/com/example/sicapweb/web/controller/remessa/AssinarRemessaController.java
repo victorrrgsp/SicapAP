@@ -112,6 +112,7 @@ public class AssinarRemessaController {
             assinarRemessaRepository.insertAssinatura();
             assinarRemessaRepository.insertInfoAssinatura(infoRemessa);
             assinarRemessaRepository.insertAdmAssinatura(infoRemessa.getChave());
+            assinarRemessaRepository.insertUsuarioAplicacao(infoRemessa);
             return ResponseEntity.ok().body("Ok");
         } else {
             return ResponseEntity.ok().body("Falha");
