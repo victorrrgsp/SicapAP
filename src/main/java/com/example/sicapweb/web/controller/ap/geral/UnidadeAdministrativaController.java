@@ -34,7 +34,7 @@ public class UnidadeAdministrativaController  extends DefaultController<UnidadeA
     @CrossOrigin
     @GetMapping(path="/{searchParams}/{tipoParams}/pagination")
     public ResponseEntity<PaginacaoUtil<UnidadeAdministrativa>> listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
-        PaginacaoUtil<UnidadeAdministrativa> paginacaoUtil = unidadeAdministrativaRepository.buscaPaginada(pageable,searchParams,tipoParams);
+        PaginacaoUtil<UnidadeAdministrativa> paginacaoUtil = unidadeAdministrativaRepository.findbyUgPaginada(pageable,searchParams,tipoParams);
         return ResponseEntity.ok().body(paginacaoUtil);
     }
     @CrossOrigin

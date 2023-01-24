@@ -3,6 +3,8 @@ package com.example.sicapweb.repository.geral;
 import br.gov.to.tce.model.ap.relacional.UnidadeAdministrativa;
 import com.example.sicapweb.repository.DefaultRepository;
 import com.example.sicapweb.security.User;
+import com.example.sicapweb.util.PaginacaoUtil;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -56,7 +58,6 @@ public class UnidadeAdministrativaRepository extends DefaultRepository<UnidadeAd
 
     public List<UnidadeAdministrativa> findbyUg() {
         List<UnidadeAdministrativa> list = getEntityManager().createNativeQuery(
-
                 "  with ids_UnidadeAdministrativa as " +
                         "(select t.codigoUnidadeAdministrativa,i.idUnidadeGestora, max(t.id) max_id_por_chave from SICAPAP21.dbo.UnidadeAdministrativa t  join SICAPAP21.dbo.InfoRemessa  i on  t.chave = i.chave and i.idUnidadeGestora='"+User.getUser(super.request).getUnidadeGestora().getId()+"'  group by t.codigoUnidadeAdministrativa,i.idUnidadeGestora ) " +
                         "select t.*  from SICAPAP21.dbo.UnidadeAdministrativa t  join SICAPAP21.dbo.InfoRemessa  i  on t.chave =  i.chave join ids_UnidadeAdministrativa ie on t.id = ie.max_id_por_chave and i.idUnidadeGestora=ie.idUnidadeGestora ",
@@ -64,6 +65,41 @@ public class UnidadeAdministrativaRepository extends DefaultRepository<UnidadeAd
 
         return list;
 
+    }
+
+    public PaginacaoUtil<UnidadeAdministrativa> findbyUgPaginada(Pageable pageable, String searchParams, Integer tipoParams) {
+
+        int pagina = Integer.valueOf(pageable.getPageNumber());
+        int tamanho = Integer.valueOf(pageable.getPageSize());
+        String search = "";
+
+        //monta pesquisa search
+        if (searchParams.length() > 3) {
+
+            if (tipoParams == 0) { //entra para tratar a string
+                String arrayOfStrings[] = searchParams.split("=");
+                search = " WHERE " + arrayOfStrings[0] + " LIKE  '%" + arrayOfStrings[1] + "%'  ";
+            } else {
+                search = " WHERE " + searchParams + "   ";
+            }
+        }
+
+        //retirar os : do Sort pageable
+        String campo = String.valueOf(pageable.getSort()).replace(":", "");
+        var query = getEntityManager().createNativeQuery(
+                "  with ids_UnidadeAdministrativa as " +
+                        "(select t.codigoUnidadeAdministrativa,i.idUnidadeGestora, max(t.id) max_id_por_chave from SICAPAP21.dbo.UnidadeAdministrativa t  join SICAPAP21.dbo.InfoRemessa  i on  t.chave = i.chave and i.idUnidadeGestora='"+User.getUser(super.request).getUnidadeGestora().getId()+"'  group by t.codigoUnidadeAdministrativa,i.idUnidadeGestora ) " +
+                        "select t.*  from SICAPAP21.dbo.UnidadeAdministrativa t  join SICAPAP21.dbo.InfoRemessa  i  on t.chave =  i.chave join ids_UnidadeAdministrativa ie on t.id = ie.max_id_por_chave and i.idUnidadeGestora=ie.idUnidadeGestora " + search + " ORDER BY " + campo,
+                UnidadeAdministrativa.class);
+        List<UnidadeAdministrativa> list = query
+                .setFirstResult(pagina)
+                .setMaxResults(tamanho)
+                .getResultList();
+
+        long totalRegistros = count();
+        long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
+
+        return new PaginacaoUtil<UnidadeAdministrativa>(tamanho, pagina, totalPaginas, totalRegistros, list);
     }
 
     public List<HashMap<String, Object>> pesquisaPorUg(String ug) {
