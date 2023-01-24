@@ -224,6 +224,19 @@ public class AssinarRemessaRepository extends DefaultRepository<String, String> 
         entityManager.flush();
     }
 
+    public void insertUsuarioAplicacao(InfoRemessa infoRemessa) {
+        Query query = entityManager.createNativeQuery(
+                "INSERT INTO AutenticacaoAssinatura.dbo.UsuarioAplicacao(Usuario, Aplicacao, UnidadeGestora, Exercicio, Remessa, Cargo) " +
+                        "VALUES (:usuario, 29, :unidade, :exercicio, :remessa, :cargo)");
+        query.setParameter("usuario", User.getUser(super.request).getCpf());
+        query.setParameter("unidade", User.getUser(super.request).getUnidadeGestora().getId());
+        query.setParameter("exercicio", infoRemessa.getExercicio());
+        query.setParameter("remessa", infoRemessa.getRemessa());
+        query.setParameter("cargo", User.getUser(super.request).getCargo().getValor());
+        query.executeUpdate();
+        entityManager.flush();
+    }
+
 
     public String getSearchDecoded(String searchParams) throws UnsupportedEncodingException {
         String search = "";
