@@ -3,8 +3,10 @@ package com.example.sicapweb.web.controller.ap.concurso;
 import br.gov.to.tce.model.ap.concurso.ConcursoEnvio;
 import br.gov.to.tce.model.ap.concurso.EditalHomologacao;
 import com.example.sicapweb.repository.concurso.ConcursoEnvioRepository;
+import com.example.sicapweb.repository.concurso.DocumentoEditalHomologacaoRepository;
 import com.example.sicapweb.repository.concurso.EditalHomologacaoRepository;
 import com.example.sicapweb.repository.concurso.EditalRepository;
+import com.example.sicapweb.repository.geral.AtoRepository;
 import com.example.sicapweb.util.PaginacaoUtil;
 import com.example.sicapweb.web.controller.DefaultController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,9 @@ public class EditalHomologacaoController extends DefaultController<EditalHomolog
 
     @Autowired
     private EditalHomologacaoRepository editalHomologacaoRepository;
+
+    @Autowired
+    private AtoRepository atoRepository;
 
     @Autowired
     private EditalRepository editalRepository;
@@ -61,10 +66,15 @@ public class EditalHomologacaoController extends DefaultController<EditalHomolog
     @Transactional
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.PUT)
     public void update(@RequestBody EditalHomologacao editalHomologacao, @PathVariable BigInteger id) {
+        var old = editalHomologacaoRepository.findById(id);
         editalHomologacao.setChave(editalRepository.buscarPrimeiraRemessa());
+        editalHomologacao.setAto(atoRepository.findById(editalHomologacao.getAto().getId()));
         editalHomologacao.setId(id);
-        //edital.setEmpresaOrganizadora(empresaOrganizadoraRepository.buscaEmpresaPorCnpj(edital.getCnpjEmpresaOrganizadora()));
+        editalHomologacao.setEdital(editalRepository.findById(editalHomologacao.getEdital().getId()));
+        editalHomologacao.setTipoAto(editalHomologacao.getAto().getTipoAto());
         editalHomologacaoRepository.update(editalHomologacao);
+    
+
     }
 
 
