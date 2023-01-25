@@ -66,7 +66,6 @@ public class EditalHomologacaoController extends DefaultController<EditalHomolog
     @Transactional
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.PUT)
     public void update(@RequestBody EditalHomologacao editalHomologacao, @PathVariable BigInteger id) {
-        var old = editalHomologacaoRepository.findById(id);
         editalHomologacao.setChave(editalRepository.buscarPrimeiraRemessa());
         editalHomologacao.setAto(atoRepository.findById(editalHomologacao.getAto().getId()));
         editalHomologacao.setId(id);
