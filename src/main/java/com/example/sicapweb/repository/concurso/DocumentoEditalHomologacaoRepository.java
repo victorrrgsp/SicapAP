@@ -16,9 +16,14 @@ public class DocumentoEditalHomologacaoRepository extends DefaultRepository<Docu
     }
 
     public List<DocumentoEditalHomologacao> buscarDocumentoEditalHomologacao(String coluna, BigInteger idEditalHomologacao) {
+        if(coluna == null||coluna.replace(" ", "") == "" ){
+            coluna = "";
+        }else{
+            coluna = " and inciso = '"+ coluna+"'"; 
+        }
         return getEntityManager().createNativeQuery(
-                "select * from DocumentoEditalHomologacao where status = 2 and inciso = '"
-                        + coluna + "' and idEditalHomologacao = " + idEditalHomologacao, DocumentoEditalHomologacao.class)
+                "select * from DocumentoEditalHomologacao where status = 2 "
+                        + coluna + " and idEditalHomologacao = " + idEditalHomologacao, DocumentoEditalHomologacao.class)
                 .getResultList();
     }
 

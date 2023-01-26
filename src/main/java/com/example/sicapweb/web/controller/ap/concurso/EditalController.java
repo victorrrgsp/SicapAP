@@ -41,6 +41,21 @@ public class EditalController extends DefaultController<Edital> {
         PaginacaoUtil<Edital> paginacaoUtil = editalRepository.buscaPaginada(pageable,searchParams,tipoParams);
         return ResponseEntity.ok().body(paginacaoUtil);
     }
+    @CrossOrigin
+    @GetMapping(path = "/EnviosFase1PorEditais/{ids}")
+    public ResponseEntity<Map<String,Object>> listDocs( @PathVariable List<Integer> ids) {
+        Map<String,Object> retorno = new HashMap<String,Object>();
+        for (Integer id : ids) {
+            //var aux = documentoEditalHomologacaoRepository.buscarDocumentoEditalHomologacao(null,BigInteger.valueOf(id));            
+            var aux = concursoEnvioRepository.buscarEnvioFAse1PorEdital(BigInteger.valueOf(id));
+            
+            if(!aux.isEmpty()){
+                retorno.put(id.toString(), aux);
+            }
+        }
+        return ResponseEntity.ok().body(retorno);
+    }
+
 
     @CrossOrigin
     @GetMapping

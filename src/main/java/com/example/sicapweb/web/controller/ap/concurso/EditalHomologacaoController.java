@@ -18,7 +18,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.math.BigInteger;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping({"/concursoHomologacao"})
@@ -76,6 +78,20 @@ public class EditalHomologacaoController extends DefaultController<EditalHomolog
 
     }
 
+    @CrossOrigin
+    @GetMapping(path = "/EnviosFase2PorEditais/{ids}")
+    public ResponseEntity<Map<String,Object>> listDocs( @PathVariable List<Integer> ids) {
+        Map<String,Object> retorno = new HashMap<String,Object>();
+        for (Integer id : ids) {
+            //var aux = documentoEditalHomologacaoRepository.buscarDocumentoEditalHomologacao(null,BigInteger.valueOf(id));            
+            var aux = concursoEnvioRepository.buscarEnvioFAse2PorEdital(BigInteger.valueOf(id));
+
+            if(!aux.isEmpty()){
+                retorno.put(id.toString(), aux);
+            }
+        }
+        return ResponseEntity.ok().body(retorno);
+    }
 
     @CrossOrigin
     @GetMapping(path = {"/envio/{id}"})
