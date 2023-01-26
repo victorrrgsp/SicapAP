@@ -512,10 +512,10 @@ export default {
       doc.text("" + this.formatarData(item.dataEntrega) + "", 35, 90);
 
       doc.setFont(undefined, "bold");
-      doc.text("Última Asinatura: ", 10, 100);
+      doc.text("Última Assinatura: ", 10, 100);
 
       doc.setFont(undefined, "normal");
-      doc.text("" + this.formatarData(item.dataAssinatura) + "", 40, 100);
+      doc.text("" + this.formatarData(item.dataAssinatura) + "", 41, 100);
 
       doc.text(
         "O Tribunal de Contas do Tocantins, atesta o recebimento das informações referentes aos dados do(s) mês(es) " +
