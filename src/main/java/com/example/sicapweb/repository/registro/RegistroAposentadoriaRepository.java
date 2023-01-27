@@ -75,6 +75,7 @@ public class RegistroAposentadoriaRepository  extends DefaultRepository<Registro
 
         long totalRegistros = countMovimentosAposentadoriaParaRegistrar(variacoesNaQuery,filtros.get("ug"));
         int tamanhoPorPagina =  (whereStatemente.isEmpty())? Integer.valueOf(pageable.getPageSize()) : (int) totalRegistros ;
+        tamanhoPorPagina = tamanhoPorPagina == 0 ? 1:0;
         long totalPaginas = (totalRegistros + (tamanhoPorPagina - 1)) / tamanhoPorPagina;
         //destiva paginação se tiver filtro preenchido
         if ( whereStatemente.isEmpty() && totalRegistros > tamanho ) {
@@ -228,6 +229,15 @@ public class RegistroAposentadoriaRepository  extends DefaultRepository<Registro
 
     public HashMap<String,Object> getUserInfoFromIdUsuarioAutenticacao(BigInteger idIsuario ){
         try{
+                //idIsuario = BigInteger.valueOf(17745);
+            
+                // var a = StaticMethods.getHashmapFromQuery(getEntityManager().createNativeQuery("  " +
+                //             "select *" +
+                //             "from Autenticar.dbo.Usuario"));
+                // var b = StaticMethods.getHashmapFromQuery(getEntityManager().createNativeQuery(
+                //     "select id as id,codigo as cpfUsuario,login as loginUsuario ,nome " +
+                //     "from Autenticar.dbo.Usuario where upper(nome) like '%'+upper('guilherme h')+'%'"));
+            
             Query sqlAutenticacao=getEntityManager().createNativeQuery("  " +
                             "  select id as id,codigo as cpfUsuario,login as loginUsuario " +
                             "from Autenticar.dbo.Usuario where id=:id ")

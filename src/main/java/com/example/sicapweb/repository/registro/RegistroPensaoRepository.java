@@ -84,6 +84,7 @@ public class RegistroPensaoRepository  extends DefaultRepository<RegistroPensao,
 
         long totalRegistros = countMovimentosPensaoParaRegistrar(filtros.get("ug"));
         int tamanhoPorPagina =  (whereStatemente.isEmpty())? Integer.valueOf(pageable.getPageSize()) : (int) totalRegistros ;
+        tamanhoPorPagina = tamanhoPorPagina == 0 ? 1:0;
         long totalPaginas = (totalRegistros + (tamanhoPorPagina - 1)) / tamanhoPorPagina;
         if (totalRegistros > tamanho  && whereStatemente.isEmpty() ){
             queryMovimentos.setFirstResult(pagina).setMaxResults(tamanho);
