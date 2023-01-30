@@ -43,7 +43,7 @@ public class EditalController extends DefaultController<Edital> {
     }
     @CrossOrigin
     @GetMapping(path = "/EnviosFase1PorEditais/{ids}")
-    public ResponseEntity<Map<String,Object>> listDocs( @PathVariable List<Integer> ids) {
+    public ResponseEntity<Map<String,Object>> getEnviosFase1PorEditais( @PathVariable List<Integer> ids) {
         Map<String,Object> retorno = new HashMap<String,Object>();
         for (Integer id : ids) {
             //var aux = documentoEditalHomologacaoRepository.buscarDocumentoEditalHomologacao(null,BigInteger.valueOf(id));            
@@ -119,6 +119,12 @@ public class EditalController extends DefaultController<Edital> {
     @Transactional
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.PUT)
     public void update(@RequestBody Edital edital, @PathVariable BigInteger id) {
+        var aux = concursoEnvioRepository.buscarEnvioFAse1PorEdital(id);
+            
+        if(!aux.isEmpty()){
+            throw new InvalitInsert("não é possível editar um edital com  processo associado !!");
+        }
+
         edital.setInfoRemessa(editalRepository.buscarPrimeiraRemessa());
         edital.setId(id);
         Edital e =editalRepository.buscarEditalPorNumero(edital.getNumeroEdital(),edital.getComplementoNumero());

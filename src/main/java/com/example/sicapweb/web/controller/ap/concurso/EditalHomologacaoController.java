@@ -2,6 +2,8 @@ package com.example.sicapweb.web.controller.ap.concurso;
 
 import br.gov.to.tce.model.ap.concurso.ConcursoEnvio;
 import br.gov.to.tce.model.ap.concurso.EditalHomologacao;
+
+import com.example.sicapweb.exception.InvalitInsert;
 import com.example.sicapweb.repository.concurso.ConcursoEnvioRepository;
 import com.example.sicapweb.repository.concurso.DocumentoEditalHomologacaoRepository;
 import com.example.sicapweb.repository.concurso.EditalHomologacaoRepository;
@@ -68,6 +70,12 @@ public class EditalHomologacaoController extends DefaultController<EditalHomolog
     @Transactional
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.PUT)
     public void update(@RequestBody EditalHomologacao editalHomologacao, @PathVariable BigInteger id) {
+        var aux = concursoEnvioRepository.buscarEnvioFAse2PorEdital(id);
+            
+        if(!aux.isEmpty()){
+            throw new InvalitInsert("não é possível editar um edital com  processo associado !!");
+        }
+        
         editalHomologacao.setChave(editalRepository.buscarPrimeiraRemessa());
         editalHomologacao.setAto(atoRepository.findById(editalHomologacao.getAto().getId()));
         editalHomologacao.setId(id);
@@ -80,14 +88,14 @@ public class EditalHomologacaoController extends DefaultController<EditalHomolog
 
     @CrossOrigin
     @GetMapping(path = "/EnviosFase2PorEditais/{ids}")
-    public ResponseEntity<Map<String,Object>> listDocs( @PathVariable List<Integer> ids) {
+    public ResponseEntity<Map<String,Object>> getEnviosFase2PorEditais( @PathVariable List<Integer> ids) {
         Map<String,Object> retorno = new HashMap<String,Object>();
         for (Integer id : ids) {
             //var aux = documentoEditalHomologacaoRepository.buscarDocumentoEditalHomologacao(null,BigInteger.valueOf(id));            
             var aux = concursoEnvioRepository.buscarEnvioFAse2PorEdital(BigInteger.valueOf(id));
 
             if(!aux.isEmpty()){
-                retorno.put(id.toString(), aux);
+                retorno.put(id.toString(), aux.get(0).getProcesso());
             }
         }
         return ResponseEntity.ok().body(retorno);
