@@ -267,64 +267,17 @@ public class RegistroAposentadoriaRepository  extends DefaultRepository<Registro
 
     public List<HashMap<String,Object>> getInforProcessosEcontas(HashMap<String,Object> userInfo ){
         try{
-            Query sqlProcessos=getEntityManager().createNativeQuery("with envios as (select cast(substring(processo, 1, len(processo) - 5) as int)             numeroProcesso,\n" +
-                    "                       cast(substring(processo, len(processo) - 3, len(processo)) as int) anoProcesso,\n" +
-                    "                       status,\n" +
-                    "                       a.idMovimentacao\n" +
-                    "                from AdmEnvio a\n" +
-                    "                where status = 4),\n" +
-                    "    processosRecebidos as (select hcodp_pnumero, hcodp_pano, assunto_desc, id_entidade_origem\n" +
-                    "                            from SCP.dbo.VW_PROC_RECEBIDOS\n" +
-                    "                            where ((proc_num_anexo IS NULL or proc_num_anexo = 0) and\n" +
-                    "                                   (processo_numaps IS NULL or processo_numaps = 0))),\n" +
-                    "    processos as ( select hcodp_pnumero       as numeroProcesso,\n" +
-                    "               hcodp_pano          as anoProcesso,\n" +
-                    "               docmt_numero        as numeroDecisao,\n" +
-                    "               docmt_ano           as anoDecisao,\n" +
-                    "               docmt_data          as dataDecisao,\n" +
-                    "               assunto_desc        as assuntoDesc,\n" +
-                    "               e.cpf               as cpfInteressado,\n" +
-                    "               e.nome                 nomeInteressado,\n" +
-                    "               f.codunidadegestora as cnpjEntidade,\n" +
-                    "               f.nomeEntidade      as nomeEntidade\n" +
-                    "        from processosRecebidos a\n" +
-                    "                 join SCP..PESSOAS_PROCESSO d\n" +
-                    "                      on d.ID_PAPEL = 2 and ID_CARGO = 0 and a.hcodp_pnumero = d.NUM_PROC and a.hcodp_pano = d.ANO_PROC\n" +
-                    "                 join SCP.dbo.document c\n" +
-                    "                      on c.dcnproc_pnumero = hcodp_pnumero and c.dcnproc_pano = hcodp_pano and c.docmt_tipo_decisao = 'D' and\n" +
-                    "                         docmt_tipo = 'RL'\n" +
-                    "                 join Cadun.dbo.PessoaFisica e on d.ID_PESSOA = e.Codigo\n" +
-                    "                 join Cadun.dbo.vwPessoaJuridica f on a.id_entidade_origem = f.id ),\n" +
-                    "     aposentEnvios as (select b.numeroProcesso, b.anoProcesso, a.*\n" +
-                    "                       from Aposentadoria a\n" +
-                    "                                join envios b on a.id = b.idMovimentacao),\n" +
-                    "     apos as (select i.idUnidadeGestora, a.*\n" +
-                    "              from aposentEnvios a\n" +
-                    "                       join InfoRemessa i\n" +
-                    "                            on a.chave = i.chave and a.tipoAposentadoria not in (7, 6) and a.reversao = 0 and\n" +
-                    "                               a.revisao = 0 -- and i.idUnidadeGestora = '01138957000161'\n" +
-                    "              where not exists(select 1 from RegistroAposentadoria where idAposentadoria = a.id))\n" +
-                    "select pss.*\n" +
-                    "--         a.id                as idMovimentacao,\n" +
-                    "--        s.cpfServidor       as cpfServidor,\n" +
-                    "--        s.nome              as nome,\n" +
-                    "--        a.tipoAposentadoria AS tipoMovimentacao,\n" +
-                    "--        a.numeroProcesso    as numeroProcesso,\n" +
-                    "--        a.anoProcesso       as anoProcesso,\n" +
-                    "--        a.dataAposentadoria as dataMovimentacao,\n" +
-                    "--        c.nomeCargo         as nomeCargo,\n" +
-                    "--        at.numeroAto        as numeroAto,\n" +
-                    "--        at.tipoAto          as tipoAto,\n" +
-                    "--        a.idUnidadeGestora  as idUnidadeGestora,\n" +
-                    "--        at.dataPublicacao   as dataAto\n" +
-                    "from apos a\n" +
-                    "         join Ato at on a.idAto = at.id\n" +
-                    "         join Admissao ad on a.id = ad.id\n" +
-                    "         join Cargo c on ad.idCargo = c.id\n" +
-                    "         join Servidor s on ad.idServidor = s.id\n" +
-                    "         left join processos pss on pss.numeroProcesso = a.numeroProcesso and pss.anoProcesso = a.anoProcesso\n" +
-                    "-- where a.cpfServidor = '37754971100   '\n" +
-                    "order by a.id");
+            Query sqlProcessos=getEntityManager().createNativeQuery("    with processosRecebidos as" +
+                    "(select hcodp_pnumero,hcodp_pano, assunto_desc,id_entidade_origem from SCP.dbo.VW_PROC_RECEBIDOS " +
+                    " where ((hdest_ldepto = :Setor) AND (proc_num_anexo IS NULL or proc_num_anexo =0) " +
+                    "and (processo_numaps IS NULL or processo_numaps =0)) and trim(hists_dest_resp)= :Usuario ) " +
+                    "select hcodp_pnumero as numeroProcesso,hcodp_pano as anoProcesso, docmt_numero as numeroDecisao, docmt_ano as anoDecisao , docmt_data as dataDecisao , assunto_desc  as assuntoDesc, e.cpf  as cpfInteressado, e.nome nomeInteressado ,f.codunidadegestora as cnpjEntidade,f.nomeEntidade as nomeEntidade  from " +
+                    " processosRecebidos a   join     SCP..PESSOAS_PROCESSO d  on d.ID_PAPEL=2 and ID_CARGO=0 and a.hcodp_pnumero=d.NUM_PROC and a.hcodp_pano = d.ANO_PROC " +
+                    " join SCP.dbo.document c on c.dcnproc_pnumero = hcodp_pnumero and c.dcnproc_pano = hcodp_pano and c.docmt_tipo_decisao = 'D'  and docmt_tipo='RL'  " +
+                    "join Cadun.dbo.PessoaFisica e on d.ID_PESSOA=e.Codigo " +
+                    "join Cadun.dbo.vwPessoaJuridica f on a.id_entidade_origem= f.id  ")
+                    .setParameter("Setor",userInfo.get("setor"))
+                    .setParameter("Usuario",userInfo.get("loginUsuario"));
             return  StaticMethods.getHashmapFromQuery(sqlProcessos);
         } catch (RuntimeException e){
             throw new RuntimeException("não encontro os processos no econtas!!");
