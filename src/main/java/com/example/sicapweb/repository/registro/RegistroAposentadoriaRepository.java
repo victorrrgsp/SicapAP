@@ -75,7 +75,7 @@ public class RegistroAposentadoriaRepository  extends DefaultRepository<Registro
 
         long totalRegistros = countMovimentosAposentadoriaParaRegistrar(variacoesNaQuery,filtros.get("ug"));
         int tamanhoPorPagina =  (whereStatemente.isEmpty())? Integer.valueOf(pageable.getPageSize()) : (int) totalRegistros ;
-        tamanhoPorPagina = tamanhoPorPagina == 0 ? 1:0;
+        tamanhoPorPagina = tamanhoPorPagina == 0 ? 1:tamanhoPorPagina;
         long totalPaginas = (totalRegistros + (tamanhoPorPagina - 1)) / tamanhoPorPagina;
         //destiva paginação se tiver filtro preenchido
         if ( whereStatemente.isEmpty() && totalRegistros > tamanho ) {

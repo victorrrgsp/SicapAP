@@ -83,7 +83,7 @@ public class RegistroAdmissaoRepository  extends DefaultRepository<RegistroAdmis
 
         long totalRegistros = countMovimentosAdmissaoParaRegistrar(filtros.get("ug"));
         int tamanhoPorPagina =  (whereStatemente.isEmpty())? Integer.valueOf(pageable.getPageSize()) : (int) totalRegistros ;
-        tamanhoPorPagina = tamanhoPorPagina == 0 ? 1:0;
+        tamanhoPorPagina = tamanhoPorPagina == 0 ? 1:tamanhoPorPagina;
         long totalPaginas = (totalRegistros + (tamanhoPorPagina - 1)) / tamanhoPorPagina;
         //desabilita paginacao caso tenho filtro
         if ( whereStatemente.isEmpty() && totalRegistros > tamanho ){
