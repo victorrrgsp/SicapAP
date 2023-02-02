@@ -10,6 +10,7 @@ import com.example.sicapweb.model.dto.PensaoDTO;
 import com.example.sicapweb.repository.concessao.AdmEnvioRepository;
 import com.example.sicapweb.repository.concessao.DocumentoPensaoRepository;
 import com.example.sicapweb.repository.concessao.PensaoRepository;
+import com.example.sicapweb.repository.movimentacaoDePessoal.PensionistaRepository;
 import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
 import com.example.sicapweb.web.controller.DefaultController;
@@ -43,9 +44,12 @@ public class ConcessaoPensaoController extends DefaultController<DocumentoPensao
     @Autowired
     private AdmEnvioRepository admEnvioRepository;
 
+    @Autowired
+    private PensionistaRepository pensionistaRepository;
+
     HashMap<String, Object> pensao = new HashMap<String, Object>();
 
-    public class PensaoDocumento{
+    public class PensaoDocumento {
         private Pensao pensao;
 
         private String situacao;
@@ -68,9 +72,9 @@ public class ConcessaoPensaoController extends DefaultController<DocumentoPensao
     }
 
     @CrossOrigin
-    @GetMapping(path="/{searchParams}/{tipoParams}/pagination")
+    @GetMapping(path = "/{searchParams}/{tipoParams}/pagination")
     public ResponseEntity<PaginacaoUtil<PensaoDTO>> listPensoes(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
-        PaginacaoUtil<PensaoDTO> paginacaoUtil = pensaoRepository.buscaPaginadaPensao(pageable,searchParams,tipoParams);
+        PaginacaoUtil<PensaoDTO> paginacaoUtil = pensaoRepository.buscaPaginadaPensao(pageable, searchParams, tipoParams);
         paginacaoUtil.getRegistros().forEach(registro -> {
             if (registro.getStatus() == 1 && getProcessoAmbiguo(registro.getId()).getBody() != null)
                 registro.setStatus(0);
@@ -82,6 +86,12 @@ public class ConcessaoPensaoController extends DefaultController<DocumentoPensao
     @GetMapping(path = {"/{id}"})
     public ResponseEntity<?> findById(@PathVariable BigInteger id) {
         return ResponseEntity.ok().body(pensaoRepository.findById(id));
+    }
+
+    @CrossOrigin
+    @PostMapping(path = {"/buscarDependentes/{cpf}"})
+    public ResponseEntity<?> buscarDependentes(@PathVariable String cpf) throws Exception {
+        return ResponseEntity.ok().body(pensionistaRepository.getDependentesPensao(cpf));
     }
 
     @CrossOrigin
@@ -108,15 +118,15 @@ public class ConcessaoPensaoController extends DefaultController<DocumentoPensao
     public ResponseEntity<?> findAllDocumentos() {
         List<Pensao> list = pensaoRepository.buscarPensao();
         PensaoDocumento situacao = new PensaoDocumento();
-        for(Integer i= 0; i < list.size(); i++){
-            Integer quantidadeDocumentos = documentoPensaoRepository.findSituacao("documentoPensao","idPensao", list.get(i).getId(), "'I', 'II', 'III', 'IV', 'VIII', 'IX', 'X', 'XI', 'XIII', 'XIV'");
-            if(quantidadeDocumentos == 0) {
+        for (Integer i = 0; i < list.size(); i++) {
+            Integer quantidadeDocumentos = documentoPensaoRepository.findSituacao("documentoPensao", "idPensao", list.get(i).getId(), "'I', 'II', 'III', 'IV', 'VIII', 'IX', 'X', 'XI', 'XIII', 'XIV'");
+            if (quantidadeDocumentos == 0) {
                 situacao.setPensao(list.get(i));
                 situacao.setSituacao("Pendente");
-            } else if(quantidadeDocumentos == 10){
+            } else if (quantidadeDocumentos == 10) {
                 situacao.setPensao(list.get(i));
                 situacao.setSituacao("Concluído");
-            } else{
+            } else {
                 situacao.setPensao(list.get(i));
                 situacao.setSituacao("Aguardando verificação");
             }
@@ -130,7 +140,7 @@ public class ConcessaoPensaoController extends DefaultController<DocumentoPensao
     @CrossOrigin
     @GetMapping(path = {"getSituacao/{id}"})
     public ResponseEntity<?> findSituacao(@PathVariable BigInteger id) {
-        return ResponseEntity.ok().body(documentoPensaoRepository.findSituacao("documentoPensao","idPensao",id, "'I', 'II', 'III', 'IV', 'VIII', 'IX', 'X', 'XI', 'XIII', 'XIV'"));
+        return ResponseEntity.ok().body(documentoPensaoRepository.findSituacao("documentoPensao", "idPensao", id, "'I', 'II', 'III', 'IV', 'VIII', 'IX', 'X', 'XI', 'XIII', 'XIV'"));
     }
 
     @CrossOrigin
@@ -183,24 +193,24 @@ public class ConcessaoPensaoController extends DefaultController<DocumentoPensao
     @CrossOrigin
     @GetMapping(path = {"anexos/{inciso}/{id}"})
     public ResponseEntity<?> findByDocumento(@PathVariable String inciso, @PathVariable BigInteger id) {
-        return ResponseEntity.ok().body(documentoPensaoRepository.buscarDocumentoPensao(inciso, id) );
+        return ResponseEntity.ok().body(documentoPensaoRepository.buscarDocumentoPensao(inciso, id));
     }
 
     @CrossOrigin
     @Transactional
     @DeleteMapping(value = {"/{id}"})
     public void delete(@PathVariable BigInteger id) {
-        documentoPensaoRepository.delete(id); 
+        documentoPensaoRepository.delete(id);
     }
 
     @CrossOrigin
     @PostMapping("/enviarGestor/{id}")
-    public ResponseEntity<?> enviarGestorAssinar(@PathVariable BigInteger id,@RequestParam(value = "Ug", required = false) String ug ){
-        admEnvioRepository.save(preencherEnvio(id,ug));
+    public ResponseEntity<?> enviarGestorAssinar(@PathVariable BigInteger id, @RequestParam(value = "Ug", required = false) String ug) {
+        admEnvioRepository.save(preencherEnvio(id, ug));
         return ResponseEntity.ok().body("Ok");
     }
 
-    private AdmEnvio preencherEnvio(BigInteger id,String ug) {
+    private AdmEnvio preencherEnvio(BigInteger id, String ug) {
         Pensao pensao = pensaoRepository.findById(id);
         AdmEnvio admEnvio = new AdmEnvio();
         admEnvio.setTipoRegistro(AdmEnvio.TipoRegistro.PENSAO.getValor());
@@ -220,7 +230,7 @@ public class ConcessaoPensaoController extends DefaultController<DocumentoPensao
     @PostMapping("/vincularProcesso/{id}/{numero}/{ano}")
     public ResponseEntity<?> vincularProcesso(@PathVariable BigInteger id, @PathVariable String numero, @PathVariable String ano) {
         String processo = numero + "/" + ano;
-        AdmEnvio admEnvio = preencherEnvio(id,null);
+        AdmEnvio admEnvio = preencherEnvio(id, null);
         admEnvio.setStatus(AdmEnvio.Status.CONCLUIDO.getValor());
         admEnvio.setProcesso(processo);
         admEnvioRepository.save(admEnvio);
