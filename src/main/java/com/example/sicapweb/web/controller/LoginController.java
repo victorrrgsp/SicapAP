@@ -1,12 +1,17 @@
 package com.example.sicapweb.web.controller;
 
 import br.gov.to.tce.model.UnidadeGestora;
+import br.gov.to.tce.model.adm.AdmAutenticacao;
 import br.gov.to.tce.validation.ValidationException;
+import com.example.sicapweb.repository.geral.AdmSistemaRepository;
+import com.example.sicapweb.repository.geral.CargoRepository;
+import com.example.sicapweb.repository.geral.UnidadeGestoraRepository;
 import com.example.sicapweb.repository.geral.UsuarioRepository;
 import com.example.sicapweb.security.Config;
 import com.example.sicapweb.security.Session;
 import com.example.sicapweb.security.User;
 import com.example.sicapweb.service.Login;
+import com.example.sicapweb.util.PaginacaoUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
@@ -39,6 +44,12 @@ public class LoginController extends DefaultController<Login> {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private AdmSistemaRepository admSistemaRepository;
+
+    @Autowired
+    private UnidadeGestoraRepository unidadeGestoraRepository;
 
     @CrossOrigin
     @Transactional
@@ -101,16 +112,6 @@ public class LoginController extends DefaultController<Login> {
         return ResponseEntity.ok().body(true);
     }
 
-//    @CrossOrigin
-//    @GetMapping(path = {"/sessions"})
-//    public ResponseEntity<?> find() {
-//        String teste = config.jedis.get("0c77bfa7-0e59-42b8-91c1-36d479ee6488");
-//
-//        ServletRequestAttributes attr = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
-//        attr.getRequest().getSession().getAttribute("01499673140");
-//        return ResponseEntity.ok().body("warley");
-//    }
-
 
     @CrossOrigin
     @Transactional
@@ -137,28 +138,48 @@ public class LoginController extends DefaultController<Login> {
             //System.out.println("autenticar(): " + resposta);
             JsonNode respostaJson = new ObjectMapper().readTree(resposta);
 
-            List<Object> lista = usuarioRepository.getUser(respostaJson.get("validacaoAssinatura").get("dados").get("cpf").asText(),
-                    user.getSistema());
-            if (lista == null || lista.isEmpty())
+            User userLogado = new User();
+            var cpf = respostaJson.get("validacaoAssinatura").get("dados").get("cpf").asText();
+            var usuario = admSistemaRepository.buscarAdmSistema(cpf);
+            if (usuario == null)
                 throw new ValidationException("Usuário sem permissão ou certificado inválido");
 
-            User userLogado = new User();
+            if (usuario != null) {
+                var unidades = unidadeGestoraRepository.buscaTodasUnidadeGestora();
+                unidades.forEach(res -> {
+                    userLogado.setId(java.util.UUID.randomUUID().toString());
+                    userLogado.setCpf(respostaJson.get("validacaoAssinatura").get("dados").get("cpf").toString().replace("\"", ""));
+                    userLogado.setUserName(userLogado.getCpf());
+                    userLogado.setNome(respostaJson.get("validacaoAssinatura").get("dados").get("nome").toString());
+                    userLogado.setCertificado(resposta);
+                    userLogado.setHashCertificado(user.getHashCertificado());
+                    userLogado.getDateEnd().addHours(2);
+                    userLogado.setUnidadeGestora(res);
+                    userLogado.setUnidadeGestoraList(userLogado.getUnidadeGestora());
 
-            lista.forEach(res -> {
-                userLogado.setId(java.util.UUID.randomUUID().toString());
-                userLogado.setCpf(respostaJson.get("validacaoAssinatura").get("dados").get("cpf").toString().replace("\"", ""));
-                userLogado.setUserName(userLogado.getCpf());
-                userLogado.setNome(respostaJson.get("validacaoAssinatura").get("dados").get("nome").toString());
-                userLogado.setCertificado(resposta);
-                userLogado.setHashCertificado(user.getHashCertificado());
-                userLogado.getDateEnd().addHours(2);
-                userLogado.setUnidadeGestora(new UnidadeGestora(((Object[]) res)[1].toString(), ((Object[]) res)[2].toString(),
-                        Integer.parseInt(((Object[]) res)[3].toString())));
-                userLogado.setUnidadeGestoraList(userLogado.getUnidadeGestora());
+                    userLogado.setCargoByInteger(usuario.getIdCargo());
+                });
+            } else {
+                List<Object> lista = usuarioRepository.getUser(respostaJson.get("validacaoAssinatura").get("dados").get("cpf").asText(),
+                        user.getSistema());
+                if (lista == null || lista.isEmpty())
+                    throw new ValidationException("Usuário sem permissão ou certificado inválido");
 
-                userLogado.setCargoByInteger(Integer.parseInt(((Object[]) res)[4].toString()));
-            });
-            //System.out.println(cpf);
+                lista.forEach(res -> {
+                    userLogado.setId(java.util.UUID.randomUUID().toString());
+                    userLogado.setCpf(respostaJson.get("validacaoAssinatura").get("dados").get("cpf").toString().replace("\"", ""));
+                    userLogado.setUserName(userLogado.getCpf());
+                    userLogado.setNome(respostaJson.get("validacaoAssinatura").get("dados").get("nome").toString());
+                    userLogado.setCertificado(resposta);
+                    userLogado.setHashCertificado(user.getHashCertificado());
+                    userLogado.getDateEnd().addHours(2);
+                    userLogado.setUnidadeGestora(new UnidadeGestora(((Object[]) res)[1].toString(), ((Object[]) res)[2].toString(),
+                            Integer.parseInt(((Object[]) res)[3].toString())));
+                    userLogado.setUnidadeGestoraList(userLogado.getUnidadeGestora());
+
+                    userLogado.setCargoByInteger(Integer.parseInt(((Object[]) res)[4].toString()));
+                });
+            }
 
             Session.setUsuario(userLogado);
             getIp.getRequest().getSession().setAttribute(userLogado.getCpf(), userLogado);
