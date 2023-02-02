@@ -16,10 +16,14 @@ public class AdmSistemaRepository extends DefaultRepository<AdmSistema, BigInteg
     }
 
     public AdmSistema buscarAdmSistema(String cpf) {
-        Query query = getEntityManager().createNativeQuery(
-                "SELECT * FROM AdmSistema " +
-                        "where cpf = :cpf and status = 1;", AdmSistema.class);
-        query.setParameter("cpf", cpf);
-        return (AdmSistema) query.getSingleResult();
+        try {
+            Query query = getEntityManager().createNativeQuery(
+                    "SELECT * FROM AdmSistema " +
+                            "where cpf = :cpf and status = 1;", AdmSistema.class);
+            query.setParameter("cpf", cpf);
+            return (AdmSistema) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
     }
 }
