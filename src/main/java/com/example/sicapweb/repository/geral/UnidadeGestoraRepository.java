@@ -1,6 +1,5 @@
 package com.example.sicapweb.repository.geral;
 
-import br.gov.to.tce.application.ApplicationException;
 import br.gov.to.tce.model.UnidadeGestora;
 import com.example.sicapweb.repository.DefaultRepository;
 import com.example.sicapweb.security.User;
