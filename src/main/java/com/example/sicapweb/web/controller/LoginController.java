@@ -135,14 +135,11 @@ public class LoginController extends DefaultController<Login> {
             Response response = client.newCall(request).execute();
 
             String resposta = response.body().string();
-            //System.out.println("autenticar(): " + resposta);
             JsonNode respostaJson = new ObjectMapper().readTree(resposta);
 
             User userLogado = new User();
             var cpf = respostaJson.get("validacaoAssinatura").get("dados").get("cpf").asText();
             var usuario = admSistemaRepository.buscarAdmSistema(cpf);
-            if (usuario == null)
-                throw new ValidationException("Usuário sem permissão ou certificado inválido");
 
             if (usuario != null) {
                 var unidades = unidadeGestoraRepository.buscaTodasUnidadeGestora();
