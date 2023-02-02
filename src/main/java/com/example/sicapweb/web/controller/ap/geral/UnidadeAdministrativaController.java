@@ -99,8 +99,10 @@ public class UnidadeAdministrativaController  extends DefaultController<UnidadeA
     @DeleteMapping(value = {"/{id}"})
     public void delete(@PathVariable BigInteger id) {
         List<Lotacao> list=lotacaoRepository.buscarLotacaoPorUA(id);
-        if (list!=null) 
+        if (list == null ||list.size() == 0 ) {
+            unidadeAdministrativaRepository.deleteRestrito(id); 
+        }else{
             throw new InvalitInsert("Existem lotaçoes pertencentes a essa unidade administrativa!");
-        unidadeAdministrativaRepository.deleteRestrito(id); 
+        }
     }
 }
