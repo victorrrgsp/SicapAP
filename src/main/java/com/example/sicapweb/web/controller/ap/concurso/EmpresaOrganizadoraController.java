@@ -66,11 +66,7 @@ public class EmpresaOrganizadoraController extends DefaultController<EmpresaOrga
         empresaOrganizadora.setId(id);
         empresaOrganizadora.setCnpjEmpresaOrganizadora(empresaOrganizadora.getCnpjEmpresaOrganizadora().replace(".", "").replace("-", "").replace("/", ""));
         empresaOrganizadora.setChave(empresaOrganizadoraRepository.buscarPrimeiraRemessa());
-        EmpresaOrganizadora e =   empresaOrganizadoraRepository.buscaEmpresaPorCnpj(empresaOrganizadora.getCnpjEmpresaOrganizadora());
-        if (e != null) {
-            if (! id.equals(e.getId())  )
-             throw new InvalitInsert("ja existe uma empresa organizadora com esse cnpj!!");
-        }
+        
         empresaOrganizadoraRepository.update(empresaOrganizadora);
     }
 
