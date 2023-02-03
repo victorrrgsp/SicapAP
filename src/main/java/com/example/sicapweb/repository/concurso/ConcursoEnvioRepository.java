@@ -28,10 +28,16 @@ public class ConcursoEnvioRepository extends DefaultRepository<ConcursoEnvio, Bi
     }
 
     public List<ConcursoEnvio> buscarEnvioFAse1PorEdital(BigInteger idEdital) {
-        return  getEntityManager().createNativeQuery(
+        var query = getEntityManager().createNativeQuery(
                         "select ev.* from ConcursoEnvio ev "+
-                                " where fase=1 and  idEdital = " + idEdital, ConcursoEnvio.class)
-                .getResultList();
+                                " where fase=1 and  idEdital = " + idEdital, ConcursoEnvio.class);
+        return query.getResultList();
+    }
+    public List<ConcursoEnvio> buscarEnvioFAse1DesambiguadoPorEdital(BigInteger idEdital) {
+        var query = getEntityManager().createNativeQuery(
+                        "select ev.* from ConcursoEnvio ev "+
+                                " where fase=1 and status = 4 and idEdital = " + idEdital, ConcursoEnvio.class);
+        return query.getResultList();
     }
 
     public List<ConcursoEnvio> buscarEnvioFAse2PorEdital(BigInteger idEdital) {

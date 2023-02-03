@@ -99,7 +99,10 @@ public class EditalAdmissaoController {
         List<AdmissaoEnvio> pa = admissaoEnvioRepository.GetEmAbertoByEdital(admissaoEnvio.getEdital().getId());
         if (pa.size()>0) throw  new InvalitInsert("Existe um processo em aberto para esse edital!");
         List<ConcursoEnvio> enviofase2 = concursoEnvioRepository.buscarEnvioFAse2PorEdital(admissaoEnvio.getEdital().getId());
-        if (enviofase2.size()==0) throw  new InvalitInsert("Fase de homnogação não foi concluida!!");
+        List<ConcursoEnvio> enviofase1 = concursoEnvioRepository.buscarEnvioFAse1DesambiguadoPorEdital( admissaoEnvio.getEdital().getId());
+        if ( enviofase2.size() == 0 && enviofase1.size() == 0){
+            throw  new InvalitInsert("Fase de homnogação não foi concluida!!");
+        } 
         admissaoEnvioRepository.save(admissaoEnvio);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(admissaoEnvio.getClass()).toUri();
         return ResponseEntity.created(uri).body(admissaoEnvio);
@@ -107,8 +110,17 @@ public class EditalAdmissaoController {
     // @CrossOrigin
     // @GetMapping("/teste")
     // public void teste() {
-    //     List<Map<String,Object>> la ;
-    //     la = admissaoEnvioRepository.getValidInfoEnvio(new BigInteger("47010"));
+    //     //#region testando cassos de desligamento
+    //     // List<Map<String,Object>> la ;
+    //     // la = admissaoEnvioRepository.getValidInfoEnvio(new BigInteger("47010"));
+    //     //#endregion
+    //     //#region testando casos de editais desanbiguados 
+    //     // List<ConcursoEnvio> enviofase2 = concursoEnvioRepository.buscarEnvioFAse2PorEdital(admissaoEnvio.getEdital().getId());
+    //     // List<ConcursoEnvio> enviofase1 = concursoEnvioRepository.buscarEnvioFAse1DesambiguadoPorEdital( admissaoEnvio.getEdital().getId());
+    //     // if ( enviofase2.size() == 0 && enviofase1.size() == 0){
+    //     //     throw  new InvalitInsert("Fase de homnogação não foi concluida!!");
+    //     // } 
+    //     //#endregion
     // }
 
     @CrossOrigin
