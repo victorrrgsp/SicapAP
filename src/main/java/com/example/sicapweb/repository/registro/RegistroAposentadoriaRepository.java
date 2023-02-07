@@ -267,15 +267,53 @@ public class RegistroAposentadoriaRepository  extends DefaultRepository<Registro
 
     public List<HashMap<String,Object>> getInforProcessosEcontas(HashMap<String,Object> userInfo ){
         try{
-            Query sqlProcessos=getEntityManager().createNativeQuery("    with processosRecebidos as" +
-                    "(select hcodp_pnumero,hcodp_pano, assunto_desc,id_entidade_origem from SCP.dbo.VW_PROC_RECEBIDOS " +
-                    " where ((hdest_ldepto = :Setor) AND (proc_num_anexo IS NULL or proc_num_anexo =0) " +
-                    "and (processo_numaps IS NULL or processo_numaps =0)) and trim(hists_dest_resp)= :Usuario ) " +
-                    "select hcodp_pnumero as numeroProcesso,hcodp_pano as anoProcesso, docmt_numero as numeroDecisao, docmt_ano as anoDecisao , docmt_data as dataDecisao , assunto_desc  as assuntoDesc, e.cpf  as cpfInteressado, e.nome nomeInteressado ,f.codunidadegestora as cnpjEntidade,f.nomeEntidade as nomeEntidade  from " +
-                    " processosRecebidos a   join     SCP..PESSOAS_PROCESSO d  on d.ID_PAPEL=2 and ID_CARGO=0 and a.hcodp_pnumero=d.NUM_PROC and a.hcodp_pano = d.ANO_PROC " +
-                    " join SCP.dbo.document c on c.dcnproc_pnumero = hcodp_pnumero and c.dcnproc_pano = hcodp_pano and c.docmt_tipo_decisao = 'D'  and docmt_tipo='RL'  " +
-                    "join Cadun.dbo.PessoaFisica e on d.ID_PESSOA=e.Codigo " +
-                    "join Cadun.dbo.vwPessoaJuridica f on a.id_entidade_origem= f.id  ")
+            Query sqlProcessos=getEntityManager().createNativeQuery(
+                     "with\n" +
+                            "   processosRecebidos as\n" +
+                            "    (\n" +
+                            "        select hcodp_pnumero,\n" +
+                            "               hcodp_pano,\n" +
+                            "               assunto_desc,\n" +
+                            "               id_entidade_origem\n" +
+                            "        from SCP.dbo.VW_PROC_RECEBIDOS\n" +
+                            "        where (\n" +
+                            "            (hdest_ldepto = :Setor) AND\n" +
+                            "            (proc_num_anexo IS NULL or proc_num_anexo =0) and\n" +
+                            "            (processo_numaps IS NULL or processo_numaps =0)\n" +
+                            "        ) and trim(hists_dest_resp)= :Usuario\n" +
+                            "    ),\n" +
+                            "    processos as (\n" +
+                            "        select distinct hcodp_pnumero as numeroProcesso,\n" +
+                            "           hcodp_pano as anoProcesso,\n" +
+                            "           docmt_numero as numeroDecisao,\n" +
+                            "           docmt_ano as anoDecisao ,\n" +
+                            "           docmt_data as dataDecisao ,\n" +
+                            "           assunto_desc  as assuntoDesc,\n" +
+                            "           e.cpf  as cpfInteressado,\n" +
+                            "           e.nome nomeInteressado ,\n" +
+                            "           f.codunidadegestora as cnpjEntidade,\n" +
+                            "           f.nomeEntidade as nomeEntidade\n" +
+                            "        from processosRecebidos a\n" +
+                            "            join SCP..PESSOAS_PROCESSO d  on d.ID_PAPEL=2 and ID_CARGO=0 and a.hcodp_pnumero=d.NUM_PROC and a.hcodp_pano = d.ANO_PROC\n" +
+                            "            join SCP.dbo.document c on c.dcnproc_pnumero = hcodp_pnumero and c.dcnproc_pano = hcodp_pano and c.docmt_tipo_decisao = 'D'  and docmt_tipo='RL'\n" +
+                            "            join Cadun.dbo.PessoaFisica e on d.ID_PESSOA=e.Codigo\n" +
+                            "            join Cadun.dbo.vwPessoaJuridica f on a.id_entidade_origem= f.id\n" +
+                            "    ) ,\n" +
+                            "    envios as ( select cast(substring(processo, 1, len(processo) - 5) as int)             numeroProcesso,\n" +
+                            "                       cast(substring(processo, len(processo) - 3, len(processo)) as int) anoProcesso\n" +
+                            "                from AdmEnvio a\n" +
+                            "                where processo is not null\n" +
+                            "                union\n" +
+                            "                select cast(substring(processo, 1, len(processo) - 5) as int)             numeroProcesso,\n" +
+                            "                       cast(substring(processo, len(processo) - 3 , len(processo)) as int) anoProcesso\n" +
+                            "                from AdmissaoEnvio a\n" +
+                            "                    where status = 3\n" +
+                            "    )\n" +
+                            "select pss.*\n" +
+                            "from envios env\n" +
+                            "    join processos pss on\n" +
+                            "        env.numeroProcesso = pss.numeroProcesso and\n" +
+                            "        env.anoProcesso    = pss.anoProcesso")
                     .setParameter("Setor",userInfo.get("setor"))
                     .setParameter("Usuario",userInfo.get("loginUsuario"));
             return  StaticMethods.getHashmapFromQuery(sqlProcessos);
