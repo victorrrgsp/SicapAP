@@ -39,6 +39,11 @@ public class AtoController extends DefaultController<Ato>  {
         List<Ato> list = atoRepository.findAll();
         return ResponseEntity.ok().body(list);
     }
+    @GetMapping(path = "/after")
+    public ResponseEntity<List<Ato>> findAllAfter2021() {
+        List<Ato> list = atoRepository.findAllAfter2021();
+        return ResponseEntity.ok().body(list);
+    }
 
     @GetMapping(path = {"/{id}"})
     public ResponseEntity<?> findById(@PathVariable BigInteger id) {

@@ -88,11 +88,28 @@ public class AtoRepository extends DefaultRepository<Ato, BigInteger> {
     }
 
     public List<Ato> findAll() {
-        return getEntityManager()
-                .createQuery("select distinct a from Ato" +
-                        " a, InfoRemessa info where a.infoRemessa.chave = info.chave and info.idUnidadeGestora = '"
-                        + User.getUser(request).getUnidadeGestora().getId() + "'", Ato.class)
-                .getResultList();
+        var query = getEntityManager()
+                .createNativeQuery("select  id = MAX(id), cnpjUgPublicacao, dataPublicacao, numeroAto, tipoAto, veiculoPublicacao,max(a.chave) as chave\n" +
+                        "from Ato a\n" +
+                        "    join InfoRemessa info on a.chave = info.chave\n" +
+                        "where info.idUnidadeGestora = '" +
+                        User.getUser(request).getUnidadeGestora().getId() + "'"+
+                        "group by cnpjUgPublicacao, dataPublicacao, numeroAto, tipoAto, veiculoPublicacao"
+                        , Ato.class);
+            var resultList = query.getResultList();
+            return resultList;
+    }
+    public List<Ato> findAllAfter2021() {
+        var query = getEntityManager()
+                .createNativeQuery("select  id = MAX(id), cnpjUgPublicacao, dataPublicacao, numeroAto, tipoAto, veiculoPublicacao,max(a.chave) as chave\n" +
+                        "from Ato a\n" +
+                        "    join InfoRemessa info on a.chave = info.chave\n" +
+                        "where info.idUnidadeGestora = '" +
+                        User.getUser(request).getUnidadeGestora().getId() + "'  and a.dataPublicacao  > '1/10/2020' "+
+                        "group by cnpjUgPublicacao, dataPublicacao, numeroAto, tipoAto, veiculoPublicacao"
+                        , Ato.class);
+            var resultList = query.getResultList();
+            return resultList;
     }
     public Ato buscarAtoPorNumero(String numero, int tipoAto) {
         List<Ato> list = getEntityManager().createNativeQuery("select top 1* from Ato a " +
