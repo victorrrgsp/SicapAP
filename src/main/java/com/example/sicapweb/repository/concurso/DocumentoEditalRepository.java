@@ -22,10 +22,10 @@ public class DocumentoEditalRepository extends DefaultRepository<DocumentoEdital
                 .getResultList();
     }
 
-    public List<DocumentoEdital> buscarDocumentosEdital(String coluna, BigInteger idEdital) {
+    public List<DocumentoEdital> buscarDocumentosEdital(BigInteger idEdital) {
         return  getEntityManager().createNativeQuery(
-                        "select * from DocumentoEdital where status=2 and  inciso in ("
-                                + coluna + ") and idEdital = " + idEdital, DocumentoEdital.class)
+                        " select * from DocumentoEdital where status=2 " +
+                        " and idEdital = " + idEdital, DocumentoEdital.class)
                 .getResultList();
     }
 

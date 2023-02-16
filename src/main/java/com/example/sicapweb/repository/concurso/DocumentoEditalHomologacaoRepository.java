@@ -27,10 +27,9 @@ public class DocumentoEditalHomologacaoRepository extends DefaultRepository<Docu
                 .getResultList();
     }
 
-    public List<DocumentoEditalHomologacao> buscarDocumentosEditalHomologacao(String coluna, BigInteger idEdital) {
+    public List<DocumentoEditalHomologacao> buscarDocumentosEditalHomologacao(BigInteger idEdital) {
         return  getEntityManager().createNativeQuery(
-                        "select * from DocumentoEditalHomologacao h join EditalHomologacao EH on H.idEditalHomologacao= EH.id   where h.status = 2 and  H.inciso in ("
-                                + coluna + ") and EH.idEdital = " + idEdital, DocumentoEditalHomologacao.class)
+                        "select * from DocumentoEditalHomologacao h join EditalHomologacao EH on H.idEditalHomologacao= EH.id   where h.status = 2 and EH.idEdital = " + idEdital, DocumentoEditalHomologacao.class)
                 .getResultList();
     }
 

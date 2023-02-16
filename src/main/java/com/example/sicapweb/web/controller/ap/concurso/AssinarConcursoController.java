@@ -119,7 +119,17 @@ public class AssinarConcursoController {
 
         return ResponseEntity.ok().body("OK");
     }
-
+    @CrossOrigin
+    @Transactional(rollbackFor = Exception.class)
+    @GetMapping(path = "/teste/{idenvio}")
+    public void teste(@PathVariable BigInteger idenvio) {
+        try {
+            gerarProcesso(concursoEnvioRepository.findById(idenvio));
+        } catch (NoSuchAlgorithmException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
     @CrossOrigin
     @PostMapping(path = "/iniciarAssinatura")
     public ResponseEntity<?> iniciarAssinatura(@RequestBody String certificado_mensagem_hash) {
@@ -246,7 +256,7 @@ public class AssinarConcursoController {
     }
 
     private void gravaDocumentosFaseEdital(ConcursoEnvio envio, BigDecimal idDocumento) {
-        List<DocumentoEdital> listaDeDocumentosEdital = documentoEditalRepository.buscarDocumentosEdital("'I','II','III','IV','V','VI','VII','VIII','IX','IX.I','X','sem'", envio.getEdital().getId());
+        List<DocumentoEdital> listaDeDocumentosEdital = documentoEditalRepository.buscarDocumentosEdital(, envio.getEdital().getId());
         if (listaDeDocumentosEdital.stream().filter(documentoEdital -> !documentoEdital.getInciso().equals("sem")).collect(Collectors.toList()).size() < 11)
             throw new InvalitInsert("não encontrou todos documentos obrigatorio anexados!!");
         String Arquivo = "";
@@ -257,7 +267,7 @@ public class AssinarConcursoController {
     }
 
     private void gravaDocumentosFaseHomologacao(ConcursoEnvio envio, BigDecimal idDocumento){
-        List<DocumentoEditalHomologacao> listaDeDocumentosHomologacaoConcurso = documentoEditalHomologacaoRepository.buscarDocumentosEditalHomologacao("'XII','XIII','XIV','XV','sem'", envio.getEdital().getId());
+        List<DocumentoEditalHomologacao> listaDeDocumentosHomologacaoConcurso = documentoEditalHomologacaoRepository.buscarDocumentosEditalHomologacao( envio.getEdital().getId());
         if (listaDeDocumentosHomologacaoConcurso.stream().filter(documentohomologacao ->  !documentohomologacao.getInciso().equals("sem")).collect(Collectors.toList()).size() < 4)
             throw new InvalitInsert("não encontrou todos documentos obrigatorio anexados!!");
         String Arquivo = "";
