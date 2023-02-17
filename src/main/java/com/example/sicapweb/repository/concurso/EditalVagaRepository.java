@@ -27,21 +27,22 @@ public class EditalVagaRepository extends DefaultRepository<EditalVaga, BigInteg
         String search = "";
 
         //monta pesquisa search
-        search = "";
+        //search = "";
 
         //retirar os : do Sort pageable
         String campo = String.valueOf(pageable.getSort()).replace(":", "");
 
-        List<EditalVaga> list = getEntityManager()
-                .createNativeQuery("with edt as ( " +
-                        "        select a.codigoVaga, i.idUnidadeGestora ,max(a.id)  max_id " +
-                        "             from EditalVaga a  join infoRemessa i on a.chave = i.chave  and i.idUnidadeGestora = '"+User.getUser(super.request).getUnidadeGestora().getId()+"'  group by " +
-                        "                a.codigoVaga, i.idUnidadeGestora " +
-                        "                         ) " +
-                        "select   a.* from EditalVaga a join infoRemessa i on a.chave = i.chave join edt b on a.id= b.max_id and i.idUnidadeGestora=b.idUnidadeGestora where 1=1 " + search + " ORDER BY " + campo, EditalVaga.class)
+        var query = getEntityManager()
+                .createNativeQuery("\n" +
+                                "select a.*\n" +
+                                "from EditalVaga a\n" +
+                                "         join infoRemessa i on a.chave = i.chave and i.idUnidadeGestora = '" +User.getUser(super.request).getUnidadeGestora().getId()+"'"+
+                                "ORDER BY id ASC" +
+                //"where 1=1 " + search + 
+                " ORDER BY " + campo, EditalVaga.class)
                 .setFirstResult(pagina)
-                .setMaxResults(tamanho)
-                .getResultList();
+                .setMaxResults(tamanho);
+        List<EditalVaga> list =  query.getResultList();
 
         long totalRegistros = countEditaisvaga( search);
         long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;

@@ -146,13 +146,13 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
         //retirar os : do Sort pageable
         String campo = String.valueOf(pageable.getSort()).replace(":", "");
 
-        List<T> list = getEntityManager()
+        var query = getEntityManager()
                 .createNativeQuery("select a.* from " + entityClass.getSimpleName() + " a " +
                         " join InfoRemessa info on info.chave = a.chave and info.idUnidadeGestora = '"
                         + User.getUser(request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, entityClass)
                 .setFirstResult(pagina)
-                .setMaxResults(tamanho)
-                .getResultList();
+                .setMaxResults(tamanho);
+        List<T> list = query.getResultList();
 
         long totalRegistros = count();
         long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
