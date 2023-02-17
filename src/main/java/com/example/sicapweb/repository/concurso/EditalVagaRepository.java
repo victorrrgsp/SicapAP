@@ -37,7 +37,6 @@ public class EditalVagaRepository extends DefaultRepository<EditalVaga, BigInteg
                                 "select a.*\n" +
                                 "from EditalVaga a\n" +
                                 "         join infoRemessa i on a.chave = i.chave and i.idUnidadeGestora = '" +User.getUser(super.request).getUnidadeGestora().getId()+"'"+
-                                "ORDER BY id ASC" +
                 //"where 1=1 " + search + 
                 " ORDER BY " + campo, EditalVaga.class)
                 .setFirstResult(pagina)
