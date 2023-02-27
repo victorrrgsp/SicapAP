@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Calendar;
 import java.util.List;
@@ -56,6 +57,8 @@ public class AdmEnvioAssinaturaRepository extends DefaultRepository<AdmEnvioAssi
         }
     }
 
+    BigDecimal idProcesso;
+
     @Transactional
     public void salvarProcesso(Map<String, Object> processo) {
         try {
@@ -65,7 +68,7 @@ public class AdmEnvioAssinaturaRepository extends DefaultRepository<AdmEnvioAssi
                             "              WHERE processo_dtaass is null AND processo_numero = :procnumero AND processo_ano = :ano " +
                             "                AND pentids_ecodc_ccodg = 0 AND pentids_ecodc_ccodc = 0 AND pentids_ecode = 0 " +
                             "                AND processo_modelo = 0 AND processo_interes = '' AND processo_assunto = '' AND processo_mrefer = 0 " +
-                            "                AND processo_arefer = :anoreferencia AND processo_qtdvol = 1 AND processo_status = 'TRAMT' " +
+                            "                AND processo_qtdvol = 1 AND processo_status = 'TRAMT' " +
                             "                AND processo_dtafin is null AND processo_usuario = '' AND processo_dtausu is null " +
                             "                AND processo_husu is null AND processo_npai = :processoNpai AND processo_apai = :processoApai " +
                             "                AND processo_origem = 0 AND processo_aorigem = 0 AND processo_julgmt = '' AND processo_nunreg = 0 " +
@@ -91,7 +94,7 @@ public class AdmEnvioAssinaturaRepository extends DefaultRepository<AdmEnvioAssi
                             "        INSERT INTO SCP..processo (processo_dtaass, processo_numero, processo_ano, pentids_ecodc_ccodg, " +
                             "                                   pentids_ecodc_ccodc, " +
                             "                                   pentids_ecode, processo_modelo, processo_interes, processo_assunto, processo_mrefer, " +
-                            "                                   processo_arefer, processo_dtaaut, processo_haut, processo_qtdvol, processo_status, " +
+                            "                                   processo_dtaaut, processo_haut, processo_qtdvol, processo_status, " +
                             "                                   processo_dtafin, processo_usuario, processo_dtausu, processo_husu, processo_npai, " +
                             "                                   processo_apai, processo_origem, processo_aorigem, processo_julgmt, processo_nunreg, " +
                             "                                   processo_dtareg, processo_vlrcove, processo_numcov, processo_anocov, processo_vlrcov, " +
@@ -115,7 +118,7 @@ public class AdmEnvioAssinaturaRepository extends DefaultRepository<AdmEnvioAssi
                             "        VALUES (NULL, " +
                             "                :procnumero, " +
                             "                :ano, 0, 0, 0, 0, '', '', 0, " +
-                            "                :anoreferencia, getdate(), getdate(), 1, 'TRAMT', null, '', null, null, " +
+                            "                getdate(), getdate(), 1, 'TRAMT', null, '', null, null, " +
                             "                :processoNpai, " +
                             "                :processoApai, 0, 0, '', 0, null, 0, 0, 0, 0, null, null, '', '', null, null, 0, '', 0, 0, " +
                             "                :relatoria, 0, null, null, null, '', " +
@@ -134,7 +137,6 @@ public class AdmEnvioAssinaturaRepository extends DefaultRepository<AdmEnvioAssi
                             "    END");
             query.setParameter("procnumero", processo.get("procnumero"));
             query.setParameter("ano", processo.get("ano"));
-            query.setParameter("anoreferencia", processo.get("anoreferencia"));
             query.setParameter("processoNpai", processo.get("processoNpai"));
             query.setParameter("processoApai", processo.get("processoApai"));
             query.setParameter("relatoria", processo.get("relatoria"));
@@ -148,6 +150,25 @@ public class AdmEnvioAssinaturaRepository extends DefaultRepository<AdmEnvioAssi
             query.setParameter("entidadevinculada", processo.get("entidadevinculada"));
             query.setParameter("idassunto", processo.get("idassunto"));
             query.setParameter("ano", processo.get("ano"));
+            query.executeUpdate();
+
+            Query query1 = entityManager.createNativeQuery(
+                    "SELECT @@IDENTITY ");
+
+            idProcesso = (BigDecimal) query1.getSingleResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Transactional
+    public void salvarProcAtosConcessao(String numAto) {
+        try {
+            Query query = getEntityManager().createNativeQuery(
+                    "INSERT INTO SCP..ProcAtosConcessao (IdProc, NumAtoConc, DataInsert, MatrUsr, CodSistema) " +
+                            "VALUES (:idProc, :numAto, getdate(), null, 29) ");
+            query.setParameter("idProc", idProcesso);
+            query.setParameter("numAto", numAto);
             query.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();

@@ -264,6 +264,7 @@ public class AssinarConcessaoController extends DefaultController<AdmEnvio> {
 
             admEnvioAssinaturaRepository.salvarProtocolo(protocolo);
             admEnvioAssinaturaRepository.salvarProcesso(processo);
+            admEnvioAssinaturaRepository.salvarProcAtosConcessao(admEnvio.getNumeroAto());
             admEnvioAssinaturaRepository.salvarAndamentoProcesso(processo);
 
             for (Map mapa : interessados) {

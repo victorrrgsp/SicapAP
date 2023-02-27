@@ -23,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -189,8 +190,12 @@ public class ConcessaoAproveitamentoController extends DefaultController<Documen
             admEnvio.setOrgaoOrigem(ug);
 
         admEnvio.setIdMovimentacao(id);
-        admEnvio.setComplemento("Conforme PORTARIA: " + aproveitamento.getAto().getNumeroAto() + " De: " + aproveitamento.getAto().getDataPublicacao());
         admEnvio.setAdmissao(aproveitamento.getAdmissao());
+        admEnvio.setNumeroAto(aproveitamento.getAto().getNumeroAto());
+
+        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+        String dataFormatada = df.format(aproveitamento.getAto().getDataPublicacao());
+        admEnvio.setComplemento("Conforme PORTARIA De: " + dataFormatada);
         return admEnvio;
     }
 
