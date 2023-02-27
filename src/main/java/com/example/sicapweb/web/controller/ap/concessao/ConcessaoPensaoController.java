@@ -26,10 +26,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 @RestController
 @RequestMapping("/documentoConcessaoPensao")
@@ -221,8 +218,12 @@ public class ConcessaoPensaoController extends DefaultController<DocumentoPensao
             admEnvio.setOrgaoOrigem(ug);
 
         admEnvio.setIdMovimentacao(id);
-        admEnvio.setComplemento("Conforme PORTARIA: " + pensao.getAto().getNumeroAto() + " De: " + pensao.getAto().getDataPublicacao());
         admEnvio.setAdmissao(pensao.getAdmissao());
+        admEnvio.setNumeroAto(pensao.getAto().getNumeroAto());
+
+        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+        String dataFormatada = df.format(pensao.getAto().getDataPublicacao());
+        admEnvio.setComplemento("Conforme PORTARIA De: " + dataFormatada);
         return admEnvio;
     }
 
@@ -250,8 +251,9 @@ public class ConcessaoPensaoController extends DefaultController<DocumentoPensao
     @CrossOrigin
     @GetMapping("/teste")
     public void teste() throws ParseException {
-        java.util.Date data = new java.util.Date(2022, Calendar.JULY, 1);
+        var data = new Date(1, 7, 2022);
         SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
         String strToDate = df.format(data);
+        java.util.Date teste = df.parse(strToDate);
     }
 }

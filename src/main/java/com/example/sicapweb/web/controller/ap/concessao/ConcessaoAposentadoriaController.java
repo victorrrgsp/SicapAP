@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -207,8 +208,12 @@ public class ConcessaoAposentadoriaController extends DefaultController<Document
             admEnvio.setOrgaoOrigem(ug);
 
         admEnvio.setIdMovimentacao(id);
-        admEnvio.setComplemento("Conforme PORTARIA: " + aposentadoria.getAto().getNumeroAto() + " De: " + aposentadoria.getAto().getDataPublicacao());
+        admEnvio.setNumeroAto(aposentadoria.getAto().getNumeroAto());
         admEnvio.setAdmissao(aposentadoria.getAdmissao());
+
+        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+        String dataFormatada = df.format(aposentadoria.getAto().getDataPublicacao());
+        admEnvio.setComplemento("Conforme PORTARIA De: " + dataFormatada);
         return admEnvio;
     }
 
