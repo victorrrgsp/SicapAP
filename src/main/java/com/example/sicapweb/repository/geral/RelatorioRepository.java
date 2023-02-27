@@ -19,7 +19,7 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
         super(em);
     }
 
-    public List<HashMap<String, Object>> buscarfolhaAnalitica( String cpf, String nome, String Natureza, List<String> Vinculo, int ano, int mes, List<String> lotacao, List<String> UnidadeAdministrativa, String UnidadeGestora, String folhaItem) {
+    public List<HashMap<String, Object>> buscarfolhaAnalitica( String cpf, String nome, String Natureza, List<String> Vinculo, int ano, int mes, List<String> lotacao, List<String> UnidadeAdministrativa, String UnidadeGestora, String folhaItem,String cargo) {
         var query = getEntityManager().createNativeQuery(
                         "with principal as(\n" +
                                 "    select distinct NaturezaRubrica , codigoFolhaItem,ud.codigoUnidadeAdministrativa,\n" +
@@ -53,17 +53,17 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
                                 "join SICAPAP21.dbo.Lotacao l on wfp.idLotacao = l.id\n" +
                                 "join UnidadeAdministrativa ud on l.idUnidadeAdministrativa = ud.id\n" +
                                 "where (:UnidadeGestora = 'todos' or wfp.idUnidadeGestora = :UnidadeGestora )\n" +
-                                "  and ud.codigoUnidadeAdministrativa  in (:UnidadeAdministrativa)\n" +
+                                (UnidadeAdministrativa != null?"  and ud.codigoUnidadeAdministrativa  in :UnidadeAdministrativa\n":"") +
                                 "\n" +
                                 "  and wfp.exercicio = :Ano\n" +
                                 "  and (wfp.remessa = :Mes or :Mes = null )\n" +
-                                (lotacao != null?"  and wfp.nomeLotacao in (:lotacao)\n":"") +
-                                (Vinculo != null?"  and wfp.TipoAdmissao in ( :Vinculo)\n":"") +
-                                (Natureza != null?"  and wfp.NaturezaRubrica in ( :Natureza)\n":"") +
+                                (lotacao != null?"  and wfp.nomeLotacao in :lotacao\n":"") +
+                                (Vinculo != null?"  and wfp.TipoAdmissao in :Vinculo\n":"") +
+                                (Natureza != null?"  and wfp.NaturezaRubrica in :Natureza\n":"") +
                                 "  and wfp.folhaItemUnidadeGestora not like 'Base%'\n" +
                                 "  and (:nome is null or upper(wfp.nome) like'%'+upper(:nome)+'%')\n" +
                                 "  and (\n" +
-                                "      (:cpf = ''or\n" +
+                                "      (:cpf is null or\n" +
                                 "            (:cargo is null or\n" +
                                 "             wfp.nomeCargoOrigem = :cargo)\n" +
                                 "            )\n" +
@@ -73,14 +73,16 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
                                 "\n" +
                                 "select distinct * from principal\n" +
                                 "order by NaturezaRubrica desc, codigoFolhaItem;")
-                                .setParameter("cpf", cpf)
+                                .setParameter("cpf", cpf )
                                 .setParameter("nome", nome)
                                 .setParameter("Ano", ano)
                                 .setParameter("Mes", mes)
-                                .setParameter("UnidadeAdministrativa", UnidadeAdministrativa)
+                                .setParameter("cargo", cargo)
                                 .setParameter("UnidadeGestora", UnidadeGestora);
                                 
-                                if(Natureza != null){
+                                if(UnidadeAdministrativa != null){
+                                    query.setParameter("UnidadeAdministrativa", UnidadeAdministrativa);
+                                }if(Natureza != null){
                                     query.setParameter("Natureza", Natureza);
                                 }if(folhaItem != null){
                                     query.setParameter("folhaItem", folhaItem);
@@ -89,6 +91,7 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
                                 }if(lotacao != null){
                                     query.setParameter("lotacao", lotacao);
                                 }
-                return StaticMethods.getHashmapFromQuery(query);
+
+                                return StaticMethods.getHashmapFromQuery(query);
     }
 }

@@ -26,13 +26,14 @@ public class RelatoriosController extends DefaultController<Lei> {
     @GetMapping(path = "/folhaAnalitica")
     public ResponseEntity<List<HashMap<String, Object>>> listChaves(@RequestParam(required = false) String cpf,
                                                                     @RequestParam(required = false) String nome,
-                                                                    @RequestParam String Natureza,
+                                                                    @RequestParam(required = false) String Natureza,
                                                                     @RequestParam(required = false) List<String> Vinculo,
                                                                     @RequestParam int ano,
                                                                     @RequestParam int mes,
                                                                     @RequestParam(required = false) List<String> lotacao,
                                                                     @RequestParam(required = false) List<String> UnidadeAdministrativa,
                                                                     @RequestParam(required = false) String folhaItem,
+                                                                    @RequestParam(required = false) String cargo,
                                                                     @RequestParam String UnidadeGestora){
         List<HashMap<String, Object>> result = relatorioRepository.buscarfolhaAnalitica(cpf, 
                                                                                         nome, 
@@ -43,7 +44,8 @@ public class RelatoriosController extends DefaultController<Lei> {
                                                                                         lotacao, 
                                                                                         UnidadeAdministrativa, 
                                                                                         UnidadeGestora,
-                                                                                        folhaItem);
+                                                                                        folhaItem,
+                                                                                        cargo);
         return ResponseEntity.ok().body(result);
     }
 
