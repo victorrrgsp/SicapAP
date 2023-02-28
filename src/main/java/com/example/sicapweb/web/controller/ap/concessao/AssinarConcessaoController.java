@@ -276,7 +276,7 @@ public class AssinarConcessaoController extends DefaultController<AdmEnvio> {
 
             //salva o documento e retorna o id
             admEnvioAssinaturaRepository.salvarDocumento(processo);
-            Integer id_documento = admEnvioAssinaturaRepository.buscarUltimoIdDocumento();
+            Integer id_documento = admEnvioAssinaturaRepository.buscarUltimoIdDocumento(processo);
 
 
             for (Object arquivo : arquivos) {

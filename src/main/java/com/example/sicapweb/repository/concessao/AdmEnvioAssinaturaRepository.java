@@ -299,10 +299,17 @@ public class AdmEnvioAssinaturaRepository extends DefaultRepository<AdmEnvioAssi
         }
     }
 
-    public Integer buscarUltimoIdDocumento() {
+    public Integer buscarUltimoIdDocumento(Map<String, Object> processo) {
         try {
             Query query = getEntityManager().createNativeQuery(
-                    "select MAX(docmt_id) as id_documento from SCP..[document]");
+                    "SELECT MAX(docmt_id) as id_documento " +
+                            "              FROM SCP..[document] " +
+                            "              WHERE [docmt_tipo] = 'TA' AND [dcnproc_pnumero] = :procnumero AND [docmt_numero] = :procnumero " +
+                            "                AND [docmt_ano] = :ano AND [docmt_depto] = 'COPRO' AND [docmt_excluido] = '' " +
+                            "                AND [login_usr] = '000003' AND [docmt_is_assinado] = 'S' AND [docmt_depto_doc] = 'COPRO' " +
+                            "                AND [sigiloso] = 'N' AND [num_evento] = '1' AND [idDeptoCriador] = 55 AND [idDeptoJuntada] = 55");
+            query.setParameter("procnumero", processo.get("procnumero"));
+            query.setParameter("ano", processo.get("ano"));
             return (Integer) query.getSingleResult();
         } catch (Exception e) {
             e.printStackTrace();
