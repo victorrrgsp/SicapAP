@@ -261,12 +261,24 @@ public class EditalRepository extends DefaultRepository<Edital, BigInteger> {
 
     public List<Edital> findAllAHomologar() {
         var query = getEntityManager().createNativeQuery(
-                "with edt as (\n" +
-                        "                        select dataPublicacao,dataInicioInscricoes,dataFimInscricoes,numeroEdital,complementoNumero,prazoValidade,veiculoPublicacao, cnpjEmpresaOrganizadora,c.id,max(a.id)  max_id \n" +
-                        "                                    from Edital a   join ConcursoEnvio c on a.id=c.idEdital and c.fase=1  join infoRemessa i on a.chave = i.chave and  i.idUnidadeGestora =  '"+User.getUser(super.request).getUnidadeGestora().getId()+"'     group by \n" +
-                        "                                        dataPublicacao,dataInicioInscricoes,dataFimInscricoes,numeroEdital,complementoNumero,prazoValidade,veiculoPublicacao, cnpjEmpresaOrganizadora,c.id\n" +
-                        " )\n" +
-                        "select   a.* from Edital a    join edt b on   a.id= b.max_id"  , Edital.class);
+                "with edt as (select dataPublicacao,\n" +
+                        "                    dataInicioInscricoes,\n" +
+                        "                    dataFimInscricoes,\n" +
+                        "                    numeroEdital,\n" +
+                        "                    complementoNumero,\n" +
+                        "                    prazoValidade,\n" +
+                        "                    veiculoPublicacao,\n" +
+                        "                    cnpjEmpresaOrganizadora,\n" +
+                        "                    c.id as concursoID,\n" +
+                        "                    max(a.id) max_id\n" +
+                        "             from Edital a\n" +
+                        "                      left join ConcursoEnvio c on a.id = c.idEdital and c.fase = 1\n" +
+                        "                      join infoRemessa i on a.chave = i.chave and i.idUnidadeGestora = '"+User.getUser(super.request).getUnidadeGestora().getId()+"'\n" +
+                        "             group by dataPublicacao, dataInicioInscricoes, dataFimInscricoes, numeroEdital, complementoNumero,\n" +
+                        "                      prazoValidade, veiculoPublicacao, cnpjEmpresaOrganizadora, c.id)\n" +
+                        "select a.*\n" +
+                        "from Edital a\n" +
+                        "         join edt b on a.id = b.max_id and (b.concursoID is not null or a.tipoEdital =2)", Edital.class);
         return query.getResultList();
     }
 }
