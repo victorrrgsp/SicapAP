@@ -15,7 +15,7 @@ public class RemessaController {
     private RemessaRepository remessaRepository;
 
     @CrossOrigin
-    @GetMapping(path = {"/{Exercicio}"})
+    @GetMapping(path = {"/{exercicio}"})
     public ResponseEntity<List<Integer>> listaRemessasByExercicio(@PathVariable Integer exercicio){
         List<Integer> list = remessaRepository.findAllRemessasByExercicio(exercicio);
         return ResponseEntity.ok().body(list);
