@@ -54,15 +54,15 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
         String search = "";
         String campo = String.valueOf(pageable.getSort()).replace(":", "");
 
-        List<EditalAprovado> listAprovados = getEntityManager()
+        var query = getEntityManager()
                 .createNativeQuery("with edt as ( " +
                         "        select a.cpf,a.numeroInscricao, i.idUnidadeGestora ,max(a.id)  max_id " +
                         "             from EditalAprovado a  join infoRemessa i on a.chave = i.chave  and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "'  group by " +
                         "                a.cpf,a.numeroInscricao , i.idUnidadeGestora " +
                         "                         ) " +
                         "select   a.* from EditalAprovado a  join infoRemessa i on a.chave = i.chave join edt b on a.id= b.max_id and i.idUnidadeGestora=b.idUnidadeGestora " +
-                        " where 1=1 " + search + " ORDER BY " + campo, EditalAprovado.class)
-                .setFirstResult(pagina)
+                        " where 1=1 " + search + " ORDER BY " + campo, EditalAprovado.class);
+        List<EditalAprovado> listAprovados = query.setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();
         long totalRegistros = quantidadeAprovados(search);
