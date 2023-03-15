@@ -56,59 +56,70 @@ public class AdmissaoRepository extends DefaultRepository<Admissao, BigInteger> 
         search = getSearch(searchParams, tipoParams);
         String campo = String.valueOf(pageable.getSort()).replace(":", "");
 
-        List<Admissao> list = getEntityManager()
-                .createNativeQuery("with admissao1  as " +
-                        "( select a.* from Admissao a  join InfoRemessa i on a.chave = i.chave and i.idUnidadeGestora = :ug and a.tipoAdmissao=1  ), " +
-                        " servidor1 as ( select d.* from Servidor d  join InfoRemessa i on d.chave = i.chave and i.idUnidadeGestora = :ug  ) " +
-                        "select c.* from admissao1 c  join  servidor1  s on   c.idServidor = s.id " + " " + search + " ORDER BY " + campo, Admissao.class)
-                .setParameter("ug",User.getUser(super.request).getUnidadeGestora().getId())
-                .setFirstResult(pagina)
+        var querylistAdmissoes =  getEntityManager()
+                .createNativeQuery("with admissao1 as (select a.* from (select a.*,RANK() OVER(PARTITION BY a.matriculaServidor,a.numeroEdital,ato.numeroAto,ato.tipoAto,Servidor.cpfServidor,a.tipoAdmissao ORDER BY a.id DESC) as rank\n" +
+                        "                   from Admissao a\n" +
+                        "                            join InfoRemessa i\n" +
+                        "                                 on a.chave = i.chave and i.idUnidadeGestora = :ug and a.tipoAdmissao = 1\n" +
+                        "                            join ato on a.idAto = Ato.id\n" +
+                        "                            join Servidor on a.idServidor = Servidor.id\n" +
+                        "                   ) a where rank = 1 ),\n" +
+                        "     servidor1 as (select d.*\n" +
+                        "                   from Servidor d\n" +
+                        "                            join InfoRemessa i on d.chave = i.chave and i.idUnidadeGestora = :ug)\n" +
+                        "select c.*\n" +
+                        "from admissao1 c\n" +
+                        "         join servidor1 s on c.idServidor = s.id\n" +
+                        "where 1 = 1 " +
+                        search + " ORDER BY " + campo, Admissao.class)
+                .setParameter("ug",User.getUser(super.request).getUnidadeGestora().getId());
+        List<Admissao> listAdmissoes = querylistAdmissoes.setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();
 
-
-             long totalRegistros = countAdmissoes(search);
+            long totalRegistros = countAdmissoes(search);
             long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
-            List<NomeacaoConcurso> listc= new ArrayList<NomeacaoConcurso>() ;
-            for(Integer i= 0; i < list.size(); i++){
-                NomeacaoConcurso nc =new NomeacaoConcurso();
-                nc.setNome(list.get(i).getServidor().getNome());
-                nc.setCpf(list.get(i).getServidor().getCpfServidor());
-                nc.setAto(list.get(i).getAto());
-                nc.setNumeroEdital(list.get(i).getNumeroEdital());
-                nc.setAdmissao(list.get(i));
-                List<EditalAprovado> ea =  getEntityManager()
-                        .createNativeQuery(" with vaga as ( " +
+            List<NomeacaoConcurso> nomeacaoConcursoList= new ArrayList<NomeacaoConcurso>();
+            for(Integer i= 0; i < listAdmissoes.size(); i++){
+                NomeacaoConcurso nomeacaoConcurso =new NomeacaoConcurso();
+                nomeacaoConcurso.setNome(listAdmissoes.get(i).getServidor().getNome());
+                nomeacaoConcurso.setCpf(listAdmissoes.get(i).getServidor().getCpfServidor());
+                nomeacaoConcurso.setAto(listAdmissoes.get(i).getAto());
+                nomeacaoConcurso.setNumeroEdital(listAdmissoes.get(i).getNumeroEdital());
+                nomeacaoConcurso.setAdmissao(listAdmissoes.get(i));
+                var queryEditalAprovado =  getEntityManager()
+                        .createNativeQuery(
+                                " with vaga as ( " +
                                 "   select v.* from  EditalVaga v   join InfoRemessa i  on v.chave=i.chave and i.idUnidadeGestora = :ug  join Cargo c  on v.idCargo=c.id  and   c.codigoCargo=:codigoCargo    " +
                                 "), " +
                                 "Aprovado as (" +
                                 "  select v.* from  EditalAprovado v join InfoRemessa i  on v.chave=i.chave and i.idUnidadeGestora = :ug and cpf= :cpf and cast( v.numeroInscricao as int ) = cast (:numeroInscricao as int)  " +
                                 " ) " +
                                 "select a.* from Aprovado a " +
-                                "join vaga b on a.idEditalVaga= b.id "  , EditalAprovado.class)
+                                "join vaga b on a.idEditalVaga= b.id " , EditalAprovado.class)
                         .setParameter("ug",User.getUser(super.request).getUnidadeGestora().getId())
-                        .setParameter("codigoCargo",list.get(i).getCargo().getCodigoCargo())
-                        .setParameter("numeroInscricao",list.get(i).getNumeroInscricao())
-                        .setParameter("cpf",nc.getCpf())
-                        .getResultList();
+                        .setParameter("codigoCargo",listAdmissoes.get(i).getCargo().getCodigoCargo())
+                        .setParameter("numeroInscricao",listAdmissoes.get(i).getNumeroInscricao())
+                        .setParameter("cpf",nomeacaoConcurso.getCpf());
+                List<EditalAprovado> editalAprovadoList = queryEditalAprovado.getResultList();
 
-            if (ea.size()>0 ){
-                nc.setEditalAprovado((EditalAprovado) ea.get(0) );
-                nc.setClassificacao(ea.get(0).getClassificacao());
-                nc.setSitCadAprovado("Aprovado Cadastrado");
-                nc.setVaga(ea.get(0).getEditalVaga().getCargo().getCargoNome().getNome());
+            if (editalAprovadoList.size()>0 ){
+                nomeacaoConcurso.setEditalAprovado((EditalAprovado) editalAprovadoList.get(0) );
+                nomeacaoConcurso.setClassificacao(editalAprovadoList.get(0).getClassificacao());
+                nomeacaoConcurso.setSitCadAprovado("Aprovado Cadastrado");
+                nomeacaoConcurso.setVaga(editalAprovadoList.get(0).getEditalVaga().getCargo().getCargoNome().getNome());
                 Integer enviado = (Integer) getEntityManager().createNativeQuery("select count(*) from DocumentoAdmissao a " +
-                        "where  status >0 and  a.idAdmissao = "+list.get(i).getId()+ "").getSingleResult();
-                    nc.setSituacaoNomeacao((enviado > 0)?"Aprovado anexado" : "Apto para envio!");
+                        "where  status >0 and  a.idAdmissao = "+listAdmissoes.get(i).getId()+ "").getSingleResult();
+                    nomeacaoConcurso.setSituacaoNomeacao((enviado > 0)?"Aprovado anexado" : "Apto para envio!");
             } else
             {
-                nc.setSitCadAprovado("Aprovado não Cadastrado!");
-                nc.setSituacaoNomeacao("inapto para envio!");
+                nomeacaoConcurso.setSitCadAprovado("Aprovado não Cadastrado!");
+                nomeacaoConcurso.setSituacaoNomeacao("inapto para envio!");
             }
 
-            listc.add(nc);
+            nomeacaoConcursoList.add(nomeacaoConcurso);
         }
-        return new PaginacaoUtil<NomeacaoConcurso>(tamanho, pagina, totalPaginas, totalRegistros, listc);
+        return new PaginacaoUtil<NomeacaoConcurso>(tamanho, pagina, totalPaginas, totalRegistros, nomeacaoConcursoList);
     }
 
     public Integer countAdmissoes(String search) {
@@ -116,8 +127,7 @@ public class AdmissaoRepository extends DefaultRepository<Admissao, BigInteger> 
                         "( select a.* from Admissao a  join InfoRemessa i on a.chave = i.chave and i.idUnidadeGestora = :ug and a.tipoAdmissao=1  ), " +
                         " servidor1 as ( select d.* from Servidor d  join InfoRemessa i on d.chave = i.chave and i.idUnidadeGestora = :ug  ) " +
                         "select count(1) from admissao1 c  join  servidor  s on   c.idServidor = s.id " + " " + search)
-                .setParameter("ug",User.getUser(super.request).getUnidadeGestora().getId())
-                ;
+                .setParameter("ug",User.getUser(super.request).getUnidadeGestora().getId());
         return (Integer) query.getSingleResult();
     }
 
