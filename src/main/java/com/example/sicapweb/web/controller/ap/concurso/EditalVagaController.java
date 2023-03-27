@@ -85,17 +85,18 @@ public class EditalVagaController extends DefaultController<EditalVaga> {
     @Transactional
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.PUT)
     public void update(@RequestBody EditalVaga editalVaga, @PathVariable BigInteger id){
-        try {
-            editalVaga.setId(id);
-            editalVaga.setChave(editalVagaRepository.buscarPrimeiraRemessa());
-            editalVaga.setEdital(editalRepository.buscarEditalPorNumero(editalVaga.getNumeroEdital(),editalVaga.getComplementoEdital() ));
-            editalVaga.setUnidadeAdministrativa(unidadeAdministrativaRepository.buscarUnidadePorcodigo(editalVaga.codigoUnidadeAdministrativa));
-            editalVaga.setCargo(cargoRepository.buscarCargoPorcodigo(editalVaga.codigoCargo));
-            EditalVaga mesmocodigo = editalVagaRepository.buscarVagasPorCodigo(editalVaga.getCodigoVaga());
-            if (mesmocodigo!=null && ! id.equals(mesmocodigo.getId()) )
-                throw  new InvalitInsert("Ja existe vaga com esse codigo!!");
-            editalVagaRepository.update(editalVaga);
+        editalVaga.setId(id);
+        editalVaga.setChave(editalVagaRepository.buscarPrimeiraRemessa());
+        editalVaga.setEdital(editalRepository.buscarEditalPorNumero(editalVaga.getNumeroEdital(),editalVaga.getComplementoEdital() ));
+        editalVaga.setUnidadeAdministrativa(unidadeAdministrativaRepository.buscarUnidadePorcodigo(editalVaga.codigoUnidadeAdministrativa));
+        editalVaga.setCargo(cargoRepository.buscarCargoPorcodigo(editalVaga.codigoCargo));
+        EditalVaga mesmocodigo = editalVagaRepository.buscarVagasPorCodigo(editalVaga.getCodigoVaga());
+        EditalVaga mesmoId = editalVagaRepository.findById(id);
 
+        if (!mesmoId.getCodigoVaga().equals(editalVaga.getCodigoVaga()) && mesmocodigo != null )
+            throw  new InvalitInsert("Ja existe vaga com esse codigo!!");
+        try {
+            editalVagaRepository.update(editalVaga);
         } catch (Exception e) {
             throw new InvalitInsert("Erro na ATALIZACAO de dados, por favor cheque os canpos enviados ");
             //TODO: handle exception

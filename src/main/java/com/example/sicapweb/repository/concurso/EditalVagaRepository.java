@@ -81,14 +81,15 @@ public class EditalVagaRepository extends DefaultRepository<EditalVaga, BigInteg
 
     public EditalVaga buscarVagasPorCodigo(String codigo) {
         try{
-            return  (EditalVaga) getEntityManager().createNativeQuery(
+            var query =  getEntityManager().createNativeQuery(
                     "with edt as ( " +
                             "        select a.codigoVaga, i.idUnidadeGestora ,max(a.id)  max_id " +
                             "             from EditalVaga a  join infoRemessa i on a.chave = i.chave  and i.idUnidadeGestora = '"+User.getUser(super.request).getUnidadeGestora().getId()+"'  group by " +
                             "                a.codigoVaga, i.idUnidadeGestora " +
                             "                         ) " +
                             "select   a.* from EditalVaga a join infoRemessa i on a.chave = i.chave join edt b on a.id= b.max_id and i.idUnidadeGestora=b.idUnidadeGestora where 1=1 "+
-                            " and a.codigoVaga = '" + codigo + "'    ", EditalVaga.class).setMaxResults(1).getSingleResult();
+                            " and a.codigoVaga = '" + codigo + "' ", EditalVaga.class).setMaxResults(1);
+            return  (EditalVaga) query.getSingleResult();
         }catch (NoResultException e){
             return null;
         }
