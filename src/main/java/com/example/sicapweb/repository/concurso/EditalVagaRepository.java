@@ -20,6 +20,7 @@ public class EditalVagaRepository extends DefaultRepository<EditalVaga, BigInteg
     public EditalVagaRepository(EntityManager em) {
         super(em);
     }
+
     public PaginacaoUtil<EditalVaga> buscaPaginada(Pageable pageable, String searchParams, Integer tipoParams) {
 
         int pagina = Integer.valueOf(pageable.getPageNumber());
@@ -50,12 +51,10 @@ public class EditalVagaRepository extends DefaultRepository<EditalVaga, BigInteg
     }
 
     public Integer countEditaisvaga(String search) {
-        Query query = getEntityManager().createNativeQuery("with edt as ( " +
-                "        select a.codigoVaga, i.idUnidadeGestora ,max(a.id)  max_id " +
-                "             from EditalVaga a  join infoRemessa i on a.chave = i.chave  and i.idUnidadeGestora = '"+User.getUser(super.request).getUnidadeGestora().getId()+"'  group by " +
-                "                a.codigoVaga, i.idUnidadeGestora " +
-                "                         ) " +
-                "select   count(1) from EditalVaga a join infoRemessa i on a.chave = i.chave join edt b on a.id= b.max_id and i.idUnidadeGestora=b.idUnidadeGestora where 1=1 " + search);
+        Query query = getEntityManager().createNativeQuery("select count(1)\n" +
+                "from EditalVaga a\n" +
+                "         join infoRemessa i on a.chave = i.chave and i.idUnidadeGestora = '"+User.getUser(super.request).getUnidadeGestora().getId()+"' \n" +
+                "where 1 = 1" + search);
         return (Integer) query.getSingleResult();
     }
 
