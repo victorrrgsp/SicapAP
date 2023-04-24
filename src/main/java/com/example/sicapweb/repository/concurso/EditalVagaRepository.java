@@ -93,5 +93,18 @@ public class EditalVagaRepository extends DefaultRepository<EditalVaga, BigInteg
             return null;
         }
     }
+    public EditalVaga buscarVagasPorCodigoTipo(String codigo,Integer tipo) {
+        try{
+            var query =  getEntityManager().createNativeQuery(
+                    "select a.*\n" +
+                            "from EditalVaga a\n" +
+                            "         join infoRemessa i on a.chave = i.chave\n" +
+                            "where 1 = 1\n" +
+                            " and a.codigoVaga = '" + codigo + "' and a.tipoConcorrencia = "+ tipo, EditalVaga.class).setMaxResults(1);
+            return  (EditalVaga) query.getSingleResult();
+        }catch (NoResultException e){
+            return null;
+        }
+    }
 
 }
