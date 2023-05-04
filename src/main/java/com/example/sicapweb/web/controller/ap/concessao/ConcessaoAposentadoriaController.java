@@ -127,15 +127,23 @@ public class ConcessaoAposentadoriaController extends DefaultController<Document
 
 
     @CrossOrigin
-    @GetMapping(path = {"getSituacao/{id}"})
-    public ResponseEntity<?> findSituacao(@PathVariable BigInteger id) {
-        Integer situacao = documentoAposentadoriaRepository.findSituacao("documentoAposentadoria", "idAposentadoria", id, "'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'XII', 'XIII'", "N", "N", "N", "N");
+    @GetMapping(path = {"getSituacao/{id}/{motivo}"})
+    public ResponseEntity<?> findSituacao(@PathVariable BigInteger id, @PathVariable Integer motivo) {
+        var incisos = Aposentadoria.TipoAposentadoria.Invalidez.getValor().equals(motivo)
+                ? "'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'X', 'IX', 'XII', 'XIII'"
+                : "'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'X', 'XII', 'XIII'";
+
+        Integer situacao = documentoAposentadoriaRepository.findSituacao(
+                "documentoAposentadoria",
+                "idAposentadoria",
+                id,
+                incisos, "N", "N", "N", "N");
         return ResponseEntity.ok().body(situacao);
     }
 
     @CrossOrigin
-    @GetMapping(path = {"getInciso/{id}"})
-    public ResponseEntity<?> findInciso(@PathVariable BigInteger id) {
+    @GetMapping(path = {"getInciso/{id}/{motivo}"})
+    public ResponseEntity<?> findInciso(@PathVariable BigInteger id, @PathVariable Integer motivo) {
         List<Inciso> list = new ArrayList<>();
         list.add(new Inciso("I", "Ofício subscrito pela autoridade competente",
                 "Ofício subscrito pela autoridade competente dirigido ao Presidente do TCE/TO dando ciência do fato", "", "Sim"));
@@ -153,10 +161,14 @@ public class ConcessaoAposentadoriaController extends DefaultController<Document
                 "Demonstrativo dos cálculos de proventos com base na remuneração do cargo efetivo, discriminando as verbas percebidas, inclusive as vantagens de caráter pessoal com fundamento legal para a incorporação, quando for o caso, informando o total mensal e especificando se os proventos são integrais ou proporcionais, devendo, neste último caso, informar a proporcionalidade adotada", "", "Sim"));
         list.add(new Inciso("VIII", "Declaração ou histórico funcional",
                 "Declaração ou histórico funcional discriminando o tempo de efetivo exercício no serviço público, o tempo de exercício na carreira e no cargo efetivo em que se deu a aposentadoria, nos casos daquelas concedidas com base no disposto nos arts. 2º e 3º da EC nº 41/2003, arts. 2º e 3º da EC nº 47/2005, ou nas hipóteses de aposentadorias embasadas na EC nº 20/1998", "", "Sim"));
+
+        var obrigatorio = Aposentadoria.TipoAposentadoria.Invalidez.getValor().equals(motivo) ? "Sim" : "Não";
+
         list.add(new Inciso("IX", "Laudo pericial atestando a incapacidade definitiva do servidor",
-                "Laudo pericial atestando a incapacidade definitiva do servidor, com a indicação da moléstia que o tornou inabilitado para a vida laboral, nos casos de aposentadoria por invalidez", "", "Não"));
+                "Laudo pericial atestando a incapacidade definitiva do servidor, com a indicação da moléstia que o tornou inabilitado para a vida laboral, nos casos de aposentadoria por invalidez", "", obrigatorio));
+
         list.add(new Inciso("X", "Declaração firmada pelo servidor de não acúmulo de proventos de aposentadoria",
-                "Declaração firmada pelo servidor de não acúmulo de proventos de aposentadoria por parte de qualquer ente público da Federação, ressalvados os cargos, empregos e funções públicas acumuláveis por permissivos constitucionais", "", "Não"));
+                "Declaração firmada pelo servidor de não acúmulo de proventos de aposentadoria por parte de qualquer ente público da Federação, ressalvados os cargos, empregos e funções públicas acumuláveis por permissivos constitucionais", "", "Sim"));
         list.add(new Inciso("XI", "Termo de opção",
                 "Termo de opção em sendo o caso de acúmulo de cargo, na conformidade das exigências legais", "", "Não"));
         list.add(new Inciso("XII", "Informação emitida pelo instituto previdenciário",
@@ -193,12 +205,12 @@ public class ConcessaoAposentadoriaController extends DefaultController<Document
 
     @CrossOrigin
     @PostMapping("/enviarGestor/{id}")
-    public ResponseEntity<?> enviarGestorAssinar(@PathVariable BigInteger id,@RequestParam(value = "Ug", required = false) String ug) {
-        admEnvioRepository.save(preencherEnvio(id,ug));
+    public ResponseEntity<?> enviarGestorAssinar(@PathVariable BigInteger id, @RequestParam(value = "Ug", required = false) String ug) {
+        admEnvioRepository.save(preencherEnvio(id, ug));
         return ResponseEntity.ok().body("Ok");
     }
 
-    private AdmEnvio preencherEnvio(BigInteger id,String ug) {
+    private AdmEnvio preencherEnvio(BigInteger id, String ug) {
         Aposentadoria aposentadoria = aposentadoriaRepository.findById(id);
         AdmEnvio admEnvio = new AdmEnvio();
         admEnvio.setTipoRegistro(AdmEnvio.TipoRegistro.APOSENTADORIA.getValor());
@@ -221,7 +233,7 @@ public class ConcessaoAposentadoriaController extends DefaultController<Document
     @PostMapping("/vincularProcesso/{id}/{numero}/{ano}")
     public ResponseEntity<?> vincularProcesso(@PathVariable BigInteger id, @PathVariable String numero, @PathVariable String ano) {
         String processo = numero + "/" + ano;
-        AdmEnvio admEnvio = preencherEnvio(id,null);
+        AdmEnvio admEnvio = preencherEnvio(id, null);
         admEnvio.setStatus(AdmEnvio.Status.CONCLUIDO.getValor());
         admEnvio.setProcesso(processo);
         admEnvioRepository.save(admEnvio);
