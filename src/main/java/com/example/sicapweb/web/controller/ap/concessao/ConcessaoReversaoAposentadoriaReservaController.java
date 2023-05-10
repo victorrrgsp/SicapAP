@@ -123,7 +123,9 @@ public class ConcessaoReversaoAposentadoriaReservaController extends DefaultCont
     @CrossOrigin
     @GetMapping(path = {"getSituacao/{id}"})
     public ResponseEntity<?> findSituacao(@PathVariable BigInteger id) {
-        return ResponseEntity.ok().body(documentoAposentadoriaRepository.findSituacao("documentoAposentadoria", "idAposentadoria", id, "'I - Seção V', 'II - Seção V', 'VI - Seção V', 'IV', 'VII - Seção V', 'VIII - Seção V'", "N", "N", "S", "N"));
+        return ResponseEntity.ok().body(documentoAposentadoriaRepository.findSituacao("documentoAposentadoria",
+                "idAposentadoria", id,
+                "'I - Seção V', 'II - Seção V', 'VI - Seção V', 'VII - Seção V', 'VIII - Seção V'", "N", "N", "S", "N"));
     }
 
     @CrossOrigin
@@ -131,15 +133,15 @@ public class ConcessaoReversaoAposentadoriaReservaController extends DefaultCont
     public ResponseEntity<?> findInciso(@PathVariable BigInteger id) {
         List<Inciso> list = new ArrayList<>();
         list.add(new Inciso("I - Seção V", "Ofício subscrito pela autoridade competente",
-                "Ofício subscrito pela autoridade competente dirigido ao Presidente do TCE/TO dando ciência do fato", "", "Sim"));
+                "Ofício subscrito pela autoridade competente dirigido ao Presidente do TCE/TO dando ciência do fato",
+                "", "Sim"));
         list.add(new Inciso("II - Seção V", "Ato da concessão acompanhado da respectiva publicação",
                 "Ato da concessão acompanhado da respectiva publicação", "", "Sim"));
         list.add(new Inciso("VI - Seção V", "Parecer jurídico atestando a legalidade do ato",
                 "Parecer jurídico atestando a legalidade do ato", "", "Sim"));
-        list.add(new Inciso("IV", "Último contracheque",
-                "Último contracheque", "", "Sim"));
         list.add(new Inciso("VII - Seção V", "Laudo médico pericial",
-                "Laudo médico pericial declarando a habilitação do aposentado para o exercício do cargo anteriormente ocupado", "", "Sim"));
+                "Laudo médico pericial declarando a habilitação do aposentado para o exercício do cargo anteriormente ocupado",
+                "", "Sim"));
         list.add(new Inciso("VIII - Seção V", "Documento de comprovação de idade do servidor",
                 "Documento de comprovação de idade do servidor", "", "Sim"));
         list.add(new Inciso("Outros", "Outros",

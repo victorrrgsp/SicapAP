@@ -138,13 +138,15 @@ public class ConcessaoRevisaoPensaoController extends DefaultController<Document
         list.add(new Inciso("II", "Requerimento de aposentadoria",
                 "Requerimento de aposentadoria", "", "Sim"));
         list.add(new Inciso("III", "Certidão comprobatória de preenchimento de requisitos",
-                "Certidão comprobatória de preenchimento de requisitos para a percepção dos proventos e/ou espécies remuneratórias previstos na revisão pretendida", "", "Sim"));
+                "Certidão comprobatória de preenchimento de requisitos para a percepção dos proventos e/ou " +
+                        "espécies remuneratórias previstos na revisão pretendida", "", "Sim"));
         list.add(new Inciso("IV", "Demonstrativo de cálculo da revisão dos proventos",
                 "Demonstrativo de cálculo da revisão dos proventos", "", "Sim"));
         list.add(new Inciso("V", "Parecer jurídico atestando a legalidade da concessão do benefício",
                 "Parecer jurídico atestando a legalidade da concessão do benefício", "", "Sim"));
         list.add(new Inciso("VI", "Ato de concessão da revisão de proventos",
-                "Ato de concessão da revisão de proventos constando o documento revisado, o nome do servidor e a fundamentação legal, acompanhado da respectiva publicação", "", "Sim"));
+                "Ato de concessão da revisão de proventos constando o documento revisado, o nome do servidor " +
+                        "e a fundamentação legal, acompanhado da respectiva publicação", "", "Sim"));
         list.add(new Inciso("Outros", "Outros",
                 "Outros", "", "Não"));
 
