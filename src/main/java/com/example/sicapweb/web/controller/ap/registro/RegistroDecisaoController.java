@@ -249,6 +249,7 @@ public class RegistroDecisaoController  {
             Integer tipoAposentadoria = (Integer) camposParaAlterar.get("tipoAposentadoria");
             Aposentadoria aposentadoria = aposentadoriaRepository.findById(idMovimentacao);
             Ato atoPrecastrado = atoRepository.buscarAtoPorNumeroECnpj(numeroAto, tipoAto,idUnidadeGestora );
+            
             if (atoPrecastrado ==null){
                 Ato novoAto = new Ato(numeroAto ,idUnidadeGestora , veiculoPublicacao , dataPublicacao, tipoAto );
                 novoAto.setChave(atoRepository.buscarPrimeiraRemessa(idUnidadeGestora));
@@ -259,6 +260,7 @@ public class RegistroDecisaoController  {
             else if ( !atosIquais(aposentadoria.getAto() , atoPrecastrado) ){
                 aposentadoria.setAto(atoPrecastrado);
             }
+            atoPrecastrado.setDataPublicacao(dataPublicacao);
             aposentadoria.setTipoAposentadoria(tipoAposentadoria);
             aposentadoriaRepository.update(aposentadoria);
 
