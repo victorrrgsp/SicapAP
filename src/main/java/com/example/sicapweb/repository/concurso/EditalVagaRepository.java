@@ -100,7 +100,7 @@ public class EditalVagaRepository extends DefaultRepository<EditalVaga, BigInteg
                             "from EditalVaga a\n" +
                             "         join infoRemessa i on a.chave = i.chave\n" +
                             "where 1 = 1\n" +
-                            " and a.codigoVaga = '" + codigo + "' and a.tipoConcorrencia = "+ tipo, EditalVaga.class).setMaxResults(1);
+                            " and a.codigoVaga = '" + codigo + "' and a.tipoConcorrencia = "+ tipo + " and i.idUnidadeGestora = '" +User.getUser(super.request).getUnidadeGestora().getId()+"'", EditalVaga.class).setMaxResults(1);
             return  (EditalVaga) query.getSingleResult();
         }catch (NoResultException e){
             return null;
