@@ -78,21 +78,33 @@ public class EditalAprovadoController extends DefaultController<EditalAprovado> 
         editalAprovado.setId(id);
         editalAprovado.setChave(editalAprovadoRepository.buscarPrimeiraRemessa());
         editalAprovado.setEditalVaga(editalVagaRepository.buscarVagasPorCodigo(editalAprovado.getCodigoVaga()));
-        EditalAprovado mesmocpf = editalAprovadoRepository.buscarAprovadoPorCpf(editalAprovado.getCpf());
-        EditalAprovado mesmoinscricao = editalAprovadoRepository.buscarAprovadoPorInscricao(editalAprovado.getNumeroInscricao());
-        EditalAprovado mesmaclassifmesmavaga = editalAprovadoRepository.buscarAprovadoPorClassificacaoConc(editalAprovado.getEditalVaga().getId(),editalAprovado.getClassificacao());
-        //  if  (!editalAprovado.getEditalVaga().getEdital().getNumeroEdital().equals(editalAprovado.getNumeroEdital()) ) throw new InvalitInsert("O edital do aprovado dever o mesmo da vaga!"); ;
-        if (mesmocpf!=null ) {
-            if (! id.equals(mesmocpf.getId())  ) throw new InvalitInsert("Cpf ja Cadastrado!");
-        } else if (mesmoinscricao!=null){
-            if (! id.equals(mesmoinscricao.getId())  ) throw new InvalitInsert("Outro aprovado com o mesmo numero de inscrição!");
-        }
-        else if (mesmaclassifmesmavaga!=null)
-        {
-            if (! id.equals(mesmaclassifmesmavaga.getId())  ) throw new InvalitInsert("outro aprovado ja se encontra na mesma classificação para mesma vaga!");
-        }
 
+        EditalAprovado versaoAnterior  = editalAprovadoRepository.findById(id);
+        if(
+            !(
+            versaoAnterior.getCpf().equals(editalAprovado.getCpf())&&
+            versaoAnterior.getNumeroInscricao().equals(editalAprovado.getNumeroInscricao())&&
+            versaoAnterior.getClassificacao().equals(editalAprovado.getClassificacao())&&
+            versaoAnterior.getEditalVaga().getEdital().getNumeroEdital().equals(editalAprovado.getNumeroEdital())&&
+            versaoAnterior.getEditalVaga().getCodigoVaga().equals(editalAprovado.getEditalVaga().getCodigoVaga())
+            )
+        ){
 
+            EditalAprovado mesmocpf = editalAprovadoRepository.buscarAprovadoPorCpf(editalAprovado.getCpf());
+            EditalAprovado mesmoinscricao = editalAprovadoRepository.buscarAprovadoPorInscricao(editalAprovado.getNumeroInscricao());
+            EditalAprovado mesmaclassifmesmavaga = editalAprovadoRepository.buscarAprovadoPorClassificacaoConc(editalAprovado.getEditalVaga().getId(),editalAprovado.getClassificacao());
+            //  if  (!editalAprovado.getEditalVaga().getEdital().getNumeroEdital().equals(editalAprovado.getNumeroEdital()) ) throw new InvalitInsert("O edital do aprovado dever o mesmo da vaga!"); ;
+            if (mesmocpf!=null ) {
+                if (!id.equals(mesmocpf.getId())) throw new InvalitInsert("Cpf ja Cadastrado!");
+            } else if (mesmoinscricao!=null){
+                if (! id.equals(mesmoinscricao.getId())  ) throw new InvalitInsert("Outro aprovado com o mesmo numero de inscrição!");
+            }
+            else if (mesmaclassifmesmavaga!=null)
+            {
+                if (! id.equals(mesmaclassifmesmavaga.getId())  ) throw new InvalitInsert("outro aprovado ja se encontra na mesma classificação para mesma vaga!");
+            }
+            
+        }
         editalAprovadoRepository.update(editalAprovado);
     }
 
