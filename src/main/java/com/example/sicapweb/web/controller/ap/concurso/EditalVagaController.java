@@ -70,8 +70,8 @@ public class EditalVagaController extends DefaultController<EditalVaga> {
             editalVaga.setCargo(cargoRepository.buscarCargoPorcodigo(editalVaga.codigoCargo));
             EditalVaga mesmocodigo = editalVagaRepository.buscarVagasPorCodigoTipo(editalVaga.getCodigoVaga(),editalVaga.getTipoConcorrencia());
             
-            if (mesmocodigo!=null )
-                throw  new InvalitInsert("Ja existe vaga com esse codigo!!");
+            // if (mesmocodigo!=null )
+            //     throw  new InvalitInsert("Ja existe vaga com esse codigo!!");
 
             editalVagaRepository.save(editalVaga);
 
