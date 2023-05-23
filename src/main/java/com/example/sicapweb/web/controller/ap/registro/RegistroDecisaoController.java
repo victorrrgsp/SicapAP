@@ -243,37 +243,35 @@ public class RegistroDecisaoController  {
                 new java.sql.Date( (new SimpleDateFormat("yyyy-MM-dd" ))
                         .parse((String)camposParaAlterar.get("dataPublicacao")).getTime() );
         BigInteger idMovimentacao =   BigInteger.valueOf(((Integer)camposParaAlterar.get("idMovimentacao")).longValue());
-
+        Ato atoPrecastrado = atoRepository.buscarAtoPorNumeroECnpj(numeroAto, tipoAto,idUnidadeGestora );
         if  (this.tiposRegistrosNaTabelaAposentadoria.contains(tipoRegistroEnum)){
             //movimentos derivados da tabela Aposentadoria
             Integer tipoAposentadoria = (Integer) camposParaAlterar.get("tipoAposentadoria");
             Aposentadoria aposentadoria = aposentadoriaRepository.findById(idMovimentacao);
-            Ato atoPrecastrado = atoRepository.buscarAtoPorNumeroECnpj(numeroAto, tipoAto,idUnidadeGestora );
-            
             if (atoPrecastrado ==null){
                 Ato novoAto = new Ato(numeroAto ,idUnidadeGestora , veiculoPublicacao , dataPublicacao, tipoAto );
                 novoAto.setChave(atoRepository.buscarPrimeiraRemessa(idUnidadeGestora));
                 atoRepository.save(novoAto);
+                novoAto.setId(atoRepository.buscarAtoPorNumeroECnpj(numeroAto, tipoAto,idUnidadeGestora ).getId());
                 aposentadoria.setAto(novoAto);
-                aposentadoriaRepository.update(aposentadoria);
             }
             else if ( !atosIquais(aposentadoria.getAto() , atoPrecastrado) ){
                 aposentadoria.setAto(atoPrecastrado);
+            }else{
+                atoPrecastrado.setDataPublicacao(dataPublicacao);
             }
-            atoPrecastrado.setDataPublicacao(dataPublicacao);
             aposentadoria.setTipoAposentadoria(tipoAposentadoria);
             aposentadoriaRepository.update(aposentadoria);
 
         } else if (this.tiposRegistrosNaTabelaPensao.contains(tipoRegistroEnum)) {
             //movimentos derivados da tabela Pensao
             Pensao pensao = pensaoRepository.findById(idMovimentacao);
-            Ato atoPrecastrado = atoRepository.buscarAtoPorNumeroECnpj(numeroAto, tipoAto,idUnidadeGestora );
             if (atoPrecastrado ==null){
                 Ato novoAto = new Ato(numeroAto ,idUnidadeGestora , veiculoPublicacao , dataPublicacao, tipoAto );
                 novoAto.setChave(atoRepository.buscarPrimeiraRemessa(idUnidadeGestora));
                 atoRepository.save(novoAto);
+                novoAto.setId(atoRepository.buscarAtoPorNumeroECnpj(numeroAto, tipoAto,idUnidadeGestora ).getId());
                 pensao.setAto(novoAto);
-                pensaoRepository.update(pensao);
             }
             else if ( !atosIquais(pensao.getAto() , atoPrecastrado) ){
                 pensao.setAto(atoPrecastrado);
@@ -282,13 +280,12 @@ public class RegistroDecisaoController  {
         } else if (this.tiposRegistrosNaTabelaAdmissao.contains(tipoRegistroEnum)) {
             //movimentos derivados da tabela Admissao
             Admissao admissao = admissaoRepository.findById(idMovimentacao);
-            Ato atoPrecastrado = atoRepository.buscarAtoPorNumeroECnpj(numeroAto, tipoAto,idUnidadeGestora );
             if (atoPrecastrado ==null){
                 Ato novoAto = new Ato(numeroAto ,idUnidadeGestora , veiculoPublicacao , dataPublicacao, tipoAto );
                 novoAto.setChave(atoRepository.buscarPrimeiraRemessa(idUnidadeGestora));
                 atoRepository.save(novoAto);
+                novoAto.setId(atoRepository.buscarAtoPorNumeroECnpj(numeroAto, tipoAto,idUnidadeGestora ).getId());
                 admissao.setAto(novoAto);
-                admissaoRepository.update(admissao);
             }
             else if ( !atosIquais(admissao.getAto() , atoPrecastrado) ){
                 admissao.setAto(atoPrecastrado);
