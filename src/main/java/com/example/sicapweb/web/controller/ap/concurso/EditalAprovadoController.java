@@ -64,7 +64,13 @@ public class EditalAprovadoController extends DefaultController<EditalAprovado> 
         EditalAprovado mesmaclassifmesmavaga = editalAprovadoRepository.buscarAprovadoPorClassificacaoConc(editalAprovado.getEditalVaga().getId(),editalAprovado.getClassificacao());
       //  if  (!editalAprovado.getEditalVaga().getEdital().getNumeroEdital().equals(editalAprovado.getNumeroEdital()) ) throw new InvalitInsert("O edital do aprovado dever o mesmo da vaga!"); ;
         if (mesmocpf!=null) throw new InvalitInsert("Cpf ja Cadastrado!");
-        else if (mesmoinscricao!=null){throw new InvalitInsert("Outro aprovado com o mesmo numero de inscrição!");}
+        else if (mesmoinscricao!=null){
+            String numeroAto = editalAprovado.getEditalVaga().getEdital().getNumeroEdital();
+            if (Integer.parseInt(numeroAto.substring(numeroAto.length()-4)) > 2016 ){
+                throw new InvalitInsert("Outro aprovado com o mesmo numero de inscrição!");
+            }
+
+        }
             else if (mesmaclassifmesmavaga!=null){throw new InvalitInsert("Outro aprovado ja se encontra na mesma classificação e tipo de concorrencia para mesma vaga!");}
         editalAprovadoRepository.save(editalAprovado);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(editalAprovado.getId()).toUri();
@@ -89,7 +95,6 @@ public class EditalAprovadoController extends DefaultController<EditalAprovado> 
             versaoAnterior.getEditalVaga().getCodigoVaga().equals(editalAprovado.getEditalVaga().getCodigoVaga())
             )
         ){
-
             EditalAprovado mesmocpf = editalAprovadoRepository.buscarAprovadoPorCpf(editalAprovado.getCpf());
             EditalAprovado mesmoinscricao = editalAprovadoRepository.buscarAprovadoPorInscricao(editalAprovado.getNumeroInscricao());
             EditalAprovado mesmaclassifmesmavaga = editalAprovadoRepository.buscarAprovadoPorClassificacaoConc(editalAprovado.getEditalVaga().getId(),editalAprovado.getClassificacao());
@@ -103,7 +108,6 @@ public class EditalAprovadoController extends DefaultController<EditalAprovado> 
             {
                 if (! id.equals(mesmaclassifmesmavaga.getId())  ) throw new InvalitInsert("outro aprovado ja se encontra na mesma classificação para mesma vaga!");
             }
-            
         }
         editalAprovadoRepository.update(editalAprovado);
     }
