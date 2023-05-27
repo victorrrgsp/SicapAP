@@ -10,7 +10,6 @@ import javax.persistence.Query;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Calendar;
-import java.util.List;
 import java.util.Map;
 
 @Repository
@@ -140,7 +139,7 @@ public class AdmEnvioAssinaturaRepository extends DefaultRepository<AdmEnvioAssi
             query.setParameter("processoNpai", processo.get("processoNpai"));
             query.setParameter("processoApai", processo.get("processoApai"));
             query.setParameter("relatoria", processo.get("relatoria"));
-            query.setParameter("complemento", processo.get("complemento"));
+            query.setParameter("complemento", "");
             query.setParameter("assuntocodigo", processo.get("assuntocodigo"));
             query.setParameter("classeassunto", processo.get("classeassunto"));
             query.setParameter("classeassunto", processo.get("classeassunto"));
@@ -156,20 +155,6 @@ public class AdmEnvioAssinaturaRepository extends DefaultRepository<AdmEnvioAssi
                     "SELECT @@IDENTITY ");
 
             idProcesso = (BigDecimal) query1.getSingleResult();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Transactional
-    public void salvarProcAtosConcessao(String numAto) {
-        try {
-            Query query = getEntityManager().createNativeQuery(
-                    "INSERT INTO SCP..ProcAtosConcessao (IdProc, NumAtoConc, DataInsert, MatrUsr, CodSistema) " +
-                            "VALUES (:idProc, :numAto, getdate(), null, 29) ");
-            query.setParameter("idProc", idProcesso);
-            query.setParameter("numAto", numAto);
-            query.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
         }
