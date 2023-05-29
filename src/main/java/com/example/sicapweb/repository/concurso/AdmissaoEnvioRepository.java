@@ -184,10 +184,11 @@ public class AdmissaoEnvioRepository extends DefaultRepository<AdmissaoEnvio, Bi
 
                 String nomeTipoConcorrencia =  Arrays.stream(EditalVaga.TipoConcorrencia.values()).filter(tipoConcorrencia -> tipoConcorrencia.getValor()==vagaAprovado.get("tipoConcorrencia")).collect( Collectors.toList()).get(0).name();
 
-                if ( ((Integer)vagaAprovado.get("quantidade")) <  ((Integer)vagaAprovado.get("max_classif"))  ){
-                    vagaAprovado.put("valido",  false);
-                    vagaAprovado.put("ocorrencia",  " o numero de aprovados axcedeu o limite estipulado da vaga de codigo "+(vagaAprovado.get("codigoVaga"))+"-"+(vagaAprovado.get("nomeCargo"))+"-" +nomeTipoConcorrencia );
-                } else if (((Integer)vagaAprovado.get("ct_nao_anexados")) > 0 ){
+                // if ( ((Integer)vagaAprovado.get("quantidade")) <  ((Integer)vagaAprovado.get("max_classif"))  ){
+                //     vagaAprovado.put("valido",  false);
+                //     vagaAprovado.put("ocorrencia",  " o numero de aprovados axcedeu o limite estipulado da vaga de codigo "+(vagaAprovado.get("codigoVaga"))+"-"+(vagaAprovado.get("nomeCargo"))+"-" +nomeTipoConcorrencia );
+                // } else 
+                if (((Integer)vagaAprovado.get("ct_nao_anexados")) > 0 ){
                     vagaAprovado.put("valido", false);
                     vagaAprovado.put("ocorrencia",  "A vaga de codigo "+(vagaAprovado.get("codigoVaga"))+"-"+(vagaAprovado.get("nomeCargo"))+"-" +nomeTipoConcorrencia+" tem aprovados ao qual não foi anexado documentos!! " );
                 }
