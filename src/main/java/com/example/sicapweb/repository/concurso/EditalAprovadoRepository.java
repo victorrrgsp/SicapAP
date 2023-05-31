@@ -194,16 +194,17 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
 
         try {
 
-            List<Object[]> InformacoesInteressadosAdmissao = entityManager.createNativeQuery(
+            var query = entityManager.createNativeQuery(
                     "select p.nome NomeResponsavel,p.cpf CpfResponsavel,a.data_assinatura DataAssinatura, null NumeroEdital, i.nomeUnidade , i.idUnidadeGestora , pj.nomeMunicipio  , ed.nome , ed.cpf from " +
                             " AdmissaoEnvioAssinatura a" +
                             "  inner join SICAPAP21..AdmissaoEnvio env on a.idEnvio= env.id" +
                             "  inner join SICAPAP21..DocumentoAdmissao docenv on env.id= docenv.idEnvio and docenv.status > 0 " +
                             "  inner join SICAPAP21..EditalAprovado ed on docenv.idAprovado = ed.id " +
                             "  inner join cadun..vwPessoa p on a.cpf=p.cpf " +
-                            "  inner join InfoRemessa i on ed.chave=i.chave  and env.cnpjEmpresaOrganizadora = i.idUnidadeGestora " +
+                            "  inner join InfoRemessa i on ed.chave=i.chave  and env.cnpjUnidadeGestora = i.idUnidadeGestora " +
                             " inner join cadun..vwPessoaJuridica pj on i.idUnidadeGestora=pj.cnpj" +
-                            " where env.processo='" + numeroProcesso + "/" + anoProcesso + "'").getResultList();
+                            " where env.processo='" + numeroProcesso + "/" + anoProcesso + "'");
+            List<Object[]> InformacoesInteressadosAdmissao = query.getResultList();
 
 
             for (Object[] informacaoInteressadoAdmissao : InformacoesInteressadosAdmissao) {
