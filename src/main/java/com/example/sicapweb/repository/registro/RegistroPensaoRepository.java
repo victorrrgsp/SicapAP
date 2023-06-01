@@ -44,7 +44,7 @@ public class RegistroPensaoRepository  extends DefaultRepository<RegistroPensao,
         if (nome !=null && !nome.isEmpty()){
             search=" where s.nome like '%"+nome+"%'";
         } else if (cpf !=null && !cpf.isEmpty()) {
-            search=" where a.cpfServidor  = '"+cpf+"'";
+            search=" where a.cpfPensionista   like '%"+cpf.trim()+"%'";
         }
         return search;
     }
@@ -55,34 +55,44 @@ public class RegistroPensaoRepository  extends DefaultRepository<RegistroPensao,
         int tamanho = Integer.valueOf(pageable.getPageSize());
 
         String whereStatemente =getSearch(filtros);
-
+        //mas adequando seria filtrar pelo processo enviado -- futura alteracao 
         Query queryMovimentos = getEntityManager().createNativeQuery(
-                "with envios as (" +
-                        "    select cast( substring(processo,1,len(processo)-5) as int) numeroProcesso, cast( substring(processo,len(processo)-3,len(processo) )  as int) anoProcesso, status,a.idMovimentacao from AdmEnvio a where status=4 " +
-                        "), pensaoEnvios as (select b.numeroProcesso, b.anoProcesso,a.* from Pensao a  join envios b on a.id=b.idMovimentacao)" +
-                        " , pens as (select i.idUnidadeGestora,a.* " +
-                        "               from pensaoEnvios a " +
-                        "                        join InfoRemessa i on a.chave = i.chave and i.idUnidadeGestora = :ug where not exists(select 1 from RegistroPensao where idPensao = a.id   ) ) " +
-                        " select a.id as idMovimentacao ,   " +
-                        "       s.cpfServidor as cpfServidor, " +
-                        "        s.nome as nome, " +
-                        "        'PENSÂO'     AS tipoMovimentacao, " +
-                        "        a.numeroProcesso as numeroProcesso, " +
-                        "        a.anoProcesso as anoProcesso, " +
-                        "        a.dataObito as dataMovimentacao, " +
-                        "        c.nomeCargo         as nomeCargo, " +
-                        "        at.numeroAto        as numeroAto, " +
-                        "        at.tipoAto          as tipoAto, " +
-                        "        a.idUnidadeGestora          as idUnidadeGestora, " +
-                        "        at.dataPublicacao   as dataAto " +
-                        " from pens a " +
-                        "          join Ato at on a.idAto = at.id " +
-                        "          join Admissao ad on a.id = ad.id " +
-                        "          join Cargo c on ad.idCargo = c.id " +
-                        "          join Servidor s on ad.idServidor = s.id "+whereStatemente )
+                "with envios as (select cast(substring(processo, 1, len(processo) - 5) as int)             numeroProcesso,\n" +
+                        "                       cast(substring(processo, len(processo) - 3, len(processo)) as int) anoProcesso,\n" +
+                        "                       status,\n" +
+                        "                       a.idMovimentacao\n" +
+                        "                from AdmEnvio a\n" +
+                        "                where status = 4),\n" +
+                        "     pensaoEnvios as (select b.numeroProcesso, b.anoProcesso, a.*, pen.cpfPensionista\n" +
+                        "                      from Pensao a\n" +
+                        "                                join envios b on a.id = b.idMovimentacao\n" +
+                        "                                join Pensionista pen on pen.cpfServidor = a.cpfServidor\n" +
+                        "                    ),\n" +
+                        "     pens as (select i.idUnidadeGestora, a.*\n" +
+                        "              from pensaoEnvios a\n" +
+                        "                       join InfoRemessa i on a.chave = i.chave and i.idUnidadeGestora = :ug\n" +
+                        "              where not exists(select 1 from RegistroPensao where idPensao = a.id))\n" +
+                        "select distinct\n" +
+                        "        a.id               as idMovimentacao,\n" +
+                        "       s.cpfServidor      as cpfServidor,\n" +
+                        "       s.nome             as nome,\n" +
+                        "       'PENSÂO'           AS tipoMovimentacao,\n" +
+                        "       a.numeroProcesso   as numeroProcesso,\n" +
+                        "       a.anoProcesso      as anoProcesso,\n" +
+                        "       a.dataObito        as dataMovimentacao,\n" +
+                        "       c.nomeCargo        as nomeCargo,\n" +
+                        "       at.numeroAto       as numeroAto,\n" +
+                        "       at.tipoAto         as tipoAto,\n" +
+                        "       a.idUnidadeGestora as idUnidadeGestora,\n" +
+                        "       at.dataPublicacao  as dataAto\n" +
+                        "from pens a\n" +
+                        "         join Ato at on a.idAto = at.id\n" +
+                        "         join Admissao ad on a.id = ad.id\n" +
+                        "         join Cargo c on ad.idCargo = c.id\n" +
+                        "         join Servidor s on ad.idServidor = s.id\n"+whereStatemente )
                 .setParameter("ug", filtros.get("ug"));
 
-        long totalRegistros = countMovimentosPensaoParaRegistrar(filtros.get("ug"));
+        long totalRegistros = queryMovimentos.getResultList().size();
         int tamanhoPorPagina =  (whereStatemente.isEmpty())? Integer.valueOf(pageable.getPageSize()) : (int) totalRegistros ;
         tamanhoPorPagina = tamanhoPorPagina == 0 ? 1:tamanhoPorPagina;
         long totalPaginas = (totalRegistros + (tamanhoPorPagina - 1)) / tamanhoPorPagina;
