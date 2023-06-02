@@ -100,7 +100,7 @@ public class AdmEnvioRepository extends DefaultRepository<AdmEnvio, BigInteger> 
                                 "    adA.data_assinatura\n" +
                                 "from AdmEnvio ad\n" +
                                 "     join SICAPAP21.dbo.UnidadeGestora UG on UG.id = ad.unidadeGestora\n" +
-                                "     join SICAPAP21.dbo.UnidadeGestora UGorigen on UGorigen.id = ad.orgaoOrigem\n" +
+                                "     left join SICAPAP21.dbo.UnidadeGestora UGorigen on UGorigen.id = ad.orgaoOrigem\n" +
                                 "     left join AdmEnvioAssinatura1 adA on adA.idEnvio = ad.id and adA.rank = 1\n" +
                                 "where (ad.unidadeGestora in :ug or 'todos' in :ug ) \n" +
                                 "     and (ad.tipoRegistro in :TipoRegistro or -1 in :TipoRegistro )\n" +
@@ -114,6 +114,7 @@ public class AdmEnvioRepository extends DefaultRepository<AdmEnvio, BigInteger> 
                 .setParameter("status", Ststuss)
                 .setParameter("dataFim", dataFim);
         List<Object[]> list = query.getResultList();
+
         List<HashMap<String, Object>> retorno = new ArrayList<HashMap<String, Object>>();
 
         list.forEach(envio -> {
