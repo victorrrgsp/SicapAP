@@ -294,7 +294,7 @@ public class RegistroAposentadoriaRepository  extends DefaultRepository<Registro
                             "           f.codunidadegestora as cnpjEntidade,\n" +
                             "           f.nomeEntidade as nomeEntidade\n" +
                             "        from processosRecebidos a\n" +
-                            "            join SCP..PESSOAS_PROCESSO d  on d.ID_PAPEL=2 and ID_CARGO=0 and a.hcodp_pnumero=d.NUM_PROC and a.hcodp_pano = d.ANO_PROC\n" +
+                            "            join SCP..PESSOAS_PROCESSO d  on (d.ID_PAPEL=2 or ID_CARGO=0 )and a.hcodp_pnumero=d.NUM_PROC and a.hcodp_pano = d.ANO_PROC\n" +
                             "            join SCP.dbo.document c on c.dcnproc_pnumero = hcodp_pnumero and c.dcnproc_pano = hcodp_pano and c.docmt_tipo_decisao = 'D'  and docmt_tipo='RL'\n" +
                             "            join Cadun.dbo.PessoaFisica e on d.ID_PESSOA=e.Codigo\n" +
                             "            join Cadun.dbo.vwPessoaJuridica f on a.id_entidade_origem= f.id\n" +
