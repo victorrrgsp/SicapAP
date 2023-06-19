@@ -262,9 +262,6 @@ public class RegistroAposentadoriaRepository  extends DefaultRepository<Registro
         }
     }
 
-
-
-
     public List<HashMap<String,Object>> getInforProcessosEcontas(HashMap<String,Object> userInfo ){
         try{
             Query sqlProcessos=getEntityManager().createNativeQuery(
@@ -277,7 +274,7 @@ public class RegistroAposentadoriaRepository  extends DefaultRepository<Registro
                             "               id_entidade_origem\n" +
                             "        from SCP.dbo.VW_PROC_RECEBIDOS\n" +
                             "        where (\n" +
-                            "            (hdest_ldepto = :Setor) AND\n" +
+                            "            (hdest_ldepto like '%DIRAP%' ) AND\n" +
                             "            (proc_num_anexo IS NULL or proc_num_anexo =0) and\n" +
                             "            (processo_numaps IS NULL or processo_numaps =0)\n" +
                             "        ) and trim(hists_dest_resp)= :Usuario\n" +
@@ -327,7 +324,7 @@ public class RegistroAposentadoriaRepository  extends DefaultRepository<Registro
         try{
             Query sqlProcessos=getEntityManager().createNativeQuery("    with processosRecebidos as" +
                     "(select hcodp_pnumero,hcodp_pano, assunto_desc,id_entidade_origem from SCP.dbo.VW_PROC_RECEBIDOS a  " +
-                    " where ((hdest_ldepto = :setor) AND (proc_num_anexo IS NULL or proc_num_anexo =0) " +
+                    " where ((hdest_ldepto like '%DIRAP%' ) AND (proc_num_anexo IS NULL or proc_num_anexo =0) " +
                     "and (processo_numaps IS NULL or processo_numaps =0)) and trim(hists_dest_resp)= :usuario ) " +
                     "select count(1)  from " +
                     " processosRecebidos a   join     SCP..PESSOAS_PROCESSO d  on d.ID_PAPEL=2 and ID_CARGO=0 and a.hcodp_pnumero=d.NUM_PROC and a.hcodp_pano = d.ANO_PROC " +
