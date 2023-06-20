@@ -88,7 +88,7 @@ public class DocumentoAdmissaoController extends DefaultController<DocumentoAdmi
              idCastor = super.setCastorFile(file, "documentoAdmissao");
              if (idCastor == null) throw  new InvalitInsert("não conseguiu gravar o file castor. Entre em contato com o TCE!!");
             documentoAdmissao.setDocumentoCastorId(idCastor);
-            documentoAdmissao.setStatus(DocumentoAdmissao.Status.Informado.getValor());
+            documentoAdmissao.setStatus(DocumentoAdmissao.Status.INFORMADO.getValor());
             documentoAdmissao.setData_cr(LocalDateTime.now());
             ServletRequestAttributes getIp = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
             documentoAdmissao.setIp_cr(getIp.getRequest().getRemoteAddr());
@@ -104,7 +104,7 @@ public class DocumentoAdmissaoController extends DefaultController<DocumentoAdmi
     public void ExcluirDocumentoAdmissao( @PathVariable BigInteger id) {
         DocumentoAdmissao documentoAdmissao = documentoAdmissaoRepository.findById(id);
         if (documentoAdmissao != null ){
-            documentoAdmissao.setStatus(DocumentoAdmissao.Status.ExcluidoDocumento.getValor());
+            documentoAdmissao.setStatus(DocumentoAdmissao.Status.EXCLUIDO_DOCUMENTO.getValor());
             ServletRequestAttributes getIp = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
             documentoAdmissao.setIp_altr(getIp.getRequest().getRemoteAddr());
             documentoAdmissao.setUsuario_altr(User.getUser(documentoAdmissaoRepository.getRequest()).getUserName());
@@ -112,7 +112,7 @@ public class DocumentoAdmissaoController extends DefaultController<DocumentoAdmi
             documentoAdmissaoRepository.update(documentoAdmissao);
             DocumentoAdmissao novo = new DocumentoAdmissao();
             novo.setDocumentoCastorId(null);
-            novo.setStatus(DocumentoAdmissao.Status.NaoInformado.getValor());
+            novo.setStatus(DocumentoAdmissao.Status.NAO_INFORMADO.getValor());
             novo.setAdmissao(documentoAdmissao.getAdmissao());
             novo.setEditalAprovado(documentoAdmissao.getEditalAprovado());
             novo.setOpcaoDesistencia(documentoAdmissao.getOpcaoDesistencia());
@@ -129,7 +129,7 @@ public class DocumentoAdmissaoController extends DefaultController<DocumentoAdmi
         DocumentoAdmissao documentoAdmissao = documentoAdmissaoRepository.findById(id);
         if (documentoAdmissao != null ){
             documentoAdmissao.setDocumentoCastorId(null);
-            documentoAdmissao.setStatus(DocumentoAdmissao.Status.ExcluidoAprovado.getValor());
+            documentoAdmissao.setStatus(DocumentoAdmissao.Status.EXCLUIDO_APROVADO.getValor());
             documentoAdmissao.setData_altr(LocalDateTime.now());
             ServletRequestAttributes getIp = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
             documentoAdmissao.setIp_altr(getIp.getRequest().getRemoteAddr());
