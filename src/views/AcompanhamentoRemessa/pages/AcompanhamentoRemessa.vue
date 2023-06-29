@@ -26,6 +26,11 @@
 
         <b-col>
           <p align="right" class="pesquisa_select">
+            <b>Status:</b> &nbsp;
+            <!-- @charge="filtraStatus"-->
+            <b-form-select class="select-selected" v-model="formdata.statu" :options="formdata.status" >
+            </b-form-select>
+            &nbsp;
             <b>Exercicio:</b> &nbsp;
             <b-form-select class="select-selected" v-model="formdata.exercicio" :options="formdata.exercicios"
               @change="pesquisarRemessas">
@@ -51,7 +56,7 @@
 
       </div>
 
-      <b-table striped hover responsive sticky-header="450px" id="my-table" :busy="isBusy" :items="tableData"
+      <b-table striped hover responsive sticky-header="450px" id="my-table" :busy="isBusy" :items="tableData2"
         :filter="filter" :fields="columns" :filter-included-fields="['nomeEntidade']" :current-page="currentPage"
         aria-controls="my-table" small>
         <template #table-busy>
@@ -84,7 +89,7 @@
       </div>
     </b-card>
 
-    <!--
+              <!--
                       if(item.contAssinaturas > 2){
                               return 'Assinado'
                         }
@@ -109,7 +114,7 @@
                           }
 
                   },
- -->
+            -->
 
     <b-icon class="h6 mb-2" icon="check-square" variant="success"> </b-icon>
     &nbsp; &nbsp;Assinado &nbsp; &nbsp; &nbsp;
@@ -170,6 +175,7 @@ export default {
   data() {
     return {
       unidades: [],
+      tableData2:[],
       isBusy: true,
       perPage: 325,
       currentPage: 1,
@@ -261,6 +267,13 @@ export default {
       ],
       formdata: {
         exercicio: 2021,
+        status:[
+              "Todos",
+              "Assinado",
+              "Pendente de assinatura", 
+              "Aguardando Envio"
+        ],
+        statu:"Todos",
         exercicios: [
           { value: "0", text: "Todos" },
           { value: "2021", text: "2021" },
@@ -284,6 +297,8 @@ export default {
   },
 
   mounted() {
+    // console.log("🚀 ~ file: AcompanhamentoRemessa.vue:317 ~ mounted ~ this.$store.remessas.tableData:", this.$store.remessas.tableData)
+    //this.formdata.statu = this.formdata.status[0] 
     this.isBusy = false;
     this.ActionFindExercicio().then();
     // this.pesquisar();
@@ -295,11 +310,14 @@ export default {
       this.unidades = resp;
     });
     this.filterSize();
+    // this.tableData = this.$store.remessas.tableData
+    // console.log("🚀 ~ file: AcompanhamentoRemessa.vue:315 ~ mounted ~ this.$store.remessas.tableData:", this.$store.remessas.tableData)
     //  this.ActionFind(),
     //  setTimeout(() =>{// aguarda com spinner antes da pesquisa aparecer na pesquisa inicial
     //       this.isBusy = false
     //       }, 2.0*2000)
   },
+    
   computed: {
     rows() {
       return this.tableData.length;
@@ -331,7 +349,6 @@ export default {
         this.formdata.exercicio = this.formdata.exercicios[0].value;
       });
     },
-    
     pesquisarRemessas() {
       api.get("/remessa/" + this.formdata.exercicio).then((resp) => {
 
@@ -348,6 +365,41 @@ export default {
         this.formdata.remessa = this.formdata.remessas[this.formdata.remessas.length-2].value;
       });
       this.filterSize();
+    },
+    filtraStatus(){
+      // console.log("🚀 ~ file: AcompanhamentoRemessa.vue:364 ~ filtraStatus ~ tableData:", this.tableData)
+      console.log("🚀 ~ file: AcompanhamentoRemessa.vue:364 ~ filtraStatus ~ this.formdata.statu:", this.formdata.statu)
+      let statu = this.formdata.statu;
+      this.tableData2 = this.$store.remessas.tableData.filter(function (x) {
+        console.log("🚀 ~ file: AcompanhamentoRemessa.vue:366 ~ x:", x)
+        let retorno = false
+        switch (statu){
+          case "Todos":
+          console.log("Todos")
+          console.log("Todos:true")
+            retorno = true
+            break
+          case "Assinado":
+            console.log("Assinado")
+            if (x.contAssinaturas > 2) {
+              console.log("Assinado:true")
+              retorno = true
+            }
+            break;
+          case "Pendente de assinatura":
+          console.log("Pendente de assinatura")
+          if (x.contAssinaturas >= 1 && x.contAssinaturas <= 2) {
+              console.log("Pendente de assinatura:true")
+              retorno = true
+            }
+            break;
+          default:
+            break;
+            
+        }
+        console.log("🚀 ~ file: AcompanhamentoRemessa.vue:394 ~ retorno:", retorno)
+        return retorno 
+      })
     },
     iconStatusTitle(item) {
       if (item.contAssinaturas > 2) {
@@ -383,7 +435,6 @@ export default {
         return "x-circle";
       }
     },
-
     iconStatusVariant(item) {
       if (item.contAssinaturas > 2) {
         return "success";
@@ -414,14 +465,14 @@ export default {
         return true;
       }
     },
-
     async pesquisarRemesssa() {
-      console.log(this);
       this.isBusy = !this.isBusy; //loading
       await this.ActionFindByExercicio(this.formdata).then({});
+      this.tableData = this.$store.remessas.tableData
       this.isBusy = false;
       this.filter = this.filterform;
       this.filterSize();
+      this.filtraStatus();
     },
     async pesquisar() {
       this.isBusy = !this.isBusy; //loading
@@ -533,7 +584,7 @@ export default {
       api.get("/unidadeGestora/todos").then((resp) => {
         //commit('getUnidades', resp.data)
         return resp.data;
-      }),
+    }),
 
     buscarDadoRemessa(chave) {
       this.findGestor(chave);
