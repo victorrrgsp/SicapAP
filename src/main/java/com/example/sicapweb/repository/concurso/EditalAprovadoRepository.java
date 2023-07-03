@@ -140,10 +140,10 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
                     ")\n" +
                     "SELECT \n" +
                     "    CASE\n" +
-                    "        WHEN qt_desistencia_desclasificado > 0 THEN 'Desclassificado'\n" +
-                    "        WHEN qt_desistenciaProrogacao > 0 THEN 'Prorrogado'\n" +
-                    "        WHEN documentoAdmissaoCount > 0 THEN 'NOMEADO E ADMITIDO'\n" +
-                    "        ELSE 'Aguardando Anexos'\n" +
+                    "        WHEN qt_desistencia_desclasificado > 0 THEN 'Inapto'\n" +
+                    "        WHEN qt_desistenciaProrogacao > 0      THEN 'Em suspensão'\n" +
+                    "        WHEN documentoAdmissaoCount > 0        THEN 'Admitido'\n" +
+                    "        ELSE 'Apto para envio' \n" +
                     "    END AS status  --,*\n" +
                     "\n" +
                     "FROM count_opcaoDesistencia_and_documentoAdmissaoCount;").setParameter("idAprovado", listAprovados.get(i).getId()).getSingleResult();
