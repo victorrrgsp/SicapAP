@@ -155,6 +155,7 @@ public class AdmissaoEnvioRepository extends DefaultRepository<AdmissaoEnvio, Bi
                             "       COUNT(CASE\n" +
                             "                WHEN da.opcaoDesistencia = 3 THEN null\n" +
                             "                WHEN da.opcaoDesistencia = 6 THEN null\n" +
+                            "                WHEN da.opcaoDesistencia is null THEN null\n" +
                             "                ELSE 1\n" +
                             "            END) AS qt_desistencia_desclasificado" +
                             "from dbo.AdmissaoEnvio pa\n" +
