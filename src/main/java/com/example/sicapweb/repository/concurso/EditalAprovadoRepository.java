@@ -83,7 +83,6 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
                         "i.idUnidadeGestora=b.idUnidadeGestora where 1=1 " + search).getSingleResult();
     }
 
-
     public PaginacaoUtil<EditalAprovadoConcurso> buscaPaginadaAprovadosDto(Pageable pageable, String searchParams, Integer tipoParams) {
 
         int pagina = Integer.valueOf(pageable.getPageNumber());
@@ -120,33 +119,26 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
             editalAprovadoConcurso.setCpf(listAprovados.get(i).getCpf());
             editalAprovadoConcurso.setEditalAprovado(listAprovados.get(i));
             String situacao = (String) getEntityManager().createNativeQuery(
-                    "WITH count_opcaoDesistencia_and_documentoAdmissaoCount AS (\n" +
-                    "    select\n" +
-                    "        COUNT(CASE\n" +
-                    "                    WHEN da.opcaoDesistencia = 3 THEN 3\n" +
-                    "                    WHEN da.opcaoDesistencia = 6 THEN 6\n" +
-                    "                    ELSE NULL\n" +
-                    "                END) AS qt_desistenciaProrogacao,\n" +
-                    "        COUNT(CASE\n" +
-                    "                    WHEN da.opcaoDesistencia = 3 THEN null\n" +
-                    "                    WHEN da.opcaoDesistencia = 6 THEN null\n" +
-                    "                    WHEN da.opcaoDesistencia is null THEN null\n" +
-                    "                    ELSE 1\n" +
-                    "                END) AS qt_desistencia_desclasificado,\n" +
-                    "        COUNT(1) AS documentoAdmissaoCount\n" +
-                    "    from DocumentoAdmissao da\n" +
-                    "    where status > 0 \n" +
-                    "    and da.idAprovado = :idAprovado \n" +
-                    ")\n" +
-                    "SELECT \n" +
-                    "    CASE\n" +
-                    "        WHEN qt_desistencia_desclasificado > 0 THEN 'Inapto'\n" +
-                    "        WHEN qt_desistenciaProrogacao > 0      THEN 'Em suspensão'\n" +
-                    "        WHEN documentoAdmissaoCount > 0        THEN 'Admitido'\n" +
-                    "        ELSE 'Apto para envio' \n" +
-                    "    END AS status  --,*\n" +
-                    "\n" +
-                    "FROM count_opcaoDesistencia_and_documentoAdmissaoCount;").setParameter("idAprovado", listAprovados.get(i).getId()).getSingleResult();
+                    "SELECT\n" +
+                            "    CASE\n" +
+                            "        WHEN COUNT(CASE\n" +
+                            "                    WHEN da.opcaoDesistencia = 3 THEN null\n" +
+                            "                    WHEN da.opcaoDesistencia = 6 THEN null\n" +
+                            "                    WHEN da.opcaoDesistencia is null THEN null\n" +
+                            "                    ELSE 1\n" +
+                            "                END)  > 0 THEN 'Inapto'\n" +
+                            "        WHEN COUNT(CASE\n" +
+                            "                    WHEN da.opcaoDesistencia = 3 THEN 3\n" +
+                            "                    WHEN da.opcaoDesistencia = 6 THEN 6\n" +
+                            "                    ELSE NULL\n" +
+                            "                END) > 0 THEN 'Em suspensão'\n" +
+                            "        WHEN COUNT(1) > 0 THEN 'Admitido'\n" +
+                            "        ELSE 'Apto para envio'\n" +
+                            "    END AS status\n" +
+                            " from DocumentoAdmissao da\n" +
+                            "    where status > 0\n" +
+                            "    and da.idAprovado = :idAprovado\n" +
+                            "    --GROUP BY da.idAprovado;").setParameter("idAprovado", listAprovados.get(i).getId()).getSingleResult();
             //TODO refatorar pra fazer em uma unica consulta no banco de dados
             editalAprovadoConcurso.setSituacao( situacao );
             listaAprovadosDto.add(editalAprovadoConcurso);
@@ -168,7 +160,6 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
                 .setParameter("ug", User.getUser(super.request).getUnidadeGestora().getId());
         return (Integer) query.getSingleResult();
     }
-
 
     public EditalAprovado buscarAprovadoPorCpf(String cpf) {
         try{
@@ -217,7 +208,6 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
             return null;
         }
     }
-
 
     public List<Map<String, Object>> buscarInfoReciboAdmissao(Integer numeroProcesso, Integer anoProcesso) {
 
