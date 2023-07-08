@@ -221,13 +221,15 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
     }
 
     public List<Object> getProcessoApEcontas(String tipo, String cpf, String cnpj) {
+        var papel = tipo.equals("77") ? 14 : 2;
+
         try {
             Query query = getEntityManager().createNativeQuery("" +
                     "SELECT p.processo_numero, " +
                     "       p.processo_ano " +
                     "FROM SCP..PESSOAS_PROCESSO pp " +
                     "         INNER JOIN SCP..processo p ON " +
-                    "    pp.NUM_PROC = p.processo_numero AND pp.ANO_PROC = p.processo_ano " +
+                    "    pp.NUM_PROC = p.processo_numero AND pp.ANO_PROC = p.processo_ano AND pp.ID_PAPEL = :papel " +
                     "         INNER JOIN SCP..assunto a on a.assunto_classe_assunto = p.processo_assunto_classe_assunto " +
                     "    and a.assunto_codigo = p.processo_assunto_codigo " +
                     "    and a.id = :tipo " +
@@ -239,6 +241,7 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
             query.setParameter("tipo", tipo);
             query.setParameter("cpf", cpf);
             query.setParameter("cnpj", cnpj);
+            query.setParameter("papel", papel);
 
             return buscarSQL(query, "p.processo_numero, p.processo_ano");
         } catch (Exception e) {
