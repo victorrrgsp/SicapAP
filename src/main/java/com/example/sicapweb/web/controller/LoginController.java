@@ -21,11 +21,17 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import okhttp3.RequestBody;
 import okhttp3.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisPoolConfig;
+import redis.clients.jedis.exceptions.JedisException;
 
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
@@ -34,10 +40,13 @@ import java.security.Key;
 import java.sql.Date;
 import java.text.ParseException;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/tcetouser")
 public class LoginController extends DefaultController<Login> {
+
+    private static RedisConnectionFactory redisConnectionFactory;
 
     @Autowired
     private Config config;
@@ -69,6 +78,7 @@ public class LoginController extends DefaultController<Login> {
             config.jedis.del(user.replace("=", ""));
             throw new ValidationException("Sessão inválida");
         }
+        config.jedis.expire(user.replace("=", ""), 900L);
         Session.usuarioLogado = userSession;
         return ResponseEntity.ok().body(true);
     }
@@ -189,7 +199,6 @@ public class LoginController extends DefaultController<Login> {
         }
 
         return ResponseEntity.ok().body("SemPermissao");
-
     }
 
     @CrossOrigin
