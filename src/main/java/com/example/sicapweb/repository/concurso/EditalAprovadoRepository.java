@@ -5,6 +5,7 @@ import com.example.sicapweb.model.EditalAprovadoConcurso;
 import com.example.sicapweb.repository.DefaultRepository;
 import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
+import com.example.sicapweb.util.StaticMethods;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
@@ -16,10 +17,10 @@ import java.util.*;
 
 @Repository
 public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, BigInteger> {
+    
     public EditalAprovadoRepository(EntityManager em) {
         super(em);
     }
-
 
     public String getSearch(String searchParams, Integer tipoParams) {
         String search = "";
@@ -83,7 +84,7 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
                         "i.idUnidadeGestora=b.idUnidadeGestora where 1=1 " + search).getSingleResult();
     }
 
-    public PaginacaoUtil<EditalAprovadoConcurso> buscaPaginadaAprovadosDto(Pageable pageable, String searchParams, Integer tipoParams) {
+    public PaginacaoUtil<HashMap<String, Object>> buscaPaginadaAprovadosDto(Pageable pageable, String searchParams, Integer tipoParams) {
 
         int pagina = Integer.valueOf(pageable.getPageNumber());
         int tamanho = Integer.valueOf(pageable.getPageSize());
@@ -92,58 +93,60 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
 
         var query  = getEntityManager()
                 .createNativeQuery(
-                        "with  Admissao1 as " +
-                        "(select a.* from Admissao a join InfoRemessa i on a.chave = i.chave and i.idUnidadeGestora=:ug and a.tipoAdmissao=1 ), " +
-                        "  Servidor1 as " +
-                        "(select a.* from Servidor a join InfoRemessa i on a.chave = i.chave and i.idUnidadeGestora=:ug )," +
-                        "      Aprovado as " +
-                        "(select a.* from EditalAprovado a join InfoRemessa i on a.chave = i.chave and i.idUnidadeGestora=:ug )" +
-                        " " +
-                        "select distinct a.* from Aprovado  a join EditalVaga b on a.idEditalVaga = b.id where (select count(1) from  Admissao1 ad join Servidor1 s  on  ad.idServidor = s.id and s.cpfServidor = a.cpf )=0  " + 
-                        search + 
-                        " ORDER BY " + campo, EditalAprovado.class);
-        List<EditalAprovado> listAprovados =  query.setParameter("ug", User.getUser(super.request).getUnidadeGestora().getId())
+                                " with Admissao1 as(select a.*\n" +
+                                "                   from Admissao a\n" +
+                                "                            join InfoRemessa i\n" +
+                                "                                 on a.chave = i.chave and i.idUnidadeGestora = :ug and a.tipoAdmissao = 1),\n" +
+                                "     Servidor1 as(select a.*\n" +
+                                "                   from Servidor a\n" +
+                                "                            join InfoRemessa i on a.chave = i.chave and i.idUnidadeGestora = :ug),\n" +
+                                "     Aprovado  as(select a.*\n" +
+                                "                  from EditalAprovado a\n" +
+                                "                           join InfoRemessa i on a.chave = i.chave and i.idUnidadeGestora = :ug),\n" +
+                                "    situacao as (\n" +
+                                "        SELECT\n" +
+                                "            CASE\n" +
+                                "                WHEN COUNT(CASE\n" +
+                                "                            WHEN da.opcaoDesistencia = 3 THEN null\n" +
+                                "                            WHEN da.opcaoDesistencia = 6 THEN null\n" +
+                                "                            WHEN da.opcaoDesistencia is null THEN null\n" +
+                                "                            ELSE 1\n" +
+                                "                        END)  > 0 THEN 'Inapto'\n" +
+                                "                WHEN COUNT(CASE\n" +
+                                "                            WHEN da.opcaoDesistencia = 3 THEN 3\n" +
+                                "                            WHEN da.opcaoDesistencia = 6 THEN 6\n" +
+                                "                            ELSE NULL\n" +
+                                "                        END) > 0 THEN 'Em suspensão'\n" +
+                                "                WHEN COUNT(1) > 0 THEN 'Admitido'\n" +
+                                "                ELSE 'Apto para envio'\n" +
+                                "            END AS situacao,\n" +
+                                "            ap.id as idAprovado\n" +
+                                "         from DocumentoAdmissao da\n" +
+                                "         join Aprovado ap on da.idAprovado = ap.id\n" +
+                                "            where status > 0\n" +
+                                "            GROUP BY da.idAprovado,ap.id\n" +
+                                "    )\n" +
+                                "   select distinct a.*,s.situacao,ed.numeroEdital,ca.nomeCargo as nomeCargoNome,b.tipoConcorrencia,ca.codigoCargo\n"+
+                                "   from Aprovado a\n" +
+                                "         join EditalVaga b on a.idEditalVaga = b.id\n" +
+                                "         join situacao s on s.idAprovado = a.id\n" +
+                                "         join Edital ed on b.idEdital = ed.id\n" +
+                                "         join Cargo ca on b.idCargo = ca.id\n" +
+                                "         join CargoNome can on ca.idCargoNome = can.id\n" +
+                                "   where ( select count(1)\n" +
+                                "        from Admissao1 ad\n" +
+                                "                join Servidor1 s on ad.idServidor = s.id and s.cpfServidor = a.cpf\n" +
+                                "        ) = 0" +
+                                search + 
+                                " ORDER BY " + campo);
+        var listAprovados = StaticMethods.getHashmapFromQuery(query.setParameter("ug", User.getUser(super.request).getUnidadeGestora().getId())
                                                         .setFirstResult(pagina)
-                                                        .setMaxResults(tamanho)
-                                                        .getResultList();
+                                                        .setMaxResults(tamanho));
 
-        long totalRegistros = countAprovadosSemAdmissao(search);
+        long totalRegistros = query.getResultList().size();
         long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
-        List<EditalAprovadoConcurso> listaAprovadosDto = new ArrayList<EditalAprovadoConcurso>();
-        for (Integer i = 0; i < listAprovados.size(); i++) {
-            EditalAprovadoConcurso editalAprovadoConcurso = new EditalAprovadoConcurso();
-            editalAprovadoConcurso.setNome(listAprovados.get(i).getNome());
-            editalAprovadoConcurso.setNumeroEdital(listAprovados.get(i).getNumeroEdital());
-            editalAprovadoConcurso.setClassificacao(listAprovados.get(i).getClassificacao());
-            editalAprovadoConcurso.setCodigoVaga(listAprovados.get(i).getCodigoVaga());
-            editalAprovadoConcurso.setCpf(listAprovados.get(i).getCpf());
-            editalAprovadoConcurso.setEditalAprovado(listAprovados.get(i));
-            String situacao = (String) getEntityManager().createNativeQuery(
-                    "SELECT\n" +
-                            "    CASE\n" +
-                            "        WHEN COUNT(CASE\n" +
-                            "                    WHEN da.opcaoDesistencia = 3 THEN null\n" +
-                            "                    WHEN da.opcaoDesistencia = 6 THEN null\n" +
-                            "                    WHEN da.opcaoDesistencia is null THEN null\n" +
-                            "                    ELSE 1\n" +
-                            "                END)  > 0 THEN 'Inapto'\n" +
-                            "        WHEN COUNT(CASE\n" +
-                            "                    WHEN da.opcaoDesistencia = 3 THEN 3\n" +
-                            "                    WHEN da.opcaoDesistencia = 6 THEN 6\n" +
-                            "                    ELSE NULL\n" +
-                            "                END) > 0 THEN 'Em suspensão'\n" +
-                            "        WHEN COUNT(1) > 0 THEN 'Admitido'\n" +
-                            "        ELSE 'Apto para envio'\n" +
-                            "    END AS status\n" +
-                            " from DocumentoAdmissao da\n" +
-                            "    where status > 0\n" +
-                            "    and da.idAprovado = :idAprovado\n" +
-                            "    --GROUP BY da.idAprovado;").setParameter("idAprovado", listAprovados.get(i).getId()).getSingleResult();
-            //TODO refatorar pra fazer em uma unica consulta no banco de dados
-            editalAprovadoConcurso.setSituacao( situacao );
-            listaAprovadosDto.add(editalAprovadoConcurso);
-        }
-        return new PaginacaoUtil<>(tamanho, pagina, totalPaginas, totalRegistros, listaAprovadosDto);
+
+        return new PaginacaoUtil<>(tamanho, pagina, totalPaginas, totalRegistros, listAprovados);
     }
 
     public Integer countAprovadosSemAdmissao(String search) {
@@ -253,4 +256,5 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
             throw new RuntimeException("problema ao gerar o recibo dos aprovados!!");
         }
     }
+
 }

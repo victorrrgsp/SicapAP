@@ -47,8 +47,8 @@ public class EditalAdmissaoController {
 
     @CrossOrigin
     @GetMapping(path="/aprovados/{searchParams}/{tipoParams}/pagination")
-    public ResponseEntity<PaginacaoUtil<EditalAprovadoConcurso>> listaprov(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
-        PaginacaoUtil<EditalAprovadoConcurso> paginacaoUtil = editalAprovadoRepository.buscaPaginadaAprovadosDto(pageable,searchParams,tipoParams);
+    public ResponseEntity<PaginacaoUtil<?>> listaprov(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
+        PaginacaoUtil<?> paginacaoUtil = editalAprovadoRepository.buscaPaginadaAprovadosDto(pageable,searchParams,tipoParams);
         return ResponseEntity.ok().body(paginacaoUtil);
     }
 
