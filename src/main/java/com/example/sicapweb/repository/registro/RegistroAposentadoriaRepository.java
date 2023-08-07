@@ -311,7 +311,6 @@ public class RegistroAposentadoriaRepository  extends DefaultRepository<Registro
                             "    join processos pss on\n" +
                             "        env.numeroProcesso = pss.numeroProcesso and\n" +
                             "        env.anoProcesso    = pss.anoProcesso")
-                    .setParameter("Setor",userInfo.get("setor"))
                     .setParameter("Usuario",userInfo.get("loginUsuario"));
             return  StaticMethods.getHashmapFromQuery(sqlProcessos);
         } catch (RuntimeException e){
@@ -332,7 +331,6 @@ public class RegistroAposentadoriaRepository  extends DefaultRepository<Registro
                     "join Cadun.dbo.PessoaFisica e on d.ID_PESSOA=e.Codigo " +
                     "join Cadun.dbo.vwPessoaJuridica f on a.id_entidade_origem= f.id " +
                     "  where  e.cpf = :cpf and f.codunidadegestora = :cnpj and assunto_desc = :assunto ")
-                    .setParameter("setor",userInfo.get("setor"))
                     .setParameter("usuario",userInfo.get("loginUsuario"))
                     .setParameter("cpf",infoMovimentacao.get("cpf"))
                     .setParameter("cnpj",infoMovimentacao.get("cnpjUnidadeGestora"))
