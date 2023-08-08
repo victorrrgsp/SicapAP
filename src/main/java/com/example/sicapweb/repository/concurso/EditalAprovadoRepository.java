@@ -126,7 +126,18 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
                                 "            where status > 0\n" +
                                 "            GROUP BY da.idAprovado,ap.id\n" +
                                 "    )\n" +
-                                "   select distinct a.*,s.situacao,ed.numeroEdital,ca.nomeCargo as nomeCargoNome,b.tipoConcorrencia,ca.codigoCargo\n"+
+                                "   select distinct a.id,\n"+
+                                "    classificacao,\n"+
+                                "    cpf,\n"+
+                                "    a.nome,\n"+
+                                "    numeroInscricao,\n"+
+                                "    idEditalVaga,\n"+
+                                "    a.chave,\n"+
+                                "    s.situacao,\n"+
+                                "    ed.numeroEdital,\n"+
+                                "    ca.nomeCargo as nomeCargoNome,\n"+
+                                "    b.tipoConcorrencia,\n"+
+                                "    ca.codigoCargo"+
                                 "   from Aprovado a\n" +
                                 "         join EditalVaga b on a.idEditalVaga = b.id\n" +
                                 "         join situacao s on s.idAprovado = a.id\n" +

@@ -4,6 +4,7 @@ package com.example.sicapweb.web.controller.ap.concurso;
 import br.gov.to.tce.model.ap.concurso.documento.DocumentoAdmissao;
 import com.example.sicapweb.exception.InvalitInsert;
 import com.example.sicapweb.repository.concurso.DocumentoAdmissaoRepository;
+import com.example.sicapweb.repository.concurso.EditalAprovadoRepository;
 import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
 import com.example.sicapweb.web.controller.DefaultController;
@@ -28,6 +29,8 @@ public class DocumentoAdmissaoController extends DefaultController<DocumentoAdmi
 
     @Autowired
     private DocumentoAdmissaoRepository documentoAdmissaoRepository;
+    @Autowired
+    private EditalAprovadoRepository editalAprovadoRepository;
 
 
     @CrossOrigin
@@ -43,6 +46,17 @@ public class DocumentoAdmissaoController extends DefaultController<DocumentoAdmi
     public ResponseEntity<List<DocumentoAdmissao>> AddDocumentoAprovado(@RequestBody List<DocumentoAdmissao> lstdocumentoAdmissao) {
         for(Integer i= 0; i < lstdocumentoAdmissao.size(); i++){
             DocumentoAdmissao a = (DocumentoAdmissao) lstdocumentoAdmissao.get(i);
+            if(a.getOpcaoDesistencia().equals(DocumentoAdmissao.OpcaoDesistencia.FINAL_DE_FILA.getValor()) ){
+
+                if (a.getFinalFila() == null || a.getFinalFila() == 0) {
+                    throw new InvalitInsert("Informe uma posicao de final da fila valida");
+                }else{
+                    var aprovado = a.getEditalAprovado();
+                    aprovado.setClassificacao(a.getFinalFila()+"");
+                    aprovado.setId(null);
+                    editalAprovadoRepository.save(aprovado);
+                }
+            }
             documentoAdmissaoRepository.save(a);
         }
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(lstdocumentoAdmissao.getClass()).toUri();
@@ -86,7 +100,7 @@ public class DocumentoAdmissaoController extends DefaultController<DocumentoAdmi
         String idCastor=null;
         if (documentoAdmissao != null ){
              idCastor = super.setCastorFile(file, "documentoAdmissao");
-             if (idCastor == null) throw  new InvalitInsert("não conseguiu gravar o file castor. Entre em contato com o TCE!!");
+             if (idCastor == null) throw  new InvalitInsert("nÃ£o conseguiu gravar o file castor. Entre em contato com o TCE!!");
             documentoAdmissao.setDocumentoCastorId(idCastor);
             documentoAdmissao.setStatus(DocumentoAdmissao.Status.INFORMADO.getValor());
             documentoAdmissao.setData_cr(LocalDateTime.now());
