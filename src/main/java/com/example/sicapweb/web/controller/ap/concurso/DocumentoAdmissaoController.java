@@ -1,6 +1,7 @@
 package com.example.sicapweb.web.controller.ap.concurso;
 
 
+import br.gov.to.tce.model.ap.concurso.EditalAprovado;
 import br.gov.to.tce.model.ap.concurso.documento.DocumentoAdmissao;
 import com.example.sicapweb.exception.InvalitInsert;
 import com.example.sicapweb.repository.concurso.DocumentoAdmissaoRepository;
@@ -54,6 +55,8 @@ public class DocumentoAdmissaoController extends DefaultController<DocumentoAdmi
                     var aprovado = a.getEditalAprovado();
                     aprovado.setClassificacao(a.getFinalFila()+"");
                     aprovado.setId(null);
+                    EditalAprovado mesmaclassifmesmavaga = editalAprovadoRepository.buscarAprovadoPorClassificacaoConc(aprovado.getEditalVaga().getId(),aprovado.getClassificacao());
+                    if (mesmaclassifmesmavaga!=null){throw new InvalitInsert("Outro aprovado ja se encontra na mesma classificação e tipo de concorrencia para mesma vaga!");}
                     editalAprovadoRepository.save(aprovado);
                 }
             }
