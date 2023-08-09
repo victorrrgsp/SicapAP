@@ -1,6 +1,8 @@
 package com.example.sicapweb.repository.concurso;
 
 import br.gov.to.tce.model.ap.concurso.EditalAprovado;
+import br.gov.to.tce.model.ap.concurso.EditalVaga;
+
 import com.example.sicapweb.model.EditalAprovadoConcurso;
 import com.example.sicapweb.repository.DefaultRepository;
 import com.example.sicapweb.security.User;
@@ -12,6 +14,8 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
+
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -126,18 +130,20 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
                                 "            where status > 0\n" +
                                 "            GROUP BY da.idAprovado,ap.id\n" +
                                 "    )\n" +
-                                "   select distinct a.id,\n"+
-                                "    classificacao,\n"+
-                                "    cpf,\n"+
+                                "   select distinct     \n"+
+                                "    a.id,\n"+
+                                "    a.classificacao,\n"+
+                                "    a.cpf,\n"+
                                 "    a.nome,\n"+
-                                "    numeroInscricao,\n"+
-                                "    idEditalVaga,\n"+
+                                "    a.numeroInscricao,\n"+
+                                "    a.idEditalVaga,\n"+
                                 "    a.chave,\n"+
                                 "    s.situacao,\n"+
                                 "    ed.numeroEdital,\n"+
                                 "    ca.nomeCargo as nomeCargoNome,\n"+
                                 "    b.tipoConcorrencia,\n"+
-                                "    ca.codigoCargo"+
+                                "    b.codigoVaga,\n"+
+                                "    ca.codigoCargo \n"+
                                 "   from Aprovado a\n" +
                                 "         join EditalVaga b on a.idEditalVaga = b.id\n" +
                                 "         join situacao s on s.idAprovado = a.id\n" +
@@ -153,7 +159,22 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
         var listAprovados = StaticMethods.getHashmapFromQuery(query.setParameter("ug", User.getUser(super.request).getUnidadeGestora().getId())
                                                         .setFirstResult(pagina)
                                                         .setMaxResults(tamanho));
+        listAprovados.forEach(Documentoaprovado -> {
+            //var aprovado = new EditalAprovado();
+            var aprovado = new EditalAprovado();
+            aprovado.setId(((BigDecimal) Documentoaprovado.get("id")).toBigInteger());
+            aprovado.setClassificacao((String) Documentoaprovado.get("classificacao"));
+            aprovado.setCpf((String) Documentoaprovado.get("cpf"));
+            aprovado.setNome((String) Documentoaprovado.get("nome"));
+            aprovado.setNumeroInscricao((String) Documentoaprovado.get("numeroInscricao"));
+            aprovado.setNumeroEdital((String) Documentoaprovado.get("numeroEdital"));
+            aprovado.setCodigoVaga((String) Documentoaprovado.get("codigoVaga"));
 
+            //aprovado.setTipoConcorrencia((String) Documentoaprovado.get("tipoConcorrencia"));
+            // aprovado.setChave((String) Documentoaprovado.get("chave"));
+            // aprovado.setSituacao((String) Documentoaprovado.get("situacao"));
+            Documentoaprovado.put("editalAprovado", aprovado);
+        });
         long totalRegistros = query.getResultList().size();
         long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
 
@@ -208,6 +229,7 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
     }
 
     public EditalAprovado buscarAprovadoPorClassificacaoConc(BigInteger idvaga, String Classificacao) {
+        //todo mudar para codigo vaga oa inves de id
         try{
         return (EditalAprovado) getEntityManager().createNativeQuery(
                 "SELECT  ea.* " +
