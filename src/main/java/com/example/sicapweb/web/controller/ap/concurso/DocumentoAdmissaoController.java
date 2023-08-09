@@ -3,9 +3,11 @@ package com.example.sicapweb.web.controller.ap.concurso;
 
 import br.gov.to.tce.model.ap.concurso.EditalAprovado;
 import br.gov.to.tce.model.ap.concurso.documento.DocumentoAdmissao;
+
 import com.example.sicapweb.exception.InvalitInsert;
 import com.example.sicapweb.repository.concurso.DocumentoAdmissaoRepository;
 import com.example.sicapweb.repository.concurso.EditalAprovadoRepository;
+import com.example.sicapweb.repository.concurso.EditalVagaRepository;
 import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
 import com.example.sicapweb.web.controller.DefaultController;
@@ -32,6 +34,8 @@ public class DocumentoAdmissaoController extends DefaultController<DocumentoAdmi
     private DocumentoAdmissaoRepository documentoAdmissaoRepository;
     @Autowired
     private EditalAprovadoRepository editalAprovadoRepository;
+    @Autowired
+    private EditalVagaRepository editalVagaRepository;
 
 
     @CrossOrigin
@@ -55,7 +59,8 @@ public class DocumentoAdmissaoController extends DefaultController<DocumentoAdmi
                     var aprovado = a.getEditalAprovado();
                     aprovado.setClassificacao(a.getFinalFila()+"");
                     aprovado.setId(null);
-                    EditalAprovado mesmaclassifmesmavaga = editalAprovadoRepository.buscarAprovadoPorClassificacaoConc(aprovado.getEditalVaga().getId(),aprovado.getClassificacao());
+                    var editalvaga = editalVagaRepository.buscarVagasPorCodigo(a.getEditalAprovado().getCodigoVaga());
+                    EditalAprovado mesmaclassifmesmavaga = editalAprovadoRepository.buscarAprovadoPorClassificacaoConc(editalvaga.getId(),aprovado.getClassificacao());
                     if (mesmaclassifmesmavaga!=null){throw new InvalitInsert("Outro aprovado ja se encontra na mesma classificação e tipo de concorrencia para mesma vaga!");}
                     editalAprovadoRepository.save(aprovado);
                 }
