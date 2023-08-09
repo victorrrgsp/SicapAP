@@ -169,6 +169,10 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
             aprovado.setNumeroInscricao((String) Documentoaprovado.get("numeroInscricao"));
             aprovado.setNumeroEdital((String) Documentoaprovado.get("numeroEdital"));
             aprovado.setCodigoVaga((String) Documentoaprovado.get("codigoVaga"));
+            var editalVaga = new EditalVaga();
+            editalVaga.setId(((BigDecimal) Documentoaprovado.get("idEditalVaga")).toBigInteger());
+            
+            aprovado.setEditalVaga(editalVaga);
 
             //aprovado.setTipoConcorrencia((String) Documentoaprovado.get("tipoConcorrencia"));
             // aprovado.setChave((String) Documentoaprovado.get("chave"));

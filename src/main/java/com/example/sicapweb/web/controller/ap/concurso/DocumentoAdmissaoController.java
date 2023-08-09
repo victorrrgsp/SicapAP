@@ -59,7 +59,10 @@ public class DocumentoAdmissaoController extends DefaultController<DocumentoAdmi
                     var aprovado = a.getEditalAprovado();
                     aprovado.setClassificacao(a.getFinalFila()+"");
                     aprovado.setId(null);
-                    var editalvaga = editalVagaRepository.buscarVagasPorCodigo(a.getEditalAprovado().getCodigoVaga());
+                    
+                    var editalvaga = editalVagaRepository.findById(aprovado.getEditalVaga().getId());
+                    aprovado.setEditalVaga(editalvaga);
+                    //var editalvaga = editalVagaRepository.buscarVagasPorCodigo(a.getEditalAprovado().getCodigoVaga());
                     EditalAprovado mesmaclassifmesmavaga = editalAprovadoRepository.buscarAprovadoPorClassificacaoConc(editalvaga.getId(),aprovado.getClassificacao());
                     if (mesmaclassifmesmavaga!=null){throw new InvalitInsert("Outro aprovado ja se encontra na mesma classificação e tipo de concorrencia para mesma vaga!");}
                     editalAprovadoRepository.save(aprovado);
