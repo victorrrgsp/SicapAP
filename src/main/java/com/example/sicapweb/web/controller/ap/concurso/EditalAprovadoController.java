@@ -71,7 +71,7 @@ public class EditalAprovadoController extends DefaultController<EditalAprovado> 
             }
 
         }
-            else if (mesmaclassifmesmavaga!=null){throw new InvalitInsert("Outro aprovado ja se encontra na mesma classificação e tipo de concorrencia para mesma vaga!");}
+        else if (mesmaclassifmesmavaga!=null){throw new InvalitInsert("Outro aprovado ja se encontra na mesma classificação e tipo de concorrencia para mesma vaga!");}
         editalAprovadoRepository.save(editalAprovado);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(editalAprovado.getId()).toUri();
         return ResponseEntity.created(uri).body(editalAprovado);
