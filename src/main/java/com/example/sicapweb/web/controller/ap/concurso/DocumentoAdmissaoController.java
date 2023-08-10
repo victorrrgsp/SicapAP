@@ -51,24 +51,32 @@ public class DocumentoAdmissaoController extends DefaultController<DocumentoAdmi
     public ResponseEntity<List<DocumentoAdmissao>> AddDocumentoAprovado(@RequestBody List<DocumentoAdmissao> lstdocumentoAdmissao) {
         for(Integer i= 0; i < lstdocumentoAdmissao.size(); i++){
             DocumentoAdmissao a = (DocumentoAdmissao) lstdocumentoAdmissao.get(i);
+
             if(a.getOpcaoDesistencia().equals(DocumentoAdmissao.OpcaoDesistencia.FINAL_DE_FILA.getValor()) ){
 
                 if (a.getFinalFila() == null || a.getFinalFila() == 0) {
                     throw new InvalitInsert("Informe uma posicao de final da fila valida");
                 }else{
-                    var aprovado = a.getEditalAprovado();
-                    aprovado.setClassificacao(a.getFinalFila()+"");
-                    aprovado.setId(null);
-                    
+                    var aprovado =(EditalAprovado) a.getEditalAprovado();
                     var editalvaga = editalVagaRepository.findById(aprovado.getEditalVaga().getId());
-                    aprovado.setEditalVaga(editalvaga);
-                    //var editalvaga = editalVagaRepository.buscarVagasPorCodigo(a.getEditalAprovado().getCodigoVaga());
-                    EditalAprovado mesmaclassifmesmavaga = editalAprovadoRepository.buscarAprovadoPorClassificacaoConc(editalvaga.getId(),aprovado.getClassificacao());
-                    if (mesmaclassifmesmavaga!=null){throw new InvalitInsert("Outro aprovado ja se encontra na mesma classificação e tipo de concorrencia para mesma vaga!");}
-                    editalAprovadoRepository.save(aprovado);
+                    EditalAprovado mesmaclassifmesmavaga = editalAprovadoRepository.buscarAprovadoPorClassificacaoConc(editalvaga.getId(),a.getFinalFila()+"");
+                    if (mesmaclassifmesmavaga!=null){
+                        throw new InvalitInsert("Outro aprovado ja se encontra na mesma classificação e tipo de concorrencia para mesma vaga!");
+                    }
+                    else{
+                        documentoAdmissaoRepository.save(a);
+                        aprovado.setChave(editalAprovadoRepository.buscarPrimeiraRemessa());
+                        aprovado.setClassificacao(a.getFinalFila()+"");
+                        aprovado.setId(null);
+                        aprovado.setEditalVaga(editalvaga);
+                        editalAprovadoRepository.save(aprovado);
+                    }
                 }
+            }else{
+                documentoAdmissaoRepository.save(a);
             }
-            documentoAdmissaoRepository.save(a);
+            
+            
         }
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(lstdocumentoAdmissao.getClass()).toUri();
         return ResponseEntity.created(uri).body(lstdocumentoAdmissao);
