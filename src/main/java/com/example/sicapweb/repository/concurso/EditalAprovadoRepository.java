@@ -97,16 +97,10 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
 
         var query  = getEntityManager()
                 .createNativeQuery(
-                                " with Admissao1 as(select a.*\n" +
-                                "                   from Admissao a\n" +
-                                "                            join InfoRemessa i\n" +
-                                "                                 on a.chave = i.chave and i.idUnidadeGestora = :ug and a.tipoAdmissao = 1),\n" +
-                                "     Servidor1 as(select a.*\n" +
-                                "                   from Servidor a\n" +
-                                "                            join InfoRemessa i on a.chave = i.chave and i.idUnidadeGestora = :ug),\n" +
-                                "     Aprovado  as(select a.*\n" +
+                                " with Aprovado  as(select a.*\n" +
                                 "                  from EditalAprovado a\n" +
-                                "                           join InfoRemessa i on a.chave = i.chave and i.idUnidadeGestora = :ug),\n" +
+                                "                           join InfoRemessa i on a.chave = i.chave and i.idUnidadeGestora = :ug\n" +
+                                "                            ),\n" +
                                 "    situacao as (\n" +
                                 "        SELECT\n" +
                                 "            CASE\n" +
@@ -121,39 +115,37 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
                                 "                            WHEN da.opcaoDesistencia = 6 THEN 6\n" +
                                 "                            ELSE NULL\n" +
                                 "                        END) > 0 THEN 'Em suspensão'\n" +
-                                "                WHEN COUNT(1) > 0 THEN 'Admitido'\n" +
+                                "                WHEN COUNT(da.id) > 0 THEN 'Admitido'\n" +
                                 "                ELSE 'Apto para envio'\n" +
                                 "            END AS situacao,\n" +
                                 "            ap.id as idAprovado\n" +
-                                "         from DocumentoAdmissao da\n" +
-                                "         join Aprovado ap on da.idAprovado = ap.id\n" +
-                                "            where status > 0\n" +
-                                "            GROUP BY da.idAprovado,ap.id\n" +
+                                "         from Aprovado ap--,DocumentoAdmissao da\n" +
+                                "         left join DocumentoAdmissao da on da.idAprovado = ap.id and da.status > 0\n" +
+                                "        GROUP BY ap.id\n" +
                                 "    )\n" +
-                                "   select distinct     \n"+
-                                "    a.id,\n"+
-                                "    a.classificacao,\n"+
-                                "    a.cpf,\n"+
-                                "    a.nome,\n"+
-                                "    a.numeroInscricao,\n"+
-                                "    a.idEditalVaga,\n"+
-                                "    a.chave,\n"+
-                                "    s.situacao,\n"+
-                                "    ed.numeroEdital,\n"+
-                                "    ca.nomeCargo as nomeCargoNome,\n"+
-                                "    b.tipoConcorrencia,\n"+
-                                "    b.codigoVaga,\n"+
-                                "    ca.codigoCargo \n"+
+                                "   -- select * from situacao join Aprovado on id = idAprovado\n" +
+                                "   select distinct\n" +
+                                "    a.id,\n" +
+                                "    a.classificacao,\n" +
+                                "    a.cpf,\n" +
+                                "    a.nome,\n" +
+                                "    a.numeroInscricao,\n" +
+                                "    a.idEditalVaga,\n" +
+                                "    a.chave,\n" +
+                                "    s.situacao,\n" +
+                                "    ed.numeroEdital,\n" +
+                                "    ca.nomeCargo as nomeCargoNome,\n" +
+                                "    b.tipoConcorrencia,\n" +
+                                "    b.codigoVaga,\n" +
+                                "    ca.codigoCargo\n" +
                                 "   from Aprovado a\n" +
                                 "         join EditalVaga b on a.idEditalVaga = b.id\n" +
                                 "         join situacao s on s.idAprovado = a.id\n" +
                                 "         join Edital ed on b.idEdital = ed.id\n" +
                                 "         join Cargo ca on b.idCargo = ca.id\n" +
                                 "         join CargoNome can on ca.idCargoNome = can.id\n" +
-                                "   where ( select count(1)\n" +
-                                "        from Admissao1 ad\n" +
-                                "                join Servidor1 s on ad.idServidor = s.id and s.cpfServidor = a.cpf\n" +
-                                "        ) = 0" +
+                                "   where 0=0\n" +
+                                "\n" +
                                 search + 
                                 " ORDER BY " + campo);
         var listAprovados = StaticMethods.getHashmapFromQuery(query.setParameter("ug", User.getUser(super.request).getUnidadeGestora().getId())
