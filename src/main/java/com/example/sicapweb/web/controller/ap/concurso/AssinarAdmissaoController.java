@@ -162,7 +162,7 @@ public class AssinarAdmissaoController {
         for (DocumentoAdmissao documentoAdmissao :  listaDeDocumentosAprovados ){
             EditalAprovado aprovado = documentoAdmissao.getEditalAprovado();
             String cpfAprovado = aprovado.getCpf();
-            String nomeAprovado = aprovado.getNome()+( (documentoAdmissao.getOpcaoDesistencia() ==null) ? "" :  Arrays.stream(DocumentoAdmissao.opcaoDesistencia.values()).filter(opcaoDesistencia1 -> opcaoDesistencia1.getValor().intValue()==documentoAdmissao.getOpcaoDesistencia().intValue() ).collect(Collectors.toList()).get(0).getLabel());
+            String nomeAprovado = aprovado.getNome()+( (documentoAdmissao.getOpcaoDesistencia() ==null) ? "" :  Arrays.stream(DocumentoAdmissao.OpcaoDesistencia.values()).filter(opcaoDesistencia1 -> opcaoDesistencia1.getValor().intValue()==documentoAdmissao.getOpcaoDesistencia().intValue() ).collect(Collectors.toList()).get(0).getLabel());
             //sera necessario gerar a chave atravez do metodo id_Document 'exec cadun.dbo.obterCodigoNovaPessoa'
             responseCadunsalvasimples = admissaoEnvioAssinaturaRepository.insertCadunPessoaInterressada(cpfAprovado,nomeAprovado);
             codigoPessoa=validaPessoaRetornadaCadun(responseCadunsalvasimples,cpfAprovado,nomeAprovado);

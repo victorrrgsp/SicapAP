@@ -6,6 +6,7 @@ import com.example.sicapweb.model.AdmissaoEnvioAssRetorno;
 import com.example.sicapweb.repository.DefaultRepository;
 import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
+import com.example.sicapweb.util.StaticMethods;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
@@ -118,8 +119,6 @@ public class AdmissaoEnvioRepository extends DefaultRepository<AdmissaoEnvio, Bi
         return new PaginacaoUtil<AdmissaoEnvioAssRetorno>(tamanho, pagina, totalPaginas, totalRegistros, listDtosAdmissaoRetorno);
     }
 
-
-
     public Integer countProcessosAguardandoAss(String search) {
         return (Integer) getEntityManager().createNativeQuery("select count(*) from AdmissaoEnvio a where  a.cnpjUnidadeGestora='" + User.getUser(super.request).getUnidadeGestora().getId() +"' "+
                 " and  a.status=2 "+search).getSingleResult();
@@ -130,8 +129,6 @@ public class AdmissaoEnvioRepository extends DefaultRepository<AdmissaoEnvio, Bi
                     " and  a.processo is null and   a.idEdital =" + idedital, AdmissaoEnvio.class).getResultList();
     }
 
-
-  
     public List<Map<String,Object>> getValidInfoEnvio(BigInteger idEdital) {
 
         List<Map<String, Object>> validacoesVagaAprovado = new ArrayList<Map<String, Object>>();
@@ -139,19 +136,28 @@ public class AdmissaoEnvioRepository extends DefaultRepository<AdmissaoEnvio, Bi
         try {
 
             var query = entityManager.createNativeQuery(
-
-                    "select ev.id                                          idvaga,\n" +
+                            "select ev.id                                          idvaga,\n" +
                             "       ev.codigoVaga,\n" +
                             "       c.nomeCargo,\n" +
                             "       ev.especialidadeVaga,\n" +
                             "       ev.tipoConcorrencia,\n" +
-                            "       cast(ev.quantidade as INTEGER)                 quantidade,\n" +
-                            "       count(1)                                       qt_aprov,\n" +
+                            "       count(EA.id)                                       qt_aprov,\n" +
                             "       min(cast(classificacao as INTEGER))            min_classif,\n" +
                             "       max(cast(classificacao as INTEGER))            max_classif,\n" +
                             "       sum(case when da.status = 1 then 1 else 0 end) ct_nao_anexados,\n" +
                             "       count(Desligamento.id)                         qt_aprovDesligado,\n" +
-                            "       count(da.opcaoDesistencia)                     qt_desistencia\n" +
+                            "       count(da.opcaoDesistencia)                     qt_desistencia,\n" +
+                            "       COUNT(CASE\n" +
+                            "                WHEN da.opcaoDesistencia = 3 THEN 3\n" +
+                            "                WHEN da.opcaoDesistencia = 6 THEN 6\n" +
+                            "                ELSE NULL\n" +
+                            "            END) AS qt_desistencia_prorogacao,\n" +
+                            "       COUNT(CASE\n" +
+                            "                WHEN da.opcaoDesistencia = 3 THEN null\n" +
+                            "                WHEN da.opcaoDesistencia = 6 THEN null\n" +
+                            "                WHEN da.opcaoDesistencia is null THEN null\n" +
+                            "                ELSE 1\n" +
+                            "            END) AS qt_desistencia_desclasificado" +
                             "from dbo.AdmissaoEnvio pa\n" +
                             "         join dbo.DocumentoAdmissao da on pa.id = da.idEnvio and da.status > 0\n" +
                             "         join dbo.EditalAprovado EA on da.idAprovado = ea.id\n" +
@@ -161,26 +167,18 @@ public class AdmissaoEnvioRepository extends DefaultRepository<AdmissaoEnvio, Bi
                             "         left join dbo.Desligamento on Admissao.id = Desligamento.idAdmissao\n" +
                             "where pa.idEdital = :idEdital\n" +
                             "group by ev.id, ev.codigoVaga, c.nomeCargo, ev.especialidadeVaga, ev.tipoConcorrencia, ev.quantidade").setParameter("idEdital",idEdital);
-            List<Object[]> list = query.getResultList();
+            var list = StaticMethods.getHashmapFromQuery(query);
 
 //            for (Object[] obj : list) {
             for (int i = 0; i < list.size(); i++) {
-                Object[] obj = list.get(i);
 
-                Map<String, Object> vagaAprovado = new HashMap<String, Object>();
+                Map<String, Object> vagaAprovado = list.get(i);
 
-                vagaAprovado.put("idvaga",  obj[0]);
-                vagaAprovado.put("codigoVaga",  obj[1]);
-                vagaAprovado.put("nomeCargo",  obj[2]);
-                vagaAprovado.put("especialidadeVaga",  obj[3]);
-                vagaAprovado.put("tipoConcorrencia",  obj[4]);
                 //quantidade= qtVagas +(qtDesistencias + qtDesligados)
-                Integer aux = ((Integer) obj[5] + ((Integer) obj[10]) + ((Integer) obj[11]));
-                vagaAprovado.put("quantidade", aux);
-                vagaAprovado.put("qt_aprov",  obj[6]);
-                vagaAprovado.put("min_classif", obj[7]);
-                vagaAprovado.put("max_classif",obj[8]);
-                vagaAprovado.put("ct_nao_anexados",  obj[9]);
+                {
+                    Integer aux = ((Integer) vagaAprovado.get("qtvagas")) + ((Integer) vagaAprovado.get("qt_desistencia_desclasificado")) + ((Integer) vagaAprovado.get("qtDesligados"));
+                    vagaAprovado.put("quantidade", aux);
+                }
 
                 String nomeTipoConcorrencia =  Arrays.stream(EditalVaga.TipoConcorrencia.values()).filter(tipoConcorrencia -> tipoConcorrencia.getValor()==vagaAprovado.get("tipoConcorrencia")).collect( Collectors.toList()).get(0).name();
 
