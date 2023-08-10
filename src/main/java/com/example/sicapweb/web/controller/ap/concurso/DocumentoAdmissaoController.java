@@ -169,7 +169,11 @@ public class DocumentoAdmissaoController extends DefaultController<DocumentoAdmi
     @DeleteMapping(value = {"/{id}"})
     public void delete(@PathVariable BigInteger id) {
         DocumentoAdmissao documentoAdmissao = documentoAdmissaoRepository.findById(id);
+        if(documentoAdmissao.getOpcaoDesistencia() == 5){
+            editalAprovadoRepository.delete(documentoAdmissao.getEditalAprovado().getId());
+        }
         if (documentoAdmissao.getDocumentoCastorId()!=null ) throw new RuntimeException("remova  primeiro o documento antes de excluir a aprovado!!");
+
         documentoAdmissaoRepository.delete(id); 
     }
 
