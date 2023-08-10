@@ -123,7 +123,6 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
                                 "         left join DocumentoAdmissao da on da.idAprovado = ap.id and da.status > 0\n" +
                                 "        GROUP BY ap.id\n" +
                                 "    )\n" +
-                                "   -- select * from situacao join Aprovado on id = idAprovado\n" +
                                 "   select distinct\n" +
                                 "    a.id,\n" +
                                 "    a.classificacao,\n" +
@@ -145,10 +144,12 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
                                 "         join Cargo ca on b.idCargo = ca.id\n" +
                                 "         join CargoNome can on ca.idCargoNome = can.id\n" +
                                 "   where 0=0\n" +
-                                "\n" +
                                 search + 
                                 " ORDER BY " + campo);
-        var listAprovados = StaticMethods.getHashmapFromQuery(query.setParameter("ug", User.getUser(super.request).getUnidadeGestora().getId())
+        query.setParameter("ug", User.getUser(super.request).getUnidadeGestora().getId());
+        long totalRegistros = query.getResultList().size();
+        long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
+        var listAprovados = StaticMethods.getHashmapFromQuery(query
                                                         .setFirstResult(pagina)
                                                         .setMaxResults(tamanho));
         listAprovados.forEach(Documentoaprovado -> {
@@ -171,9 +172,7 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
             // aprovado.setSituacao((String) Documentoaprovado.get("situacao"));
             Documentoaprovado.put("editalAprovado", aprovado);
         });
-        long totalRegistros = query.getResultList().size();
-        long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
-
+        
         return new PaginacaoUtil<>(tamanho, pagina, totalPaginas, totalRegistros, listAprovados);
     }
 
