@@ -22,11 +22,13 @@ import java.util.List;
         public List<Object> getDependentesPensao(String cpfServidorPensao) throws Exception {
             try {
                 Query query = getEntityManager().createNativeQuery("" +
-                        "select distinct p.cpfPensionista as cpf, p.nome " +
+                        "select distinct p.cpfPensionista as cpf, p.nome, p.grauParentesco, p.tipoBeneficio, " +
+                        "p.inicioBeneficio, p.fimBeneficio, p.percentual " +
                         "from SICAPAP21..Pensionista p " +
                         "         join SICAPAP21..Pensao pe on p.cpfServidor = pe.cpfServidor " +
                         "where pe.cpfServidor = '" + cpfServidorPensao + "'");
-                List<Object> result = buscarSQL(query, "p.cpfPensionista as cpf, p.nome");
+                List<Object> result = buscarSQL(query,
+                        "p.cpfPensionista as cpf, p.nome, p.grauParentesco, p.tipoBeneficio, p.inicioBeneficio, p.fimBeneficio, p.percentual");
                 return result;
             } catch (NoResultException e) {
                 e.printStackTrace();
