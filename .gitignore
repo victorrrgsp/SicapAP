@@ -52,3 +52,4 @@ mainteste
 /xml/
 /target/
 ProjetoTeste/
+src/main/resources/scripts/consultasTCU.sql
