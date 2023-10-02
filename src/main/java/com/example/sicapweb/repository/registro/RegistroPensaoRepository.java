@@ -44,7 +44,7 @@ public class RegistroPensaoRepository  extends DefaultRepository<RegistroPensao,
         if (nome !=null && !nome.isEmpty()){
             search=" where s.nome like '%"+nome+"%'";
         } else if (cpf !=null && !cpf.isEmpty()) {
-            search=" where a.cpfPensionista   like '%"+cpf.trim()+"%'";
+            search=" where a.cpfServidor like '%"+cpf.trim()+"%'";
         }
         return search;
     }
