@@ -265,52 +265,62 @@ public class RegistroAposentadoriaRepository  extends DefaultRepository<Registro
     public List<HashMap<String,Object>> getInforProcessosEcontas(HashMap<String,Object> userInfo ){
         try{
             Query sqlProcessos=getEntityManager().createNativeQuery(
-                     "with\n" +
-                            "   processosRecebidos as\n" +
-                            "    (\n" +
-                            "        select hcodp_pnumero,\n" +
-                            "               hcodp_pano,\n" +
-                            "               assunto_desc,\n" +
-                            "               id_entidade_origem\n" +
-                            "        from SCP.dbo.VW_PROC_RECEBIDOS\n" +
-                            "        where (\n" +
-                            "            (hdest_ldepto like '%DIRAP%' ) AND\n" +
-                            "            (proc_num_anexo IS NULL or proc_num_anexo =0) and\n" +
-                            "            (processo_numaps IS NULL or processo_numaps =0)\n" +
-                            "        ) and trim(hists_dest_resp)= :Usuario\n" +
-                            "    ),\n" +
-                            "    processos as (\n" +
-                            "        select distinct hcodp_pnumero as numeroProcesso,\n" +
-                            "           hcodp_pano as anoProcesso,\n" +
-                            "           docmt_numero as numeroDecisao,\n" +
-                            "           docmt_ano as anoDecisao ,\n" +
-                            "           docmt_data as dataDecisao ,\n" +
-                            "           assunto_desc  as assuntoDesc,\n" +
-                            "           e.cpf  as cpfInteressado,\n" +
-                            "           e.nome nomeInteressado ,\n" +
-                            "           f.codunidadegestora as cnpjEntidade,\n" +
-                            "           f.nomeEntidade as nomeEntidade\n" +
-                            "        from processosRecebidos a\n" +
-                            "            join SCP..PESSOAS_PROCESSO d  on (d.ID_PAPEL=2 or ID_CARGO=0 )and a.hcodp_pnumero=d.NUM_PROC and a.hcodp_pano = d.ANO_PROC\n" +
-                            "            join SCP.dbo.document c on c.dcnproc_pnumero = hcodp_pnumero and c.dcnproc_pano = hcodp_pano and c.docmt_tipo_decisao = 'D'  and docmt_tipo='RL'\n" +
-                            "            join Cadun.dbo.PessoaFisica e on d.ID_PESSOA=e.Codigo\n" +
-                            "            join Cadun.dbo.vwPessoaJuridica f on a.id_entidade_origem= f.id\n" +
-                            "    ) ,\n" +
-                            "    envios as ( select cast(substring(processo, 1, len(processo) - 5) as int)             numeroProcesso,\n" +
-                            "                       cast(substring(processo, len(processo) - 3, len(processo)) as int) anoProcesso\n" +
-                            "                from AdmEnvio a\n" +
-                            "                where processo is not null\n" +
-                            "                union\n" +
-                            "                select cast(substring(processo, 1, len(processo) - 5) as int)             numeroProcesso,\n" +
-                            "                       cast(substring(processo, len(processo) - 3 , len(processo)) as int) anoProcesso\n" +
-                            "                from AdmissaoEnvio a\n" +
-                            "                    where status = 3\n" +
-                            "    )\n" +
-                            "select pss.*\n" +
-                            "from envios env\n" +
-                            "    join processos pss on\n" +
-                            "        env.numeroProcesso = pss.numeroProcesso and\n" +
-                            "        env.anoProcesso    = pss.anoProcesso")
+                     "with\r\n" + //
+                             "   processosRecebidos as\r\n" + //
+                             "    (\r\n" + //
+                             "        select hcodp_pnumero,\r\n" + //
+                             "               hcodp_pano,\r\n" + //
+                             "               assunto_desc,\r\n" + //
+                             "               id_entidade_origem\r\n" + //
+                             "        from SCP.dbo.VW_PROC_RECEBIDOS\r\n" + //
+                             "        where (\r\n" + //
+                             "            (hdest_ldepto like '%DIRAP%' ) AND\r\n" + //
+                             "            (proc_num_anexo IS NULL or proc_num_anexo =0) and\r\n" + //
+                             "            (processo_numaps IS NULL or processo_numaps =0)\r\n" + //
+                             "        )  and trim(hists_dest_resp)= :Usuario\r\n" + //
+                             "    ),\r\n" + //
+                             "    processos as (\r\n" + //
+                             "        select distinct\r\n" + //
+                             "           hcodp_pnumero as numeroProcesso,\r\n" + //
+                             "           hcodp_pano as anoProcesso,\r\n" + //
+                             "           docmt_numero as numeroDecisao,\r\n" + //
+                             "           docmt_ano as anoDecisao ,\r\n" + //
+                             "           docmt_data as dataDecisao ,\r\n" + //
+                             "           assunto_desc  as assuntoDesc,\r\n" + //
+                             "           e.cpf  as cpfInteressado,\r\n" + //
+                             "           e.nome nomeInteressado ,\r\n" + //
+                             "           f.codunidadegestora as cnpjEntidade,\r\n" + //
+                             "           f.nomeEntidade as nomeEntidade\r\n" + //
+                             "        from processosRecebidos a\r\n" + //
+                             "            join SCP..PESSOAS_PROCESSO d  on\r\n" + //
+                             "                (ID_CARGO=0 )and\r\n" + //
+                             "                d.ID_PAPEL<> 1 and\r\n" + //
+                             "                (\r\n" + //
+                             "                    (d.ID_PAPEL = 14 AND assunto_desc like '%PENSÃO%') or\r\n" + //
+                             "                    (d.ID_PAPEL not in (1,14)  AND assunto_desc not like '%PENSÃO%')\r\n" + //
+                             "                )and\r\n" + //
+                             "                a.hcodp_pnumero=d.NUM_PROC and\r\n" + //
+                             "                a.hcodp_pano = d.ANO_PROC\r\n" + //
+                             "            join SCP.dbo.document c on c.dcnproc_pnumero = hcodp_pnumero and c.dcnproc_pano = hcodp_pano and c.docmt_tipo_decisao = 'D'  and docmt_tipo='RL'\r\n" + //
+                             "            join Cadun.dbo.PessoaFisica e on d.ID_PESSOA=e.Codigo\r\n" + //
+                             "            join Cadun.dbo.vwPessoaJuridica f on a.id_entidade_origem= f.id\r\n" + //
+                             "    ),\r\n" + //
+                             "    envios as (\r\n" + //
+                             "                select cast(substring(processo, 1, len(processo) - 5) as int)             numeroProcesso,\r\n" + //
+                             "                       cast(substring(processo, len(processo) - 3, len(processo)) as int) anoProcesso\r\n" + //
+                             "                from AdmEnvio a\r\n" + //
+                             "                where processo is not  null\r\n" + //
+                             "                union\r\n" + //
+                             "                select cast(substring(processo, 1, len(processo) - 5) as int)             numeroProcesso,\r\n" + //
+                             "                       cast(substring(processo, len(processo) - 3, len(processo)) as int) anoProcesso\r\n" + //
+                             "                from AdmissaoEnvio a\r\n" + //
+                             "                    where status = 3\r\n" + //
+                             "    )\r\n" + //
+                             "select pss.*\r\n" + //
+                             "from envios env\r\n" + //
+                             "    join processos pss on\r\n" + //
+                             "        env.numeroProcesso = pss.numeroProcesso and\r\n" + //
+                             "        env.anoProcesso    = pss.anoProcesso")
                     .setParameter("Usuario",userInfo.get("loginUsuario"));
             return  StaticMethods.getHashmapFromQuery(sqlProcessos);
         } catch (RuntimeException e){
