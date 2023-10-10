@@ -59,6 +59,15 @@ public class CargoController  extends DefaultController<Cargo> {
         List<Cargo> list = cargoRepository.buscarCargoPorUG(User.getUser(cargoRepository.getRequest()).unidadeGestora.getId() );
         return ResponseEntity.ok().body(list);
     }
+
+    @CrossOrigin
+    @GetMapping("/ug/{idug}")
+    public ResponseEntity<List<Cargo>> findByug(@PathVariable String idug ) {
+        List<Cargo> list = cargoRepository.buscarCargoPorUG(idug);
+        return ResponseEntity.ok().body(list);
+    }
+
+
     @CrossOrigin
     @GetMapping("/{unidade}/{mes}/{ano}")
     public ResponseEntity<List<Object>> findByunidade( @PathVariable String unidade,@PathVariable int mes,@PathVariable int ano ) {

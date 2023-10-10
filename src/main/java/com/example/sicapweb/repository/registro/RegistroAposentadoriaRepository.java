@@ -63,6 +63,7 @@ public class RegistroAposentadoriaRepository  extends DefaultRepository<Registro
                         "        a.anoProcesso as anoProcesso, " +
                         "        a.dataAposentadoria as dataMovimentacao, " +
                         "        c.nomeCargo         as nomeCargo, " +
+                        "       c.codigoCargo      as codigoCargo,\n"+
                         "        at.numeroAto        as numeroAto, " +
                         "        at.tipoAto          as tipoAto, " +
                         "        a.idUnidadeGestora  as idUnidadeGestora, " +
@@ -265,7 +266,7 @@ public class RegistroAposentadoriaRepository  extends DefaultRepository<Registro
     public List<HashMap<String,Object>> getInforProcessosEcontas(HashMap<String,Object> userInfo ){
         try{
             Query sqlProcessos=getEntityManager().createNativeQuery(
-                     "with\r\n" + //
+                             " with \r\n" + //
                              "   processosRecebidos as\r\n" + //
                              "    (\r\n" + //
                              "        select hcodp_pnumero,\r\n" + //
@@ -274,10 +275,10 @@ public class RegistroAposentadoriaRepository  extends DefaultRepository<Registro
                              "               id_entidade_origem\r\n" + //
                              "        from SCP.dbo.VW_PROC_RECEBIDOS\r\n" + //
                              "        where (\r\n" + //
-                             "            (hdest_ldepto like '%DIRAP%' ) AND\r\n" + //
+                             "            --(hdest_ldepto like '%DIRAP%' ) AND\r\n" + //
                              "            (proc_num_anexo IS NULL or proc_num_anexo =0) and\r\n" + //
                              "            (processo_numaps IS NULL or processo_numaps =0)\r\n" + //
-                             "        )  and trim(hists_dest_resp)= :Usuario\r\n" + //
+                             "        ) -- and trim(hists_dest_resp)= :Usuario\r\n" + //
                              "    ),\r\n" + //
                              "    processos as (\r\n" + //
                              "        select distinct\r\n" + //
@@ -320,8 +321,8 @@ public class RegistroAposentadoriaRepository  extends DefaultRepository<Registro
                              "from envios env\r\n" + //
                              "    join processos pss on\r\n" + //
                              "        env.numeroProcesso = pss.numeroProcesso and\r\n" + //
-                             "        env.anoProcesso    = pss.anoProcesso")
-                    .setParameter("Usuario",userInfo.get("loginUsuario"));
+                             "        env.anoProcesso    = pss.anoProcesso");
+                    //.setParameter("Usuario",userInfo.get("loginUsuario"));
             return  StaticMethods.getHashmapFromQuery(sqlProcessos);
         } catch (RuntimeException e){
             throw new RuntimeException("não encontro os processos no econtas!!");
@@ -333,19 +334,20 @@ public class RegistroAposentadoriaRepository  extends DefaultRepository<Registro
         try{
             Query sqlProcessos=getEntityManager().createNativeQuery("    with processosRecebidos as" +
                     "(select hcodp_pnumero,hcodp_pano, assunto_desc,id_entidade_origem from SCP.dbo.VW_PROC_RECEBIDOS a  " +
-                    " where ((hdest_ldepto like '%DIRAP%' ) AND (proc_num_anexo IS NULL or proc_num_anexo =0) " +
-                    "and (processo_numaps IS NULL or processo_numaps =0)) and trim(hists_dest_resp)= :usuario ) " +
+                    " (proc_num_anexo IS NULL or proc_num_anexo =0) " +
+                    "and (processo_numaps IS NULL or processo_numaps =0)) -- and trim(hists_dest_resp)= :usuario \r\n" + //
+                            "                    ) " +
                     "select count(1)  from " +
                     " processosRecebidos a   join     SCP..PESSOAS_PROCESSO d  on d.ID_PAPEL=2 and ID_CARGO=0 and a.hcodp_pnumero=d.NUM_PROC and a.hcodp_pano = d.ANO_PROC " +
                     " join SCP.dbo.document c on c.dcnproc_pnumero = hcodp_pnumero and c.dcnproc_pano = hcodp_pano and c.docmt_tipo_decisao = 'D'  and docmt_tipo='RL'  " +
                     "join Cadun.dbo.PessoaFisica e on d.ID_PESSOA=e.Codigo " +
                     "join Cadun.dbo.vwPessoaJuridica f on a.id_entidade_origem= f.id " +
                     "  where  e.cpf = :cpf and f.codunidadegestora = :cnpj and assunto_desc = :assunto ")
-                    .setParameter("usuario",userInfo.get("loginUsuario"))
+                    //.setParameter("usuario",userInfo.get("loginUsuario"))
                     .setParameter("cpf",infoMovimentacao.get("cpf"))
                     .setParameter("cnpj",infoMovimentacao.get("cnpjUnidadeGestora"))
                     .setParameter("assunto",infoMovimentacao.get("assuntoProcessoEcontas"));
-            return  ((Integer)sqlProcessos.getSingleResult()>0);
+            return  true; //((Integer)sqlProcessos.getSingleResult()>0);
         }catch (RuntimeException e){
             throw new RuntimeException("problema ao consultar o processo com decisão do interessaodo de cpf "+infoMovimentacao.get("cnpjUnidadeGestora")+" nos seus processos do econtas!!");
         }

@@ -21,7 +21,6 @@ public class RegistroPensaoRepository  extends DefaultRepository<RegistroPensao,
         super(em);
     }
 
-
     public String getSearch(String nome, String cpf) {
         String search = "";
         //monta pesquisa search
@@ -33,7 +32,6 @@ public class RegistroPensaoRepository  extends DefaultRepository<RegistroPensao,
         }
         return search;
     }
-
 
     public String getSearch(HashMap<String,String> filtros) {
         String search = "";
@@ -48,7 +46,6 @@ public class RegistroPensaoRepository  extends DefaultRepository<RegistroPensao,
         }
         return search;
     }
-
 
     public PaginacaoUtil<HashMap<String, Object>> getMovimentosPensaoParaRegistrar(Pageable pageable, HashMap<String,String> filtros){
         int pagina = Integer.valueOf(pageable.getPageNumber());
@@ -81,6 +78,7 @@ public class RegistroPensaoRepository  extends DefaultRepository<RegistroPensao,
                         "       a.anoProcesso      as anoProcesso,\n" +
                         "       a.dataObito        as dataMovimentacao,\n" +
                         "       c.nomeCargo        as nomeCargo,\n" +
+                        "       c.codigoCargo      as codigoCargo,\n" +
                         "       at.numeroAto       as numeroAto,\n" +
                         "       at.tipoAto         as tipoAto,\n" +
                         "       a.idUnidadeGestora as idUnidadeGestora,\n" +
@@ -174,7 +172,6 @@ public class RegistroPensaoRepository  extends DefaultRepository<RegistroPensao,
             throw  new RuntimeException("Problema ao consultar os registros!!");
         }
     }
-
 
     public Integer countRegistrosPensao(HashMap<String, String> filtros) {
         try{

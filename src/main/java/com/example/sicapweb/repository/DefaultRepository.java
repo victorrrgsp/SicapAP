@@ -65,6 +65,19 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
             e.printStackTrace();
         }
     }
+    public <F extends  DefaultEntity > void updateVinculo( T pai,F filho ) {
+        if(filho == null || pai == null||filho.getId() == null || entityClass.getSimpleName() == null) throw new NullPointerException();
+        try {
+            entityManager = getEntityManager();
+            //cria um comando sql para atualizar o cargo em admissao
+            Query query = entityManager.createNativeQuery("update "+entityClass.getSimpleName()+" set id" + filho.getClass().getSimpleName() +" = :idfilho where id = :id");
+            query.setParameter("idfilho",filho.getId());
+            query.setParameter("id",entityClass.getMethod("getId").invoke(pai));
+            query.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     //@Transactional(rollbackFor = { SQLException.class },  propagation = Propagation.NESTED )
     public void deleteRestrito(BigInteger id) {

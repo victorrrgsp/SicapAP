@@ -8,10 +8,12 @@ import br.gov.to.tce.model.ap.registro.RegistroAdmissao;
 import br.gov.to.tce.model.ap.registro.RegistroAposentadoria;
 import br.gov.to.tce.model.ap.registro.RegistroPensao;
 import br.gov.to.tce.model.ap.relacional.Ato;
+
 import com.example.sicapweb.exception.InvalitInsert;
 import com.example.sicapweb.repository.concessao.AposentadoriaRepository;
 import com.example.sicapweb.repository.concessao.PensaoRepository;
 import com.example.sicapweb.repository.geral.AtoRepository;
+import com.example.sicapweb.repository.geral.CargoRepository;
 import com.example.sicapweb.repository.movimentacaoDePessoal.AdmissaoRepository;
 import com.example.sicapweb.repository.registro.RegistroAdmissaoRepository;
 import com.example.sicapweb.repository.registro.RegistroAposentadoriaRepository;
@@ -55,6 +57,9 @@ public class RegistroDecisaoController {
 
     @Autowired
     private AdmissaoRepository admissaoRepository;
+
+    @Autowired
+    private CargoRepository cargoRepository;
 
     @Autowired
     private AtoRepository atoRepository;
@@ -177,7 +182,7 @@ public class RegistroDecisaoController {
         else if (this.tiposRegistrosNaTabelaAdmissao.contains(tipoRegistroEnum))
             return registroAdmissaoRepository.getRegistrosAdmissao(pageable, filtro);
         else
-            throw new RuntimeException("n√£o encontrou tipo de registro!!");
+            throw new RuntimeException("n„o encontrou tipo de registro!!");
     }
 
     private PaginacaoUtil<HashMap<String, Object>> getMovimentosPorTipo(Pageable pageable, Integer tipoRegistro, HashMap<String, String> filtro) {
@@ -189,7 +194,7 @@ public class RegistroDecisaoController {
         else if (this.tiposRegistrosNaTabelaAdmissao.contains(tipoRegistroEnum))
             return registroAdmissaoRepository.getMovimentosAdmissaoParaRegistrar(pageable, filtro);
         else
-            throw new RuntimeException("n√£o encontrou tipo de registro definido na busca!!");
+            throw new RuntimeException("n„o encontrou tipo de registro definido na busca!!");
     }
 
     private void gravarRegistro(Registro registro, Integer tipoRegistro) {
@@ -202,12 +207,12 @@ public class RegistroDecisaoController {
             else if (this.tiposRegistrosNaTabelaAdmissao.contains(tipoRegistroEnum))
                 registroAdmissaoRepository.save(new RegistroAdmissao(registro, admissaoRepository.findById(registro.getIdMovimentacao())));
             else
-                throw new IllegalArgumentException("Tipo de registro n√£o encontrado !!");
+                throw new IllegalArgumentException("Tipo de registro n„o encontrado !!");
         } catch (IllegalArgumentException e) {
             throw new InvalitInsert(e.getMessage());
         } catch (RuntimeException e) {
             e.printStackTrace();
-            throw new InvalitInsert("Problema ao alterar o registro da movimenta√ß√£o do servidor com cpf " + registro.getCpfServidor() + " !!");
+            throw new InvalitInsert("Problema ao alterar o registro da movimentaÁ„o do servidor com cpf " + registro.getCpfServidor() + " !!");
         }
     }
 
@@ -221,18 +226,18 @@ public class RegistroDecisaoController {
             else if (this.tiposRegistrosNaTabelaAdmissao.contains(tipoRegistroEnum))
                 registroAdmissaoRepository.update(registroAdmissaoRepository.findById(registro.getId()).setCamposRegistro(registro));
             else
-                throw new IllegalArgumentException("Tipo de registro n√£o encontrado !!");
+                throw new IllegalArgumentException("Tipo de registro n„o encontrado !!");
         } catch (IllegalArgumentException e) {
             throw new InvalitInsert(e.getMessage());
         } catch (RuntimeException e) {
             e.printStackTrace();
-            throw new InvalitInsert("Problema ao registro a movimenta√ß√£o do servidor com cpf " + registro.getCpfServidor() + " !!");
+            throw new InvalitInsert("Problema ao registro a movimentaÁ„o do servidor com cpf " + registro.getCpfServidor() + " !!");
         }
     }
 
     private void alterarMovimentacao(HashMap<String, Object> camposParaAlterar, Integer tipoRegistro) throws ParseException {
         Registro.Tipo tipoRegistroEnum = Arrays.stream(Registro.Tipo.values()).filter(tipo -> tipo.getValor() == tipoRegistro).findFirst().get();
-        //Informa√ßoes que ser√£o alterados no movimento
+        //InformaÁoes que ser„o alterados no movimento
         String numeroAto = (String) camposParaAlterar.get("numeroAto");
         Integer tipoAto = (Integer) camposParaAlterar.get("tipoAto");
         String idUnidadeGestora = (String) camposParaAlterar.get("idUnidadeGestora");
@@ -241,6 +246,7 @@ public class RegistroDecisaoController {
                 new java.sql.Date((new SimpleDateFormat("yyyy-MM-dd"))
                         .parse((String) camposParaAlterar.get("dataPublicacao")).getTime());
         BigInteger idMovimentacao = BigInteger.valueOf(((Integer) camposParaAlterar.get("idMovimentacao")).longValue());
+        Admissao admissao;
         //tratando as alteracoes de ato 
         Ato atoPrecastrado = atoRepository.buscarAtoPorNumeroECnpj(numeroAto, tipoAto, idUnidadeGestora);
         Ato novoAto;
@@ -257,27 +263,32 @@ public class RegistroDecisaoController {
         if (this.tiposRegistrosNaTabelaAposentadoria.contains(tipoRegistroEnum)) {
             //movimentos derivados da tabela Aposentadoria
             Integer tipoAposentadoria = (Integer) camposParaAlterar.get("tipoAposentadoria");
-            Aposentadoria aposentadoria = aposentadoriaRepository.findById(idMovimentacao);
-            aposentadoria.setAto(novoAto);
-            aposentadoria.setTipoAposentadoria(tipoAposentadoria);
-            aposentadoriaRepository.update(aposentadoria);
+            Aposentadoria movimentacao = aposentadoriaRepository.findById(idMovimentacao);
+            admissao = admissaoRepository.findById(movimentacao.getAdmissao().getId());
+            movimentacao.setAto(novoAto);
+            movimentacao.setTipoAposentadoria(tipoAposentadoria);
+            aposentadoriaRepository.update(movimentacao);
         } else if (this.tiposRegistrosNaTabelaPensao.contains(tipoRegistroEnum)) {
             //movimentos derivados da tabela Pensao
-            Pensao pensao = pensaoRepository.findById(idMovimentacao);
-            pensao.setAto(novoAto);
-            pensaoRepository.update(pensao);
+            Pensao movimentacao = pensaoRepository.findById(idMovimentacao);
+            movimentacao.setAto(novoAto);
+            pensaoRepository.update(movimentacao);
+            admissao = admissaoRepository.findById(movimentacao.getAdmissao().getId());
+
         } else if (this.tiposRegistrosNaTabelaAdmissao.contains(tipoRegistroEnum)) {
             //movimentos derivados da tabela Admissao
-            Admissao admissao = admissaoRepository.findById(idMovimentacao);
+            admissao = admissaoRepository.findById(idMovimentacao);
             admissao.setAto(novoAto);
             admissaoRepository.update(admissao);
         } else {
             if (atoPrecastrado == null) {
                 atoRepository.deleteRestrito(novoAto.getId());
             }
-            throw new IllegalArgumentException("Tipo de movimentacao n√£o definido para altera√ß√£o !!");
-
+            throw new IllegalArgumentException("Tipo de movimentaÁ„o n„o definido para alteraÁ„o");
         }
+        var cargo = cargoRepository.buscarCargoUgPorcodigo((String)camposParaAlterar.get("cargo"),admissao.getChave().getIdUnidadeGestora());
+        admissaoRepository.updateVinculo(admissao, cargo);;
+
     }
 
     private void validarMovimentacao(HashMap<String, Object> infoUser, BigInteger idMovimentacao, Integer tipoRegistro) {
@@ -290,9 +301,9 @@ public class RegistroDecisaoController {
             infoMovimentacao.put("cpf", aposentadoria.getCpfServidor());
             infoMovimentacao.put("cnpjUnidadeGestora", aposentadoria.getAdmissao().getChave().getIdUnidadeGestora());
             if (aposentadoria == null)
-                throw new InvalitInsert("n√£o encontrou a movimentacao de tipo " + tipoRegistroEnum.getLabel() + " para o id especificado!! ");
+                throw new InvalitInsert("n„o encontrou a movimentacao de tipo " + tipoRegistroEnum.getLabel() + " para o id especificado!! ");
             if (!registroAposentadoriaRepository.temProcessoEcontasPorInteressado(infoUser, infoMovimentacao)) {
-                throw new InvalitInsert("a movimenta√ß√£o de tipo " + tipoRegistroEnum.getLabel() + " do cpf " + aposentadoria.getCpfServidor() + " n√£o tem processo no Econtas com decis√£o julgada para o usuario atual!! ");
+                throw new InvalitInsert("a movimentaÁ„o de tipo " + tipoRegistroEnum.getLabel() + " do cpf " + aposentadoria.getCpfServidor() + " n„o tem processo no Econtas com decis„o julgada para o usuario atual!! ");
             }
         } else if (this.tiposRegistrosNaTabelaPensao.contains(tipoRegistroEnum)) {
             //movimentos derivados da tabela Aposentadoria
@@ -300,21 +311,21 @@ public class RegistroDecisaoController {
             infoMovimentacao.put("cpf", pensao.getCpfServidor());
             infoMovimentacao.put("cnpjUnidadeGestora", pensao.getAdmissao().getChave().getIdUnidadeGestora());
             if (pensao == null)
-                throw new InvalitInsert("n√£o encontrou a movimentacao de tipo " + tipoRegistroEnum.getLabel() + " para o id especificado!! ");
+                throw new InvalitInsert("n„o encontrou a movimentacao de tipo " + tipoRegistroEnum.getLabel() + " para o id especificado!! ");
             if (!registroAposentadoriaRepository.temProcessoEcontasPorInteressado(infoUser, infoMovimentacao)) {
-                throw new InvalitInsert("a movimenta√ß√£o " + tipoRegistroEnum.getLabel() + " do cpf " + pensao.getCpfServidor() + " n√£o tem processso no Econtas com decis√£o julgada para o usuario atual!! ");
+                throw new InvalitInsert("a movimentaÁ„o " + tipoRegistroEnum.getLabel() + " do cpf " + pensao.getCpfServidor() + " n„o tem processso no Econtas com decis„o julgada para o usuario atual!! ");
             }
         } else if (this.tiposRegistrosNaTabelaAdmissao.contains(tipoRegistroEnum)) {
-            //movimentos derivados da tabela Admiss√£o
+            //movimentos derivados da tabela Admiss„o
             Admissao admissao = admissaoRepository.findById(idMovimentacao);
             infoMovimentacao.put("cpf", admissao.getServidor().getCpfServidor());
             infoMovimentacao.put("cnpjUnidadeGestora", admissao.getChave().getIdUnidadeGestora());
             if (admissao == null)
-                throw new InvalitInsert("n√£o encontrou a movimentacao de tipo " + tipoRegistroEnum.getLabel() + " para o id especificado!! ");
+                throw new InvalitInsert("n„o encontrou a movimentacao de tipo " + tipoRegistroEnum.getLabel() + " para o id especificado!! ");
             if (!registroAposentadoriaRepository.temProcessoEcontasPorInteressado(infoUser, infoMovimentacao)) {
-                throw new InvalitInsert("a movimenta√ß√£o " + tipoRegistroEnum.getLabel() + " do cpf: " + admissao.getCpfServidor() + " e nome: " + admissao + " n√£o ter processso no econtas com decis√£o julgada para o usuario atual!! ");
+                throw new InvalitInsert("a movimentaÁ„o " + tipoRegistroEnum.getLabel() + " do cpf: " + admissao.getCpfServidor() + " e nome: " + admissao + " n„o ter processso no econtas com decis„o julgada para o usuario atual!! ");
             }
-        } else throw new IllegalArgumentException("Tipo de registro n√£o encontrado !!");
+        } else throw new IllegalArgumentException("Tipo de registro n„o encontrado !!");
     }
 
     private BigInteger getIdUsuarioFromToken(String token) {
@@ -326,7 +337,7 @@ public class RegistroDecisaoController {
             return new BigInteger(idusuariojson.get("sub").asText());
         } catch (JsonProcessingException e) {
             e.printStackTrace();
-            throw new RuntimeException("autentica√ß√£o invalida. favor entrar em contato com o administrador!! ");
+            throw new RuntimeException("autenticaÁ„o invalida. favor entrar em contato com o administrador!! ");
         }
     }
 

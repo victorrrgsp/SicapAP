@@ -26,6 +26,11 @@ public class CargoRepository extends DefaultRepository<Cargo, BigInteger> {
                 " where codigoCargo = '" + codigo + "'", Cargo.class).getResultList();
         return list.get(0);
     }
+    public Cargo buscarCargoUgPorcodigo(String codigo,String UG) {
+        List<Cargo> list = getEntityManager().createNativeQuery("select ed.* from Cargo ed join InfoRemessa i on ed.chave = i.chave and i.idUnidadeGestora='"+ UG +"'"+
+                " where codigoCargo = '" + codigo + "'", Cargo.class).getResultList();
+        return list.get(0);
+    }
     public List<Object> buscarCargoPorUnidade(String cnpj) {
 
         var query = getEntityManager().createNativeQuery(
