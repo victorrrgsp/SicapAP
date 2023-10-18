@@ -112,8 +112,8 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
                                 "from vwFolhaPagamento wfp\n" +
                                 "   join SICAPAP21.dbo.Lotacao l on wfp.idLotacao = l.id\n" +
                                 "   join UnidadeAdministrativa ud on l.idUnidadeAdministrativa = ud.id\n" +
-                                "where YEAR(wfp.Competencia) = :Ano\n" +
-                                "  and (MONTH(wfp.Competencia) = :Mes or :Mes = null )\n" +
+                                "where exercicio= :Ano\n" +
+                                "  and (remessa = :Mes or :Mes = null )\n" +
                                 (Natureza != null?"  and wfp.NaturezaRubrica in :Natureza\n":"") +
                                 "  and wfp.folhaItemUnidadeGestora not like 'Base%'\n" +
                                 "  and wfp.matriculaServidor like '%'+ :matriculaServidor +'%'\n" +
@@ -166,8 +166,8 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
                                 "where (:UnidadeGestora = 'todos' or wfp.idUnidadeGestora = :UnidadeGestora )\n" +
                                 (UnidadeAdministrativa != null?"  and ud.codigoUnidadeAdministrativa  in :UnidadeAdministrativa\n":"") +
                                 "\n" +
-                                "  and YEAR(wfp.Competencia) = :Ano\n" +
-                                "  and (MONTH(wfp.Competencia) = :Mes or :Mes = null )\n" +
+                                "  and Exercicio = :Ano\n" +
+                                "  and (remessa = :Mes or :Mes = null )\n" +
                                 (lotacao != null?"  and wfp.nomeLotacao in :lotacao\n":"") +
                                 (Vinculo != null?"  and wfp.TipoAdmissao in :Vinculo\n":"") +
                                 (Natureza != null?"  and wfp.NaturezaRubrica in :Natureza\n":"") +
@@ -188,6 +188,7 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
                                 "    wfp.nome                                                        ,\n" +
                                 "    wfp.cpfServidor                                                 ,\n" +
                                 "    wfp.cargo                                                       ,\n" +
+                                "    wfp.Classe                                                      ,\n" +
                                 "    wfp.nomeCargoOrigem                                             ,\n" +
                                 "    wfp.TipoAdmissao                                                ,\n" +
                                 "    wfp.JornadaFolha                                                ,\n" +
