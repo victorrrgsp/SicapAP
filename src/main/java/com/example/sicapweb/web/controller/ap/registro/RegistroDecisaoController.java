@@ -65,8 +65,7 @@ public class RegistroDecisaoController {
     private AtoRepository atoRepository;
 
     public static final List<Registro.Tipo> tiposRegistrosNaTabelaAposentadoria = Arrays.asList(
-            Registro.Tipo.Aposentadoria, Registro.Tipo.Reserva, Registro.Tipo.Reforma, Registro.Tipo.Reversao,
-            Registro.Tipo.RevisaoReforma, Registro.Tipo.RevisaoAposentadoria, Registro.Tipo.RevisaoReserva
+            Registro.Tipo.Aposentadoria,Registro.Tipo.Reserva,Registro.Tipo.Reforma,Registro.Tipo.Reversao,Registro.Tipo.RevisaoReforma,Registro.Tipo.RevisaoAposentadoria,Registro.Tipo.RevisaoReserva
     );
 
     public static final List<Registro.Tipo> tiposRegistrosNaTabelaPensao = Arrays.asList(Registro.Tipo.Pensao);
@@ -87,6 +86,7 @@ public class RegistroDecisaoController {
                 )
         );
     }
+
 
     @PostMapping("/{tipoRegistro}/")
     @Transactional
@@ -145,7 +145,6 @@ public class RegistroDecisaoController {
         return ResponseEntity.ok().body(infoProcessos);
     }
 
-
     @GetMapping(path = "/autorizado")
     public ResponseEntity<String> autorizarRegistro(@RequestHeader("Authorization") String bearerToken) {
         HashMap<String, Object> userInfo = getInfoUserFromToken(bearerToken);
@@ -155,7 +154,6 @@ public class RegistroDecisaoController {
         return ResponseEntity.ok().body("semAutorizacao");
     }
 
-
     @GetMapping(path = "/documentos/{numeroProcesso}/{anoProcesso}")
     public ResponseEntity<List<HashMap<String, Object>>> listaDocumentos(@RequestHeader("Authorization") String bearerToken,
                                                                          @PathVariable Integer numeroProcesso,
@@ -164,7 +162,6 @@ public class RegistroDecisaoController {
         List<HashMap<String, Object>> infoProcessos = registroAposentadoriaRepository.getDocumentosbyProcessoEcontas(userInfo, numeroProcesso, anoProcesso);
         return ResponseEntity.ok().body(infoProcessos);
     }
-
 
     private void setInformacoesDoUsuarioNoRegistro(Registro registro, HashMap<String, Object> userInfo) {
         registro.setDataCadastro(LocalDateTime.now());
@@ -287,8 +284,7 @@ public class RegistroDecisaoController {
             throw new IllegalArgumentException("Tipo de movimentação não definido para alteração");
         }
         var cargo = cargoRepository.buscarCargoUgPorcodigo((String)camposParaAlterar.get("cargo"),admissao.getChave().getIdUnidadeGestora());
-        admissaoRepository.updateVinculo(admissao, cargo);;
-
+        admissaoRepository.updateVinculo(admissao, cargo);
     }
 
     private void validarMovimentacao(HashMap<String, Object> infoUser, BigInteger idMovimentacao, Integer tipoRegistro) {
@@ -302,9 +298,9 @@ public class RegistroDecisaoController {
             infoMovimentacao.put("cnpjUnidadeGestora", aposentadoria.getAdmissao().getChave().getIdUnidadeGestora());
             if (aposentadoria == null)
                 throw new InvalitInsert("não encontrou a movimentacao de tipo " + tipoRegistroEnum.getLabel() + " para o id especificado!! ");
-            if (!registroAposentadoriaRepository.temProcessoEcontasPorInteressado(infoUser, infoMovimentacao)) {
-                throw new InvalitInsert("a movimentação de tipo " + tipoRegistroEnum.getLabel() + " do cpf " + aposentadoria.getCpfServidor() + " não tem processo no Econtas com decisão julgada para o usuario atual!! ");
-            }
+            // if (!registroAposentadoriaRepository.temProcessoEcontasPorInteressado(infoUser, infoMovimentacao)) {
+            //     throw new InvalitInsert("a movimentação de tipo " + tipoRegistroEnum.getLabel() + " do cpf " + aposentadoria.getCpfServidor() + " não tem processo no Econtas com decisão julgada para o usuario atual!! ");
+            // }
         } else if (this.tiposRegistrosNaTabelaPensao.contains(tipoRegistroEnum)) {
             //movimentos derivados da tabela Aposentadoria
             Pensao pensao = pensaoRepository.findById(idMovimentacao);
@@ -312,9 +308,9 @@ public class RegistroDecisaoController {
             infoMovimentacao.put("cnpjUnidadeGestora", pensao.getAdmissao().getChave().getIdUnidadeGestora());
             if (pensao == null)
                 throw new InvalitInsert("não encontrou a movimentacao de tipo " + tipoRegistroEnum.getLabel() + " para o id especificado!! ");
-            if (!registroAposentadoriaRepository.temProcessoEcontasPorInteressado(infoUser, infoMovimentacao)) {
-                throw new InvalitInsert("a movimentação " + tipoRegistroEnum.getLabel() + " do cpf " + pensao.getCpfServidor() + " não tem processso no Econtas com decisão julgada para o usuario atual!! ");
-            }
+            // if (!registroAposentadoriaRepository.temProcessoEcontasPorInteressado(infoUser, infoMovimentacao)) {
+            //     throw new InvalitInsert("a movimentação " + tipoRegistroEnum.getLabel() + " do cpf " + pensao.getCpfServidor() + " não tem processso no Econtas com decisão julgada para o usuario atual!! ");
+            // }
         } else if (this.tiposRegistrosNaTabelaAdmissao.contains(tipoRegistroEnum)) {
             //movimentos derivados da tabela Admissão
             Admissao admissao = admissaoRepository.findById(idMovimentacao);
@@ -322,9 +318,9 @@ public class RegistroDecisaoController {
             infoMovimentacao.put("cnpjUnidadeGestora", admissao.getChave().getIdUnidadeGestora());
             if (admissao == null)
                 throw new InvalitInsert("não encontrou a movimentacao de tipo " + tipoRegistroEnum.getLabel() + " para o id especificado!! ");
-            if (!registroAposentadoriaRepository.temProcessoEcontasPorInteressado(infoUser, infoMovimentacao)) {
-                throw new InvalitInsert("a movimentação " + tipoRegistroEnum.getLabel() + " do cpf: " + admissao.getCpfServidor() + " e nome: " + admissao + " não ter processso no econtas com decisão julgada para o usuario atual!! ");
-            }
+            // if (!registroAposentadoriaRepository.temProcessoEcontasPorInteressado(infoUser, infoMovimentacao)) {
+            //     throw new InvalitInsert("a movimentação " + tipoRegistroEnum.getLabel() + " do cpf: " + admissao.getCpfServidor() + " e nome: " + admissao + " não ter processso no econtas com decisão julgada para o usuario atual!! ");
+            // }
         } else throw new IllegalArgumentException("Tipo de registro não encontrado !!");
     }
 
