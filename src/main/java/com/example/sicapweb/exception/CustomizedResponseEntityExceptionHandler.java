@@ -35,6 +35,16 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
 						);
 		return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
 	}
+	@ExceptionHandler(MovimentacaoNotFaud.class)
+	public final ResponseEntity<ExceptionResponse> MovimentacaoNotFaudExceptions(Exception ex, WebRequest request) {
+		ExceptionResponse exceptionResponse = 
+				new ExceptionResponse(
+						//new Date(),
+						ex.getMessage()
+						//request.getDescription(true)
+						);
+		return new ResponseEntity<>(exceptionResponse, HttpStatus.PRECONDITION_FAILED);
+	}
 	
 	
 
