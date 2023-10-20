@@ -263,7 +263,11 @@ public class RegistroAposentadoriaRepository  extends DefaultRepository<Registro
         }
     }
 
-    public List<HashMap<String,Object>> getInforProcessosEcontas(HashMap<String,Object> userInfo ){
+
+    public List<HashMap<String,Object>> getInforProcessosEcontas(HashMap<String,Object> userInfo){
+        return getInforProcessosEcontas(userInfo,null);
+    }
+    public List<HashMap<String,Object>> getInforProcessosEcontas(HashMap<String,Object> userInfo,HashMap<String,Object> infoMovimentacao){
         try{
             Query sqlProcessos=getEntityManager().createNativeQuery(
                              " with \r\n" + //
@@ -305,6 +309,7 @@ public class RegistroAposentadoriaRepository  extends DefaultRepository<Registro
                              "            join SCP.dbo.document c on c.dcnproc_pnumero = hcodp_pnumero and c.dcnproc_pano = hcodp_pano and c.docmt_tipo_decisao = 'D'  and docmt_tipo='RL'\r\n" + //
                              "            join Cadun.dbo.PessoaFisica e on d.ID_PESSOA=e.Codigo\r\n" + //
                              "            join Cadun.dbo.vwPessoaJuridica f on a.id_entidade_origem= f.id\r\n" + //
+                             (infoMovimentacao==null?"":"        where e.cpf = :cpf and f.codunidadegestora = :cnpj and assunto_desc = :assunto") + //
                              "    ),\r\n" + //
                              "    envios as (\r\n" + //
                              "                select cast(substring(processo, 1, len(processo) - 5) as int)             numeroProcesso,\r\n" + //
@@ -323,34 +328,21 @@ public class RegistroAposentadoriaRepository  extends DefaultRepository<Registro
                              "        env.numeroProcesso = pss.numeroProcesso and\r\n" + //
                              "        env.anoProcesso    = pss.anoProcesso")
                     .setParameter("Usuario",userInfo.get("loginUsuario"));
+                    if (infoMovimentacao != null) {
+                        sqlProcessos
+                            .setParameter("cpf",infoMovimentacao.get("cpf"))
+                            .setParameter("cnpj",infoMovimentacao.get("cnpjUnidadeGestora"))
+                            .setParameter("assunto",infoMovimentacao.get("assuntoProcessoEcontas"));
+                    }
             return  StaticMethods.getHashmapFromQuery(sqlProcessos);
         } catch (RuntimeException e){
-            throw new RuntimeException("não encontro os processos no econtas!!");
+            throw new RuntimeException("não foi posivel encontrar os processos no econtas!!");
         }
     }
 
 
     public Boolean temProcessoEcontasPorInteressado(HashMap<String,Object> userInfo, HashMap<String,Object> infoMovimentacao ){
-        try{
-            Query sqlProcessos=getEntityManager().createNativeQuery("    with processosRecebidos as" +
-                    "(select hcodp_pnumero,hcodp_pano, assunto_desc,id_entidade_origem from SCP.dbo.VW_PROC_RECEBIDOS a  " +
-                    " (proc_num_anexo IS NULL or proc_num_anexo =0) " +
-                    "and (processo_numaps IS NULL or processo_numaps =0)) and trim(hists_dest_resp)= :usuario \r\n" + //
-                            "                    ) " +
-                    "select count(1)  from " +
-                    " processosRecebidos a   join     SCP..PESSOAS_PROCESSO d  on d.ID_PAPEL=2 and ID_CARGO=0 and a.hcodp_pnumero=d.NUM_PROC and a.hcodp_pano = d.ANO_PROC " +
-                    " join SCP.dbo.document c on c.dcnproc_pnumero = hcodp_pnumero and c.dcnproc_pano = hcodp_pano and c.docmt_tipo_decisao = 'D'  and docmt_tipo='RL'  " +
-                    "join Cadun.dbo.PessoaFisica e on d.ID_PESSOA=e.Codigo " +
-                    "join Cadun.dbo.vwPessoaJuridica f on a.id_entidade_origem= f.id " +
-                    "  where  e.cpf = :cpf and f.codunidadegestora = :cnpj and assunto_desc = :assunto ")
-                    .setParameter("usuario",userInfo.get("loginUsuario"))
-                    .setParameter("cpf",infoMovimentacao.get("cpf"))
-                    .setParameter("cnpj",infoMovimentacao.get("cnpjUnidadeGestora"))
-                    .setParameter("assunto",infoMovimentacao.get("assuntoProcessoEcontas"));
-            return  true; //((Integer)sqlProcessos.getSingleResult()>0);
-        }catch (RuntimeException e){
-            throw new RuntimeException("problema ao consultar o processo com decisão do interessaodo de cpf "+infoMovimentacao.get("cnpjUnidadeGestora")+" nos seus processos do econtas!!");
-        }
+        return !getInforProcessosEcontas(userInfo, infoMovimentacao).isEmpty();
     }
 
 
