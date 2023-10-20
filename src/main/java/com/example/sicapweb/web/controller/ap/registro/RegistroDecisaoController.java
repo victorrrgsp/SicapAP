@@ -10,6 +10,7 @@ import br.gov.to.tce.model.ap.registro.RegistroPensao;
 import br.gov.to.tce.model.ap.relacional.Ato;
 
 import com.example.sicapweb.exception.InvalitInsert;
+import com.example.sicapweb.exception.MovimentacaoNotFaud;
 import com.example.sicapweb.repository.concessao.AposentadoriaRepository;
 import com.example.sicapweb.repository.concessao.PensaoRepository;
 import com.example.sicapweb.repository.geral.AtoRepository;
@@ -298,9 +299,9 @@ public class RegistroDecisaoController {
             infoMovimentacao.put("cnpjUnidadeGestora", aposentadoria.getAdmissao().getChave().getIdUnidadeGestora());
             if (aposentadoria == null)
                 throw new InvalitInsert("não encontrou a movimentacao de tipo " + tipoRegistroEnum.getLabel() + " para o id especificado!! ");
-            // if (!registroAposentadoriaRepository.temProcessoEcontasPorInteressado(infoUser, infoMovimentacao)) {
-            //     throw new InvalitInsert("a movimentação de tipo " + tipoRegistroEnum.getLabel() + " do cpf " + aposentadoria.getCpfServidor() + " não tem processo no Econtas com decisão julgada para o usuario atual!! ");
-            // }
+            if (!registroAposentadoriaRepository.temProcessoEcontasPorInteressado(infoUser, infoMovimentacao)) {
+                throw new MovimentacaoNotFaud( tipoRegistroEnum.getLabel(), aposentadoria.getCpfServidor());
+            }
         } else if (this.tiposRegistrosNaTabelaPensao.contains(tipoRegistroEnum)) {
             //movimentos derivados da tabela Aposentadoria
             Pensao pensao = pensaoRepository.findById(idMovimentacao);
@@ -308,9 +309,9 @@ public class RegistroDecisaoController {
             infoMovimentacao.put("cnpjUnidadeGestora", pensao.getAdmissao().getChave().getIdUnidadeGestora());
             if (pensao == null)
                 throw new InvalitInsert("não encontrou a movimentacao de tipo " + tipoRegistroEnum.getLabel() + " para o id especificado!! ");
-            // if (!registroAposentadoriaRepository.temProcessoEcontasPorInteressado(infoUser, infoMovimentacao)) {
-            //     throw new InvalitInsert("a movimentação " + tipoRegistroEnum.getLabel() + " do cpf " + pensao.getCpfServidor() + " não tem processso no Econtas com decisão julgada para o usuario atual!! ");
-            // }
+            if (!registroAposentadoriaRepository.temProcessoEcontasPorInteressado(infoUser, infoMovimentacao)) {
+                throw new MovimentacaoNotFaud( tipoRegistroEnum.getLabel(), pensao.getCpfServidor());
+            }
         } else if (this.tiposRegistrosNaTabelaAdmissao.contains(tipoRegistroEnum)) {
             //movimentos derivados da tabela Admissão
             Admissao admissao = admissaoRepository.findById(idMovimentacao);
@@ -318,9 +319,9 @@ public class RegistroDecisaoController {
             infoMovimentacao.put("cnpjUnidadeGestora", admissao.getChave().getIdUnidadeGestora());
             if (admissao == null)
                 throw new InvalitInsert("não encontrou a movimentacao de tipo " + tipoRegistroEnum.getLabel() + " para o id especificado!! ");
-            // if (!registroAposentadoriaRepository.temProcessoEcontasPorInteressado(infoUser, infoMovimentacao)) {
-            //     throw new InvalitInsert("a movimentação " + tipoRegistroEnum.getLabel() + " do cpf: " + admissao.getCpfServidor() + " e nome: " + admissao + " não ter processso no econtas com decisão julgada para o usuario atual!! ");
-            // }
+            if (!registroAposentadoriaRepository.temProcessoEcontasPorInteressado(infoUser, infoMovimentacao)) {
+                throw new MovimentacaoNotFaud( tipoRegistroEnum.getLabel(), admissao.getCpfServidor());
+            }
         } else throw new IllegalArgumentException("Tipo de registro não encontrado !!");
     }
 
