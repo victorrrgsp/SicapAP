@@ -81,9 +81,10 @@ public class RelatoriosController extends DefaultController<Lei> {
                                                                     @RequestParam(required = false) String Natureza,
                                                                     @RequestParam int ano,
                                                                     @RequestParam int mes,
-                                                                    @RequestParam(required = false) String folhaItem
+                                                                    @RequestParam(required = false) String folhaItem,
+                                                                    @RequestParam String UnidadeGestora
                                                                     ){
-        List<HashMap<String, Object>> result = relatorioRepository.buscarFolhaPesoas(matriculaServidor, Natureza, ano, mes, folhaItem);
+        List<HashMap<String, Object>> result = relatorioRepository.buscarFolhaPesoas(matriculaServidor, Natureza, ano, mes, folhaItem,UnidadeGestora);
         return ResponseEntity.ok().body(result);
     }
 

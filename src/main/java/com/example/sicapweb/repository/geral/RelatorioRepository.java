@@ -95,7 +95,7 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
         return StaticMethods.getHashmapFromQuery(query);
     }
 
-    public List<HashMap<String, Object>> buscarFolhaPesoas( String matriculaServidor , String Natureza, int ano, int mes, String folhaItem ) {
+    public List<HashMap<String, Object>> buscarFolhaPesoas( String matriculaServidor , String Natureza, int ano, int mes, String folhaItem, String unidadeGestora ) {
         var query = getEntityManager().createNativeQuery(
                                 "with principal as(\n" +
                                 "    select distinct NaturezaRubrica,\r\n" + //
@@ -110,28 +110,22 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
                                 "            when 'Vantagem' then wfp.valor\n" +
                                 "            when 'Desconto' then (wfp.valor * -1) end)  as Valor\n" +
                                 "from vwFolhaPagamento wfp\n" +
-                                "   join SICAPAP21.dbo.Lotacao l on wfp.idLotacao = l.id\n" +
-                                "   join UnidadeAdministrativa ud on l.idUnidadeAdministrativa = ud.id\n" +
                                 "where exercicio= :Ano\n" +
                                 "  and (remessa = :Mes or :Mes = null )\n" +
+                                "  and wfp.idUnidadeGestora = :UnidadeGestora \n" +
                                 (Natureza != null?"  and wfp.NaturezaRubrica in :Natureza\n":"") +
                                 "  and wfp.folhaItemUnidadeGestora not like 'Base%'\n" +
-                                "  and wfp.matriculaServidor like '%'+ :matriculaServidor +'%'\n" +
+                                "  and wfp.matriculaServidor = :matriculaServidor \n" +
                                 (folhaItem != null?"  and wfp.FolhaItemUnidadeGestora like '%'+ :folhaItem +'%'\n":"") +
                                 ")\n" +
                                 "\n" +
                                 "select distinct * from principal\n" +
                                 "order by NaturezaRubrica desc, codigoFolhaItem;")
-
                                 .setParameter("Ano", ano)
                                 .setParameter("Mes", mes)
-                                .setParameter("matriculaServidor", matriculaServidor);
-
-        if(Natureza != null){
-            query.setParameter("Natureza", Natureza);
-        }if(folhaItem != null){
-            query.setParameter("folhaItem", folhaItem);
-        }
+                                .setParameter("matriculaServidor", matriculaServidor)
+                                .setParameter("UnidadeGestora", unidadeGestora);
+                                
         return StaticMethods.getHashmapFromQuery(query);
     }
 
