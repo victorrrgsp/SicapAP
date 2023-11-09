@@ -67,7 +67,6 @@ public class CargoController  extends DefaultController<Cargo> {
         return ResponseEntity.ok().body(list);
     }
 
-
     @CrossOrigin
     @GetMapping("/{unidade}/{mes}/{ano}")
     public ResponseEntity<List<Object>> findByunidade( @PathVariable String unidade,@PathVariable int mes,@PathVariable int ano ) {
@@ -75,7 +74,7 @@ public class CargoController  extends DefaultController<Cargo> {
         return ResponseEntity.ok().body(list);
     }
     @GetMapping(path = {"findByCodigo/{codigo}"})
-    public ResponseEntity<?> findById(@PathVariable String codigo) {
+    public ResponseEntity<?> findByCodigo(@PathVariable String codigo) {
         Cargo list = cargoRepository.buscarCargoPorcodigo(codigo);
         return ResponseEntity.ok().body(list);
     }
@@ -101,5 +100,20 @@ public class CargoController  extends DefaultController<Cargo> {
     @DeleteMapping(value = {"/{id}"})
     public void delete(@PathVariable BigInteger id) {
         cargoRepository.deleteRestrito(id); 
+    }
+
+    @CrossOrigin
+    @GetMapping(path = {"/{id}"})
+    public ResponseEntity<?> findById(@PathVariable BigInteger id) {
+        var list = cargoRepository.findById(id);
+        return ResponseEntity.ok().body(list);
+    }
+
+    @Transactional
+    @PostMapping
+    public ResponseEntity<Cargo> create(@RequestBody Cargo cargo) {
+        cargo.setChave(cargoRepository.buscarPrimeiraRemessa());
+        cargoRepository.save(cargo);
+        return ResponseEntity.noContent().build();
     }
 }
