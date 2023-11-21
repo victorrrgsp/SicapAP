@@ -147,7 +147,9 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
                                 "       wfp.matriculaServidor as matriculaServidor,\n" +
                                 "       wfp.TipoAto,\n" +
                                 "       wfp.NumeroAtoAdmissao,\n" +
-                                "       wfp.nomeLotacao,\n" +
+                                "       wfp.nomeLotacao,\r\n" + //
+                                "       wfp.RegimePrevidenciario,\r\n" + //
+                                "       wfp.DataExercicio,\n" +
                                 "       ud.nome as unidadeAdministrativa ,\n" +
                                 "       sum((case wfp.NaturezaRubrica when 'Vantagem' then wfp.valor end)) as Vantagem,\n" +
                                 "       sum((case wfp.NaturezaRubrica when 'Desconto' then wfp.valor end)) as Descontos,\n" +
@@ -175,8 +177,10 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
                                 "    or wfp.cpfServidor like concat('%', :cpf, '%'))\n" +
                                 (folhaItem != null?"  and wfp.FolhaItemUnidadeGestora like '%'+ :folhaItem +'%'\n":"") +
                                 "group by\n" +
+                                "    wfp.RegimePrevidenciario,\n" + //
                                 "    ud.codigoUnidadeAdministrativa,\n" +
                                 "    wfp.idUnidadeGestora                                            ,\n" +
+                                "    wfp.DataExercicio                                               ,\n" +
                                 "    wfp.unidadeGestora                                              ,\n" +
                                 "    wfp.Competencia                                                 ,\n" +
                                 "    wfp.nome                                                        ,\n" +
