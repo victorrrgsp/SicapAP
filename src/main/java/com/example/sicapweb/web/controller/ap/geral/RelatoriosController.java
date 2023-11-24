@@ -75,15 +75,22 @@ public class RelatoriosController extends DefaultController<Lei> {
         return ResponseEntity.ok().body(result);
     }
     @CrossOrigin
+    @GetMapping(path = "/informacaoServidor")
+    public ResponseEntity<HashMap<String, Object>> informacaoServidor(@RequestParam(required = false) String cpf){
+        var result = relatorioRepository.buscarInfoPesoas(cpf);
+        return ResponseEntity.ok().body(result);
+    }
+    @CrossOrigin
     @GetMapping(path = "/folhaServidor")
     public ResponseEntity<List<HashMap<String, Object>>> listfolhaServidor(
                                                                     @RequestParam String matriculaServidor,
                                                                     @RequestParam(required = false) String Natureza,
                                                                     @RequestParam int ano,
                                                                     @RequestParam int mes,
-                                                                    @RequestParam(required = false) String folhaItem
+                                                                    @RequestParam(required = false) String folhaItem,
+                                                                    @RequestParam String UnidadeGestora
                                                                     ){
-        List<HashMap<String, Object>> result = relatorioRepository.buscarFolhaPesoas(matriculaServidor, Natureza, ano, mes, folhaItem);
+        List<HashMap<String, Object>> result = relatorioRepository.buscarFolhaPesoas(matriculaServidor, Natureza, ano, mes, folhaItem,UnidadeGestora);
         return ResponseEntity.ok().body(result);
     }
 

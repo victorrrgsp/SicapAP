@@ -35,7 +35,7 @@ public class RegistroAposentadoriaRepository  extends DefaultRepository<Registro
         if (nome !=null && !nome.isEmpty()){
             search=" where s.nome like '%"+nome+"%'";
         } else if (cpf !=null && !cpf.isEmpty()) {
-            search=" where a.cpfServidor  = '"+cpf+"'";
+            search=" where a.cpfServidor  = '"+cpf.trim()+"'";
         }
         return search;
     }
@@ -54,7 +54,7 @@ public class RegistroAposentadoriaRepository  extends DefaultRepository<Registro
                         "), aposentEnvios as (select b.numeroProcesso, b.anoProcesso,a.* from Aposentadoria a  join envios b on a.id=b.idMovimentacao) " +
                         " , apos as (select i.idUnidadeGestora,a.* " +
                         "               from aposentEnvios a " +
-                        "                        join InfoRemessa i on a.chave = i.chave "+variacoesNaQuery.get("FiltroSubtipo")+" and  i.idUnidadeGestora = '"+filtros.get("ug")+"'    where not exists(select 1 from RegistroAposentadoria where idAposentadoria = a.id   ) ) " +
+                        "                        join InfoRemessa i on a.chave = i.chave "+variacoesNaQuery.get("FiltroSubtipo")+" and  i.idUnidadeGestora = '"+filtros.get("ug")+"' ) " +
                         " select a.id as idMovimentacao ,   " +
                         "       s.cpfServidor as cpfServidor, " +
                         "        s.nome as nome, " +

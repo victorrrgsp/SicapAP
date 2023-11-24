@@ -88,7 +88,6 @@ public class RegistroDecisaoController {
         );
     }
 
-
     @PostMapping("/{tipoRegistro}/")
     @Transactional
     public void salvarRegistrar(@RequestHeader("Authorization") String bearerToken,
@@ -264,7 +263,9 @@ public class RegistroDecisaoController {
             Aposentadoria movimentacao = aposentadoriaRepository.findById(idMovimentacao);
             admissao = admissaoRepository.findById(movimentacao.getAdmissao().getId());
             movimentacao.setAto(novoAto);
-            movimentacao.setTipoAposentadoria(tipoAposentadoria);
+            if (tipoAposentadoria != null) {
+                movimentacao.setTipoAposentadoria(tipoAposentadoria);
+            }
             aposentadoriaRepository.update(movimentacao);
         } else if (this.tiposRegistrosNaTabelaPensao.contains(tipoRegistroEnum)) {
             //movimentos derivados da tabela Pensao
