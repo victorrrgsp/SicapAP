@@ -226,7 +226,7 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
         
         var queryinfoServidor = getEntityManager()
                                     .createNativeQuery("select top 1 nome,cpfServidor,dataNascimento from SICAPAP21..Servidor s\r\n" + //
-                "where s.cpfServidor like @cpf")
+                "where s.cpfServidor like :cpf")
                 .setParameter("cpf", cpf);
         var queryHistoricoDeVinculo = getEntityManager().createNativeQuery("with\r\n" + //
                 "     MAdmisao as (\r\n" + //
@@ -286,7 +286,7 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
                 "    from MAdmisao Ma\r\n" + //
                 "            left join Servidor  s on Ma.idServidor = s.id\r\n" + //
                 "            inner join SICAPAP21..cargo c on Ma.idCargo = c.id\r\n" + //
-                "    where posicaoId = 1 and S.cpfServidor = @cpf\r\n" + //
+                "    where posicaoId = 1 and S.cpfServidor = :cpf\r\n" + //
                 ")\r\n" + //
                 "-- select * from AdimisoeDistintas\r\n" + //
                 "    ,MAposentadoria as (\r\n" + //
@@ -348,7 +348,7 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
                 "    from MAposentadoria Ma\r\n" + //
                 "            left join Servidor  s on Ma.idServidor = s.id\r\n" + //
                 "            inner join SICAPAP21..cargo c on Ma.idCargo = c.id\r\n" + //
-                "    where posicaoId = 1 and S.cpfServidor = @cpf\r\n" + //
+                "    where posicaoId = 1 and S.cpfServidor = :cpf\r\n" + //
                 ")\r\n" + //
                 "--select * from AposentadoriaDistintas\r\n" + //
                 "    ,MDesligamento as (\r\n" + //
@@ -445,7 +445,7 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
                 "    from MDesligamento Ma\r\n" + //
                 "             left join Servidor  s on Ma.idServidor = s.id\r\n" + //
                 "             left join SICAPAP21..cargo c on Ma.idCargo = c.id\r\n" + //
-                "    where posicaoId = 1 and S.cpfServidor = @cpf\r\n" + //
+                "    where posicaoId = 1 and S.cpfServidor = :cpf\r\n" + //
                 ")\r\n" + //
                 "-- select * from DesligamentoDistintas\r\n" + //
                 "    ,MReadaptacao as (\r\n" + //
@@ -507,7 +507,7 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
                 "    from MReadaptacao Ma\r\n" + //
                 "        left join Servidor  s on Ma.idServidor = s.id\r\n" + //
                 "        inner join SICAPAP21..cargo c on Ma.idCargo = c.id\r\n" + //
-                "    where posicaoId = 1 and S.cpfServidor = @cpf\r\n" + //
+                "    where posicaoId = 1 and S.cpfServidor = :cpf\r\n" + //
                 ")\r\n" + //
                 "-- select * from ReadaptacaoDistintas\r\n" + //
                 "    ,MReconducao as (\r\n" + //
@@ -567,7 +567,7 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
                 "    from MReconducao Ma\r\n" + //
                 "            left join Servidor  s on Ma.idServidor = s.id\r\n" + //
                 "            inner join SICAPAP21..cargo c on Ma.idCargo = c.id\r\n" + //
-                "    where posicaoId = 1 and S.cpfServidor = @cpf\r\n" + //
+                "    where posicaoId = 1 and S.cpfServidor = :cpf\r\n" + //
                 ")\r\n" + //
                 "-- select * from ReadaptacaoDistintas\r\n" + //
                 "    ,MReintegracao as (\r\n" + //
@@ -627,7 +627,7 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
                 "    from MReintegracao Ma\r\n" + //
                 "            left join Servidor  s on Ma.idServidor = s.id\r\n" + //
                 "            inner join SICAPAP21..cargo c on Ma.idCargo = c.id\r\n" + //
-                "    where posicaoId = 1 and S.cpfServidor = @cpf\r\n" + //
+                "    where posicaoId = 1 and S.cpfServidor = :cpf\r\n" + //
                 ")\r\n" + //
                 "-- select * from ReintegracaoDistintas\r\n" + //
                 "    ,MPensao as (\r\n" + //
@@ -687,7 +687,7 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
                 "    from MPensao Ma\r\n" + //
                 "            left join Servidor  s on Ma.idServidor = s.id\r\n" + //
                 "            inner join SICAPAP21..cargo c on Ma.idCargo = c.id\r\n" + //
-                "    where posicaoId = 1 and S.cpfServidor = @cpf\r\n" + //
+                "    where posicaoId = 1 and S.cpfServidor = :cpf\r\n" + //
                 ")\r\n" + //
                 "-- select * from PensaoDistintas\r\n" + //
                 "    ,MLicenca as (\r\n" + //
@@ -746,7 +746,7 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
                 "    from MLicenca Ma\r\n" + //
                 "            left join Servidor  s on Ma.idServidor = s.id\r\n" + //
                 "            inner join SICAPAP21..cargo c on Ma.idCargo = c.id\r\n" + //
-                "    where posicaoId = 1 and S.cpfServidor = @cpf\r\n" + //
+                "    where posicaoId = 1 and S.cpfServidor = :cpf\r\n" + //
                 ")\r\n" + //
                 "--select * from LicencaDistintas;\r\n" + //
                 "    ,MDesignacaoDeFuncao as (\r\n" + //
@@ -806,7 +806,7 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
                 "    from MDesignacaoDeFuncao Ma\r\n" + //
                 "            left join Servidor  s on Ma.idServidor = s.id\r\n" + //
                 "            inner join SICAPAP21..cargo c on Ma.idCargo = c.id\r\n" + //
-                "    where posicaoId = 1 and S.cpfServidor = @cpf\r\n" + //
+                "    where posicaoId = 1 and S.cpfServidor = :cpf\r\n" + //
                 ")\r\n" + //
                 "\r\n" + //
                 "    ,MCessao as (\r\n" + //
@@ -866,7 +866,7 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
                 "    from MCessao Ma\r\n" + //
                 "            left  join Servidor  s on Ma.idServidor = s.id\r\n" + //
                 "            inner join SICAPAP21..cargo c on Ma.idCargo = c.id\r\n" + //
-                "    where posicaoId = 1 and S.cpfServidor = @cpf\r\n" + //
+                "    where posicaoId = 1 and S.cpfServidor = :cpf\r\n" + //
                 ")\r\n" + //
                 "\r\n" + //
                 "    ,MAproveitamento as (\r\n" + //
@@ -926,7 +926,7 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
                 "    from MAproveitamento Ma\r\n" + //
                 "            left  join Servidor  s on Ma.idServidor = s.id\r\n" + //
                 "            inner join SICAPAP21..cargo c on Ma.idCargo = c.id\r\n" + //
-                "    where posicaoId = 1 and S.cpfServidor = @cpf\r\n" + //
+                "    where posicaoId = 1 and S.cpfServidor = :cpf\r\n" + //
                 ")\r\n" + //
                 "\r\n" + //
                 "   , movimentacoes as (\r\n" + //
@@ -957,7 +957,8 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
                 "       1 AS count\r\n" + //
                 "from movimentacoes M\r\n" + //
                 "    inner join SICAPAP21..InfoRemessa i on i.chave = M.chave\r\n" + //
-                "where cpfServidor like @cpf order by matriculaServidor , exercicio ,remessa");
+                "where cpfServidor like :cpf order by matriculaServidor , exercicio ,remessa")
+                .setParameter("cpf", cpf);
         var queryAcumulacaoDeVinculos = getEntityManager().createNativeQuery("select 1 as teste");
         var queryRemessasComFolha = getEntityManager().createNativeQuery("select 1 as teste");
         
