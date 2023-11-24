@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import org.springframework.stereotype.Repository;
 
@@ -221,13 +222,14 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
         return StaticMethods.getHashmapFromQuery(query);
     }
 
-    public HashMap<String, Object> buscarInfoPesoas(String cpf) {
-        var hashMap = new HashMap<String, Object>();
-        
-        var queryinfoServidor = getEntityManager()
+    private Query getQueryinfoServidor(String cpf) {
+        return getEntityManager()
                                     .createNativeQuery("select top 1 nome,cpfServidor,dataNascimento from SICAPAP21..Servidor s\r\n" + //
                 "where s.cpfServidor like :cpf")
                 .setParameter("cpf", cpf);
+    }
+
+    private Query getQueryHistoricoDeVinculo(String cpf) {
         var queryHistoricoDeVinculo = getEntityManager().createNativeQuery("with\r\n" + //
                 "     MAdmisao as (\r\n" + //
                 "    select --D.dataDesligamento,\r\n" + //
@@ -959,6 +961,14 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
                 "    inner join SICAPAP21..InfoRemessa i on i.chave = M.chave\r\n" + //
                 "where cpfServidor like :cpf order by matriculaServidor , exercicio ,remessa")
                 .setParameter("cpf", cpf);
+        return queryHistoricoDeVinculo;
+    }
+
+    public HashMap<String, Object> buscarInfoPesoas(String cpf) {
+        var hashMap = new HashMap<String, Object>();
+
+        var queryinfoServidor = getQueryinfoServidor(cpf);
+        var queryHistoricoDeVinculo = getQueryHistoricoDeVinculo(cpf);
         var queryAcumulacaoDeVinculos = getEntityManager().createNativeQuery("select 1 as teste");
         var queryRemessasComFolha = getEntityManager().createNativeQuery("select 1 as teste");
         
