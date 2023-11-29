@@ -3,6 +3,7 @@ package com.example.sicapweb.repository.geral;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -130,11 +131,22 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
         return StaticMethods.getHashmapFromQuery(query);
     }
 
-    public List<HashMap<String, Object>> buscarPesoasfolha( String cpf, String nome, String Natureza, List<String> Vinculo, int ano, int mes, List<String> lotacao, List<String> UnidadeAdministrativa, String UnidadeGestora, String folhaItem,String cargo) {
-        var query = getEntityManager().createNativeQuery(
-                                "with principal as(\n" +
+    public List<HashMap<String, Object>> buscarPesoasfolha( String cpf, String nome, int ano,Integer mes) {
+        return buscarPesoasfolha(cpf, nome, null, null, ano,mes,null, null, null, null, null);
+    }
+    public List<HashMap<String, Object>> buscarPesoasfolha( String cpf, String nome, String Natureza, List<String> Vinculo, int ano, Integer mes, List<String> lotacao, List<String> UnidadeAdministrativa, String UnidadeGestora, String folhaItem,String cargo) {
+        var PesoaParam = cpf != null?cpf:nome;
+        // retorna um array de string com o cpf [coluna 1] da lista de array de objetos de getQueryinfoServidor(PesoaParam).getResultList()
+        List<String> cpfsServidor = (List) getQueryinfoServidor(PesoaParam)
+                                                .getResultList()
+                                                .stream()
+                                                .map(x -> {
+                                                    return ((Object[]) x)[1];
+                                                }).collect(Collectors.toList());
+
+        var sql = "with principal as(\n" +
                                 "    select distinct ud.codigoUnidadeAdministrativa,\n" +
-                                "       wfp.idUnidadeGestora                                         as CNPJ,\n" +
+                                "       wfp.idUnidadeGestora                                          as CNPJ,\n" +
                                 "       wfp.unidadeGestora                                            as Entidade,\n" +
                                 "       YEAR(wfp.Competencia)                                         as Ano,\n" +
                                 "       MONTH(wfp.Competencia)                                        as Mes,\n" +
@@ -160,22 +172,23 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
                                 "from vwFolhaPagamento wfp\n" +
                                 "join SICAPAP21.dbo.Lotacao l on wfp.idLotacao = l.id\n" +
                                 "join UnidadeAdministrativa ud on l.idUnidadeAdministrativa = ud.id\n" +
-                                "where (:UnidadeGestora = 'todos' or wfp.idUnidadeGestora = :UnidadeGestora )\n" +
-                                (UnidadeAdministrativa != null?"  and ud.codigoUnidadeAdministrativa  in :UnidadeAdministrativa\n":"") +
-                                "\n" +
-                                "  and Exercicio = :Ano\n" +
-                                "  and (remessa = :Mes or :Mes = null )\n" +
-                                (lotacao != null?"  and wfp.nomeLotacao in :lotacao\n":"") +
-                                (Vinculo != null?"  and wfp.TipoAdmissao in :Vinculo\n":"") +
+                                "where \n";
+                                if(cpfsServidor.size() > 0){
+                                    sql +=" wfp.cpfServidor in :cpfsServidor\n" ;
+                                }else{
+                                    sql +=" (:UnidadeGestora = 'todos' or wfp.idUnidadeGestora = :UnidadeGestora )\n" + 
+                                    (Vinculo != null?"  and wfp.TipoAdmissao in :Vinculo\n":"")+
+                                    (UnidadeAdministrativa != null?"  and ud.codigoUnidadeAdministrativa  in :UnidadeAdministrativa\n":"") +
+                                    (lotacao != null?"  and wfp.nomeLotacao in :lotacao\n":"")+
+                                    "  and (\n" +
+                                    "           :cargo is null or\n" +
+                                    "           wfp.nomeCargoOrigem = :cargo\n" +
+                                    "       )\n" ;
+                                }
+                                sql += "  and Exercicio = :Ano\n" +
+                                (mes != null?"  and remessa = :Mes \n":"") +
                                 (Natureza != null?"  and wfp.NaturezaRubrica in :Natureza\n":"") +
                                 "  and wfp.folhaItemUnidadeGestora not like 'Base%'\n" +
-                                "  and (:nome is null or upper(wfp.nome) like'%'+upper(:nome)+'%')\n" +
-                                "  and (\n" +
-                                "      (:cpf is null or\n" +
-                                "            (:cargo is null or\n" +
-                                "             wfp.nomeCargoOrigem = :cargo)\n" +
-                                "            )\n" +
-                                "    or wfp.cpfServidor like concat('%', :cpf, '%'))\n" +
                                 (folhaItem != null?"  and wfp.FolhaItemUnidadeGestora like '%'+ :folhaItem +'%'\n":"") +
                                 "group by\n" +
                                 "    wfp.RegimePrevidenciario,\n" + //
@@ -197,26 +210,35 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
                                 "    wfp.nomeLotacao                                                 ,\n" +
                                 "    ud.nome\n" +
                                 ")\n" +
-                                "\n" +
                                 "select distinct * from principal\n" +
-                                "order by nome;")
-                                .setParameter("cpf", cpf )
-                                .setParameter("nome", nome)
-                                .setParameter("Ano", ano)
-                                .setParameter("Mes", mes)
-                                .setParameter("cargo", cargo)
-                                .setParameter("UnidadeGestora", UnidadeGestora);
-                                
-        if(UnidadeAdministrativa != null){
-            query.setParameter("UnidadeAdministrativa", UnidadeAdministrativa);
-        }if(Natureza != null){
+                                "order by nome;";
+
+        var query = getEntityManager().createNativeQuery(sql)
+                                .setParameter("Ano", ano);
+        
+        if(mes != null){
+            query.setParameter("Mes", mes);
+        }
+        if(Natureza != null){
             query.setParameter("Natureza", Natureza);
-        }if(folhaItem != null){
+        }
+        if(folhaItem != null){
             query.setParameter("folhaItem", folhaItem);
-        }if(Vinculo != null){
-            query.setParameter("Vinculo", Vinculo);
-        }if(lotacao != null){
-            query.setParameter("lotacao", lotacao);
+        }
+        if(cpfsServidor.size() > 0){
+            query.setParameter("cpfsServidor", cpfsServidor);
+        }else{
+            query.setParameter("UnidadeGestora", UnidadeGestora)
+                 .setParameter("cargo", cargo);
+            if (UnidadeAdministrativa != null) {
+                query.setParameter("UnidadeAdministrativa", UnidadeAdministrativa);
+            }
+            if (Vinculo != null) {
+                query.setParameter("Vinculo", Vinculo);
+            }
+            if (lotacao != null) {
+                query.setParameter("lotacao", lotacao);
+            }
         }
 
         return StaticMethods.getHashmapFromQuery(query);
@@ -231,7 +253,7 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
             "IF :nome is null\n" +
             "    INSERT INTO @tbfolha\n" +
             "    SELECT\n" +
-            "        p.idUnidadeGestora, p.cpfServidor, p.exercicio, p.remessa, CASE WHEN p.JornadaFolha = '88' THEN 0 WHEN p.JornadaFolha = '99' THEN 0 WHEN UPPER(p.JornadaFolha) = 'OUTROS' THEN 0 WHEN p.JornadaFolha = 'Regime de plant„o' THEN 0 ELSE p.JornadaFolha END JornadaFolha\n" +
+            "        p.idUnidadeGestora, p.cpfServidor, p.exercicio, p.remessa, CASE WHEN p.JornadaFolha = '88' THEN 0 WHEN p.JornadaFolha = '99' THEN 0 WHEN UPPER(p.JornadaFolha) = 'OUTROS' THEN 0 WHEN p.JornadaFolha = 'Regime de plant√£o' THEN 0 ELSE p.JornadaFolha END JornadaFolha\n" +
             "    FROM SICAPAP21..vwFolhaPagamento p\n" +
             "    WHERE\n" +
             "        p.idUnidadeGestora != '61365284013435' --unidade de teste\n" +
@@ -241,7 +263,7 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
             "ELSE\n" +
             "    INSERT INTO @tbfolha\n" +
             "    SELECT\n" +
-            "        p.idUnidadeGestora, p.cpfServidor, p.exercicio, p.remessa, CASE WHEN p.JornadaFolha = '88' THEN 0 WHEN p.JornadaFolha = '99' THEN 0 WHEN UPPER(p.JornadaFolha) = 'OUTROS' THEN 0 WHEN p.JornadaFolha = 'Regime de plant„o' THEN 0 ELSE p.JornadaFolha END JornadaFolha\n" +
+            "        p.idUnidadeGestora, p.cpfServidor, p.exercicio, p.remessa, CASE WHEN p.JornadaFolha = '88' THEN 0 WHEN p.JornadaFolha = '99' THEN 0 WHEN UPPER(p.JornadaFolha) = 'OUTROS' THEN 0 WHEN p.JornadaFolha = 'Regime de plant√£o' THEN 0 ELSE p.JornadaFolha END JornadaFolha\n" +
             "    FROM SICAPAP21..vwFolhaPagamento p\n" +
             "    WHERE\n" +
             "        p.idUnidadeGestora != '61365284013435' --unidade de teste\n" +
@@ -266,7 +288,7 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
             "    CASE p.mes\n" +
             "        WHEN 1 THEN 'Janeiro'\n" +
             "        WHEN 2 THEN 'Fevereiro'\n" +
-            "        WHEN 3 THEN 'MarÁo'\n" +
+            "        WHEN 3 THEN 'Mar√ßo'\n" +
             "        WHEN 4 THEN 'Abril'\n" +
             "        WHEN 5 THEN 'Maio'\n" +
             "        WHEN 6 THEN 'Junho'\n" +
@@ -278,7 +300,7 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
             "        WHEN 12 THEN 'Dezembro'\n" +
             "    END AS mesExtenso,\n" +
             "    CASE\n" +
-            "        WHEN f.JornadaFolha = '99' THEN 'Plant„o'\n" +
+            "        WHEN f.JornadaFolha = '99' THEN 'Plant√£o'\n" +
             "        WHEN f.JornadaFolha = '88' THEN 'Outros'\n" +
             "        WHEN f.JornadaFolha = '0' THEN 'Inativo'\n" +
             "        ELSE CAST(f.JornadaFolha AS VARCHAR(50))\n" +
@@ -296,8 +318,9 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
 
     private Query getQueryinfoServidor(String cpf) {
         return getEntityManager()
-                                    .createNativeQuery("select top 1 nome,cpfServidor,dataNascimento from SICAPAP21..Servidor s\r\n" + //
-                "where s.cpfServidor like :cpf")
+                                    .createNativeQuery("select distinct nome,cpfServidor,dataNascimento \r\n" + //
+                                            "from SICAPAP21..Servidor s \r\n" + //
+                                            "where s.cpfServidor+s.nome like '%'+:cpf+'%'")
                 .setParameter("cpf", cpf);
     }
 
