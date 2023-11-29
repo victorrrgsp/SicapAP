@@ -1,4 +1,5 @@
 package com.example.sicapweb.exception;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
@@ -6,9 +7,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class MovimentacaoNotFaud extends RuntimeException{
 
 	private static final long serialVersionUID = 1L;
-	
+
 	public MovimentacaoNotFaud(String tipoRegistro,String CpfServido) {
-    super("A movimentaÁ„o de "+tipoRegistro+" do CPF "+CpfServido+" n„o tem processo no e-Contas com decis„o julgada para o usu·rio atual!");
+		super("A movimenta√ß√£o de " + tipoRegistro + " do CPF " + CpfServido + " n√£o tem processo no e-Contas com decis√£o julgada para o usu√°rio atual!");
 	}
-	
+
 }
