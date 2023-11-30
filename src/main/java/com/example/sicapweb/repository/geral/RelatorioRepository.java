@@ -137,6 +137,16 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
         return buscarPesoasfolha(cpf, nome, null, null, ano,mes,null, null, null, null, null);
     }
     public List<HashMap<String, Object>> buscarPesoasfolha( String cpf, String nome, String Natureza, List<String> Vinculo, int ano, Integer mes, List<String> lotacao, List<String> UnidadeAdministrativa, String UnidadeGestora, String folhaItem,String cargo) {
+        List<String> cpfsServidor = getCpfsServidor(cpf, nome);
+        // retorna um array de string com o cpf [coluna 1] da lista de array de objetos de getQueryinfoServidor(PesoaParam).getResultList()
+        
+        var query = getQueryServidoresFolha(Natureza, Vinculo, ano, mes, lotacao, UnidadeAdministrativa, UnidadeGestora, folhaItem,
+                cargo, cpfsServidor);
+
+        return StaticMethods.getHashmapFromQuery(query);
+    }
+
+    private List<String> getCpfsServidor(String cpf, String nome) {
         var PesoaParam = cpf != null?cpf:nome;
         List<String> cpfsServidor = new ArrayList<>();
 
@@ -148,8 +158,12 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
                                                     return ((Object[]) x)[1];
                                                 }).collect(Collectors.toList());
         }
-        // retorna um array de string com o cpf [coluna 1] da lista de array de objetos de getQueryinfoServidor(PesoaParam).getResultList()
-        
+        return cpfsServidor;
+    }
+
+    private Query getQueryServidoresFolha(String Natureza, List<String> Vinculo, int ano, Integer mes, List<String> lotacao,
+            List<String> UnidadeAdministrativa, String UnidadeGestora, String folhaItem, String cargo,
+            List<String> cpfsServidor) {
         var sql = "with principal as(\n" +
                                 "    select distinct ud.codigoUnidadeAdministrativa,\n" +
                                 "       wfp.idUnidadeGestora                                          as CNPJ,\n" +
@@ -246,8 +260,7 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
                 query.setParameter("lotacao", lotacao);
             }
         }
-
-        return StaticMethods.getHashmapFromQuery(query);
+        return query;
     }
 
     public List<HashMap<String, Object>> buscarFichafinanceira(String cpf, String nome, int ano) {
