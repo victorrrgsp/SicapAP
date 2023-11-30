@@ -97,22 +97,5 @@ public class RelatoriosController extends DefaultController<Lei> {
         return ResponseEntity.ok().body(result);
     }
 
-    //List<HashMap<String, Object>> buscarFichafinanceira(String cpf, String nome, int ano, int mes)
-    @CrossOrigin
-    @GetMapping(path = "/fichaFinanceira")
-    public ResponseEntity<List<HashMap<String, Object>>> listfichaFinanceira(
-                                                                    @RequestParam(required = false) String cpf,
-                                                                    @RequestParam(required = false) String nome,
-                                                                    @RequestParam int ano,
-                                                                    @RequestParam(required = false) Integer mes
-                                                                    ){
-        
-        if(cpf == null && nome == null){
-            return ResponseEntity.badRequest().build();
-        }
-        List<HashMap<String, Object>> result = relatorioRepository.buscarPesoasfolha(cpf, nome, ano,mes);
-        return ResponseEntity.ok().body(result);
-    }
-
 }
 
