@@ -1,6 +1,7 @@
 package com.example.sicapweb.repository.geral;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -8,6 +9,7 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Repository;
 
 import com.example.sicapweb.repository.DefaultRepository;
@@ -136,14 +138,18 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
     }
     public List<HashMap<String, Object>> buscarPesoasfolha( String cpf, String nome, String Natureza, List<String> Vinculo, int ano, Integer mes, List<String> lotacao, List<String> UnidadeAdministrativa, String UnidadeGestora, String folhaItem,String cargo) {
         var PesoaParam = cpf != null?cpf:nome;
-        // retorna um array de string com o cpf [coluna 1] da lista de array de objetos de getQueryinfoServidor(PesoaParam).getResultList()
-        List<String> cpfsServidor = (List) getQueryinfoServidor(PesoaParam)
+        List<String> cpfsServidor = new ArrayList<>();
+
+        if (PesoaParam != null && PesoaParam.length()>4) {
+             cpfsServidor = (List) getQueryinfoServidor(PesoaParam)
                                                 .getResultList()
                                                 .stream()
                                                 .map(x -> {
                                                     return ((Object[]) x)[1];
                                                 }).collect(Collectors.toList());
-
+        }
+        // retorna um array de string com o cpf [coluna 1] da lista de array de objetos de getQueryinfoServidor(PesoaParam).getResultList()
+        
         var sql = "with principal as(\n" +
                                 "    select distinct ud.codigoUnidadeAdministrativa,\n" +
                                 "       wfp.idUnidadeGestora                                          as CNPJ,\n" +

@@ -55,12 +55,15 @@ public class RelatoriosController extends DefaultController<Lei> {
                                                                     @RequestParam(required = false) String Natureza,
                                                                     @RequestParam(required = false) List<String> Vinculo,
                                                                     @RequestParam int ano,
-                                                                    @RequestParam int mes,
+                                                                    @RequestParam(required = false) Integer mes,
                                                                     @RequestParam(required = false) List<String> lotacao,
                                                                     @RequestParam(required = false) List<String> UnidadeAdministrativa,
                                                                     @RequestParam(required = false) String folhaItem,
                                                                     @RequestParam(required = false) String cargo,
-                                                                    @RequestParam String UnidadeGestora){
+                                                                    @RequestParam(required = false) String UnidadeGestora){
+        if((UnidadeGestora == null&&cpf == null && nome == null)||(UnidadeGestora != null&&mes == null)){
+            return ResponseEntity.badRequest().build();
+        }
         List<HashMap<String, Object>> result = relatorioRepository.buscarPesoasfolha(cpf,
                                                                                         nome,
                                                                                         Natureza,
