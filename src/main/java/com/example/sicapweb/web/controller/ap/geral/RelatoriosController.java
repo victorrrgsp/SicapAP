@@ -18,7 +18,7 @@ import br.gov.to.tce.model.ap.relacional.Lei;
 
 @RestController
 @RequestMapping("/Relatorios")
-public class RelatoriosController extends DefaultController<Lei> {
+public class RelatoriosController {
     @Autowired
     private RelatorioRepository relatorioRepository; 
 
@@ -55,12 +55,15 @@ public class RelatoriosController extends DefaultController<Lei> {
                                                                     @RequestParam(required = false) String Natureza,
                                                                     @RequestParam(required = false) List<String> Vinculo,
                                                                     @RequestParam int ano,
-                                                                    @RequestParam int mes,
+                                                                    @RequestParam(required = false) Integer mes,
                                                                     @RequestParam(required = false) List<String> lotacao,
                                                                     @RequestParam(required = false) List<String> UnidadeAdministrativa,
                                                                     @RequestParam(required = false) String folhaItem,
                                                                     @RequestParam(required = false) String cargo,
-                                                                    @RequestParam String UnidadeGestora){
+                                                                    @RequestParam(required = false) String UnidadeGestora){
+        if((UnidadeGestora == null&&cpf == null && nome == null)||(UnidadeGestora != null&&mes == null)){
+            return ResponseEntity.badRequest().build();
+        }
         List<HashMap<String, Object>> result = relatorioRepository.buscarPesoasfolha(cpf,
                                                                                         nome,
                                                                                         Natureza,
@@ -93,6 +96,15 @@ public class RelatoriosController extends DefaultController<Lei> {
         List<HashMap<String, Object>> result = relatorioRepository.buscarFolhaPesoas(matriculaServidor, Natureza, ano, mes, folhaItem,UnidadeGestora);
         return ResponseEntity.ok().body(result);
     }
-
+    
+    @CrossOrigin
+    @GetMapping(path = "/acumuloDeViculos")
+    public ResponseEntity<List<HashMap<String, Object>>> listAcumuloDeViculos(
+                                                                    @RequestParam int ano,
+                                                                    @RequestParam int mes,
+                                                                    @RequestParam String unidadeGestora){
+        List<HashMap<String, Object>> result = relatorioRepository.buscarAcumulosDeVinculos(unidadeGestora,ano, mes);
+        return ResponseEntity.ok().body(result);
+    }
 }
 

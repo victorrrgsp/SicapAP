@@ -1,12 +1,15 @@
 package com.example.sicapweb.repository.geral;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Repository;
 
 import com.example.sicapweb.repository.DefaultRepository;
@@ -16,6 +19,11 @@ import br.gov.to.tce.model.ap.relacional.Lei;
 
 @Repository
 public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
+    /**
+     *
+     */
+    private static final int LIMITE_ACUMULO = 10;
+
     public RelatorioRepository(EntityManager em) {
         super(em);
     }
@@ -130,11 +138,57 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
         return StaticMethods.getHashmapFromQuery(query);
     }
 
-    public List<HashMap<String, Object>> buscarPesoasfolha( String cpf, String nome, String Natureza, List<String> Vinculo, int ano, int mes, List<String> lotacao, List<String> UnidadeAdministrativa, String UnidadeGestora, String folhaItem,String cargo) {
-        var query = getEntityManager().createNativeQuery(
-                                "with principal as(\n" +
+    public List<HashMap<String, Object>> buscarPesoasfolha( String cpf, String nome, int ano,Integer mes) {
+        return buscarPesoasfolha(cpf, nome, null, null, ano,mes,null, null, null, null, null);
+    }
+    
+    public List<HashMap<String, Object>> buscarPesoasfolha( String cpf, String nome, String Natureza, List<String> Vinculo, int ano, Integer mes, List<String> lotacao, List<String> UnidadeAdministrativa, String UnidadeGestora, String folhaItem,String cargo) {
+        List<String> cpfsServidor = getCpfsServidor(cpf, nome);
+        // retorna um array de string com o cpf [coluna 1] da lista de array de objetos de getQueryinfoServidor(PesoaParam).getResultList()
+        
+        var query = getQueryServidoresFolha(Natureza, Vinculo, ano, mes, lotacao, UnidadeAdministrativa, UnidadeGestora, folhaItem,
+                cargo, cpfsServidor);
+
+        return StaticMethods.getHashmapFromQuery(query);
+    }
+
+
+    public List<HashMap<String, Object>> buscarAcumulosDeVinculos(String CNPJUG,int exercicio,int remessa){
+        var cpfServidor = getCpfsServidor(CNPJUG);
+        var query = getQueryServidoresFolha(null, null, exercicio, remessa, null, null,null,null, null, cpfServidor);
+        return StaticMethods.getHashmapFromQuery(query);
+    }
+
+    private List<String> getCpfsServidor(String cnpjUj) {
+        List<String> cpfsServidor = getEntityManager().createNativeQuery("select distinct cpfServidor\r\n" + //
+                "from servidor\r\n" + //
+                "join InfoRemessa on Servidor.chave = InfoRemessa.chave\r\n" + //
+                "where InfoRemessa.idUnidadeGestora = :UG")
+                .setParameter("UG", cnpjUj).getResultList();
+        return cpfsServidor;
+    }
+
+    private List<String> getCpfsServidor(String cpf, String nome) {
+        var PesoaParam = cpf != null?cpf:nome;
+        List<String> cpfsServidor = new ArrayList<>();
+
+        if (PesoaParam != null && PesoaParam.length()>4) {
+             cpfsServidor = (List) getQueryinfoServidor(PesoaParam)
+                                                .getResultList()
+                                                .stream()
+                                                .map(x -> {
+                                                    return ((Object[]) x)[1];
+                                                }).collect(Collectors.toList());
+        }
+        return cpfsServidor;
+    }
+
+    private Query getQueryServidoresFolha(String Natureza, List<String> Vinculo, int ano, Integer mes, List<String> lotacao,
+            List<String> UnidadeAdministrativa, String UnidadeGestora, String folhaItem, String cargo,
+            List<String> cpfsServidor) {
+        var sql = "with principal as(\n" +
                                 "    select distinct ud.codigoUnidadeAdministrativa,\n" +
-                                "       wfp.idUnidadeGestora                                         as CNPJ,\n" +
+                                "       wfp.idUnidadeGestora                                          as CNPJ,\n" +
                                 "       wfp.unidadeGestora                                            as Entidade,\n" +
                                 "       YEAR(wfp.Competencia)                                         as Ano,\n" +
                                 "       MONTH(wfp.Competencia)                                        as Mes,\n" +
@@ -152,30 +206,37 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
                                 "       wfp.RegimePrevidenciario,\r\n" + //
                                 "       wfp.DataExercicio,\n" +
                                 "       ud.nome as unidadeAdministrativa ,\n" +
+                                ((cpfsServidor.size()>LIMITE_ACUMULO)? "       count(wfp.matriculaServidor) over(PARTITION BY wfp.cpfServidor,wfp.Competencia) acumuloDeVinculos,\n" :"")+
                                 "       sum((case wfp.NaturezaRubrica when 'Vantagem' then wfp.valor end)) as Vantagem,\n" +
                                 "       sum((case wfp.NaturezaRubrica when 'Desconto' then wfp.valor end)) as Descontos,\n" +
                                 "       sum((case wfp.NaturezaRubrica\n" +
                                 "            when 'Vantagem' then wfp.valor\n" +
-                                "            when 'Desconto' then (wfp.valor * -1) end)) as Liquido\n" +
+                                "            when 'Desconto' then (wfp.valor * -1) end)) as Liquido\n"+
                                 "from vwFolhaPagamento wfp\n" +
                                 "join SICAPAP21.dbo.Lotacao l on wfp.idLotacao = l.id\n" +
                                 "join UnidadeAdministrativa ud on l.idUnidadeAdministrativa = ud.id\n" +
-                                "where (:UnidadeGestora = 'todos' or wfp.idUnidadeGestora = :UnidadeGestora )\n" +
-                                (UnidadeAdministrativa != null?"  and ud.codigoUnidadeAdministrativa  in :UnidadeAdministrativa\n":"") +
-                                "\n" +
-                                "  and Exercicio = :Ano\n" +
-                                "  and (remessa = :Mes or :Mes = null )\n" +
-                                (lotacao != null?"  and wfp.nomeLotacao in :lotacao\n":"") +
-                                (Vinculo != null?"  and wfp.TipoAdmissao in :Vinculo\n":"") +
+                                "where \n";
+                                if(cpfsServidor.size() > 0){
+                                    var parms = "";
+                                    for (String string : cpfsServidor) {
+                                        parms += "'"+string+"',";
+                                    }
+                                    parms = parms.substring(0, parms.length()-1);
+                                    sql +=" wfp.cpfServidor in ("+parms+")\n" ;
+                                }else{
+                                    sql +=" (:UnidadeGestora = 'todos' or wfp.idUnidadeGestora = :UnidadeGestora )\n" + 
+                                    (Vinculo != null?"  and wfp.TipoAdmissao in :Vinculo\n":"")+
+                                    (UnidadeAdministrativa != null?"  and ud.codigoUnidadeAdministrativa  in :UnidadeAdministrativa\n":"") +
+                                    (lotacao != null?"  and wfp.nomeLotacao in :lotacao\n":"")+
+                                    "  and (\n" +
+                                    "           :cargo is null or\n" +
+                                    "           wfp.nomeCargoOrigem = :cargo\n" +
+                                    "       )\n" ;
+                                }
+                                sql += "  and Exercicio = :Ano\n" +
+                                (mes != null?"  and remessa = :Mes \n":"") +
                                 (Natureza != null?"  and wfp.NaturezaRubrica in :Natureza\n":"") +
                                 "  and wfp.folhaItemUnidadeGestora not like 'Base%'\n" +
-                                "  and (:nome is null or upper(wfp.nome) like'%'+upper(:nome)+'%')\n" +
-                                "  and (\n" +
-                                "      (:cpf is null or\n" +
-                                "            (:cargo is null or\n" +
-                                "             wfp.nomeCargoOrigem = :cargo)\n" +
-                                "            )\n" +
-                                "    or wfp.cpfServidor like concat('%', :cpf, '%'))\n" +
                                 (folhaItem != null?"  and wfp.FolhaItemUnidadeGestora like '%'+ :folhaItem +'%'\n":"") +
                                 "group by\n" +
                                 "    wfp.RegimePrevidenciario,\n" + //
@@ -197,35 +258,43 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
                                 "    wfp.nomeLotacao                                                 ,\n" +
                                 "    ud.nome\n" +
                                 ")\n" +
-                                "\n" +
                                 "select distinct * from principal\n" +
-                                "order by nome;")
-                                .setParameter("cpf", cpf )
-                                .setParameter("nome", nome)
-                                .setParameter("Ano", ano)
-                                .setParameter("Mes", mes)
-                                .setParameter("cargo", cargo)
-                                .setParameter("UnidadeGestora", UnidadeGestora);
-                                
-        if(UnidadeAdministrativa != null){
-            query.setParameter("UnidadeAdministrativa", UnidadeAdministrativa);
-        }if(Natureza != null){
-            query.setParameter("Natureza", Natureza);
-        }if(folhaItem != null){
-            query.setParameter("folhaItem", folhaItem);
-        }if(Vinculo != null){
-            query.setParameter("Vinculo", Vinculo);
-        }if(lotacao != null){
-            query.setParameter("lotacao", lotacao);
-        }
+                                ((cpfsServidor.size()>LIMITE_ACUMULO)?"where acumuloDeVinculos > 1\n":"")+
+                                "order by nome;";
 
-        return StaticMethods.getHashmapFromQuery(query);
+        var query = getEntityManager().createNativeQuery(sql)
+                                .setParameter("Ano", ano);
+        
+        if(mes != null){
+            query.setParameter("Mes", mes);
+        }
+        if(Natureza != null){
+            query.setParameter("Natureza", Natureza);
+        }
+        if(folhaItem != null){
+            query.setParameter("folhaItem", folhaItem);
+        }
+        if (cpfsServidor.size() == 0) {
+            query.setParameter("UnidadeGestora", UnidadeGestora)
+                 .setParameter("cargo", cargo);
+            if (UnidadeAdministrativa != null) {
+                query.setParameter("UnidadeAdministrativa", UnidadeAdministrativa);
+            }
+            if (Vinculo != null) {
+                query.setParameter("Vinculo", Vinculo);
+            }
+            if (lotacao != null) {
+                query.setParameter("lotacao", lotacao);
+            }
+        }
+        return query;
     }
 
     private Query getQueryinfoServidor(String cpf) {
         return getEntityManager()
-                                    .createNativeQuery("select top 1 nome,cpfServidor,dataNascimento from SICAPAP21..Servidor s\r\n" + //
-                "where s.cpfServidor like :cpf")
+                                    .createNativeQuery("select distinct nome,cpfServidor,dataNascimento \r\n" + //
+                                            "from SICAPAP21..Servidor s \r\n" + //
+                                            "where s.cpfServidor+s.nome like '%'+:cpf+'%'")
                 .setParameter("cpf", cpf);
     }
 
