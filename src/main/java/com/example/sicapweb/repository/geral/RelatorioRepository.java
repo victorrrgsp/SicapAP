@@ -19,6 +19,11 @@ import br.gov.to.tce.model.ap.relacional.Lei;
 
 @Repository
 public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
+    /**
+     *
+     */
+    private static final int LIMITE_ACUMULO = 10;
+
     public RelatorioRepository(EntityManager em) {
         super(em);
     }
@@ -136,6 +141,7 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
     public List<HashMap<String, Object>> buscarPesoasfolha( String cpf, String nome, int ano,Integer mes) {
         return buscarPesoasfolha(cpf, nome, null, null, ano,mes,null, null, null, null, null);
     }
+    
     public List<HashMap<String, Object>> buscarPesoasfolha( String cpf, String nome, String Natureza, List<String> Vinculo, int ano, Integer mes, List<String> lotacao, List<String> UnidadeAdministrativa, String UnidadeGestora, String folhaItem,String cargo) {
         List<String> cpfsServidor = getCpfsServidor(cpf, nome);
         // retorna um array de string com o cpf [coluna 1] da lista de array de objetos de getQueryinfoServidor(PesoaParam).getResultList()
@@ -144,6 +150,22 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
                 cargo, cpfsServidor);
 
         return StaticMethods.getHashmapFromQuery(query);
+    }
+
+
+    public List<HashMap<String, Object>> buscarAcumulosDeVinculos(String CNPJUG,int exercicio,int remessa){
+        var cpfServidor = getCpfsServidor(CNPJUG);
+        var query = getQueryServidoresFolha(null, null, exercicio, remessa, null, null,null,null, null, cpfServidor);
+        return StaticMethods.getHashmapFromQuery(query);
+    }
+
+    private List<String> getCpfsServidor(String cnpjUj) {
+        List<String> cpfsServidor = getEntityManager().createNativeQuery("select distinct cpfServidor\r\n" + //
+                "from servidor\r\n" + //
+                "join InfoRemessa on Servidor.chave = InfoRemessa.chave\r\n" + //
+                "where InfoRemessa.idUnidadeGestora = :UG")
+                .setParameter("UG", cnpjUj).getResultList();
+        return cpfsServidor;
     }
 
     private List<String> getCpfsServidor(String cpf, String nome) {
@@ -184,17 +206,23 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
                                 "       wfp.RegimePrevidenciario,\r\n" + //
                                 "       wfp.DataExercicio,\n" +
                                 "       ud.nome as unidadeAdministrativa ,\n" +
+                                ((cpfsServidor.size()>LIMITE_ACUMULO)? "       count(wfp.matriculaServidor) over(PARTITION BY wfp.cpfServidor,wfp.Competencia) acumuloDeVinculos,\n" :"")+
                                 "       sum((case wfp.NaturezaRubrica when 'Vantagem' then wfp.valor end)) as Vantagem,\n" +
                                 "       sum((case wfp.NaturezaRubrica when 'Desconto' then wfp.valor end)) as Descontos,\n" +
                                 "       sum((case wfp.NaturezaRubrica\n" +
                                 "            when 'Vantagem' then wfp.valor\n" +
-                                "            when 'Desconto' then (wfp.valor * -1) end)) as Liquido\n" +
+                                "            when 'Desconto' then (wfp.valor * -1) end)) as Liquido\n"+
                                 "from vwFolhaPagamento wfp\n" +
                                 "join SICAPAP21.dbo.Lotacao l on wfp.idLotacao = l.id\n" +
                                 "join UnidadeAdministrativa ud on l.idUnidadeAdministrativa = ud.id\n" +
                                 "where \n";
                                 if(cpfsServidor.size() > 0){
-                                    sql +=" wfp.cpfServidor in :cpfsServidor\n" ;
+                                    var parms = "";
+                                    for (String string : cpfsServidor) {
+                                        parms += "'"+string+"',";
+                                    }
+                                    parms = parms.substring(0, parms.length()-1);
+                                    sql +=" wfp.cpfServidor in ("+parms+")\n" ;
                                 }else{
                                     sql +=" (:UnidadeGestora = 'todos' or wfp.idUnidadeGestora = :UnidadeGestora )\n" + 
                                     (Vinculo != null?"  and wfp.TipoAdmissao in :Vinculo\n":"")+
@@ -231,6 +259,7 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
                                 "    ud.nome\n" +
                                 ")\n" +
                                 "select distinct * from principal\n" +
+                                ((cpfsServidor.size()>LIMITE_ACUMULO)?"where acumuloDeVinculos > 1\n":"")+
                                 "order by nome;";
 
         var query = getEntityManager().createNativeQuery(sql)
@@ -245,9 +274,7 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
         if(folhaItem != null){
             query.setParameter("folhaItem", folhaItem);
         }
-        if(cpfsServidor.size() > 0){
-            query.setParameter("cpfsServidor", cpfsServidor);
-        }else{
+        if (cpfsServidor.size() == 0) {
             query.setParameter("UnidadeGestora", UnidadeGestora)
                  .setParameter("cargo", cargo);
             if (UnidadeAdministrativa != null) {

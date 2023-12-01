@@ -18,7 +18,7 @@ import br.gov.to.tce.model.ap.relacional.Lei;
 
 @RestController
 @RequestMapping("/Relatorios")
-public class RelatoriosController extends DefaultController<Lei> {
+public class RelatoriosController {
     @Autowired
     private RelatorioRepository relatorioRepository; 
 
@@ -96,6 +96,15 @@ public class RelatoriosController extends DefaultController<Lei> {
         List<HashMap<String, Object>> result = relatorioRepository.buscarFolhaPesoas(matriculaServidor, Natureza, ano, mes, folhaItem,UnidadeGestora);
         return ResponseEntity.ok().body(result);
     }
-
+    
+    @CrossOrigin
+    @GetMapping(path = "/acumuloDeViculos")
+    public ResponseEntity<List<HashMap<String, Object>>> listAcumuloDeViculos(
+                                                                    @RequestParam int ano,
+                                                                    @RequestParam int mes,
+                                                                    @RequestParam String unidadeGestora){
+        List<HashMap<String, Object>> result = relatorioRepository.buscarAcumulosDeVinculos(unidadeGestora,ano, mes);
+        return ResponseEntity.ok().body(result);
+    }
 }
 
