@@ -230,8 +230,8 @@ public abstract class DefaultController<T> {
     public void getFileType(MultipartFile file) {
         String fileType = file.getContentType();
         if (!(fileType.equals("application/pdf"))) {
-            throw new InvalitInsert("Tipo de arquivo inv·lido envie um arquivo pdf ");
-            // return ResponseEntity.badRequest().body("Tipo de arquivo inv·lido envie um arquivo pdf ");
+            throw new InvalitInsert("Tipo de arquivo inv√°lido envie um arquivo pdf ");
+            // return ResponseEntity.badRequest().body("Tipo de arquivo inv√°lido envie um arquivo pdf ");
         }
     }
     public String setCastorFile(MultipartFile file, String origem) {
