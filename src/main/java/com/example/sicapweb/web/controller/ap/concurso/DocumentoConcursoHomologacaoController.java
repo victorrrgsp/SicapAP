@@ -105,6 +105,10 @@ public class DocumentoConcursoHomologacaoController extends DefaultController<Ed
     @Transactional
     @PostMapping("/upload/{inciso}/{id}")
     public ResponseEntity<?> addFile(@RequestParam("file") MultipartFile file, @PathVariable String inciso, @PathVariable BigInteger id) {
+        
+        // Verificar o tipo de arquivo
+        getFileType(file);
+
         DocumentoEditalHomologacao documentoEditalHomologacao = new DocumentoEditalHomologacao();
         documentoEditalHomologacao.setEditalHomologacao(editalHomologacaoRepository.findById(id));
         documentoEditalHomologacao.setInciso(inciso);

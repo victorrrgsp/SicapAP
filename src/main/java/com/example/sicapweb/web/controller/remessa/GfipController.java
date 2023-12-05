@@ -118,6 +118,10 @@ public class GfipController extends DefaultController<InfoRemessa> {
     @Transactional
     @PostMapping("/upload/{chave}/{tipo}")
     public ResponseEntity<?> addFile(@RequestParam("file") MultipartFile file, @PathVariable String chave, @PathVariable String tipo) {
+        
+        // Verificar o tipo de arquivo
+        getFileType(file);
+
         Gfip gfip = new Gfip();
         Date hoje = new Date();
         gfip.setInfoRemessa(infoRemessaRepository.findById(chave));

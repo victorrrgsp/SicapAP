@@ -115,6 +115,10 @@ public class LeiController extends DefaultController<Lei> {
     @Transactional
     @PostMapping("/upload/{id}")
     public ResponseEntity<?> addFile(@RequestParam("file") MultipartFile file, @PathVariable BigInteger id) {
+
+        // Verificar o tipo de arquivo
+        getFileType(file);
+
         Lei lei = new Lei();
         lei = leiRepository.findById(id);
         CastorFile castorFile = super.getCastorFile(file, "Lei");

@@ -80,6 +80,10 @@ public class ConcessaoReconducaoController extends DefaultController<DocumentoRe
     @Transactional
     @PostMapping("/upload/{inciso}/{id}")
     public ResponseEntity<?> addFile(@RequestParam("file") MultipartFile file, @PathVariable String inciso, @PathVariable BigInteger id, @RequestParam(value = "descricao", required = false) String descricao) throws UnknownHostException {
+        
+        // Verificar o tipo de arquivo
+        getFileType(file);
+
         DocumentoReconducao documentoReconducao = new DocumentoReconducao();
         documentoReconducao.setReconducao(reconducaoRepository.findById(id));
         documentoReconducao.setInciso(inciso);

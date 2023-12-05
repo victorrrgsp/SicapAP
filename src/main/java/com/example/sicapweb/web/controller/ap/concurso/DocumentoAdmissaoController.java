@@ -115,6 +115,9 @@ public class DocumentoAdmissaoController extends DefaultController<DocumentoAdmi
     @Transactional
     @PutMapping("/upload/{id}" )
     public ResponseEntity<?> uploadDocumentoAdmissao(@RequestParam("file") MultipartFile file, @PathVariable BigInteger id) {
+
+        // Verificar o tipo de arquivo
+        getFileType(file);
         DocumentoAdmissao documentoAdmissao = documentoAdmissaoRepository.findById(id);
         String idCastor=null;
         if (documentoAdmissao != null ){

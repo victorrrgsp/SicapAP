@@ -83,6 +83,10 @@ public class ConcessaoReintegracaoController extends DefaultController<Documento
     @Transactional
     @PostMapping("/upload/{inciso}/{id}")
     public ResponseEntity<?> addFile(@RequestParam("file") MultipartFile file, @PathVariable String inciso, @PathVariable BigInteger id, @RequestParam(value = "descricao", required = false) String descricao) throws UnknownHostException {
+        
+        // Verificar o tipo de arquivo
+        getFileType(file);
+
         DocumentoReintegracao documentoReintegracao = new DocumentoReintegracao();
         documentoReintegracao.setReintegracao(reintegracaoRepository.findById(id));
         documentoReintegracao.setInciso(inciso);

@@ -80,6 +80,11 @@ public class ConcessaoReversaoAposentadoriaReservaController extends DefaultCont
     @Transactional
     @PostMapping("/upload/{inciso}/{id}")
     public ResponseEntity<?> addFile(@RequestParam("file") MultipartFile file, @PathVariable String inciso, @PathVariable BigInteger id, @RequestParam(value = "descricao", required = false) String descricao) throws UnknownHostException {
+        
+        // Verificar o tipo de arquivo
+        getFileType(file);
+
+
         DocumentoAposentadoria documentoAposentadoria = new DocumentoAposentadoria();
         documentoAposentadoria.setAposentadoria(aposentadoriaRepository.findById(id));
         documentoAposentadoria.setInciso(inciso);

@@ -113,6 +113,10 @@ public class DocumentoConcursoEditalController extends DefaultController<Documen
     @Transactional
     @PostMapping("/upload/{inciso}/{id}")
     public ResponseEntity<?> addFile(@RequestParam("file") MultipartFile file, @PathVariable String inciso, @PathVariable BigInteger id) {
+        
+        // Verificar o tipo de arquivo
+        getFileType(file);
+
         DocumentoEdital documentoEdital = new DocumentoEdital();
         documentoEdital.setEdital(editalRepository.findById(id));
         documentoEdital.setInciso(inciso);

@@ -86,6 +86,10 @@ public class ConcessaoAproveitamentoController extends DefaultController<Documen
     @Transactional
     @PostMapping("/upload/{inciso}/{id}")
     public ResponseEntity<?> addFile(@RequestParam("file") MultipartFile file, @PathVariable String inciso, @PathVariable BigInteger id, @RequestParam(value = "descricao", required = false) String descricao) throws UnknownHostException {
+        
+        // Verificar o tipo de arquivo
+        getFileType(file);
+
         DocumentoAproveitamento documentoAproveitamento = new DocumentoAproveitamento();
         documentoAproveitamento.setAproveitamento(aproveitamentoRepository.findById(id));
         documentoAproveitamento.setInciso(inciso);

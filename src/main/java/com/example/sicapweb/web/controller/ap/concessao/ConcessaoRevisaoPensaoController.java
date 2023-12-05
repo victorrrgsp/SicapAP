@@ -82,6 +82,11 @@ public class ConcessaoRevisaoPensaoController extends DefaultController<Document
     @Transactional
     @PostMapping("/upload/{inciso}/{id}")
     public ResponseEntity<?> addFile(@RequestParam("file") MultipartFile file, @PathVariable String inciso, @PathVariable BigInteger id, @RequestParam(value = "descricao", required = false) String descricao) throws UnknownHostException {
+        
+        // Verificar o tipo de arquivo
+        getFileType(file);
+
+        
         DocumentoPensao documentoPensao = new DocumentoPensao();
         documentoPensao.setPensao(pensaoRepository.findById(id));
         documentoPensao.setInciso(inciso);

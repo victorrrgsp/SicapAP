@@ -74,6 +74,9 @@ public class EmpresaOrganizadoraController extends DefaultController<EmpresaOrga
     @Transactional
     @PostMapping("/upload")
     public ResponseEntity<?> addFile(@RequestParam("file") MultipartFile file) {
+        // Verificar o tipo de arquivo
+        getFileType(file);
+
         return ResponseEntity.ok().body(super.setCastorFile(file, "EmpresaOrganizadora"));
     }
 

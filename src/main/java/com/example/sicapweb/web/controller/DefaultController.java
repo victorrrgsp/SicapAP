@@ -5,6 +5,8 @@ import br.gov.to.tce.castor.arquivo.CastorController;
 import br.gov.to.tce.castor.arquivo.ObjetoCastor;
 import br.gov.to.tce.model.CastorFile;
 import br.gov.to.tce.util.JayReflection;
+
+import com.example.sicapweb.exception.InvalitInsert;
 import com.example.sicapweb.repository.geral.CastorFileRepository;
 import com.example.sicapweb.repository.geral.UnidadeGestoraRepository;
 import org.apache.commons.io.FilenameUtils;
@@ -225,6 +227,13 @@ public abstract class DefaultController<T> {
         return null;
     }
 
+    public void getFileType(MultipartFile file) {
+        String fileType = file.getContentType();
+        if (!(fileType.equals("application/pdf"))) {
+            throw new InvalitInsert("Tipo de arquivo inválido envie um arquivo pdf ");
+            // return ResponseEntity.badRequest().body("Tipo de arquivo inválido envie um arquivo pdf ");
+        }
+    }
     public String setCastorFile(MultipartFile file, String origem) {
         CastorFile castorFile = getCastorFile(file, origem);
         return castorFile != null ? castorFile.getId() : "";
