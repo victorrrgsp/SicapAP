@@ -120,7 +120,10 @@ public class RegistroAposentadoriaRepository  extends DefaultRepository<Registro
                         "                   from RegistroAposentadoria " +
                         "                   where idUnidadeGestora = :ug and cpfUsuarioCadastro=:cpfUsuario   and  (:cpfServidor is null or    :cpfServidor = cpfServidor) and dataCadastro  between  cast(:dtini as date) and cast(:dtfim as date)  \n" +
                         "                     ) " +
-                        "select b.id                as idRegistro,\n" +
+                        "select \r\n " + //
+                        //tentar usar o setFirstResult(0) ou o setMaxResults() sem o setFirstResult() causa erro na consulta 
+                        (pagina == 1 ?"       top("+tamanho+")\n":"") + 
+                        "       b.id                as idRegistro,\n" +
                         "       idAposentadoria     as idMovimentacao,\n" +
                         "       numeroAnoProcesso   as numeroAnoProcesso,\n" +
                         "       dataAtoDecisao   as dataAtoDecisao,\n" +
@@ -136,13 +139,13 @@ public class RegistroAposentadoriaRepository  extends DefaultRepository<Registro
                         "       at.numeroAto        as numeroAto,\n" +
                         "       at.tipoAto          as tipoAto,\n" +
                         "       b.dataCadastro          as dataCadastro,\n" +
-                        "       at.dataPublicacao   as dataAto " +
-                        "from registros b " +
-                        "         join Aposentadoria a on b.idAposentadoria=a.id "+variacoesNaQuery.get("FiltroSubtipo")+" " +
-                        "         join Ato at on a.idAto = at.id " +
-                        "         join Admissao ad on a.id = ad.id " +
-                        "         join Cargo c on ad.idCargo = c.id " +
-                        "         join Servidor s on ad.idServidor = s.id   " )
+                        "       at.dataPublicacao   as dataAto \n" +
+                        "from registros b \n" +
+                        "         join Aposentadoria a on b.idAposentadoria=a.id "+variacoesNaQuery.get("FiltroSubtipo")+" \n" +
+                        "         join Ato at on a.idAto = at.id \n" +
+                        "         join Admissao ad on a.id = ad.id \n" +
+                        "         join Cargo c on ad.idCargo = c.id \n" +
+                        "         join Servidor s on ad.idServidor = s.id " )
                 .setParameter("ug", filtros.get("ug"))
                 .setParameter("cpfUsuario", filtros.get("cpfUsuario"))
                 .setParameter("dtini", filtros.get("dataInicio"))
@@ -152,7 +155,8 @@ public class RegistroAposentadoriaRepository  extends DefaultRepository<Registro
 
         long totalRegistros = countRegistros(variacoesNaQuery,filtros);
         long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
-        if (totalRegistros > tamanho  && whereStatemente.isEmpty() ){
+
+        if (totalRegistros > tamanho  && whereStatemente.isEmpty()&& pagina != 1 ){
             queryRegistroMovimentos.setFirstResult(pagina).setMaxResults(tamanho);
         }
         try{
