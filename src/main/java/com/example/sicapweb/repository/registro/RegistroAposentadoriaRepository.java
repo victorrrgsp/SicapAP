@@ -283,7 +283,21 @@ public class RegistroAposentadoriaRepository  extends DefaultRepository<Registro
                              "            (proc_num_anexo IS NULL or proc_num_anexo =0) and\r\n" + //
                              "            (processo_numaps IS NULL or processo_numaps =0)\r\n" + //
                              "        )  and trim(hists_dest_resp)= :Usuario\r\n" + //
-                             "    ),\r\n" + //
+                             "    ),\r\n"+ //
+                             "registros as (\r\n" + //
+                            "        select numeroAnoProcesso from RegistroPensao\r\n" + //
+                            "        union all\r\n" + //
+                            "        select numeroAnoProcesso from RegistroAposentadoria\r\n" + //
+                            "        union all\r\n" + //
+                            "        select numeroAnoProcesso from RegistroAdmissao\r\n" + //
+                            "        union all\r\n" + //
+                            "        select rp.RegNrAnoProc from SICAPAP..REGISTRO r\r\n" + //
+                            "             left join SICAPAP..REGISTRO_PROCESSO rp on\r\n" + //
+                            "                r.RegNrAnoProc = rp.RegNrAnoProc and\r\n" + //
+                            "                r.RegUnidGestora = rp.RegUnidGestora and\r\n" + //
+                            "                r.RegFuncCpf = rp.RegFuncCpf\r\n" + //
+                            "\r\n" + //
+                            "    )," + //
                              "    processos as (\r\n" + //
                              "        select distinct\r\n" + //
                              "           hcodp_pnumero as numeroProcesso,\r\n" + //
@@ -308,8 +322,10 @@ public class RegistroAposentadoriaRepository  extends DefaultRepository<Registro
                              "                a.hcodp_pano = d.ANO_PROC\r\n" + //
                              "            join SCP.dbo.document c on c.dcnproc_pnumero = hcodp_pnumero and c.dcnproc_pano = hcodp_pano and c.docmt_tipo_decisao = 'D'  and docmt_tipo='RL'\r\n" + //
                              "            join Cadun.dbo.PessoaFisica e on d.ID_PESSOA=e.Codigo\r\n" + //
-                             "            join Cadun.dbo.vwPessoaJuridica f on a.id_entidade_origem= f.id\r\n" + //
-                             (infoMovimentacao==null?"":"        where e.cpf = :cpf and f.codunidadegestora = :cnpj and assunto_desc = :assunto") + //
+                             "            join Cadun.dbo.vwPessoaJuridica f on a.id_entidade_origem= f.id\r\n\r\n" + //
+                             "            left join registros on numeroAnoProcesso = CONCAT(a.hcodp_pnumero,a.hcodp_pano)\r\n" + //
+                             "        where registros.numeroAnoProcesso is null \r\n" + //
+                             (infoMovimentacao==null?"":"        and e.cpf = :cpf and f.codunidadegestora = :cnpj and assunto_desc = :assunto") + //
                              "    ),\r\n" + //
                              "    envios as (\r\n" + //
                              "                select cast(substring(processo, 1, len(processo) - 5) as int)             numeroProcesso,\r\n" + //
