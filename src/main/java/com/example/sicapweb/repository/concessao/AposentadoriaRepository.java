@@ -1,6 +1,8 @@
 package com.example.sicapweb.repository.concessao;
 
 import br.gov.to.tce.model.ap.pessoal.Aposentadoria;
+
+import com.example.sicapweb.exception.NonRPPSAccessException;
 import com.example.sicapweb.model.dto.AposentadoriaDTO;
 import com.example.sicapweb.repository.DefaultRepository;
 import com.example.sicapweb.security.User;
@@ -53,6 +55,9 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
     // ----------------------------------------- Concessão Aposentadoria -------------------------------------------- //
     // -------------------------------------------------------------------------------------------------------------- //
     public PaginacaoUtil<AposentadoriaDTO> buscaPaginadaAposentadorias(Pageable pageable, String searchParams, Integer tipoParams) {
+        if (!isRPPS()) {
+            throw new NonRPPSAccessException();
+        }
         int pagina = Integer.valueOf(pageable.getPageNumber());
         int tamanho = Integer.valueOf(pageable.getPageSize());
         String search = "";
@@ -108,6 +113,11 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
     // ----------------------------------------- Concessão Reforma / Reserva----------------------------------------- //
     // -------------------------------------------------------------------------------------------------------------- //
     public PaginacaoUtil<AposentadoriaDTO> buscaPaginadaPorTipo(Pageable pageable, String searchParams, Integer tipoParams, Integer tipoAposentadoria) {
+        
+        if (!isRPPS()) {
+            throw new NonRPPSAccessException();
+        }
+
         int pagina = Integer.valueOf(pageable.getPageNumber());
         int tamanho = Integer.valueOf(pageable.getPageSize());
         String search = "";
@@ -166,6 +176,10 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
     // --------------------------------------- Concessão Revisão Aposentadoria -------------------------------------- //
     // -------------------------------------------------------------------------------------------------------------- //
     public PaginacaoUtil<AposentadoriaDTO> buscaPaginadaAposentadoriaRevisao(Pageable pageable, String searchParams, Integer tipoParams) {
+        
+        if (!isRPPS()) {
+            throw new NonRPPSAccessException();
+        }
         int pagina = Integer.valueOf(pageable.getPageNumber());
         int tamanho = Integer.valueOf(pageable.getPageSize());
         String search = "";
@@ -224,6 +238,11 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
     // ----------------------------------------- Concessão Revisão Reserva ------------------------------------------ //
     // -------------------------------------------------------------------------------------------------------------- //
     public PaginacaoUtil<AposentadoriaDTO> buscaPaginadaRevisaoReserva(Pageable pageable, String searchParams, Integer tipoParams) {
+        
+        if (!isRPPS()) {
+            throw new NonRPPSAccessException();
+        }
+        
         int pagina =  Integer.valueOf(pageable.getPageNumber());
         int tamanho = Integer.valueOf(pageable.getPageSize());
         String search = "";
@@ -280,6 +299,10 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
     // ----------------------------------------- Concessão Revisão Reforma ------------------------------------------ //
     // -------------------------------------------------------------------------------------------------------------- //
     public PaginacaoUtil<AposentadoriaDTO> buscaPaginadaRevisaoReforma(Pageable pageable, String searchParams, Integer tipoParams) {
+        
+        if (!isRPPS()) {
+            throw new NonRPPSAccessException();
+        }
         int pagina = Integer.valueOf(pageable.getPageNumber());
         int tamanho = Integer.valueOf(pageable.getPageSize());
         String search = "";
@@ -336,6 +359,10 @@ public class AposentadoriaRepository extends DefaultRepository<Aposentadoria, Bi
     // --------------------------------- Concessão Reversão Aposentadoria / Reserva --------------------------------- //
     // -------------------------------------------------------------------------------------------------------------- //
     public PaginacaoUtil<AposentadoriaDTO> buscaPaginadaReversaoAposentadoriaReserva(Pageable pageable, String searchParams, Integer tipoParams) {
+        if (!isRPPS()) {
+            throw new NonRPPSAccessException();
+        }
+        
         int pagina = Integer.valueOf(pageable.getPageNumber());
         int tamanho = Integer.valueOf(pageable.getPageSize());
         String search = "";

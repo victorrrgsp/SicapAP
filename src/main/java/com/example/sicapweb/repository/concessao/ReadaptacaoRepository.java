@@ -1,6 +1,8 @@
 package com.example.sicapweb.repository.concessao;
 
 import br.gov.to.tce.model.ap.pessoal.Readaptacao;
+
+import com.example.sicapweb.exception.NonRPPSAccessException;
 import com.example.sicapweb.model.dto.ReadaptacaoDTO;
 import com.example.sicapweb.repository.DefaultRepository;
 import com.example.sicapweb.security.User;
@@ -23,6 +25,10 @@ public class ReadaptacaoRepository extends DefaultRepository<Readaptacao, BigInt
     }
 
     public PaginacaoUtil<ReadaptacaoDTO> buscaPaginadaReadaptacao(Pageable pageable, String searchParams, Integer tipoParams) {
+        
+        if (!isRPPS()) {
+            throw new NonRPPSAccessException();
+        }
         int pagina = Integer.valueOf(pageable.getPageNumber());
         int tamanho = Integer.valueOf(pageable.getPageSize());
         String search = "";

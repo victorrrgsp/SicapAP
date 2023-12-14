@@ -65,7 +65,7 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
             e.printStackTrace();
         }
     }
-    public boolean isRPPS(String idUnidade ){
+    public boolean isRPPS(){
         return entityManager.createNativeQuery("select * from UnidadeGestoraRpps where cnpjRpps like '%"+User.getUser(getRequest()).getUnidadeGestora().getId()+"%'").getResultList().size() > 0;
     }
     public <F extends  DefaultEntity > void updateVinculo( T pai,F filho ) {
