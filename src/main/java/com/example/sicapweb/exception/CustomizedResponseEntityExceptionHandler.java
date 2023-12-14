@@ -45,6 +45,16 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
 						);
 		return new ResponseEntity<>(exceptionResponse, HttpStatus.PRECONDITION_FAILED);
 	}
+	@ExceptionHandler(NonRPPSAccessException.class)
+	public final ResponseEntity<ExceptionResponse> NonRPPSAccessExceptions(Exception ex, WebRequest request) {
+		ExceptionResponse exceptionResponse = 
+				new ExceptionResponse(
+						//new Date(),
+						ex.getMessage()
+						//request.getDescription(true)
+						);
+		return new ResponseEntity<>(exceptionResponse, HttpStatus.UNAUTHORIZED);
+	}
 	
 	
 
