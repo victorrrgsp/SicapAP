@@ -49,15 +49,12 @@ public class EditalAprovadoController extends DefaultController<EditalAprovado> 
         return ResponseEntity.ok().body(list);
     }
 
-
     @CrossOrigin
     @Transactional
     @PostMapping
     public ResponseEntity<EditalAprovado> create(@RequestBody EditalAprovado editalAprovado) {
         editalAprovado.setChave(editalAprovadoRepository.buscarPrimeiraRemessa());
-        if (editalVagaRepository.buscarVagasPorCodigo(editalAprovado.getCodigoVaga()) ==null)
-            throw  new InvalidParameterException("Não encontrou vaga com esse codigo");
-        editalAprovado.setEditalVaga(editalVagaRepository.buscarVagasPorCodigo(editalAprovado.getCodigoVaga()));
+        associateVagaToEditalAprovado(editalAprovado);
 
         EditalAprovado mesmocpf = editalAprovadoRepository.buscarAprovadoPorCpf(editalAprovado.getCpf());
         EditalAprovado mesmoinscricao = editalAprovadoRepository.buscarAprovadoPorInscricao(editalAprovado.getNumeroInscricao());
@@ -77,13 +74,22 @@ public class EditalAprovadoController extends DefaultController<EditalAprovado> 
         return ResponseEntity.created(uri).body(editalAprovado);
     }
 
+    private void associateVagaToEditalAprovado(EditalAprovado editalAprovado) {
+        String codigoVaga = editalAprovado.getCodigoVaga();
+        String numeroEdital = editalAprovado.getNumeroEdital();
+        EditalVaga vagaPorCodigoEEdital = editalVagaRepository.buscarVagasPorCodigoEEdital(codigoVaga,numeroEdital);
+        if (vagaPorCodigoEEdital == null)
+            throw  new InvalidParameterException("Não encontrou vaga com esse codigo");
+        editalAprovado.setEditalVaga(vagaPorCodigoEEdital);
+    }
+
     @CrossOrigin
     @Transactional
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.PUT)
-    public void update(@RequestBody EditalAprovado editalAprovado, @PathVariable BigInteger id){
+    public EditalAprovado update(@RequestBody EditalAprovado editalAprovado, @PathVariable BigInteger id){
+        associateVagaToEditalAprovado(editalAprovado);
         editalAprovado.setId(id);
         editalAprovado.setChave(editalAprovadoRepository.buscarPrimeiraRemessa());
-        editalAprovado.setEditalVaga(editalVagaRepository.buscarVagasPorCodigo(editalAprovado.getCodigoVaga()));
 
         EditalAprovado versaoAnterior  = editalAprovadoRepository.findById(id);
         if(
@@ -101,15 +107,17 @@ public class EditalAprovadoController extends DefaultController<EditalAprovado> 
             //  if  (!editalAprovado.getEditalVaga().getEdital().getNumeroEdital().equals(editalAprovado.getNumeroEdital()) ) throw new InvalitInsert("O edital do aprovado dever o mesmo da vaga!"); ;
             if (mesmocpf!=null ) {
                 if (!id.equals(mesmocpf.getId())) throw new InvalitInsert("Cpf ja Cadastrado!");
-            } else if (mesmoinscricao!=null){
+            } 
+            if (mesmoinscricao!=null){
                 if (! id.equals(mesmoinscricao.getId())  ) throw new InvalitInsert("Outro aprovado com o mesmo numero de inscrição!");
             }
-            else if (mesmaclassifmesmavaga!=null)
+            if (mesmaclassifmesmavaga!=null)
             {
                 if (! id.equals(mesmaclassifmesmavaga.getId())  ) throw new InvalitInsert("outro aprovado ja se encontra na mesma classificação para mesma vaga!");
             }
         }
         editalAprovadoRepository.update(editalAprovado);
+        return editalAprovadoRepository.findById(editalAprovado.getId());
     }
 
     @CrossOrigin
@@ -119,4 +127,5 @@ public class EditalAprovadoController extends DefaultController<EditalAprovado> 
         if (documentoAdmissaoRepository.getDocumenttosAdmissaoByIdAprovado(id).size()>0) throw new RuntimeException("Aprovado Vinculado a um documento. Excluia o documento antes de Excluir o aprovado!");
         editalAprovadoRepository.delete(id);
     }
+
 }
