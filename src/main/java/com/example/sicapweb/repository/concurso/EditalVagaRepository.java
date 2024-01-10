@@ -93,6 +93,31 @@ public class EditalVagaRepository extends DefaultRepository<EditalVaga, BigInteg
             return null;
         }
     }
+
+    public EditalVaga buscarVagasPorCodigoEEdital(String codigo,String numeroedital) {
+        try{
+            var query =  getEntityManager().createNativeQuery(
+                    "with edt as (select a.codigoVaga, i.idUnidadeGestora, max(a.id) max_id\r\n" + //
+                            "             from EditalVaga a\r\n" + //
+                            "                      join Edital ed on a.idEdital = ed.id\r\n" + //
+                            "                      join infoRemessa i on a.chave = i.chave and i.idUnidadeGestora = :idUG\r\n" + //
+                            "             group by a.codigoVaga, i.idUnidadeGestora,ed.numeroEdital)\r\n" + //
+                            "select a.*\r\n" + //
+                            "from EditalVaga a\r\n" + //
+                            "         join infoRemessa i on a.chave = i.chave\r\n" + //
+                            "         join edt b on a.id = b.max_id and i.idUnidadeGestora = b.idUnidadeGestora\r\n" + //
+                            "         join Edital ed on a.idEdital = ed.id\r\n" + //
+                            "where a.codigoVaga = :codigoVaga and ed.numeroEdital = :numeroedital order by a.id", EditalVaga.class)
+                            .setParameter("codigoVaga", codigo)
+                            .setParameter("numeroedital",numeroedital)
+                            .setParameter("idUG",User.getUser(super.request).getUnidadeGestora().getId())
+                            .setMaxResults(1);
+            return  (EditalVaga) query.getSingleResult();
+        }catch (NoResultException e){
+            return null;
+        }
+    }
+
     public EditalVaga buscarVagasPorCodigoTipo(String codigo,Integer tipo) {
         try{
             var query =  getEntityManager().createNativeQuery(
