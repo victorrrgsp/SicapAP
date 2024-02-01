@@ -23,7 +23,7 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
                                                                   WebRequest request) {
 			ExceptionResponse exceptionResponse =
 			new ExceptionResponse(
-				"erro ao transmitir dados para o servidor, verifique os campos obrigatórios e tente novamente\ncasso o erro persista entre em contato com o suporte."
+				"“Verifique os campos e tente novamente. Caso o erro persista, entre em contato com o suporte."
 			);
 
 		return new ResponseEntity<>(exceptionResponse, status);
@@ -68,7 +68,4 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
 						);
 		return new ResponseEntity<>(exceptionResponse, HttpStatus.UNAUTHORIZED);
 	}
-	
-	
-
 }
