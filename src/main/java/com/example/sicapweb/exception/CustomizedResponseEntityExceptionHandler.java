@@ -3,17 +3,31 @@ import java.util.Date;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import org.springframework.http.HttpHeaders;
 
 @ControllerAdvice
 @RestController
 public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExceptionHandler{
 	
+    @Override
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
+                                                                  HttpHeaders headers,
+                                                                  HttpStatus status,
+                                                                  WebRequest request) {
+			ExceptionResponse exceptionResponse =
+			new ExceptionResponse(
+				"erro ao transmitir dados para o servidor, verifique os campos obrigatórios e tente novamente\ncasso o erro persista entre em contato com o suporte."
+			);
+
+		return new ResponseEntity<>(exceptionResponse, status);
+	}
 	@ExceptionHandler(Exception.class)
 	public final ResponseEntity<ExceptionResponse> handleAllExceptions(Exception ex, WebRequest request) {
 		ExceptionResponse exceptionResponse = 
@@ -24,7 +38,6 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
 						);
 		return new ResponseEntity<>(exceptionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
-	
 	@ExceptionHandler(InvalitInsert.class)
 	public final ResponseEntity<ExceptionResponse> InvalitInsertExceptions(Exception ex, WebRequest request) {
 		ExceptionResponse exceptionResponse = 
