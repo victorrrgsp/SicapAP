@@ -1,6 +1,4 @@
 package com.example.sicapweb.exception;
-import java.util.Date;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -21,11 +19,10 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
                                                                   HttpHeaders headers,
                                                                   HttpStatus status,
                                                                   WebRequest request) {
-			ExceptionResponse exceptionResponse =
-			new ExceptionResponse(
-				"“Verifique os campos e tente novamente. Caso o erro persista, entre em contato com o suporte."
-			);
-
+		ExceptionResponse exceptionResponse =
+		new ExceptionResponse(
+			"Verifique os campos e tente novamente. Caso o erro persista, entre em contato com o suporte."
+		);
 		return new ResponseEntity<>(exceptionResponse, status);
 	}
 	@ExceptionHandler(Exception.class)

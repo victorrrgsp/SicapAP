@@ -7,6 +7,8 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.persistence.TemporalType;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,16 +29,17 @@ public class AcompanhamentoRemessaRepository extends DefaultRepository<String, S
     public Object buscarResponsavelAssinatura(Integer tipoCargo, InfoRemessa infoRemessa) {
         try {
             Query query = entityManager.createNativeQuery(
-                    "select  nome, cpf, max(status) status, max(data) data, CodigoCargo " +
+                    "select  nome, cpf, max(status) status, max(data) data, CodigoCargo" +
                             "from (" +
                             "         select distinct pf.nome, pf.cpf, null status, null data, upc.CodigoCargo" +
                             "         from cadun.dbo.UnidadePessoaCargo upc" +
                             "                  join cadun.dbo.vwpessoa pf on pf.id = upc.CodigoPessoaFisica" +
                             "                  join AutenticacaoAssinatura..UsuarioAplicacao ua on ua.Usuario = pf.cpf" +
-                            "         join Cadun.dbo.PessoaJuridica pj on upc.CodigoPessoaJuridica = pj.Codigo" +
+                            "                  join Cadun.dbo.PessoaJuridica pj on upc.CodigoPessoaJuridica = pj.Codigo" +
                             "         where upc.CodigoCargo in (:tipo)" +
-                            "           and (dataInicio <= :date and (datafim is null or datafim >= :date))" +
-                            "           and pj.CNPJ = :unidade and ua.Aplicacao = 29" +
+                            "           and (dataInicio <= :date AND (datafim IS NULL OR YEAR(datafim) * 100 +MONTH(datafim) >= YEAR(:date) * 100 +MONTH(:date)))" +
+                            "           and pj.CNPJ = :unidade" +
+                            "           and ua.Aplicacao = 29" +
                             "         union" +
                             "         select distinct pf.nome, pf.cpf, b.DataAssinatura, b.DataAssinatura, upc.CodigoCargo" +
                             "         from cadun.dbo.UnidadePessoaCargo upc" +
@@ -48,7 +51,7 @@ public class AcompanhamentoRemessaRepository extends DefaultRepository<String, S
                             "                  join SICAPAP21..AdmAssinatura ad on ad.idAssinatura = b.OID " +
                             "                  join SICAPAP21..InfoRemessa i on i.chave = ad.chave" +
                             "         where upc.CodigoCargo in (:tipo)" +
-                            "           and (dataInicio <= :date and (datafim is null or datafim >= :date))" +
+                            "           and (dataInicio <= :date AND (datafim IS NULL OR YEAR(datafim) * 100 +MONTH(datafim) >= YEAR(:date) * 100 +MONTH(:date)))" +
                             "           and i.idUnidadeGestora = :unidade" +
                             "           and pj.CNPJ  = :unidade" +
                             "           and c.Exercicio = :exercicio" +
@@ -57,7 +60,7 @@ public class AcompanhamentoRemessaRepository extends DefaultRepository<String, S
                             "     ) as v " +
                             "group by nome, cpf, CodigoCargo;");
             query.setParameter("tipo", tipoCargo);
-            query.setParameter("date", infoRemessa.getData());
+            query.setParameter("date", infoRemessa.getData(), TemporalType.DATE);
             query.setParameter("unidade", infoRemessa.getIdUnidadeGestora());
             query.setParameter("exercicio", infoRemessa.getExercicio());
             query.setParameter("remessa", infoRemessa.getRemessa());
