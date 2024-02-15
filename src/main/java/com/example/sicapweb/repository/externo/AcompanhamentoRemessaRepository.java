@@ -29,7 +29,7 @@ public class AcompanhamentoRemessaRepository extends DefaultRepository<String, S
     public Object buscarResponsavelAssinatura(Integer tipoCargo, InfoRemessa infoRemessa) {
         try {
             Query query = entityManager.createNativeQuery(
-                    "select  nome, cpf, max(status) status, max(data) data, CodigoCargo" +
+                    "select  nome, cpf, max(status) status, max(data) data, CodigoCargo " +
                             "from (" +
                             "         select distinct pf.nome, pf.cpf, null status, null data, upc.CodigoCargo" +
                             "         from cadun.dbo.UnidadePessoaCargo upc" +
@@ -124,8 +124,8 @@ public class AcompanhamentoRemessaRepository extends DefaultRepository<String, S
                 mapa.put("contAssinaturas", (Integer) obj[5]);
                 mapa.put("mostraRecibo", (Integer) obj[6]);
                 mapa.put("exercicio", (Integer) obj[7]);
-                mapa.put("remessa", (Integer) obj[8]);
-                mapa.put("chave", (String) obj[9]);
+                mapa.put("remessa"  , (Integer) obj[8]);
+                mapa.put("chave"    , (String) obj[9]);
                 retorno.add(mapa);
             }
             return retorno;
