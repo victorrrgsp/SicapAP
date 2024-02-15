@@ -37,7 +37,7 @@ public class AcompanhamentoRemessaRepository extends DefaultRepository<String, S
                             "                  join AutenticacaoAssinatura..UsuarioAplicacao ua on ua.Usuario = pf.cpf" +
                             "                  join Cadun.dbo.PessoaJuridica pj on upc.CodigoPessoaJuridica = pj.Codigo" +
                             "         where upc.CodigoCargo in (:tipo)" +
-                            "           and (dataInicio <= :date AND (datafim IS NULL OR YEAR(datafim) * 100 +MONTH(datafim) >= YEAR(:date) * 100 +MONTH(:date)))" +
+                            "           and (:date is null or (dataInicio <= :date AND (datafim IS NULL OR YEAR(datafim) * 100 +MONTH(datafim) >= YEAR(:date) * 100 +MONTH(:date))))" +
                             "           and pj.CNPJ = :unidade" +
                             "           and ua.Aplicacao = 29" +
                             "         union" +
@@ -51,7 +51,7 @@ public class AcompanhamentoRemessaRepository extends DefaultRepository<String, S
                             "                  join SICAPAP21..AdmAssinatura ad on ad.idAssinatura = b.OID " +
                             "                  join SICAPAP21..InfoRemessa i on i.chave = ad.chave" +
                             "         where upc.CodigoCargo in (:tipo)" +
-                            "           and (dataInicio <= :date AND (datafim IS NULL OR YEAR(datafim) * 100 +MONTH(datafim) >= YEAR(:date) * 100 +MONTH(:date)))" +
+                            "           and (:date is null or (dataInicio <= :date AND (datafim IS NULL OR YEAR(datafim) * 100 +MONTH(datafim) >= YEAR(:date) * 100 +MONTH(:date))))" +
                             "           and i.idUnidadeGestora = :unidade" +
                             "           and pj.CNPJ  = :unidade" +
                             "           and c.Exercicio = :exercicio" +
