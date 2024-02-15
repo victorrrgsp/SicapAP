@@ -58,7 +58,7 @@ public class AcompanhamentoRemessaRepository extends DefaultRepository<String, S
                             "           and c.Bimestre = :remessa" +
                             "           and ua.Aplicacao = 29" +
                             "     ) as v " +
-                            "group by nome, cpf, CodigoCargo;");
+                            "group by nome, cpf, CodigoCargo; ");
             query.setParameter("tipo", tipoCargo);
             query.setParameter("date", infoRemessa.getData(), TemporalType.DATE);
             query.setParameter("unidade", infoRemessa.getIdUnidadeGestora());
@@ -192,36 +192,100 @@ public class AcompanhamentoRemessaRepository extends DefaultRepository<String, S
         List<Map<String, Object>> retorno = new ArrayList<Map<String, Object>>();
 
         try {
-            String existeRemessa = " ";
-            if (remessa != 0 && exercicio == 0) {
-                existeRemessa = " where i.REMESSA = " + remessa + " ";
+            if (remessa == 0) {
+                remessa = null;
+            }
+            if(exercicio == 0){
+                exercicio = null;
             }
 
-            if (remessa != 0 && exercicio != 0) {
-                existeRemessa = " and i.REMESSA = " + remessa + " ";
-            }
-
-            String existeExercicio = " ";
-            if (exercicio != 0) {
-                existeExercicio = " where i.exercicio = " + exercicio + "";
-            }
-
-            List<Object[]> list = entityManager.createNativeQuery(
-                    "with ugsAptas as ( " +
-                            " SELECT  COUNT(DISTINCT idCargo) AS contAssinaturas, IDUNIDADEGESTORA , i.EXERCICIO, i.remessa, i.chave, max(i.relatoria) relatoria, max(f.dataEnvio) dataEntrega, max(dataAssinatura) dataAssinatura" +
-                            " FROM inforemessa i left join " +
-                            " admassinatura  a on a.chave = i.CHAVE  left join " +
-                            " AutenticacaoAssinatura..Assinatura  ass on ass.oid = a.idAssinatura left join " +
-                            " admfilarecebimento f on f.id = i.idfilarecebimento " +
-                            "" + existeExercicio + existeRemessa + " " +
-                            "group by IDUNIDADEGESTORA, i.EXERCICIO, i.REMESSA,  i.CHAVE " +
-                            ") " +
-                            "select IDUNIDADEGESTORA, c.NomeMunicipio + ' - '+ c.nomeEntidade nomeEntidade, case when b.relatoria is null then c.numeroRelatoria else b.relatoria end relatoria, " +
-                            "dataEntrega, dataAssinatura, contAssinaturas, case when  contAssinaturas >= 3 then 1 else 0 end mostraRecibo, exercicio, remessa, chave " +
-                            "from" +
-                            " ugsAptas b inner join  cadun.dbo.vwUnidadeGestora c on IDUNIDADEGESTORA = c.cnpj " +
-                            " where CNPJ <> '00000000000000' " +
-                            "order by NomeMunicipio, nomeEntidade, remessa asc;").getResultList();
+            var query = entityManager.createNativeQuery(
+                    " with ugsAptas as (\r\n" + //
+                    "    SELECT  COUNT(DISTINCT idCargo) AS contAssinaturas,\r\n" + //
+                    "           IDUNIDADEGESTORA ,\r\n" + //
+                    "           i.EXERCICIO,\r\n" + //
+                    "           i.remessa,\r\n" + //
+                    "           i.chave,\r\n" + //
+                    "           max(i.relatoria) relatoria,\r\n" + //
+                    "           max(f.dataEnvio) dataEntrega,\r\n" + //
+                    "           max(dataAssinatura) dataAssinatura\r\n" + //
+                    "    FROM inforemessa i\r\n" + //
+                    "        left join  admassinatura  a on a.chave = i.CHAVE\r\n" + //
+                    "        left join  AutenticacaoAssinatura..Assinatura  ass on ass.oid = a.idAssinatura\r\n" + //
+                    "        left join  admfilarecebimento f on f.id = i.idfilarecebimento\r\n" + //
+                    "    where i.exercicio = :exercicio and (:remessa is null or i.REMESSA = :remessa)\r\n" + //
+                    "    group by IDUNIDADEGESTORA, i.EXERCICIO, i.REMESSA,  i.CHAVE )\r\n" + //
+                    "select IDUNIDADEGESTORA,\r\n" + //
+                    "       c.NomeMunicipio + ' - '+ c.nomeEntidade nomeEntidade,\r\n" + //
+                    "       case\r\n" + //
+                    "           when b.relatoria is null then c.numeroRelatoria\r\n" + //
+                    "           else b.relatoria\r\n" + //
+                    "           end relatoria,\r\n" + //
+                    "       dataEntrega,\r\n" + //
+                    "       dataAssinatura,\r\n" + //
+                    "       contAssinaturas,\r\n" + //
+                    "       case\r\n" + //
+                    "           when  contAssinaturas >= 3 then 1\r\n" + //
+                    "           else 0\r\n" + //
+                    "           end mostraRecibo,\r\n" + //
+                    "       case\r\n" + //
+                    "           when  contAssinaturas >= 3 then 'Assinado'\r\n" + //
+                    "           when  contAssinaturas >= 0 and contAssinaturas <= 2 then 'Pendente de Assinatura'\r\n" + //
+                    "           -- when   then 'Pendente de Assinatura'\r\n" + //
+                    "           -- else 'Aguardando Envio'\r\n" + //
+                    "           else  'Pendente de Assinatura'\r\n" + //
+                    "           end Status,\r\n" + //
+                    "       b.exercicio,\r\n" + //
+                    "       b.remessa,\r\n" + //
+                    "       chave,\r\n" + //
+                    "       pr.dataInicialEnvio,\r\n" + //
+                    "       pr.dataFinalEnvio,\r\n" + //
+                    "        case\r\n" + //
+                    "           when dataFinalEnvio >= dataAssinatura then 'Tempestivo'\r\n" + //
+                    "               else 'Intempestivo' end  StatusRemessa\r\n" + //
+                    "\r\n" + //
+                    "from ugsAptas b\r\n" + //
+                    "    inner join  cadun.dbo.vwUnidadeGestora c on IDUNIDADEGESTORA = c.cnpj\r\n" + //
+                    "    join cadun.dbo.PeriodoRemessa pr on idSistema = 29 and pr.exercicio = b.exercicio and pr.numeroRemessa = b.remessa\r\n" + //
+                    "where CNPJ <> '00000000000000' and\r\n" + //
+                    "      (CNPJ = :ug or :ug ='todos')\r\n" + //
+                    "union all\r\n" + //
+                    "select  ug.CNPJ ,\r\n" + //
+                    "        ug.NomeMunicipio + ' - '+ ug.nomeEntidade nomeEntidade,\r\n" + //
+                    "        ug.numeroRelatoria as relatoria,\r\n" + //
+                    "        null as dataEntrega,\r\n" + //
+                    "        null as dataAssinatura,\r\n" + //
+                    "        null as contAssinaturas,\r\n" + //
+                    "        0 as mostraRecibo,\r\n" + //
+                    "        'pendente de envio' as status,\r\n" + //
+                    "        remessas.exercicio as exercicio ,\r\n" + //
+                    "        remessas.remessa as remessa,\r\n" + //
+                    "        null as chave,\r\n" + //
+                    "       pr.dataInicialEnvio,\r\n" + //
+                    "       pr.dataFinalEnvio,\r\n" + //
+                    "       case\r\n" + //
+                    "           when dataFinalEnvio <= GETDATE() then 'pendente de envio'\r\n" + //
+                    "               else 'inadiplante' end  StatusRemessa\r\n" + //
+                    "\r\n" + //
+                    "from cadun.dbo.vwUnidadeGestora ug ,\r\n" + //
+                    "     (select distinct exercicio ,remessa from  InfoRemessa) remessas\r\n" + //
+                    "join cadun.dbo.PeriodoRemessa pr on idSistema = 29 and pr.exercicio = remessas.exercicio and pr.numeroRemessa = remessas.remessa\r\n" + //
+                    "where not exists(\r\n" + //
+                    "    select *\r\n" + //
+                    "    from InfoRemessa ir\r\n" + //
+                    "    where ug.CNPJ = ir.idUnidadeGestora\r\n" + //
+                    "    and ir.remessa = remessas.remessa\r\n" + //
+                    "    and ir.exercicio= remessas.exercicio\r\n" + //
+                    "    )\r\n" + //
+                    "  and ( :remessa is null or remessa = :remessa )\r\n" + //
+                    "  and remessas.exercicio = :exercicio\r\n" + //
+                    "  and ug.NomeMunicipio is not null\r\n" + //
+                    "  and CNPJ <> '00000000000000'\r\n" + //
+                    "  and (CNPJ = :ug or :ug ='todos');");
+                query.setParameter("exercicio", exercicio)
+                    .setParameter("remessa", remessa)
+                    .setParameter("ug", "todos");
+                List<Object[]> list = query.getResultList();
 
             //list.stream().forEach((record) -> {
 
@@ -236,9 +300,9 @@ public class AcompanhamentoRemessaRepository extends DefaultRepository<String, S
                 mapa.put("dataAssinatura", (String) obj[4]);
                 mapa.put("contAssinaturas", (Integer) obj[5]);
                 mapa.put("mostraRecibo", (Integer) obj[6]);
-                mapa.put("exercicio", (Integer) obj[7]);
-                mapa.put("remessa", (Integer) obj[8]);
-                mapa.put("chave", (String) obj[9]);
+                mapa.put("exercicio", (Integer) obj[8]);
+                mapa.put("remessa", (Integer) obj[9]);
+                mapa.put("chave", (String) obj[10]);
 
                 retorno.add(mapa);
 
