@@ -281,7 +281,7 @@ public class AcompanhamentoRemessaRepository extends DefaultRepository<String, S
                     "  and remessas.exercicio = :exercicio\r\n" + //
                     "  and ug.NomeMunicipio is not null\r\n" + //
                     "  and CNPJ <> '00000000000000'\r\n" + //
-                    "  and (CNPJ = :ug or :ug ='todos');");
+                    "  and (CNPJ = :ug or :ug ='todos') and ug.cnpj in (select distinct id from sicapap21..UnidadeGestora);");
                 query.setParameter("exercicio", exercicio)
                     .setParameter("remessa", remessa)
                     .setParameter("ug", "todos");
