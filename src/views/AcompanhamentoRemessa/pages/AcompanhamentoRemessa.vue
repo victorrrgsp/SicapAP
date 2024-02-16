@@ -1,4 +1,4 @@
-4<template>
+<template>
   <div>
     <b-card no-body>
       <b-card-header header-tag="nav">
@@ -269,6 +269,7 @@ export default {
         exercicio: 2021,
         status:[
               "Todos",
+              "Todos Enviados",
               "Assinado",
               "Pendente de assinatura", 
               "Aguardando Envio"
@@ -297,8 +298,6 @@ export default {
   },
 
   mounted() {
-    // console.log("🚀 ~ file: AcompanhamentoRemessa.vue:317 ~ mounted ~ this.$store.remessas.tableData:", this.$store.remessas.tableData)
-    //this.formdata.statu = this.formdata.status[0] 
     this.isBusy = false;
     this.ActionFindExercicio().then();
     // this.pesquisar();
@@ -310,17 +309,11 @@ export default {
       this.unidades = resp;
     });
     this.filterSize();
-    // this.tableData = this.$store.remessas.tableData
-    // console.log("🚀 ~ file: AcompanhamentoRemessa.vue:315 ~ mounted ~ this.$store.remessas.tableData:", this.$store.remessas.tableData)
-    //  this.ActionFind(),
-    //  setTimeout(() =>{// aguarda com spinner antes da pesquisa aparecer na pesquisa inicial
-    //       this.isBusy = false
-    //       }, 2.0*2000)
   },
     
   computed: {
     rows() {
-      return this.tableData.length;
+      return this.tableData2.length;
     },
     ...mapState("remessas", ["tableData"]),
   },
@@ -367,37 +360,38 @@ export default {
       this.filterSize();
     },
     filtraStatus(){
-      // console.log("🚀 ~ file: AcompanhamentoRemessa.vue:364 ~ filtraStatus ~ tableData:", this.tableData)
-      console.log("🚀 ~ file: AcompanhamentoRemessa.vue:364 ~ filtraStatus ~ this.formdata.statu:", this.formdata.statu)
-      let statu = this.formdata.statu;
-      this.tableData2 = this.$store.remessas.tableData.filter(function (x) {
-        console.log("🚀 ~ file: AcompanhamentoRemessa.vue:366 ~ x:", x)
+      let status = this.formdata.statu;
+      this.tableData2 = this.tableData.filter(function (x) {
         let retorno = false
-        switch (statu){
+        switch (status){
           case "Todos":
-          console.log("Todos")
-          console.log("Todos:true")
+
             retorno = true
             break
           case "Assinado":
-            console.log("Assinado")
             if (x.contAssinaturas > 2) {
-              console.log("Assinado:true")
               retorno = true
             }
             break;
           case "Pendente de assinatura":
-          console.log("Pendente de assinatura")
           if (x.contAssinaturas >= 1 && x.contAssinaturas <= 2) {
-              console.log("Pendente de assinatura:true")
+              retorno = true
+            }
+            break;
+          case "Aguardando Envio":
+            if (x.dataEntrega === null) {
+              retorno = true
+            }
+            break;
+          case "Todos Enviados":
+            if (x.dataEntrega !== null) {
               retorno = true
             }
             break;
           default:
+            retorno = false
             break;
-            
         }
-        console.log("🚀 ~ file: AcompanhamentoRemessa.vue:394 ~ retorno:", retorno)
         return retorno 
       })
     },
@@ -405,7 +399,7 @@ export default {
       if (item.contAssinaturas > 2) {
         return "Assinado";
       }
-      if (item.contAssinaturas >= 1 && item.contAssinaturas <= 2) {
+      if (item.dataEntrega !== null && item.contAssinaturas <= 2) {
         return "Pendente de Assinatura";
       } else if (item.qntDocumentoGFIP < 3) {
         return "Pendente GFIP ";
@@ -415,7 +409,7 @@ export default {
     },
     filterSize() {
       let sum = 0;
-      this.tableData.map(x => {
+      this.tableData2.map(x => {
         if (x.nomeEntidade.toUpperCase().includes(this.filter.trim().toUpperCase())) {
           sum++;
         }
@@ -424,16 +418,17 @@ export default {
       return sum;
     },
     iconStatus(item) {
-      if (item.contAssinaturas > 2) {
-        return "check-square";
+      switch (this.iconStatusTitle(item)){
+        case "Assinado":
+          return "check-square";
+        case "Pendente de Assinatura":
+          return "exclamation-triangle-fill";
+        case "Pendente GFIP ":
+          return "dash-circle";
+        case "Aguardando Envio":
+          return "x-circle";
       }
-      if (item.contAssinaturas >= 1 && item.contAssinaturas <= 2) {
-        return "exclamation-triangle-fill";
-      } else if (item.qntDocumentoGFIP < 3) {
-        return "dash-circle";
-      } else {
-        return "x-circle";
-      }
+      
     },
     iconStatusVariant(item) {
       if (item.contAssinaturas > 2) {
@@ -468,7 +463,7 @@ export default {
     async pesquisarRemesssa() {
       this.isBusy = !this.isBusy; //loading
       await this.ActionFindByExercicio(this.formdata).then({});
-      this.tableData = this.$store.remessas.tableData
+      //this.tableData = this.$store.remessas.tableData
       this.isBusy = false;
       this.filter = this.filterform;
       this.filterSize();
