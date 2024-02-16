@@ -266,7 +266,7 @@ export default {
         },
       ],
       formdata: {
-        exercicio: 2021,
+        exercicio: 2024,
         status:[
               "Todos",
               "Todos Enviados",
@@ -279,7 +279,7 @@ export default {
           { value: "0", text: "Todos" },
           { value: "2021", text: "2021" },
         ],
-        remessa: 10,
+        remessa: 1,
         remessas: [
           { value: "0", text: "Todos" },
           { value: "10", text: "10" },
@@ -355,7 +355,7 @@ export default {
           value: 0,
           text: "Todos",
         };
-        this.formdata.remessa = this.formdata.remessas[this.formdata.remessas.length-2].value;
+        this.formdata.remessa = this.formdata.remessas[this.formdata.remessas.length-1].value;
       });
       this.filterSize();
     },
