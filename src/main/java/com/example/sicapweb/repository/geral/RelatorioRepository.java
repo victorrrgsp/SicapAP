@@ -8,11 +8,10 @@ import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
-
-import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Repository;
 
 import com.example.sicapweb.repository.DefaultRepository;
+import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.StaticMethods;
 
 import br.gov.to.tce.model.ap.relacional.Lei;
@@ -28,7 +27,7 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
         super(em);
     }
 
-    public List<HashMap<String, Object>> buscarfolhaAnalitica( String cpf, String nome, String Natureza, List<String> Vinculo, int ano, int mes, List<String> lotacao, List<String> UnidadeAdministrativa, String UnidadeGestora, String folhaItem,String cargo) {
+    public List<HashMap<String, Object>> buscarfolhaAnalitica( String cpf, String nome, String Natureza, List<String> Vinculo, int ano, int mes, List<String> lotacao, List<String> UnidadeAdministrativa, String folhaItem,String cargo) {
         var query = getEntityManager().createNativeQuery(
                         "with principal as(\n" +
                                 "    select distinct NaturezaRubrica , codigoFolhaItem,ud.codigoUnidadeAdministrativa,\n" +
@@ -61,7 +60,7 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
                                 "from vwFolhaPagamento wfp\n" +
                                 "join SICAPAP21.dbo.Lotacao l on wfp.idLotacao = l.id\n" +
                                 "join UnidadeAdministrativa ud on l.idUnidadeAdministrativa = ud.id\n" +
-                                "where (:UnidadeGestora = 'todos' or wfp.idUnidadeGestora = :UnidadeGestora )\n" +
+                                "where (wfp.idUnidadeGestora = :UnidadeGestora )\n" +
                                 (UnidadeAdministrativa != null?"  and ud.codigoUnidadeAdministrativa  in :UnidadeAdministrativa\n":"") +
                                 "\n" +
                                 "  and wfp.exercicio = :Ano\n" +
@@ -87,7 +86,7 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
                                 .setParameter("Ano", ano)
                                 .setParameter("Mes", mes)
                                 .setParameter("cargo", cargo)
-                                .setParameter("UnidadeGestora", UnidadeGestora);
+                                .setParameter("UnidadeGestora", User.getUser(super.request).getUnidadeGestora().getId());
                                 
         if(UnidadeAdministrativa != null){
             query.setParameter("UnidadeAdministrativa", UnidadeAdministrativa);
@@ -104,7 +103,7 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
         return StaticMethods.getHashmapFromQuery(query);
     }
 
-    public List<HashMap<String, Object>> buscarFolhaPesoas( String matriculaServidor , String Natureza, int ano, int mes, String folhaItem, String unidadeGestora ) {
+    public List<HashMap<String, Object>> buscarFolhaPesoas( String matriculaServidor , String Natureza, int ano, int mes, String folhaItem ) {
         var query = getEntityManager().createNativeQuery(
                                 "with principal as(\n" +
                                 "    select distinct NaturezaRubrica,\r\n" + //
@@ -133,38 +132,37 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
                                 .setParameter("Ano", ano)
                                 .setParameter("Mes", mes)
                                 .setParameter("matriculaServidor", matriculaServidor)
-                                .setParameter("UnidadeGestora", unidadeGestora);
+                                .setParameter("UnidadeGestora", User.getUser(super.request).getUnidadeGestora().getId());
                                 
         return StaticMethods.getHashmapFromQuery(query);
     }
 
     public List<HashMap<String, Object>> buscarPesoasfolha( String cpf, String nome, int ano,Integer mes) {
-        return buscarPesoasfolha(cpf, nome, null, null, ano,mes,null, null, null, null, null);
+        return buscarPesoasfolha(cpf, nome, null, null, ano,mes,null, null, null,  null);
     }
-    
-    public List<HashMap<String, Object>> buscarPesoasfolha( String cpf, String nome, String Natureza, List<String> Vinculo, int ano, Integer mes, List<String> lotacao, List<String> UnidadeAdministrativa, String UnidadeGestora, String folhaItem,String cargo) {
+
+    public List<HashMap<String, Object>> buscarPesoasfolha( String cpf, String nome, String Natureza, List<String> Vinculo, int ano, Integer mes, List<String> lotacao, List<String> UnidadeAdministrativa, String folhaItem,String cargo) {
         List<String> cpfsServidor = getCpfsServidor(cpf, nome);
         // retorna um array de string com o cpf [coluna 1] da lista de array de objetos de getQueryinfoServidor(PesoaParam).getResultList()
         
-        var query = getQueryServidoresFolha(Natureza, Vinculo, ano, mes, lotacao, UnidadeAdministrativa, UnidadeGestora, folhaItem,
+        var query = getQueryServidoresFolha(Natureza, Vinculo, ano, mes, lotacao, UnidadeAdministrativa,User.getUser(super.request).getUnidadeGestora().getId(), folhaItem,
                 cargo, cpfsServidor);
 
         return StaticMethods.getHashmapFromQuery(query);
     }
 
-
-    public List<HashMap<String, Object>> buscarAcumulosDeVinculos(String CNPJUG,int exercicio,int remessa){
-        var cpfServidor = getCpfsServidor(CNPJUG);
-        var query = getQueryServidoresFolha(null, null, exercicio, remessa, null, null,null,null, null, cpfServidor);
+    public List<HashMap<String, Object>> buscarAcumulosDeVinculos(int exercicio,int remessa){
+        var cpfServidor = getCpfsServidor();
+        var query = getQueryServidoresFolha(null, null, exercicio, remessa, null, null,null,null,null, cpfServidor);
         return StaticMethods.getHashmapFromQuery(query);
     }
 
-    private List<String> getCpfsServidor(String cnpjUj) {
+    private List<String> getCpfsServidor() {
         List<String> cpfsServidor = getEntityManager().createNativeQuery("select distinct cpfServidor\r\n" + //
                 "from servidor\r\n" + //
                 "join InfoRemessa on Servidor.chave = InfoRemessa.chave\r\n" + //
                 "where InfoRemessa.idUnidadeGestora = :UG")
-                .setParameter("UG", cnpjUj).getResultList();
+                .setParameter("UG", User.getUser(super.request).getUnidadeGestora().getId()).getResultList();
         return cpfsServidor;
     }
 
@@ -172,10 +170,10 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
         var PesoaParam = cpf != null?cpf:nome;
         List<String> cpfsServidor = new ArrayList<>();
 
-        if (PesoaParam != null && PesoaParam.length()>4) {
-             cpfsServidor = (List) getQueryinfoServidor(PesoaParam)
-                                                .getResultList()
-                                                .stream()
+        if (PesoaParam == null || PesoaParam.length()>4) {
+             cpfsServidor = (List) getQueryinfoServidor(PesoaParam==null?"":PesoaParam)
+             .getResultList()
+             .stream()
                                                 .map(x -> {
                                                     return ((Object[]) x)[1];
                                                 }).collect(Collectors.toList());
@@ -291,11 +289,12 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
     }
 
     private Query getQueryinfoServidor(String cpf) {
-        return getEntityManager()
-                                    .createNativeQuery("select distinct nome,cpfServidor,dataNascimento \r\n" + //
+        return getEntityManager().createNativeQuery("select distinct nome,cpfServidor,dataNascimento \r\n" + //
                                             "from SICAPAP21..Servidor s \r\n" + //
-                                            "where s.cpfServidor+s.nome like '%'+:cpf+'%'")
-                .setParameter("cpf", cpf);
+                                            "join InfoRemessa on s.chave = InfoRemessa.chave\r\n"+
+                                            "where s.cpfServidor+s.nome like '%'+:cpf+'%' and InfoRemessa.idUnidadeGestora = :UG")
+                .setParameter("cpf", cpf)
+                .setParameter("UG", User.getUser(super.request).getUnidadeGestora().getId());
     }
 
     private Query getQueryHistoricoDeVinculo(String cpf) {
@@ -1028,8 +1027,9 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
                 "       1 AS count\r\n" + //
                 "from movimentacoes M\r\n" + //
                 "    inner join SICAPAP21..InfoRemessa i on i.chave = M.chave\r\n" + //
-                "where cpfServidor like :cpf order by matriculaServidor , exercicio ,remessa")
-                .setParameter("cpf", cpf);
+                "where cpfServidor like :cpf and idUnidadeGestora = :unidadeGestora order by matriculaServidor , exercicio ,remessa")
+                .setParameter("cpf", cpf)
+                .setParameter("unidadeGestora", User.getUser(super.request).getUnidadeGestora().getId());
         return queryHistoricoDeVinculo;
     }
 

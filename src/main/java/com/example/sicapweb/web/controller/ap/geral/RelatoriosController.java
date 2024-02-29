@@ -33,8 +33,7 @@ public class RelatoriosController {
                                                                     @RequestParam(required = false) List<String> lotacao,
                                                                     @RequestParam(required = false) List<String> UnidadeAdministrativa,
                                                                     @RequestParam(required = false) String folhaItem,
-                                                                    @RequestParam(required = false) String cargo,
-                                                                    @RequestParam String UnidadeGestora){
+                                                                    @RequestParam(required = false) String cargo){
         List<HashMap<String, Object>> result = relatorioRepository.buscarfolhaAnalitica(cpf,
                                                                                         nome,
                                                                                         Natureza,
@@ -43,7 +42,6 @@ public class RelatoriosController {
                                                                                         mes,
                                                                                         lotacao,
                                                                                         UnidadeAdministrativa,
-                                                                                        UnidadeGestora,
                                                                                         folhaItem,
                                                                                         cargo);
         return ResponseEntity.ok().body(result);
@@ -59,9 +57,8 @@ public class RelatoriosController {
                                                                     @RequestParam(required = false) List<String> lotacao,
                                                                     @RequestParam(required = false) List<String> UnidadeAdministrativa,
                                                                     @RequestParam(required = false) String folhaItem,
-                                                                    @RequestParam(required = false) String cargo,
-                                                                    @RequestParam(required = false) String UnidadeGestora){
-        if((UnidadeGestora == null&&cpf == null && nome == null)||(UnidadeGestora != null&&mes == null)){
+                                                                    @RequestParam(required = false) String cargo){
+        if(((cpf != null || nome != null) && mes != null)){
             return ResponseEntity.badRequest().build();
         }
         List<HashMap<String, Object>> result = relatorioRepository.buscarPesoasfolha(cpf,
@@ -72,7 +69,6 @@ public class RelatoriosController {
                                                                                         mes,
                                                                                         lotacao,
                                                                                         UnidadeAdministrativa,
-                                                                                        UnidadeGestora,
                                                                                         folhaItem,
                                                                                         cargo);
         return ResponseEntity.ok().body(result);
@@ -90,10 +86,9 @@ public class RelatoriosController {
                                                                     @RequestParam(required = false) String Natureza,
                                                                     @RequestParam int ano,
                                                                     @RequestParam int mes,
-                                                                    @RequestParam(required = false) String folhaItem,
-                                                                    @RequestParam String UnidadeGestora
+                                                                    @RequestParam(required = false) String folhaItem
                                                                     ){
-        List<HashMap<String, Object>> result = relatorioRepository.buscarFolhaPesoas(matriculaServidor, Natureza, ano, mes, folhaItem,UnidadeGestora);
+        List<HashMap<String, Object>> result = relatorioRepository.buscarFolhaPesoas(matriculaServidor, Natureza, ano, mes, folhaItem);
         return ResponseEntity.ok().body(result);
     }
     
@@ -101,9 +96,8 @@ public class RelatoriosController {
     @GetMapping(path = "/acumuloDeViculos")
     public ResponseEntity<List<HashMap<String, Object>>> listAcumuloDeViculos(
                                                                     @RequestParam int ano,
-                                                                    @RequestParam int mes,
-                                                                    @RequestParam String unidadeGestora){
-        List<HashMap<String, Object>> result = relatorioRepository.buscarAcumulosDeVinculos(unidadeGestora,ano, mes);
+                                                                    @RequestParam int mes){
+        List<HashMap<String, Object>> result = relatorioRepository.buscarAcumulosDeVinculos(ano, mes);
         return ResponseEntity.ok().body(result);
     }
 }
