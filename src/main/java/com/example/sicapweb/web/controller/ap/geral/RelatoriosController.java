@@ -21,31 +21,6 @@ import br.gov.to.tce.model.ap.relacional.Lei;
 public class RelatoriosController {
     @Autowired
     private RelatorioRepository relatorioRepository; 
-
-    @CrossOrigin
-    @GetMapping(path = "/folhaAnalitica")
-    public ResponseEntity<List<HashMap<String, Object>>> listChaves(@RequestParam(required = false) String cpf,
-                                                                    @RequestParam(required = false) String nome,
-                                                                    @RequestParam(required = false) String Natureza,
-                                                                    @RequestParam(required = false) List<String> Vinculo,
-                                                                    @RequestParam int ano,
-                                                                    @RequestParam int mes,
-                                                                    @RequestParam(required = false) List<String> lotacao,
-                                                                    @RequestParam(required = false) List<String> UnidadeAdministrativa,
-                                                                    @RequestParam(required = false) String folhaItem,
-                                                                    @RequestParam(required = false) String cargo){
-        List<HashMap<String, Object>> result = relatorioRepository.buscarfolhaAnalitica(cpf,
-                                                                                        nome,
-                                                                                        Natureza,
-                                                                                        Vinculo,
-                                                                                        ano,
-                                                                                        mes,
-                                                                                        lotacao,
-                                                                                        UnidadeAdministrativa,
-                                                                                        folhaItem,
-                                                                                        cargo);
-        return ResponseEntity.ok().body(result);
-    }
     @CrossOrigin
     @GetMapping(path = "/servidoresEmFolha")
     public ResponseEntity<List<HashMap<String, Object>>> listServidoresFolha(@RequestParam(required = false) String cpf,
@@ -58,9 +33,7 @@ public class RelatoriosController {
                                                                     @RequestParam(required = false) List<String> UnidadeAdministrativa,
                                                                     @RequestParam(required = false) String folhaItem,
                                                                     @RequestParam(required = false) String cargo){
-        if(((cpf != null || nome != null) && mes != null)){
-            return ResponseEntity.badRequest().build();
-        }
+        
         List<HashMap<String, Object>> result = relatorioRepository.buscarPesoasfolha(cpf,
                                                                                         nome,
                                                                                         Natureza,
@@ -89,15 +62,6 @@ public class RelatoriosController {
                                                                     @RequestParam(required = false) String folhaItem
                                                                     ){
         List<HashMap<String, Object>> result = relatorioRepository.buscarFolhaPesoas(matriculaServidor, Natureza, ano, mes, folhaItem);
-        return ResponseEntity.ok().body(result);
-    }
-    
-    @CrossOrigin
-    @GetMapping(path = "/acumuloDeViculos")
-    public ResponseEntity<List<HashMap<String, Object>>> listAcumuloDeViculos(
-                                                                    @RequestParam int ano,
-                                                                    @RequestParam int mes){
-        List<HashMap<String, Object>> result = relatorioRepository.buscarAcumulosDeVinculos(ano, mes);
         return ResponseEntity.ok().body(result);
     }
 }
