@@ -157,7 +157,7 @@ public class AdmissaoEnvioRepository extends DefaultRepository<AdmissaoEnvio, Bi
                             "                WHEN da.opcaoDesistencia = 6 THEN null\n" +
                             "                WHEN da.opcaoDesistencia is null THEN null\n" +
                             "                ELSE 1\n" +
-                            "            END) AS qt_desistencia_desclasificado" +
+                            "            END) AS qt_desistencia_desclasificado " +
                             "from dbo.AdmissaoEnvio pa\n" +
                             "         join dbo.DocumentoAdmissao da on pa.id = da.idEnvio and da.status > 0\n" +
                             "         join dbo.EditalAprovado EA on da.idAprovado = ea.id\n" +
@@ -188,11 +188,11 @@ public class AdmissaoEnvioRepository extends DefaultRepository<AdmissaoEnvio, Bi
                 // } else 
                 if (((Integer)vagaAprovado.get("ct_nao_anexados")) > 0 ){
                     vagaAprovado.put("valido", false);
-                    vagaAprovado.put("ocorrencia",  "A vaga de codigo "+(vagaAprovado.get("codigoVaga"))+"-"+(vagaAprovado.get("nomeCargo"))+"-" +nomeTipoConcorrencia+" tem aprovados ao qual não foi anexado documentos!! " );
+                    vagaAprovado.put("ocorrencia",  "A vaga de código "+(vagaAprovado.get("codigoVaga"))+"-"+(vagaAprovado.get("nomeCargo"))+"-" +nomeTipoConcorrencia+" tem aprovados ao qual não foi anexado documentos!! " );
                 }
                 else if ( ((Integer)vagaAprovado.get("max_classif")) >   ((Integer)vagaAprovado.get("qt_aprov"))   ){
                     vagaAprovado.put("valido",  false);
-                    vagaAprovado.put("ocorrencia",  "A vaga de codigo "+(vagaAprovado.get("codigoVaga"))+"-"+(vagaAprovado.get("nomeCargo"))+"-" +nomeTipoConcorrencia+" não tem os classificados na ordem de classificacão!! " );
+                    vagaAprovado.put("ocorrencia",  "A vaga de código "+(vagaAprovado.get("codigoVaga"))+"-"+(vagaAprovado.get("nomeCargo"))+"-" +nomeTipoConcorrencia+" não tem os classificados na ordem de classificacão!! " );
                 }
                 else{
                     vagaAprovado.put("valido",  true);
@@ -203,7 +203,7 @@ public class AdmissaoEnvioRepository extends DefaultRepository<AdmissaoEnvio, Bi
             return validacoesVagaAprovado;
 
         } catch (Exception e) {
-            throw  new RuntimeException("Problema ao validão aprovados e vagas!! entre em contato com o administrador do Sicap AP!!");
+            throw  new RuntimeException("Problema ao validar aprovados e vagas!! Entre em contato com o administrador do Sicap AP!!");
         }
     }
 
