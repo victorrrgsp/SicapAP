@@ -35,7 +35,7 @@ public class User implements Serializable {
     public List<String> systems = new ArrayList<>();
 
     @Autowired
-    private Config config;
+    private transient Config config;
 
     @JsonIgnore
     public List<UnidadeGestora> unidadeGestoraList = new ArrayList<>();
