@@ -22,7 +22,7 @@ public class CargoRepository extends DefaultRepository<Cargo, BigInteger> {
     }
 
     public Cargo buscarCargoPorcodigo(String codigo) {
-        List<Cargo> list = getEntityManager().createNativeQuery("select ed.* from Cargo ed join InfoRemessa i on ed.chave = i.chave and i.idUnidadeGestora='"+ User.getUser(super.request).getUnidadeGestora().getId()+"'"+
+        List<Cargo> list = getEntityManager().createNativeQuery("select ed.* from Cargo ed join InfoRemessa i on ed.chave = i.chave and i.idUnidadeGestora='"+ user.getUser(super.request).getUnidadeGestora().getId()+"'"+
                 " where codigoCargo = '" + codigo + "'", Cargo.class).getResultList();
         return list.get(0);
     }

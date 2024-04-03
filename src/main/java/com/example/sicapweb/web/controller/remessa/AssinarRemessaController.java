@@ -35,6 +35,8 @@ import java.util.*;
 public class AssinarRemessaController {
 
     @Autowired
+    protected User user;
+    @Autowired
     private UnidadeGestoraRepository unidadeGestoraRepository;
 
     public InfoRemessa info;
@@ -96,8 +98,7 @@ public class AssinarRemessaController {
     @CrossOrigin
     @GetMapping(path = {"/autenticacao"})
     public ResponseEntity<User> findeUserAutenticacao(HttpSession session) {
-        User user = User.getUser(assinarRemessaRepository.getRequest());
-        return ResponseEntity.ok().body(user);
+        return ResponseEntity.ok().body(user.getUser(assinarRemessaRepository.getRequest()));
     }
 
     @CrossOrigin

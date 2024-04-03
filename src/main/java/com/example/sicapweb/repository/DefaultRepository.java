@@ -32,6 +32,10 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
     @Autowired
     protected HttpServletRequest request;
 
+
+    @Autowired
+    protected User user;
+
     public DefaultRepository(EntityManager em) {
         entityManager = em;
     }
@@ -66,7 +70,7 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
         }
     }
     public boolean isRPPS(){
-        return entityManager.createNativeQuery("select * from UnidadeGestoraRpps where cnpjRpps like '%"+User.getUser(getRequest()).getUnidadeGestora().getId()+"%'").getResultList().size() > 0;
+        return entityManager.createNativeQuery("select * from UnidadeGestoraRpps where cnpjRpps like '%"+user.getUser(getRequest()).getUnidadeGestora().getId()+"%'").getResultList().size() > 0;
     }
     public <F extends  DefaultEntity > void updateVinculo( T pai,F filho ) {
         if(filho == null || pai == null||filho.getId() == null || entityClass.getSimpleName() == null) throw new NullPointerException();
@@ -87,7 +91,7 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
         try {
             DefaultEntity objeto = (DefaultEntity)getEntityManager().find(entityClass, id);
             objeto.setId(id);
-            if(objeto.getChave().getIdUnidadeGestora().equals(User.getUser(request).getUnidadeGestora().getId())){
+            if(objeto.getChave().getIdUnidadeGestora().equals(user.getUser(request).getUnidadeGestora().getId())){
                 getEntityManager().remove(objeto);
             }
         }catch (Exception e){
@@ -116,7 +120,7 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
         return getEntityManager()
                 .createQuery("select a from " + entityClass.getSimpleName() +
                         " a, InfoRemessa info where a.infoRemessa.chave = info.chave and info.idUnidadeGestora = '"
-                        + User.getUser(request).getUnidadeGestora().getId() + "'", entityClass)
+                        + user.getUser(request).getUnidadeGestora().getId() + "'", entityClass)
                 .getResultList();
     }
 
@@ -165,7 +169,7 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
         var query = getEntityManager()
                 .createNativeQuery("select a.* from " + entityClass.getSimpleName() + " a " +
                         " join InfoRemessa info on info.chave = a.chave and info.idUnidadeGestora = '"
-                        + User.getUser(request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, entityClass)
+                        + user.getUser(request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, entityClass)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho);
         List<T> list = query.getResultList();
@@ -178,16 +182,16 @@ public abstract class DefaultRepository<T, PK extends Serializable> {
 
     public Integer count() {
         Query query = getEntityManager().createNativeQuery("select count(*) from " + entityClass.getSimpleName()
-                + " a join InfoRemessa i on a.chave = i.chave where i.idUnidadeGestora= '"+ User.getUser(request).getUnidadeGestora().getId()+ "'");
+                + " a join InfoRemessa i on a.chave = i.chave where i.idUnidadeGestora= '"+ user.getUser(request).getUnidadeGestora().getId()+ "'");
         return (Integer) query.getSingleResult();
     }
 
     public InfoRemessa buscarPrimeiraRemessa() {
-        if(User.getUser(request) == null){
+        if(user.getUser(request) == null){
             throw new NullPointerException("falha ao buscar informacoes do usuario na sessão refaça o login");
         }
         List<InfoRemessa> list = getEntityManager().createNativeQuery("select * from infoRemessa " +
-                "where remessa = 1 and exercicio = 2021 and idUnidadeGestora = '" + User.getUser(request).getUnidadeGestora().getId() + "'", InfoRemessa.class).getResultList();
+                "where remessa = 1 and exercicio = 2021 and idUnidadeGestora = '" + user.getUser(request).getUnidadeGestora().getId() + "'", InfoRemessa.class).getResultList();
         return list.get(0);
     }
 

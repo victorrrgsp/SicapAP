@@ -4,7 +4,8 @@ import br.gov.to.tce.model.DefaultEnum;
 import br.gov.to.tce.model.UnidadeGestora;
 import br.gov.to.tce.util.Date;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.springframework.web.context.annotation.SessionScope;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
@@ -14,7 +15,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-@SessionScope
+
+@Component
 public class User implements Serializable {
     private static final long serialVersionUID = -6455849887168288989L;
 
@@ -31,15 +33,22 @@ public class User implements Serializable {
     public Date dateEnd = new Date();
     public Integer sistema = null;
     public List<String> systems = new ArrayList<>();
+
+    @Autowired
+    private Config config;
+
     @JsonIgnore
     public List<UnidadeGestora> unidadeGestoraList = new ArrayList<>();
     public UnidadeGestora unidadeGestora = new UnidadeGestora("00299180000154", "PREFEITURA MUNICIPAL DE PARAÍSO DO TOCANTINS", 1);
 
-    public static User getUser(String user) {
-        return Config.fromJson(new Config().jedis.get(user.replace("=", "")), User.class);
+    public User getUser(String user) {
+        return Config.fromJson(config.getJedis().get(user.replace("=", "")), User.class);
+    }
+    public void teste(String test) {
+        config.getJedis().set(test, "teste");
     }
 
-    public static User getUser(HttpServletRequest request) {
+    public User getUser(HttpServletRequest request) {
         return getUser(request.getHeader("user"));
     }
 

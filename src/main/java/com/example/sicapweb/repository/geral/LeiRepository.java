@@ -58,7 +58,7 @@ public class LeiRepository extends DefaultRepository<Lei, BigInteger> {
         Query query = getEntityManager()
                .createNativeQuery("select DISTINCT a.* from    Lei   a " +
                        " join InfoRemessa info on info.chave = a.chave and info.idUnidadeGestora = '"
-                       + User.getUser(request).getUnidadeGestora().getId()+"'      " +
+                       + user.getUser(request).getUnidadeGestora().getId()+"'      " +
                        " left join dbo.Ato b on a.idAto=b.id  " +
                        "  where   a.numeroLei = '"+numeroLei+"'  and b.numeroAto =  '"+ numeroAto+"' and  b.tipoAto = "+tipoAto+" ",Lei.class );
        List<Lei> llei = query.getResultList();
@@ -103,7 +103,7 @@ public class LeiRepository extends DefaultRepository<Lei, BigInteger> {
                         "      where " +
                         "          e.id = (select max(e1.id) " +
                         "                    from lei e1 join InfoRemessa af1 on e1.chave= af1.chave " +
-                        "                             join ato a1     on e1.idAto = a1.id join InfoRemessa af2 on a1.chave= af1.chave  and af1.idUnidadeGestora= af2.idUnidadeGestora and af1.idUnidadeGestora = '" +User.getUser(request).getUnidadeGestora().getId()+ "' "+
+                        "                             join ato a1     on e1.idAto = a1.id join InfoRemessa af2 on a1.chave= af1.chave  and af1.idUnidadeGestora= af2.idUnidadeGestora and af1.idUnidadeGestora = '" +user.getUser(request).getUnidadeGestora().getId()+ "' "+
                         "                    where e1.dataPublicacao = e.dataPublicacao " +
                         "                      and e1.ementa = e.ementa " +
                         "                      and e1.numeroLei = e.numeroLei " +
@@ -111,7 +111,7 @@ public class LeiRepository extends DefaultRepository<Lei, BigInteger> {
                         "                      and a1.numeroAto = a.numeroAto and a1.tipoAto=a.tipoAto  ) " +
                         "      ) a " +
                         "         join InfoRemessa info on info.chave = a.chave and info.idUnidadeGestora = '"
-                        + User.getUser(request).getUnidadeGestora().getId() + "' "  + search + " ORDER BY " + campo, Lei.class)
+                        + user.getUser(request).getUnidadeGestora().getId() + "' "  + search + " ORDER BY " + campo, Lei.class)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();
@@ -138,7 +138,7 @@ public class LeiRepository extends DefaultRepository<Lei, BigInteger> {
                         "      where " +
                         "          e.id = (select max(e1.id) " +
                         "                    from lei e1 join InfoRemessa af1 on e1.chave= af1.chave " +
-                        "                             join ato a1     on e1.idAto = a1.id join InfoRemessa af2 on a1.chave= af1.chave  and af1.idUnidadeGestora= af2.idUnidadeGestora and af1.idUnidadeGestora = '" +User.getUser(request).getUnidadeGestora().getId()+ "' "+
+                        "                             join ato a1     on e1.idAto = a1.id join InfoRemessa af2 on a1.chave= af1.chave  and af1.idUnidadeGestora= af2.idUnidadeGestora and af1.idUnidadeGestora = '" +user.getUser(request).getUnidadeGestora().getId()+ "' "+
                         "                    where e1.dataPublicacao = e.dataPublicacao " +
                         "                      and e1.ementa = e.ementa " +
                         "                      and e1.numeroLei = e.numeroLei " +
@@ -146,7 +146,7 @@ public class LeiRepository extends DefaultRepository<Lei, BigInteger> {
                         "                      and a1.numeroAto = a.numeroAto and a1.tipoAto=a.tipoAto  ) " +
                         "      ) a " +
                         "         join InfoRemessa info on info.chave = a.chave and info.idUnidadeGestora = '"
-                        + User.getUser(request).getUnidadeGestora().getId() + "' " );
+                        + user.getUser(request).getUnidadeGestora().getId() + "' " );
         return (Integer) query.getSingleResult();
     }
 }

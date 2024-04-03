@@ -62,7 +62,7 @@ public class AcompanhamentoDeRemessasRepository extends DefaultRepository<String
                             "group by nome, cpf, CodigoCargo;");
             query.setParameter("tipo", tipoCargo);
             query.setParameter("date", infoRemessa.getAdmFilaRecebimento().getDataProcessamento());
-            query.setParameter("unidade", User.getUser(super.request).getUnidadeGestora().getId());
+            query.setParameter("unidade", user.getUser(super.request).getUnidadeGestora().getId());
             query.setParameter("exercicio", infoRemessa.getExercicio());
             query.setParameter("remessa", infoRemessa.getRemessa());
             return query.getSingleResult();
@@ -77,7 +77,7 @@ public class AcompanhamentoDeRemessasRepository extends DefaultRepository<String
       return  entityManager.createNativeQuery(
         "select * from InfoRemessa i" +
           " where (select count(DISTINCT a.idCargo) from AdmAssinatura a where a.chave = i.chave) > 0" +
-          " and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "'", InfoRemessa.class).getResultList();
+          " and i.idUnidadeGestora = '" + user.getUser(super.request).getUnidadeGestora().getId() + "'", InfoRemessa.class).getResultList();
     } catch (Exception e) {
       return null;
     }
@@ -99,7 +99,7 @@ public class AcompanhamentoDeRemessasRepository extends DefaultRepository<String
         "select * from InfoRemessa i" +
           " where (select count(DISTINCT a.idCargo) from AdmAssinatura a where a.chave = i.chave) > 0" +
           " and i.exercicio = '" + exercicio + "'"+
-          " and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "'", InfoRemessa.class).getResultList();
+          " and i.idUnidadeGestora = '" + user.getUser(super.request).getUnidadeGestora().getId() + "'", InfoRemessa.class).getResultList();
     } catch (Exception e) {
       return null;
     }
@@ -127,7 +127,7 @@ public class AcompanhamentoDeRemessasRepository extends DefaultRepository<String
     List<InfoRemessa> list = getEntityManager()
       .createNativeQuery("select * from InfoRemessa i" +
         " where (select count(DISTINCT a.idCargo) from AdmAssinatura a where a.chave = i.chave) > 0" +
-        " and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' "+search +"ORDER BY i.exercicio, i.remessa desc", InfoRemessa.class)
+        " and i.idUnidadeGestora = '" + user.getUser(super.request).getUnidadeGestora().getId() + "' "+search +"ORDER BY i.exercicio, i.remessa desc", InfoRemessa.class)
       .setFirstResult(pagina)
       .setMaxResults(tamanho)
       .getResultList();
@@ -139,7 +139,7 @@ public class AcompanhamentoDeRemessasRepository extends DefaultRepository<String
   public Integer counts() {
     Query query = getEntityManager().createNativeQuery("select count(*) from InfoRemessa i" +
       " where (select count(DISTINCT a.idCargo) from AdmAssinatura a where a.chave = i.chave) > 0" +
-      " and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' " );
+      " and i.idUnidadeGestora = '" + user.getUser(super.request).getUnidadeGestora().getId() + "' " );
     return (Integer) query.getSingleResult();
   }
 
@@ -232,7 +232,7 @@ public class AcompanhamentoDeRemessasRepository extends DefaultRepository<String
                                         "left join admassinatura a on a.chave = i.CHAVE " +
                                         "left join AutenticacaoAssinatura..Assinatura ass on ass.oid = a.idAssinatura " +
                                         "left join admfilarecebimento f on f.id = i.idfilarecebimento " +
-                        "where IDUNIDADEGESTORA = '"+User.getUser(super.request).getUnidadeGestora().getId()+"' " +
+                        "where IDUNIDADEGESTORA = '"+user.getUser(super.request).getUnidadeGestora().getId()+"' " +
                                         "group by IDUNIDADEGESTORA, i.EXERCICIO, i.REMESSA, i.CHAVE, i.nomeUnidade " +
                         "   order by i.EXERCICIO desc, i.REMESSA desc")
                 .setFirstResult(pagina)

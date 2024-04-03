@@ -97,8 +97,8 @@ public class ConcessaoAproveitamentoController extends DefaultController<Documen
         documentoAproveitamento.setIdCastorFile(idCastor);
         documentoAproveitamento.setStatus(DocumentoAproveitamento.Status.Informado.getValor());
         documentoAproveitamento.setDescricao(descricao);
-        documentoAproveitamento.setIdCargo(User.getUser(aproveitamentoRepository.getRequest()).getCargo().getValor());
-        documentoAproveitamento.setCpfUsuario(User.getUser(aproveitamentoRepository.getRequest()).getCpf());
+        documentoAproveitamento.setIdCargo(user.getUser(aproveitamentoRepository.getRequest()).getCargo().getValor());
+        documentoAproveitamento.setCpfUsuario(user.getUser(aproveitamentoRepository.getRequest()).getCpf());
         documentoAproveitamento.setIpUsuario(InetAddress.getLocalHost().getHostAddress());
         documentoAproveitamento.setDataUpload(new Date());
         documentoAproveitamentoRepository.save(documentoAproveitamento);

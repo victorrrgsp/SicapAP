@@ -81,7 +81,7 @@ public class GfipRepository extends DefaultRepository<Gfip, BigInteger> {
                         "where l.linha = 1 and\n" +
                         "      Ug.id = :UG");
 
-        var ug =User.getUser(request).getUnidadeGestora().getId().toString();
+        var ug =user.getUser(request).getUnidadeGestora().getId().toString();
         query.setParameter("UG",ug);
         List<Object[]> resultList = query.getResultList();
         List<Gfip> retorno = new ArrayList<Gfip>();

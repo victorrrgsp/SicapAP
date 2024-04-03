@@ -94,8 +94,8 @@ public class ConcessaoReintegracaoController extends DefaultController<Documento
         documentoReintegracao.setIdCastorFile(idCastor);
         documentoReintegracao.setStatus(DocumentoReintegracao.Status.Informado.getValor());
         documentoReintegracao.setDescricao(descricao);
-        documentoReintegracao.setIdCargo(User.getUser(reintegracaoRepository.getRequest()).getCargo().getValor());
-        documentoReintegracao.setCpfUsuario(User.getUser(reintegracaoRepository.getRequest()).getCpf());
+        documentoReintegracao.setIdCargo(user.getUser(reintegracaoRepository.getRequest()).getCargo().getValor());
+        documentoReintegracao.setCpfUsuario(user.getUser(reintegracaoRepository.getRequest()).getCpf());
         documentoReintegracao.setIpUsuario(InetAddress.getLocalHost().getHostAddress());
         documentoReintegracao.setDataUpload(new Date());
         documentoReintegracaoRepository.save(documentoReintegracao);

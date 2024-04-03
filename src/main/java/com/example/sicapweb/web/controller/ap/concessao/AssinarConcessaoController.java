@@ -79,7 +79,7 @@ public class AssinarConcessaoController extends DefaultController<AdmEnvio> {
 
     @GetMapping(path = "/{searchParams}/{tipoParams}/pagination")
     public ResponseEntity<PaginacaoUtil<AdmEnvio>> listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
-        if (User.getUser(admEnvioRepository.getRequest()).getCargo().getValor() != 4) {
+        if (user.getUser(admEnvioRepository.getRequest()).getCargo().getValor() != 4) {
             return ResponseEntity.ok().body(null);
         } else {
             PaginacaoUtil<AdmEnvio> paginacaoUtil = admEnvioRepository.buscaPaginada(pageable, searchParams, tipoParams);
@@ -112,8 +112,8 @@ public class AssinarConcessaoController extends DefaultController<AdmEnvio> {
                     AdmEnvio envio = admEnvioRepository.findById(id);
                     if (envio != null) {
                         AdmEnvioAssinatura admEnvioAssinatura = new AdmEnvioAssinatura();
-                        admEnvioAssinatura.setIdCargo(User.getUser(admEnvioRepository.getRequest()).getCargo().getValor());
-                        admEnvioAssinatura.setCpf(User.getUser(admEnvioRepository.getRequest()).getCpf());
+                        admEnvioAssinatura.setIdCargo(user.getUser(admEnvioRepository.getRequest()).getCargo().getValor());
+                        admEnvioAssinatura.setCpf(user.getUser(admEnvioRepository.getRequest()).getCpf());
                         admEnvioAssinatura.setIpAssinante(InetAddress.getLocalHost().getHostAddress());
                         admEnvioAssinatura.setAdmEnvio(envio);
                         admEnvioAssinatura.setData_assinatura(new Date());
@@ -473,7 +473,7 @@ public class AssinarConcessaoController extends DefaultController<AdmEnvio> {
     public ResponseEntity<?> iniciarAssinatura(@RequestBody String certificado_mensagem_hash) {
         String respostaIniciarAssinatura = new String();
         try {
-            User userlogado = User.getUser(admEnvioRepository.getRequest());
+            User userlogado = user.getUser(admEnvioRepository.getRequest());
             JsonNode respostaJson = new ObjectMapper().readTree(certificado_mensagem_hash);
             JsonNode certificadoJson = new ObjectMapper().readTree(userlogado.getCertificado());
             String certificado = respostaJson.get("certificado").asText();

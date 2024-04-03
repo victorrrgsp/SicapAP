@@ -1,6 +1,7 @@
 package com.example.sicapweb.security;
 
 import com.google.gson.Gson;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import redis.clients.jedis.Jedis;
 
@@ -76,9 +77,12 @@ public class Config {
 
 
     public String ip = "172.30.0.149";
-    public Jedis jedis = new Jedis(ip, 6379);
+    private Jedis jedis = null;
 
+    @Bean
     public Jedis getJedis() {
+        if(jedis == null)
+            jedis = new Jedis(ip, 6379);
         return jedis;
     }
 

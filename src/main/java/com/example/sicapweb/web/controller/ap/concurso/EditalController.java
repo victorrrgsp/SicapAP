@@ -208,7 +208,7 @@ public class EditalController extends DefaultController<Edital> {
         if (edital!= null ){
             Integer numEdital = Integer.valueOf(edital.getNumeroEdital().substring(0, edital.getNumeroEdital().length() - 4));
             Integer anoEdital = Integer.valueOf(edital.getNumeroEdital().substring(edital.getNumeroEdital().length() - 4));
-             htp =  concursoEnvioRepository.getProcessosEcontas(numEdital,anoEdital, User.getUser(concursoEnvioRepository.getRequest()).getUnidadeGestora().getId());
+             htp =  concursoEnvioRepository.getProcessosEcontas(numEdital,anoEdital, user.getUser(concursoEnvioRepository.getRequest()).getUnidadeGestora().getId());
         }
         else { throw new RuntimeException("não encontrou edital!!");}
 

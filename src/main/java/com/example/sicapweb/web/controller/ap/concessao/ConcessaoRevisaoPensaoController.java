@@ -95,8 +95,8 @@ public class ConcessaoRevisaoPensaoController extends DefaultController<Document
         documentoPensao.setStatus(DocumentoPensao.Status.Informado.getValor());
         documentoPensao.setRevisao("S");
         documentoPensao.setDescricao(descricao);
-        documentoPensao.setIdCargo(User.getUser(pensaoRepository.getRequest()).getCargo().getValor());
-        documentoPensao.setCpfUsuario(User.getUser(pensaoRepository.getRequest()).getCpf());
+        documentoPensao.setIdCargo(user.getUser(pensaoRepository.getRequest()).getCargo().getValor());
+        documentoPensao.setCpfUsuario(user.getUser(pensaoRepository.getRequest()).getCpf());
         documentoPensao.setIpUsuario(InetAddress.getLocalHost().getHostAddress());
         documentoPensao.setDataUpload(new Date());
         documentoPensaoRepository.save(documentoPensao);

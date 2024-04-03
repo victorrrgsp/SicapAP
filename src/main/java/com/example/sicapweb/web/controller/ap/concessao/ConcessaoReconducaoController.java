@@ -91,8 +91,8 @@ public class ConcessaoReconducaoController extends DefaultController<DocumentoRe
         documentoReconducao.setIdCastorFile(idCastor);
         documentoReconducao.setStatus(DocumentoReconducao.Status.Informado.getValor());
         documentoReconducao.setDescricao(descricao);
-        documentoReconducao.setIdCargo(User.getUser(reconducaoRepository.getRequest()).getCargo().getValor());
-        documentoReconducao.setCpfUsuario(User.getUser(reconducaoRepository.getRequest()).getCpf());
+        documentoReconducao.setIdCargo(user.getUser(reconducaoRepository.getRequest()).getCargo().getValor());
+        documentoReconducao.setCpfUsuario(user.getUser(reconducaoRepository.getRequest()).getCpf());
         documentoReconducao.setIpUsuario(InetAddress.getLocalHost().getHostAddress());
         documentoReconducao.setDataUpload(new Date());
         documentoReconducaoRepository.save(documentoReconducao);

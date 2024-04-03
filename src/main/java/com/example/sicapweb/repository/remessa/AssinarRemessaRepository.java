@@ -118,7 +118,7 @@ public class AssinarRemessaRepository extends DefaultRepository<String, String> 
                             "group by nome, cpf, idCargo;");
             query.setParameter("tipo", tipoCargo);
             query.setParameter("date", new Date());
-            query.setParameter("unidade", User.getUser(super.request).getUnidadeGestora().getId());
+            query.setParameter("unidade", user.getUser(super.request).getUnidadeGestora().getId());
             query.setParameter("exercicio", infoRemessa.getExercicio());
             query.setParameter("remessa", infoRemessa.getRemessa());
             return query.getSingleResult();
@@ -132,7 +132,7 @@ public class AssinarRemessaRepository extends DefaultRepository<String, String> 
             return (InfoRemessa) entityManager.createNativeQuery(
                     "select * from InfoRemessa i" +
                             " where (select count(DISTINCT a.idCargo) from AdmAssinatura a where a.chave = i.chave) < 3" +
-                            " and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "'", InfoRemessa.class).getSingleResult();
+                            " and i.idUnidadeGestora = '" + user.getUser(super.request).getUnidadeGestora().getId() + "'", InfoRemessa.class).getSingleResult();
         } catch (Exception e) {
             return null;
         }
@@ -143,7 +143,7 @@ public class AssinarRemessaRepository extends DefaultRepository<String, String> 
             return (InfoRemessa) entityManager.createNativeQuery(
                     "select * from InfoRemessa i" +
                             " where (select count(DISTINCT a.idCargo) from AdmAssinatura a where a.chave = i.chave) = 3" +
-                            " and i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "'", InfoRemessa.class).getSingleResult();
+                            " and i.idUnidadeGestora = '" + user.getUser(super.request).getUnidadeGestora().getId() + "'", InfoRemessa.class).getSingleResult();
         } catch (Exception e) {
             return null;
         }
@@ -155,7 +155,7 @@ public class AssinarRemessaRepository extends DefaultRepository<String, String> 
                 "from SICAPAP21..InfoRemessa a " +
                 "         join SICAPAP21..AdmFilaRecebimento b on a.idFilaRecebimento = b.id " +
                 "where b.status = 2 " +
-                "  and a.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "'" +
+                "  and a.idUnidadeGestora = '" + user.getUser(super.request).getUnidadeGestora().getId() + "'" +
                 "  and a.exercicio = " + infoRemessa.getExercicio() +
                 "  and a.remessa = " + infoRemessa.getRemessa());
         try {
@@ -176,7 +176,7 @@ public class AssinarRemessaRepository extends DefaultRepository<String, String> 
                 "INSERT INTO AutenticacaoAssinatura.dbo.Arquivo(MIME, Nome, URLASS, Label, DataEntrada, cpf) " +
                         "VALUES ('application/octet-stream', 'Remessa SICAP AP', 'Remessa SICAP AP', 'Remessa SICAP AP', :data, :cpf)");
         query.setParameter("data", new br.gov.to.tce.util.Date().toStringDateAndHourDatabaseFormat());
-        query.setParameter("cpf", User.getUser(super.request).getCpf());
+        query.setParameter("cpf", user.getUser(super.request).getCpf());
         query.executeUpdate();
 
         Query query1 = entityManager.createNativeQuery(
@@ -189,7 +189,7 @@ public class AssinarRemessaRepository extends DefaultRepository<String, String> 
         Query query = entityManager.createNativeQuery(
                 "INSERT INTO AutenticacaoAssinatura.dbo.Assinatura(Usuario, Arquivo, DataAssinatura) " +
                         "VALUES (:cpf, :arquivo, :data)");
-        query.setParameter("cpf", User.getUser(super.request).getCpf());
+        query.setParameter("cpf", user.getUser(super.request).getCpf());
         query.setParameter("arquivo", idArquivo);
         query.setParameter("data", new br.gov.to.tce.util.Date().toStringDateAndHourDatabaseFormat());
         query.executeUpdate();
@@ -205,7 +205,7 @@ public class AssinarRemessaRepository extends DefaultRepository<String, String> 
         Query query = entityManager.createNativeQuery(
                 "INSERT INTO AutenticacaoAssinatura.dbo.InfoAssinatura(CodUndGestora, Bimestre, Exercicio, Assinatura, Aplicacao) " +
                         "VALUES (:unidade, :remessa, :exercicio, :assinatura, 29)");
-        query.setParameter("unidade", User.getUser(super.request).getUnidadeGestora().getId());
+        query.setParameter("unidade", user.getUser(super.request).getUnidadeGestora().getId());
         query.setParameter("remessa", infoRemessa.getRemessa());
         query.setParameter("exercicio", infoRemessa.getExercicio());
         query.setParameter("assinatura", idAssinatura);
@@ -219,7 +219,7 @@ public class AssinarRemessaRepository extends DefaultRepository<String, String> 
                         "VALUES (:chave, :assinatura, :cargo)");
         query.setParameter("chave", chave);
         query.setParameter("assinatura", idAssinatura);
-        query.setParameter("cargo", User.getUser(super.request).getCargo().getValor());
+        query.setParameter("cargo", user.getUser(super.request).getCargo().getValor());
         query.executeUpdate();
         entityManager.flush();
     }
@@ -228,11 +228,11 @@ public class AssinarRemessaRepository extends DefaultRepository<String, String> 
         Query query = entityManager.createNativeQuery(
                 "INSERT INTO AutenticacaoAssinatura.dbo.UsuarioAplicacao(Usuario, Aplicacao, UnidadeGestora, Exercicio, Remessa, Cargo) " +
                         "VALUES (:usuario, 29, :unidade, :exercicio, :remessa, :cargo)");
-        query.setParameter("usuario", User.getUser(super.request).getCpf());
-        query.setParameter("unidade", User.getUser(super.request).getUnidadeGestora().getId());
+        query.setParameter("usuario", user.getUser(super.request).getCpf());
+        query.setParameter("unidade", user.getUser(super.request).getUnidadeGestora().getId());
         query.setParameter("exercicio", infoRemessa.getExercicio());
         query.setParameter("remessa", infoRemessa.getRemessa());
-        query.setParameter("cargo", User.getUser(super.request).getCargo().getValor());
+        query.setParameter("cargo", user.getUser(super.request).getCargo().getValor());
         query.executeUpdate();
         entityManager.flush();
     }
@@ -272,12 +272,12 @@ public class AssinarRemessaRepository extends DefaultRepository<String, String> 
 
         try {
 
-            queryTabelaRemessa.setParameter("remessa",remessa).setParameter("exercicio",exercicio).setParameter("ug",User.getUser(super.getRequest()).getUnidadeGestora().getId());
+            queryTabelaRemessa.setParameter("remessa",remessa).setParameter("exercicio",exercicio).setParameter("ug",user.getUser(super.getRequest()).getUnidadeGestora().getId());
 
             long totalRegistros = (Integer) queryTabelaQuantidade
                     .setParameter("remessa",remessa)
                     .setParameter("exercicio",exercicio)
-                    .setParameter("ug",User.getUser(super.getRequest()).getUnidadeGestora().getId()).getSingleResult();
+                    .setParameter("ug",user.getUser(super.getRequest()).getUnidadeGestora().getId()).getSingleResult();
             int pagina = Integer.valueOf(paginacaoFrontEnd.getPageNumber());
             int tamanhoPorPagina =  (filtroWhere.isEmpty())? Integer.valueOf(paginacaoFrontEnd.getPageSize()) : (int) totalRegistros ;
 
@@ -305,7 +305,7 @@ public class AssinarRemessaRepository extends DefaultRepository<String, String> 
                 Query queryTabelaQuantidade = getEntityManager().createNativeQuery((String) JayReflection.executeStaticMethod(itemTabela.getpackageRepository()+'.'+itemTabela.getLabel()+"Repository","getQueryCountExtratoRemessa"));
                 queryTabelaQuantidade.setParameter("remessa",remessa)
                         .setParameter("exercicio",exercicio)
-                        .setParameter("ug",User.getUser(super.getRequest()).getUnidadeGestora().getId());
+                        .setParameter("ug",user.getUser(super.getRequest()).getUnidadeGestora().getId());
                 item.put("quantidade",(Integer) queryTabelaQuantidade.getSingleResult());
                 return item;
             } catch (Exception e) {

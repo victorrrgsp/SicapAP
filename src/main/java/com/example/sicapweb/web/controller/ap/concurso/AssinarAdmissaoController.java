@@ -40,6 +40,8 @@ import java.util.stream.Collectors;
 @RequestMapping("/assinarAdmissao")
 public class AssinarAdmissaoController {
     @Autowired
+    protected User user;
+    @Autowired
     private AdmissaoEnvioRepository admissaoEnvioRepository;
 
     @Autowired
@@ -67,7 +69,7 @@ public class AssinarAdmissaoController {
     @CrossOrigin
     @GetMapping(path="/{searchParams}/{tipoParams}/pagination")
     public ResponseEntity<PaginacaoUtil<AdmissaoEnvioAssRetorno>> listaAProcessosAguardandoAss(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
-        if (User.getUser(admissaoEnvioRepository.getRequest()).getCargo().getValor()!=4 ){
+        if (user.getUser(admissaoEnvioRepository.getRequest()).getCargo().getValor()!=4 ){
             List<AdmissaoEnvioAssRetorno> listavazia= new ArrayList<>() ;
             PaginacaoUtil<AdmissaoEnvioAssRetorno> paginacaoUtilvazia= new PaginacaoUtil<AdmissaoEnvioAssRetorno>(0, 1, 1, 0, listavazia);
             return ResponseEntity.ok().body(paginacaoUtilvazia);
@@ -79,7 +81,7 @@ public class AssinarAdmissaoController {
     @PostMapping(path="/iniciarAssinatura")
     public ResponseEntity<?> iniciarAssinatura(@RequestBody String certificado_mensagem_hash  ){
         try {
-            User userlogado = User.getUser(admissaoEnvioAssinaturaRepository.getRequest());
+            User userlogado = user.getUser(admissaoEnvioAssinaturaRepository.getRequest());
             JsonNode respostaJson = new ObjectMapper().readTree(certificado_mensagem_hash);
             JsonNode certificadoJson = new ObjectMapper().readTree(userlogado.getCertificado());
             String certificado = respostaJson.get("certificado").asText();
@@ -130,8 +132,8 @@ public class AssinarAdmissaoController {
                 AdmissaoEnvio envio =  admissaoEnvioRepository.findById(idenvio);
                 validaEnvio(envio);
                 AdmissaoEnvioAssinatura  novoAssinaturaAdmissao = new AdmissaoEnvioAssinatura();
-                novoAssinaturaAdmissao.setIdCargo(User.getUser(admissaoEnvioAssinaturaRepository.getRequest()).getCargo().getValor());
-                novoAssinaturaAdmissao.setCpf(User.getUser(admissaoEnvioAssinaturaRepository.getRequest()).getCpf());
+                novoAssinaturaAdmissao.setIdCargo(user.getUser(admissaoEnvioAssinaturaRepository.getRequest()).getCargo().getValor());
+                novoAssinaturaAdmissao.setCpf(user.getUser(admissaoEnvioAssinaturaRepository.getRequest()).getCpf());
                 ServletRequestAttributes getIp = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
                 novoAssinaturaAdmissao.setIp(getIp.getRequest().getRemoteAddr());
                 novoAssinaturaAdmissao.setAdmissaoEnvio(envio);
@@ -189,7 +191,7 @@ public class AssinarAdmissaoController {
     }
 
     private void validaUsuarioAssinante(){
-        User userlogado = User.getUser(admissaoEnvioRepository.getRequest());
+        User userlogado = user.getUser(admissaoEnvioRepository.getRequest());
         if (userlogado != null) {
             if (userlogado.getCargo().getValor() !=4 ) throw new RuntimeException("Apenas o gestor da unidade gestora pode assinar envios!!");
             if (userlogado.getUnidadeGestora().getId().equals("00000000000000") ) throw new RuntimeException("Não assina envios na ug de teste!!");
@@ -201,7 +203,7 @@ public class AssinarAdmissaoController {
 
     private void gerarProcesso(AdmissaoEnvio envio) throws IOException, URISyntaxException {
         //coleta dados do cadun sobre o id  do responsavel da ug e o id da pessoa juridica
-        String Cnpj = User.getUser(admissaoEnvioAssinaturaRepository.getRequest()).getUnidadeGestora().getId();
+        String Cnpj = user.getUser(admissaoEnvioAssinaturaRepository.getRequest()).getUnidadeGestora().getId();
         Integer origem =   admissaoEnvioAssinaturaRepository.getIdPessoaJuridicaNoCadun(Cnpj);
         Integer responsavel = admissaoEnvioAssinaturaRepository.getIdPessoaFisicaNoCadun(Cnpj);
         LocalDateTime dataHoraDoprotocolo= LocalDateTime.now();

@@ -54,7 +54,7 @@ public class AdmissaoEnvioRepository extends DefaultRepository<AdmissaoEnvio, Bi
         String campo = String.valueOf(pageable.getSort()).replace(":", "");
 
         List<AdmissaoEnvio> list = getEntityManager()
-                .createNativeQuery("select a.* from AdmissaoEnvio a  where  a.cnpjUnidadeGestora='" + User.getUser(super.request).getUnidadeGestora().getId() +"' "+
+                .createNativeQuery("select a.* from AdmissaoEnvio a  where  a.cnpjUnidadeGestora='" + user.getUser(super.request).getUnidadeGestora().getId() +"' "+
                         " and   1=1 " + search + " ORDER BY " + campo, AdmissaoEnvio.class)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
@@ -80,7 +80,7 @@ public class AdmissaoEnvioRepository extends DefaultRepository<AdmissaoEnvio, Bi
     }
 
     public Integer countProcessos(String search) {
-        return  (Integer)getEntityManager().createNativeQuery("select count(*) from AdmissaoEnvio a  where a.cnpjUnidadeGestora='" + User.getUser(super.request).getUnidadeGestora().getId() +"' "+search
+        return  (Integer)getEntityManager().createNativeQuery("select count(*) from AdmissaoEnvio a  where a.cnpjUnidadeGestora='" + user.getUser(super.request).getUnidadeGestora().getId() +"' "+search
                 ).getSingleResult();
     }
 
@@ -92,7 +92,7 @@ public class AdmissaoEnvioRepository extends DefaultRepository<AdmissaoEnvio, Bi
         String campo = String.valueOf(pageable.getSort()).replace(":", "");
 
         List<AdmissaoEnvio> list = getEntityManager()
-                .createNativeQuery("select a.* from AdmissaoEnvio a where  a.cnpjUnidadeGestora='" + User.getUser(super.request).getUnidadeGestora().getId() +"' "+
+                .createNativeQuery("select a.* from AdmissaoEnvio a where  a.cnpjUnidadeGestora='" + user.getUser(super.request).getUnidadeGestora().getId() +"' "+
                         " and  status=2 and not exists(select 1 from AdmissaoEnvioAssinatura ass  where  ass.idEnvio=a.id)  and a.status=2 " + search + " ORDER BY " + campo, AdmissaoEnvio.class)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
@@ -120,12 +120,12 @@ public class AdmissaoEnvioRepository extends DefaultRepository<AdmissaoEnvio, Bi
     }
 
     public Integer countProcessosAguardandoAss(String search) {
-        return (Integer) getEntityManager().createNativeQuery("select count(*) from AdmissaoEnvio a where  a.cnpjUnidadeGestora='" + User.getUser(super.request).getUnidadeGestora().getId() +"' "+
+        return (Integer) getEntityManager().createNativeQuery("select count(*) from AdmissaoEnvio a where  a.cnpjUnidadeGestora='" + user.getUser(super.request).getUnidadeGestora().getId() +"' "+
                 " and  a.status=2 "+search).getSingleResult();
     }
 
     public List<AdmissaoEnvio> GetEmAbertoByEdital(BigInteger idedital){
-            return getEntityManager().createNativeQuery("select top 1 a.* from AdmissaoEnvio a where  a.cnpjUnidadeGestora='" + User.getUser(super.request).getUnidadeGestora().getId() + "' " +
+            return getEntityManager().createNativeQuery("select top 1 a.* from AdmissaoEnvio a where  a.cnpjUnidadeGestora='" + user.getUser(super.request).getUnidadeGestora().getId() + "' " +
                     " and  a.processo is null and   a.idEdital =" + idedital, AdmissaoEnvio.class).getResultList();
     }
 

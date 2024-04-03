@@ -95,8 +95,8 @@ public class ConcessaoRevisaoReservaController extends DefaultController<Documen
         documentoAposentadoria.setRevisao("S");
         documentoAposentadoria.setReserva("S");
         documentoAposentadoria.setDescricao(descricao);
-        documentoAposentadoria.setIdCargo(User.getUser(aposentadoriaRepository.getRequest()).getCargo().getValor());
-        documentoAposentadoria.setCpfUsuario(User.getUser(aposentadoriaRepository.getRequest()).getCpf());
+        documentoAposentadoria.setIdCargo(user.getUser(aposentadoriaRepository.getRequest()).getCargo().getValor());
+        documentoAposentadoria.setCpfUsuario(user.getUser(aposentadoriaRepository.getRequest()).getCpf());
         documentoAposentadoria.setIpUsuario(InetAddress.getLocalHost().getHostAddress());
         documentoAposentadoria.setDataUpload(new Date());
         documentoAposentadoriaRepository.save(documentoAposentadoria);

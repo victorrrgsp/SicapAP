@@ -37,7 +37,7 @@ public class EditalVagaRepository extends DefaultRepository<EditalVaga, BigInteg
                 .createNativeQuery("\n" +
                                 "select a.*\n" +
                                 "from EditalVaga a\n" +
-                                "         join infoRemessa i on a.chave = i.chave and i.idUnidadeGestora = '" +User.getUser(super.request).getUnidadeGestora().getId()+"'"+
+                                "         join infoRemessa i on a.chave = i.chave and i.idUnidadeGestora = '" +user.getUser(super.request).getUnidadeGestora().getId()+"'"+
                 //"where 1=1 " + search + 
                 " ORDER BY " + campo, EditalVaga.class)
                 .setFirstResult(pagina)
@@ -53,7 +53,7 @@ public class EditalVagaRepository extends DefaultRepository<EditalVaga, BigInteg
     public Integer countEditaisvaga(String search) {
         Query query = getEntityManager().createNativeQuery("select count(1)\n" +
                 "from EditalVaga a\n" +
-                "         join infoRemessa i on a.chave = i.chave and i.idUnidadeGestora = '"+User.getUser(super.request).getUnidadeGestora().getId()+"' \n" +
+                "         join infoRemessa i on a.chave = i.chave and i.idUnidadeGestora = '"+user.getUser(super.request).getUnidadeGestora().getId()+"' \n" +
                 "where 1 = 1" + search);
         return (Integer) query.getSingleResult();
     }
@@ -62,7 +62,7 @@ public class EditalVagaRepository extends DefaultRepository<EditalVaga, BigInteg
         return  getEntityManager().createNativeQuery(
                         "select a.* from EditalVaga a"+
                         " join InfoRemessa i on a.chave = i.chave " +
-                                "where  i.idUnidadeGestora = '" + User.getUser(super.request).getUnidadeGestora().getId() + "' ", EditalVaga.class)
+                                "where  i.idUnidadeGestora = '" + user.getUser(super.request).getUnidadeGestora().getId() + "' ", EditalVaga.class)
                 .getResultList();
     }
 
@@ -70,7 +70,7 @@ public class EditalVagaRepository extends DefaultRepository<EditalVaga, BigInteg
         return getEntityManager().createNativeQuery(
                         "with edt as ( " +
                                 "        select a.codigoVaga, i.idUnidadeGestora ,max(a.id)  max_id " +
-                                "             from EditalVaga a  join infoRemessa i on a.chave = i.chave  and i.idUnidadeGestora = '"+User.getUser(super.request).getUnidadeGestora().getId()+"'  group by " +
+                                "             from EditalVaga a  join infoRemessa i on a.chave = i.chave  and i.idUnidadeGestora = '"+user.getUser(super.request).getUnidadeGestora().getId()+"'  group by " +
                                 "                a.codigoVaga, i.idUnidadeGestora " +
                                 "                         ) " +
                                 "select   a.* from EditalVaga a join infoRemessa i on a.chave = i.chave join edt b on a.id= b.max_id and i.idUnidadeGestora=b.idUnidadeGestora where 1=1 "+
@@ -83,7 +83,7 @@ public class EditalVagaRepository extends DefaultRepository<EditalVaga, BigInteg
             var query =  getEntityManager().createNativeQuery(
                     "with edt as ( " +
                             "        select a.codigoVaga, i.idUnidadeGestora ,max(a.id)  max_id " +
-                            "             from EditalVaga a  join infoRemessa i on a.chave = i.chave  and i.idUnidadeGestora = '"+User.getUser(super.request).getUnidadeGestora().getId()+"'  group by " +
+                            "             from EditalVaga a  join infoRemessa i on a.chave = i.chave  and i.idUnidadeGestora = '"+user.getUser(super.request).getUnidadeGestora().getId()+"'  group by " +
                             "                a.codigoVaga, i.idUnidadeGestora " +
                             "                         ) " +
                             "select   a.* from EditalVaga a join infoRemessa i on a.chave = i.chave join edt b on a.id= b.max_id and i.idUnidadeGestora=b.idUnidadeGestora where 1=1 "+
@@ -110,7 +110,7 @@ public class EditalVagaRepository extends DefaultRepository<EditalVaga, BigInteg
                             "where a.codigoVaga = :codigoVaga and ed.numeroEdital = :numeroedital order by a.id", EditalVaga.class)
                             .setParameter("codigoVaga", codigo)
                             .setParameter("numeroedital",numeroedital)
-                            .setParameter("idUG",User.getUser(super.request).getUnidadeGestora().getId())
+                            .setParameter("idUG",user.getUser(super.request).getUnidadeGestora().getId())
                             .setMaxResults(1);
             return  (EditalVaga) query.getSingleResult();
         }catch (NoResultException e){
@@ -125,7 +125,7 @@ public class EditalVagaRepository extends DefaultRepository<EditalVaga, BigInteg
                             "from EditalVaga a\n" +
                             "         join infoRemessa i on a.chave = i.chave\n" +
                             "where 1 = 1\n" +
-                            " and a.codigoVaga = '" + codigo + "' and a.tipoConcorrencia = "+ tipo + " and i.idUnidadeGestora = '" +User.getUser(super.request).getUnidadeGestora().getId()+"'", EditalVaga.class).setMaxResults(1);
+                            " and a.codigoVaga = '" + codigo + "' and a.tipoConcorrencia = "+ tipo + " and i.idUnidadeGestora = '" +user.getUser(super.request).getUnidadeGestora().getId()+"'", EditalVaga.class).setMaxResults(1);
             return  (EditalVaga) query.getSingleResult();
         }catch (NoResultException e){
             return null;

@@ -72,7 +72,7 @@ public class AdmissaoRepository extends DefaultRepository<Admissao, BigInteger> 
                         "         join servidor1 s on c.idServidor = s.id\n" +
                         "where 1 = 1 " +
                         search + " ORDER BY " + campo, Admissao.class)
-                .setParameter("ug",User.getUser(super.request).getUnidadeGestora().getId());
+                .setParameter("ug",user.getUser(super.request).getUnidadeGestora().getId());
         List<Admissao> listAdmissoes = querylistAdmissoes.setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();
@@ -97,7 +97,7 @@ public class AdmissaoRepository extends DefaultRepository<Admissao, BigInteger> 
                                 " ) " +
                                 "select a.* from Aprovado a " +
                                 "join vaga b on a.idEditalVaga= b.id " , EditalAprovado.class)
-                        .setParameter("ug",User.getUser(super.request).getUnidadeGestora().getId())
+                        .setParameter("ug",user.getUser(super.request).getUnidadeGestora().getId())
                         .setParameter("codigoCargo",listAdmissoes.get(i).getCargo().getCodigoCargo())
                         .setParameter("numeroInscricao",listAdmissoes.get(i).getNumeroInscricao())
                         .setParameter("cpf",nomeacaoConcurso.getCpf());
@@ -127,7 +127,7 @@ public class AdmissaoRepository extends DefaultRepository<Admissao, BigInteger> 
                         "( select a.* from Admissao a  join InfoRemessa i on a.chave = i.chave and i.idUnidadeGestora = :ug and a.tipoAdmissao=1  ), " +
                         " servidor1 as ( select d.* from Servidor d  join InfoRemessa i on d.chave = i.chave and i.idUnidadeGestora = :ug  ) " +
                         "select count(1) from admissao1 c  join  servidor  s on   c.idServidor = s.id " + " " + search)
-                .setParameter("ug",User.getUser(super.request).getUnidadeGestora().getId());
+                .setParameter("ug",user.getUser(super.request).getUnidadeGestora().getId());
         return (Integer) query.getSingleResult();
     }
 

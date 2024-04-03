@@ -56,7 +56,7 @@ public class DocumentoConcursoEditalController extends DefaultController<Documen
             Integer numEdital = Integer.valueOf(listE.get(i).getNumeroEdital().substring(0, listE.get(i).getNumeroEdital().length() - 4));
             Integer anoEdital = Integer.valueOf(listE.get(i).getNumeroEdital().substring(listE.get(i).getNumeroEdital().length() - 4));
             Integer quantEdital =editalRepository.GetQuantidadePorNumeroEdital(listE.get(i).getNumeroEdital(),listE.get(i).getComplementoNumero() );
-            List<Map<String, Integer>> listaprocessoes =  concursoEnvioRepository.getProcessosEcontas(numEdital,anoEdital,User.getUser(concursoEnvioRepository.getRequest()).getUnidadeGestora().getId());
+            List<Map<String, Integer>> listaprocessoes =  concursoEnvioRepository.getProcessosEcontas(numEdital,anoEdital,user.getUser(concursoEnvioRepository.getRequest()).getUnidadeGestora().getId());
            if (listE.get(i).getVeiculoPublicacao()==null  || listE.get(i).getDataPublicacao()==null || listE.get(i).getDataInicioInscricoes()==null || listE.get(i).getDataFimInscricoes() == null  || listE.get(i).getPrazoValidade()==null || listE.get(i).getCnpjEmpresaOrganizadora()==null ) {
                 listE.get(i).setSituacao("Dados Incompletos");
                listE.get(i).setTooltip("Complete o cadastro dos campos vazios antes de prosseguir");
@@ -127,7 +127,7 @@ public class DocumentoConcursoEditalController extends DefaultController<Documen
         documentoEdital.setData_cr(LocalDateTime.now());
         ServletRequestAttributes getIp = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
         documentoEdital.setIp_cr(getIp.getRequest().getRemoteAddr());
-        documentoEdital.setUsuario_cr(User.getUser(documentoEditalRepository.getRequest()).getUserName());
+        documentoEdital.setUsuario_cr(user.getUser(documentoEditalRepository.getRequest()).getUserName());
         documentoEditalRepository.save(documentoEdital);
         return ResponseEntity.ok().body(idCastor);
     }
@@ -225,7 +225,7 @@ public class DocumentoConcursoEditalController extends DefaultController<Documen
             documentoEdital.setStatus(DocumentoEdital.Status.NaoInformado.getValor());
             ServletRequestAttributes getIp = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
             documentoEdital.setIp_altr(getIp.getRequest().getRemoteAddr());
-            documentoEdital.setUsuario_altr(User.getUser(documentoEditalRepository.getRequest()).getUserName());
+            documentoEdital.setUsuario_altr(user.getUser(documentoEditalRepository.getRequest()).getUserName());
             documentoEdital.setData_altr(LocalDateTime.now());
             documentoEditalRepository.update(documentoEdital);
         }

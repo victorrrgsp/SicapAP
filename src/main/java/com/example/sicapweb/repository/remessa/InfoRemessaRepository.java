@@ -17,7 +17,7 @@ public class InfoRemessaRepository extends DefaultRepository<InfoRemessa, String
             return getEntityManager()
                     .createNativeQuery("select * from " +
                             "InfoRemessa info where info.idUnidadeGestora = " +
-                            "'" + User.getUser(super.request).getUnidadeGestora().getId() + "'"
+                            "'" + user.getUser(super.request).getUnidadeGestora().getId() + "'"
 //                            "'01613619000134'"
                             , InfoRemessa.class)
                     .getResultList();

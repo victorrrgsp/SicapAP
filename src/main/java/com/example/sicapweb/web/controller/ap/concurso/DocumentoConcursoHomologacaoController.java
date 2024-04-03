@@ -3,16 +3,13 @@ package com.example.sicapweb.web.controller.ap.concurso;
 
 import br.gov.to.tce.model.ap.concurso.ConcursoEnvio;
 import br.gov.to.tce.model.ap.concurso.EditalHomologacao;
-import br.gov.to.tce.model.ap.concurso.documento.DocumentoEdital;
 import br.gov.to.tce.model.ap.concurso.documento.DocumentoEditalHomologacao;
 import com.example.sicapweb.exception.InvalitInsert;
-import com.example.sicapweb.model.EditalConcurso;
 import com.example.sicapweb.model.EditalHomologaConcurso;
 import com.example.sicapweb.model.Inciso;
 import com.example.sicapweb.repository.concurso.ConcursoEnvioRepository;
 import com.example.sicapweb.repository.concurso.DocumentoEditalHomologacaoRepository;
 import com.example.sicapweb.repository.concurso.EditalHomologacaoRepository;
-import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
 import com.example.sicapweb.web.controller.DefaultController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -118,7 +115,7 @@ public class DocumentoConcursoHomologacaoController extends DefaultController<Ed
         documentoEditalHomologacao.setData_cr(LocalDateTime.now());
         ServletRequestAttributes getIp = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
         documentoEditalHomologacao.setIp_cr(getIp.getRequest().getRemoteAddr());
-        documentoEditalHomologacao.setUsuario_cr(User.getUser(editalHomologacaoRepository.getRequest()).getUserName());
+        documentoEditalHomologacao.setUsuario_cr(user.getUser(editalHomologacaoRepository.getRequest()).getUserName());
         documentoEditalHomologacaoRepository.save(documentoEditalHomologacao);
         return ResponseEntity.ok().body(idCastor);
     }
@@ -171,7 +168,7 @@ public class DocumentoConcursoHomologacaoController extends DefaultController<Ed
             documentoEditalHomologacao.setStatus(DocumentoEditalHomologacao.Status.NaoInformado.getValor());
             ServletRequestAttributes getIp = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
             documentoEditalHomologacao.setIp_altr(getIp.getRequest().getRemoteAddr());
-            documentoEditalHomologacao.setUsuario_altr(User.getUser(documentoEditalHomologacaoRepository.getRequest()).getUserName());
+            documentoEditalHomologacao.setUsuario_altr(user.getUser(documentoEditalHomologacaoRepository.getRequest()).getUserName());
             documentoEditalHomologacao.setData_altr(LocalDateTime.now());
             documentoEditalHomologacaoRepository.update(documentoEditalHomologacao);
         }

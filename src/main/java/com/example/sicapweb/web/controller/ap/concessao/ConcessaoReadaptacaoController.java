@@ -92,8 +92,8 @@ public class ConcessaoReadaptacaoController extends DefaultController<DocumentoR
         documentoReadaptacao.setIdCastorFile(idCastor);
         documentoReadaptacao.setStatus(DocumentoReadaptacao.Status.Informado.getValor());
         documentoReadaptacao.setDescricao(descricao);
-        documentoReadaptacao.setIdCargo(User.getUser(readaptacaoRepository.getRequest()).getCargo().getValor());
-        documentoReadaptacao.setCpfUsuario(User.getUser(readaptacaoRepository.getRequest()).getCpf());
+        documentoReadaptacao.setIdCargo(user.getUser(readaptacaoRepository.getRequest()).getCargo().getValor());
+        documentoReadaptacao.setCpfUsuario(user.getUser(readaptacaoRepository.getRequest()).getCpf());
         documentoReadaptacao.setIpUsuario(InetAddress.getLocalHost().getHostAddress());
         documentoReadaptacao.setDataUpload(new Date());
         documentoReadaptacaoRepository.save(documentoReadaptacao);

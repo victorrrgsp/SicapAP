@@ -69,7 +69,7 @@ public class AtoRepository extends DefaultRepository<Ato, BigInteger> {
             List<Ato> list = getEntityManager()
                     .createNativeQuery("select a.* from Ato a " +
                             " join InfoRemessa info on info.chave = a.chave and info.idUnidadeGestora = '"
-                            + User.getUser(request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, Ato.class)
+                            + user.getUser(request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo, Ato.class)
                     .setFirstResult(pagina)
                     .setMaxResults(tamanho)
                     .getResultList();
@@ -83,7 +83,7 @@ public class AtoRepository extends DefaultRepository<Ato, BigInteger> {
 
 
     public Integer countAtos(String search) {
-        Query query = getEntityManager().createNativeQuery("select count(1) from Ato a join InfoRemessa i on a.chave = i.chave where i.idUnidadeGestora= '"+ User.getUser(request).getUnidadeGestora().getId()+ "' "+search);
+        Query query = getEntityManager().createNativeQuery("select count(1) from Ato a join InfoRemessa i on a.chave = i.chave where i.idUnidadeGestora= '"+ user.getUser(request).getUnidadeGestora().getId()+ "' "+search);
         return (Integer) query.getSingleResult();
     }
 
@@ -93,7 +93,7 @@ public class AtoRepository extends DefaultRepository<Ato, BigInteger> {
                         "from Ato a\n" +
                         "    join InfoRemessa info on a.chave = info.chave\n" +
                         "where info.idUnidadeGestora = '" +
-                        User.getUser(request).getUnidadeGestora().getId() + "'"+
+                        user.getUser(request).getUnidadeGestora().getId() + "'"+
                         "group by cnpjUgPublicacao, dataPublicacao, numeroAto, tipoAto, veiculoPublicacao"
                         , Ato.class);
             var resultList = query.getResultList();
@@ -105,7 +105,7 @@ public class AtoRepository extends DefaultRepository<Ato, BigInteger> {
                         "veiculoPublicacao,max(a.chave) as chave " +
                         "from Ato a " +
                         "    join InfoRemessa info on a.chave = info.chave " +
-                        "where info.idUnidadeGestora = '" + User.getUser(request).getUnidadeGestora().getId() + "'"+
+                        "where info.idUnidadeGestora = '" + user.getUser(request).getUnidadeGestora().getId() + "'"+
                         "group by cnpjUgPublicacao, dataPublicacao, numeroAto, tipoAto, veiculoPublicacao", Ato.class);
             var resultList = query.getResultList();
             return resultList;

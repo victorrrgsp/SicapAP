@@ -3,11 +3,13 @@ package com.example.sicapweb.web.controller.ap.concurso;
 import br.gov.to.tce.model.ap.concurso.AdmissaoEnvio;
 import br.gov.to.tce.model.ap.concurso.ConcursoEnvio;
 import com.example.sicapweb.exception.InvalitInsert;
+import com.example.sicapweb.model.AdmissaoEnvioAssRetorno;
 import com.example.sicapweb.model.EditalFinalizado;
 import com.example.sicapweb.model.NomeacaoConcurso;
-import com.example.sicapweb.model.AdmissaoEnvioAssRetorno;
-import com.example.sicapweb.repository.concurso.*;
-import com.example.sicapweb.model.EditalAprovadoConcurso;
+import com.example.sicapweb.repository.concurso.AdmissaoEnvioRepository;
+import com.example.sicapweb.repository.concurso.ConcursoEnvioRepository;
+import com.example.sicapweb.repository.concurso.EditalAprovadoRepository;
+import com.example.sicapweb.repository.concurso.EditalRepository;
 import com.example.sicapweb.repository.movimentacaoDePessoal.AdmissaoRepository;
 import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
@@ -29,6 +31,8 @@ import java.util.Objects;
 @RestController
 @RequestMapping({"/ConcessaoAdmissao"})
 public class EditalAdmissaoController {
+    @Autowired
+    protected User user;
 
     @Autowired
     private EditalAprovadoRepository editalAprovadoRepository;
@@ -93,7 +97,7 @@ public class EditalAdmissaoController {
     @Transactional
     @PostMapping(path = "/processos")
     public ResponseEntity<AdmissaoEnvio> create(@RequestBody AdmissaoEnvio admissaoEnvio) {
-        admissaoEnvio.setCnpjUnidadeGestora(User.getUser(admissaoEnvioRepository.getRequest()).getUnidadeGestora().getId());
+        admissaoEnvio.setCnpjUnidadeGestora(user.getUser(admissaoEnvioRepository.getRequest()).getUnidadeGestora().getId());
         Integer numeroEnvio = admissaoEnvioRepository.getLastNumeroEnvioByEdital(admissaoEnvio.getEdital().getId());
         admissaoEnvio.setNumeroEnvio(numeroEnvio==null?1:numeroEnvio );
         List<AdmissaoEnvio> pa = admissaoEnvioRepository.GetEmAbertoByEdital(admissaoEnvio.getEdital().getId());

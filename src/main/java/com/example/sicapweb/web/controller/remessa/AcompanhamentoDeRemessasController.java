@@ -24,7 +24,8 @@ import java.util.Objects;
 @RequestMapping(value = "/acompanhamentoDeRemessas")
 public class AcompanhamentoDeRemessasController {
 
-
+    @Autowired
+    protected User user;
 
     @Autowired
     private AcompanhamentoDeRemessasRepository acompanhamentoDeRemessasRepository;
@@ -88,8 +89,8 @@ public class AcompanhamentoDeRemessasController {
     @CrossOrigin
     @GetMapping(path = {"/autenticacao"})
     public ResponseEntity<User> findeUserAutenticacao() {
-      User user = User.getUser(acompanhamentoDeRemessasRepository.getRequest());
-      return ResponseEntity.ok().body(user);
+      User usuario = user.getUser(acompanhamentoDeRemessasRepository.getRequest());
+      return ResponseEntity.ok().body(usuario);
     }
   @CrossOrigin
   @GetMapping(path = "/{searchParams}/{tipoParams}/pagination")

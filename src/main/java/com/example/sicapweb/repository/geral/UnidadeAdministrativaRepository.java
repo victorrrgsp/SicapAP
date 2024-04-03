@@ -23,7 +23,7 @@ public class UnidadeAdministrativaRepository extends DefaultRepository<UnidadeAd
     public UnidadeAdministrativa buscarUnidadePorcodigo(String codigo) {
         List<UnidadeAdministrativa> list = getEntityManager()
                 .createNativeQuery(" with ids_UnidadeAdministrativa as " +
-                        "(select t.codigoUnidadeAdministrativa,i.idUnidadeGestora, max(t.id) max_id_por_chave from SICAPAP21.dbo.UnidadeAdministrativa t  join SICAPAP21.dbo.InfoRemessa  i on  t.chave = i.chave and i.idUnidadeGestora='"+User.getUser(super.request).getUnidadeGestora().getId()+"'  group by t.codigoUnidadeAdministrativa,i.idUnidadeGestora )" +
+                        "(select t.codigoUnidadeAdministrativa,i.idUnidadeGestora, max(t.id) max_id_por_chave from SICAPAP21.dbo.UnidadeAdministrativa t  join SICAPAP21.dbo.InfoRemessa  i on  t.chave = i.chave and i.idUnidadeGestora='"+user.getUser(super.request).getUnidadeGestora().getId()+"'  group by t.codigoUnidadeAdministrativa,i.idUnidadeGestora )" +
                         "select t.*  from SICAPAP21.dbo.UnidadeAdministrativa t  join SICAPAP21.dbo.InfoRemessa  i  on t.chave =  i.chave join ids_UnidadeAdministrativa ie on t.id = ie.max_id_por_chave and i.idUnidadeGestora=ie.idUnidadeGestora" +
                         " where t.codigoUnidadeAdministrativa = '" + codigo + "'  ", UnidadeAdministrativa.class)
                 .getResultList();
@@ -59,7 +59,7 @@ public class UnidadeAdministrativaRepository extends DefaultRepository<UnidadeAd
     public List<UnidadeAdministrativa> findbyUg() {
         List<UnidadeAdministrativa> list = getEntityManager().createNativeQuery(
                 "  with ids_UnidadeAdministrativa as " +
-                        "(select t.codigoUnidadeAdministrativa,i.idUnidadeGestora, max(t.id) max_id_por_chave from SICAPAP21.dbo.UnidadeAdministrativa t  join SICAPAP21.dbo.InfoRemessa  i on  t.chave = i.chave and i.idUnidadeGestora='"+User.getUser(super.request).getUnidadeGestora().getId()+"'  group by t.codigoUnidadeAdministrativa,i.idUnidadeGestora ) " +
+                        "(select t.codigoUnidadeAdministrativa,i.idUnidadeGestora, max(t.id) max_id_por_chave from SICAPAP21.dbo.UnidadeAdministrativa t  join SICAPAP21.dbo.InfoRemessa  i on  t.chave = i.chave and i.idUnidadeGestora='"+user.getUser(super.request).getUnidadeGestora().getId()+"'  group by t.codigoUnidadeAdministrativa,i.idUnidadeGestora ) " +
                         "select t.*  from SICAPAP21.dbo.UnidadeAdministrativa t  join SICAPAP21.dbo.InfoRemessa  i  on t.chave =  i.chave join ids_UnidadeAdministrativa ie on t.id = ie.max_id_por_chave and i.idUnidadeGestora=ie.idUnidadeGestora ",
                 UnidadeAdministrativa.class).getResultList();
 
@@ -88,7 +88,7 @@ public class UnidadeAdministrativaRepository extends DefaultRepository<UnidadeAd
         String campo = String.valueOf(pageable.getSort()).replace(":", "");
         var query = getEntityManager().createNativeQuery(
                 "  with ids_UnidadeAdministrativa as " +
-                        "(select t.codigoUnidadeAdministrativa,i.idUnidadeGestora, max(t.id) max_id_por_chave from SICAPAP21.dbo.UnidadeAdministrativa t  join SICAPAP21.dbo.InfoRemessa  i on  t.chave = i.chave and i.idUnidadeGestora='"+User.getUser(super.request).getUnidadeGestora().getId()+"'  group by t.codigoUnidadeAdministrativa,i.idUnidadeGestora ) " +
+                        "(select t.codigoUnidadeAdministrativa,i.idUnidadeGestora, max(t.id) max_id_por_chave from SICAPAP21.dbo.UnidadeAdministrativa t  join SICAPAP21.dbo.InfoRemessa  i on  t.chave = i.chave and i.idUnidadeGestora='"+user.getUser(super.request).getUnidadeGestora().getId()+"'  group by t.codigoUnidadeAdministrativa,i.idUnidadeGestora ) " +
                         "select t.*  from SICAPAP21.dbo.UnidadeAdministrativa t  join SICAPAP21.dbo.InfoRemessa  i  on t.chave =  i.chave join ids_UnidadeAdministrativa ie on t.id = ie.max_id_por_chave and i.idUnidadeGestora=ie.idUnidadeGestora " + search + " ORDER BY " + campo,
                 UnidadeAdministrativa.class);
         List<UnidadeAdministrativa> list = query

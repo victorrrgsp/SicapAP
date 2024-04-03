@@ -1,10 +1,10 @@
 package com.example.sicapweb.web.controller.ap.concurso;
 
 
-import br.gov.to.tce.model.ap.concurso.documento.DocumentoEdital;
-import br.gov.to.tce.model.ap.concurso.documento.DocumentoEditalHomologacao;
 import br.gov.to.tce.model.ap.concurso.ConcursoEnvio;
 import br.gov.to.tce.model.ap.concurso.ConcursoEnvioAssinatura;
+import br.gov.to.tce.model.ap.concurso.documento.DocumentoEdital;
+import br.gov.to.tce.model.ap.concurso.documento.DocumentoEditalHomologacao;
 import com.example.sicapweb.exception.InvalitInsert;
 import com.example.sicapweb.model.ConcursoEnvioAssRetorno;
 import com.example.sicapweb.repository.concurso.ConcursoEnvioAssinaturaRepository;
@@ -12,14 +12,13 @@ import com.example.sicapweb.repository.concurso.ConcursoEnvioRepository;
 import com.example.sicapweb.repository.concurso.DocumentoEditalHomologacaoRepository;
 import com.example.sicapweb.repository.concurso.DocumentoEditalRepository;
 import com.example.sicapweb.security.User;
-import com.example.sicapweb.util.PaginacaoUtil;
 import com.example.sicapweb.service.AssinarCertificadoDigital;
+import com.example.sicapweb.util.PaginacaoUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,20 +26,24 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Iterator;
+import java.util.List;
 import java.util.stream.Collectors;
 
 
 @RestController
 @RequestMapping("/assinarConcurso")
 public class AssinarConcursoController {
+    @Autowired
+    protected User user;
 
     @Autowired
     private ConcursoEnvioRepository concursoEnvioRepository;
@@ -71,7 +74,7 @@ public class AssinarConcursoController {
     @CrossOrigin
     @GetMapping(path = "/{searchParams}/{tipoParams}/pagination")
     public ResponseEntity<PaginacaoUtil<ConcursoEnvioAssRetorno>> listaAEnviosAguardandoAss(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
-        if (User.getUser(concursoEnvioAssinaturaRepository.getRequest()).getCargo().getValor() != 4) {
+        if (user.getUser(concursoEnvioAssinaturaRepository.getRequest()).getCargo().getValor() != 4) {
             List<ConcursoEnvioAssRetorno> listavazia = new ArrayList<>();
             PaginacaoUtil<ConcursoEnvioAssRetorno> paginacaoUtilvazia = new PaginacaoUtil<>(0, 1, 1, 0, listavazia);
             return ResponseEntity.ok().body(paginacaoUtilvazia);
@@ -102,8 +105,8 @@ public class AssinarConcursoController {
 
                 //gera assinatura do envio
                 ConcursoEnvioAssinatura novaAssinaturaConcurso = new ConcursoEnvioAssinatura();
-                novaAssinaturaConcurso.setIdCargo(User.getUser(concursoEnvioAssinaturaRepository.getRequest()).getCargo().getValor());
-                novaAssinaturaConcurso.setCpf(User.getUser(concursoEnvioAssinaturaRepository.getRequest()).getCpf());
+                novaAssinaturaConcurso.setIdCargo(user.getUser(concursoEnvioAssinaturaRepository.getRequest()).getCargo().getValor());
+                novaAssinaturaConcurso.setCpf(user.getUser(concursoEnvioAssinaturaRepository.getRequest()).getCpf());
                 novaAssinaturaConcurso.setIp(((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest().getRemoteAddr());
                 novaAssinaturaConcurso.setConcursoEnvio(envio);
                 novaAssinaturaConcurso.setData_Assinatura(LocalDateTime.now());
@@ -134,7 +137,7 @@ public class AssinarConcursoController {
     @PostMapping(path = "/iniciarAssinatura")
     public ResponseEntity<?> iniciarAssinatura(@RequestBody String certificado_mensagem_hash) {
         try {
-            User userlogado = User.getUser(concursoEnvioAssinaturaRepository.getRequest());
+            User userlogado = user.getUser(concursoEnvioAssinaturaRepository.getRequest());
             JsonNode respostaJson = new ObjectMapper().readTree(certificado_mensagem_hash);
             String certificado = respostaJson.get("certificado").asText();
             String Original = respostaJson.get("original").asText();
@@ -173,7 +176,7 @@ public class AssinarConcursoController {
 
     private void gerarProcesso(ConcursoEnvio envio) throws NoSuchAlgorithmException {
         //coleta dados do cadun sobre o id  do responsavel da ug e o id da pessoa juridica
-        String Cnpj = User.getUser(concursoEnvioAssinaturaRepository.getRequest()).getUnidadeGestora().getId();
+        String Cnpj = user.getUser(concursoEnvioAssinaturaRepository.getRequest()).getUnidadeGestora().getId();
         Integer origem = concursoEnvioAssinaturaRepository.getidCADUNPJ(Cnpj);
         Integer responsavel = concursoEnvioAssinaturaRepository.getidCADUNPF(Cnpj);
         Integer id_entidade_vinculada = null;
@@ -220,7 +223,7 @@ public class AssinarConcursoController {
     }
 
     private void validaUsuarioAssinante() {
-        User userlogado = User.getUser(concursoEnvioRepository.getRequest());
+        User userlogado = user.getUser(concursoEnvioRepository.getRequest());
         if (userlogado != null) {
             if (userlogado.getCargo().getValor() != 4)
                 throw new RuntimeException("Apenas o gestor da unidade gestora pode assinar envios!!");

@@ -40,7 +40,7 @@ public class UnidadeGestoraRepository extends DefaultRepository<UnidadeGestora, 
     }
     public List<UnidadeGestora> buscaTodasOutraUnidadeGestora() {
         List<UnidadeGestora> list = entityManager.createNativeQuery(
-                "select * from UnidadeGestora where UnidadeGestora.id <> '"+ User.getUser(request).getUnidadeGestora().getId()+"' ORDER BY nome ASC"
+                "select * from UnidadeGestora where UnidadeGestora.id <> '"+ user.getUser(request).getUnidadeGestora().getId()+"' ORDER BY nome ASC"
                 ,UnidadeGestora.class).getResultList();
         return list;
     }
@@ -233,7 +233,7 @@ public class UnidadeGestoraRepository extends DefaultRepository<UnidadeGestora, 
 
     public Boolean EhUnidadeGestoraRpps(){
         try {
-            return ( getEntityManager().createNativeQuery("select  1 from UnidadeGestoraRpps where cnpjRpps=:cnpj  ").setParameter("cnpj", User.getUser(super.getRequest()).getUnidadeGestora().getId() ).getResultList().size()>0) ;
+            return ( getEntityManager().createNativeQuery("select  1 from UnidadeGestoraRpps where cnpjRpps=:cnpj  ").setParameter("cnpj", user.getUser(super.getRequest()).getUnidadeGestora().getId() ).getResultList().size()>0) ;
         }catch (RuntimeException e){
             return false;
         }

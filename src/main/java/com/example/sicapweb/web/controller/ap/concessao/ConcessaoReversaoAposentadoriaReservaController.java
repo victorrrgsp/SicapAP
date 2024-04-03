@@ -93,8 +93,8 @@ public class ConcessaoReversaoAposentadoriaReservaController extends DefaultCont
         documentoAposentadoria.setStatus(DocumentoAposentadoria.Status.Informado.getValor());
         documentoAposentadoria.setReversao("S");
         documentoAposentadoria.setDescricao(descricao);
-        documentoAposentadoria.setIdCargo(User.getUser(aposentadoriaRepository.getRequest()).getCargo().getValor());
-        documentoAposentadoria.setCpfUsuario(User.getUser(aposentadoriaRepository.getRequest()).getCpf());
+        documentoAposentadoria.setIdCargo(user.getUser(aposentadoriaRepository.getRequest()).getCargo().getValor());
+        documentoAposentadoria.setCpfUsuario(user.getUser(aposentadoriaRepository.getRequest()).getCpf());
         documentoAposentadoria.setIpUsuario(InetAddress.getLocalHost().getHostAddress());
         documentoAposentadoria.setDataUpload(new Date());
         documentoAposentadoriaRepository.save(documentoAposentadoria);

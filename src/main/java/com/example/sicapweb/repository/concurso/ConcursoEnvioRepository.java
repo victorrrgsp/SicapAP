@@ -91,7 +91,7 @@ public class ConcursoEnvioRepository extends DefaultRepository<ConcursoEnvio, Bi
                 .createNativeQuery("select a.* from ConcursoEnvio a  " +
                         " where status=3 and " +
                         "  exists(select 1 from Edital ed join InfoRemessa i on ed.chave = i.chave and i.idUnidadeGestora = :ug where  ed.id = a.idEdital  ) and  not exists(select 1 from ConcursoEnvioAssinatura ass  where  ass.idEnvio=a.id) " + search + " ORDER BY " + campo, ConcursoEnvio.class)
-                .setParameter("ug", User.getUser(super.request).getUnidadeGestora().getId())
+                .setParameter("ug", user.getUser(super.request).getUnidadeGestora().getId())
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();

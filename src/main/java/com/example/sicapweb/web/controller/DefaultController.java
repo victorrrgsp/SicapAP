@@ -9,6 +9,7 @@ import br.gov.to.tce.util.JayReflection;
 import com.example.sicapweb.exception.InvalitInsert;
 import com.example.sicapweb.repository.geral.CastorFileRepository;
 import com.example.sicapweb.repository.geral.UnidadeGestoraRepository;
+import com.example.sicapweb.security.User;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -45,6 +46,11 @@ import java.util.Objects;
 @Controller
 @RequestMapping
 public abstract class DefaultController<T> {
+
+
+    @Autowired
+    protected User user;
+
     public String clazz;
     {
         try {

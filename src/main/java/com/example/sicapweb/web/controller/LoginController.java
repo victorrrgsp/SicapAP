@@ -53,20 +53,20 @@ public class LoginController extends DefaultController<Login> {
     @PostMapping(path = {"/session/"})
     public ResponseEntity<?> find(@org.springframework.web.bind.annotation.RequestBody String user) throws ValidationException {
 
-        if (user == null || user.trim().isEmpty() || config.jedis.get(user.replace("=", "")) == null)
+        if (user == null || user.trim().isEmpty() || config.getJedis().get(user.replace("=", "")) == null)
             throw new ValidationException("Usuário não autenticado");
 
-        User userSession = Config.fromJson(config.jedis.get(user.replace("=", "")), User.class);
+        User userSession = Config.fromJson(config.getJedis().get(user.replace("=", "")), User.class);
         try {
             new br.gov.to.tce.util.Date(userSession.getDateEnd().toStringDateAndHourDatabaseFormat2());
         } catch (ParseException e) {
             throw new ValidationException(e.getMessage());
         }
         if (!userSession.isValid()) {
-            config.jedis.del(user.replace("=", ""));
+            config.getJedis().del(user.replace("=", ""));
             throw new ValidationException("Sessão inválida");
         }
-        config.jedis.expire(user.replace("=", ""), 480L);
+        config.getJedis().expire(user.replace("=", ""), 480L);
         Session.usuarioLogado = userSession;
         return ResponseEntity.ok().body(true);
     }
@@ -75,7 +75,7 @@ public class LoginController extends DefaultController<Login> {
     @Transactional
     @PostMapping(path = {"/logout/"})
     public ResponseEntity<?> logout(@org.springframework.web.bind.annotation.RequestBody String user) {
-        config.jedis.del(user.replace("=", ""));
+        config.getJedis().del(user.replace("=", ""));
         Session.usuarioLogado = null;
 
         return ResponseEntity.ok().body(true);
@@ -85,9 +85,9 @@ public class LoginController extends DefaultController<Login> {
     @Transactional
     @GetMapping(path = {"/getugs"})
     public ResponseEntity<?> getUg() {
-        String user = User.getUser(usuarioRepository.getRequest()).getId();
-        user = user.replace("=", "");
-        User userLogado = Config.fromJson(config.jedis.get(user.replace("=", "")), User.class);
+        String usuario = user.getUser(usuarioRepository.getRequest()).getId();
+        usuario = usuario.replace("=", "");
+        User userLogado = Config.fromJson(config.getJedis().get(usuario.replace("=", "")), User.class);
         return ResponseEntity.ok().body(userLogado.getUnidadeGestoraList());
     }
 
@@ -95,18 +95,18 @@ public class LoginController extends DefaultController<Login> {
     @Transactional
     @PostMapping(path = {"/setug/"})
     public ResponseEntity<?> setUg(@org.springframework.web.bind.annotation.RequestBody String idUnidadeGestora) {
-        String user = User.getUser(usuarioRepository.getRequest()).getId();
-        user = user.replace("=", "");
+        String usuario = user.getUser(usuarioRepository.getRequest()).getId();
+        usuario = usuario.replace("=", "");
         idUnidadeGestora = idUnidadeGestora.replace("=", "");
 
-        User userLogado = Config.fromJson(config.jedis.get(user.replace("=", "")), User.class);
+        User userLogado = Config.fromJson(config.getJedis().get(usuario.replace("=", "")), User.class);
         String finalIdUnidadeGestora = idUnidadeGestora;
         userLogado.setUnidadeGestora(userLogado.getUnidadeGestoraList()
                 .stream().filter(o -> o.getId().equalsIgnoreCase(finalIdUnidadeGestora.trim()))
                 .findFirst().get());
 
-        config.jedis.del(user.replace("=", ""));
-        config.jedis.set(userLogado.getId(), Config.json(userLogado));
+        config.getJedis().del(usuario.replace("=", ""));
+        config.getJedis().set(userLogado.getId(), Config.json(userLogado));
         return ResponseEntity.ok().body(true);
     }
 
@@ -178,11 +178,11 @@ public class LoginController extends DefaultController<Login> {
 
             Session.setUsuario(userLogado);
             getIp.getRequest().getSession().setAttribute(userLogado.getCpf(), userLogado);
-            config.jedis.set(userLogado.getId(), Config.json(userLogado));
+            config.getJedis().set(userLogado.getId(), Config.json(userLogado));
 
             return ResponseEntity.ok().body(userLogado.getId());
         } catch (Exception e) {
-            System.out.println("[falha]: " + e.toString());
+            System.out.println("[falha]: " + e);
             e.printStackTrace();
         }
 
