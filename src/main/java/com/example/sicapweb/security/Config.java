@@ -14,14 +14,14 @@ import java.util.TimeZone;
 @Component
 public class Config {
 
-    public static String json(Object object){
-        return new Gson().toJson(object);
-    }
-
-
-    public static <T> T fromJson(String object, Class<T> tClass){
-        return new Gson().fromJson(object, tClass);
-    }
+//    public static String json(Object object){
+//        return new Gson().toJson(object);
+//    }
+//
+//
+//    public static <T> T fromJson(String object, Class<T> tClass){
+//        return new Gson().fromJson(object, tClass);
+//    }
 
 
     public String ip = "172.30.0.149";

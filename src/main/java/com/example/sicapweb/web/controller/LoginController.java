@@ -89,7 +89,6 @@ public class LoginController extends DefaultController<Login> {
     }
 
 
-
     @CrossOrigin
     @Transactional
     @PostMapping(path = {"/autenticar"})
@@ -212,7 +211,7 @@ public class LoginController extends DefaultController<Login> {
                 .findFirst().get());
 
         redisConnect.delete(usuario.replace("=", ""));
-        redisConnect.add(userLogado.getId(), Config.json(userLogado));
+        redisConnect.add(userLogado.getId(), userLogado);
         return ResponseEntity.ok().body(true);
     }
 
