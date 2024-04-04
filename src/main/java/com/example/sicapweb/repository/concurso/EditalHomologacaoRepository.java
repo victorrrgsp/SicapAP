@@ -54,7 +54,7 @@ public class EditalHomologacaoRepository extends DefaultRepository<EditalHomolog
                         "join Edital e on a.idEdital = e.id " +
                         "join  ConcursoEnvio env on a.idEdital = env.idEdital  and env.fase=1 and env.status in (2,4) " +
                         "join InfoRemessa i on a.chave = i.chave " +
-                        "where   i.idUnidadeGestora = '" + user.getUser(super.request).getUnidadeGestora().getId() + "' " + filtro + " ORDER BY " + campoOrderby, EditalHomologacao.class)
+                        "where   i.idUnidadeGestora = '" + redisConnect.getUser(super.request).getUnidadeGestora().getId() + "' " + filtro + " ORDER BY " + campoOrderby, EditalHomologacao.class)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();
@@ -82,7 +82,7 @@ public class EditalHomologacaoRepository extends DefaultRepository<EditalHomolog
                 "join Edital e on a.idEdital = e.id " +
                         "join  ConcursoEnvio env on a.idEdital = env.idEdital  and env.fase=1 and env.status in (2,4) " +
                         "join InfoRemessa i on a.chave = i.chave " +
-                        "where   i.idUnidadeGestora = '" + user.getUser(super.request).getUnidadeGestora().getId() + "' " + search).getSingleResult();
+                        "where   i.idUnidadeGestora = '" + redisConnect.getUser(super.request).getUnidadeGestora().getId() + "' " + search).getSingleResult();
     }
 
 }

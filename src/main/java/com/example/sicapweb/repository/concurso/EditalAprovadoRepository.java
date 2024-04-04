@@ -62,7 +62,7 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
         var query = getEntityManager()
                 .createNativeQuery("with edt as ( " +
                         "        select a.cpf,a.numeroInscricao, i.idUnidadeGestora ,max(a.id)  max_id " +
-                        "             from EditalAprovado a  join infoRemessa i on a.chave = i.chave  and i.idUnidadeGestora = '" + user.getUser(super.request).getUnidadeGestora().getId() + "'  group by " +
+                        "             from EditalAprovado a  join infoRemessa i on a.chave = i.chave  and i.idUnidadeGestora = '" + redisConnect.getUser(super.request).getUnidadeGestora().getId() + "'  group by " +
                         "                a.cpf,a.numeroInscricao , i.idUnidadeGestora " +
                         "                         ) " +
                         "select   a.* from EditalAprovado a  join infoRemessa i on a.chave = i.chave join edt b on a.id= b.max_id and i.idUnidadeGestora=b.idUnidadeGestora " +
@@ -79,7 +79,7 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
         return (Integer) getEntityManager()
                 .createNativeQuery("with edt as ( " +
                         "        select a.cpf,a.numeroInscricao, i.idUnidadeGestora ,max(a.id)  max_id " +
-                        "             from EditalAprovado a  join infoRemessa i on a.chave = i.chave  and i.idUnidadeGestora = '" + user.getUser(super.request).getUnidadeGestora().getId() + "'  group by " +
+                        "             from EditalAprovado a  join infoRemessa i on a.chave = i.chave  and i.idUnidadeGestora = '" + redisConnect.getUser(super.request).getUnidadeGestora().getId() + "'  group by " +
                         "                a.cpf,a.numeroInscricao , i.idUnidadeGestora " +
                         "                         ) " +
                         "select   count(1) " +
@@ -146,7 +146,7 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
                                 "   where 0=0\n" +
                                 search + 
                                 " ORDER BY " + campo);
-        query.setParameter("ug", user.getUser(super.request).getUnidadeGestora().getId());
+        query.setParameter("ug", redisConnect.getUser(super.request).getUnidadeGestora().getId());
         long totalRegistros = query.getResultList().size();
         long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
         var listAprovados = StaticMethods.getHashmapFromQuery(query
@@ -187,7 +187,7 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
                         "(select a.* from EditalAprovado a join InfoRemessa i on a.chave = i.chave and i.idUnidadeGestora=:ug )" +
                         " " +
                         "select distinct count(1) from Aprovado a join EditalVaga b on a.idEditalVaga = b.id where (select count(1) from  Admissao1 ad join Servidor1 s  on  ad.idServidor = s.id and s.cpfServidor = a.cpf )=0  " + search)
-                .setParameter("ug", user.getUser(super.request).getUnidadeGestora().getId());
+                .setParameter("ug", redisConnect.getUser(super.request).getUnidadeGestora().getId());
         return (Integer) query.getSingleResult();
     }
 
@@ -200,7 +200,7 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
                         " WHERE   c.cpf = :cpf  "
                 , EditalAprovado.class)
                 .setParameter("cpf",cpf)
-                .setParameter("ug",user.getUser(super.request).getUnidadeGestora().getId()).setMaxResults(1).getSingleResult();
+                .setParameter("ug",redisConnect.getUser(super.request).getUnidadeGestora().getId()).setMaxResults(1).getSingleResult();
         }catch (NoResultException e){
             return null;
         }
@@ -216,7 +216,7 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
                                     " WHERE   c.numeroInscricao = :inscricao "
                             , EditalAprovado.class)
                     .setParameter("inscricao",inscricao)
-                    .setParameter("ug",user.getUser(super.request).getUnidadeGestora().getId())
+                    .setParameter("ug",redisConnect.getUser(super.request).getUnidadeGestora().getId())
                     .setMaxResults(1).getSingleResult();
         }catch (NoResultException e){
             return null;
@@ -234,7 +234,7 @@ public class EditalAprovadoRepository extends DefaultRepository<EditalAprovado, 
                 , EditalAprovado.class)
                 .setParameter("idvaga",idvaga)
                 .setParameter("classificacao",Classificacao)
-                .setParameter("ug",user.getUser(super.request).getUnidadeGestora().getId()).setMaxResults(1).getSingleResult();
+                .setParameter("ug",redisConnect.getUser(super.request).getUnidadeGestora().getId()).setMaxResults(1).getSingleResult();
         }catch (NoResultException e){
             return null;
         }

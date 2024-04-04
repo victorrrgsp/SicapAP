@@ -11,6 +11,7 @@ import com.example.sicapweb.repository.concurso.ConcursoEnvioAssinaturaRepositor
 import com.example.sicapweb.repository.concurso.ConcursoEnvioRepository;
 import com.example.sicapweb.repository.concurso.DocumentoEditalHomologacaoRepository;
 import com.example.sicapweb.repository.concurso.DocumentoEditalRepository;
+import com.example.sicapweb.security.RedisConnect;
 import com.example.sicapweb.security.User;
 import com.example.sicapweb.service.AssinarCertificadoDigital;
 import com.example.sicapweb.util.PaginacaoUtil;
@@ -43,7 +44,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/assinarConcurso")
 public class AssinarConcursoController {
     @Autowired
-    protected User user;
+    private RedisConnect redisConnect;
 
     @Autowired
     private ConcursoEnvioRepository concursoEnvioRepository;
@@ -74,7 +75,7 @@ public class AssinarConcursoController {
     @CrossOrigin
     @GetMapping(path = "/{searchParams}/{tipoParams}/pagination")
     public ResponseEntity<PaginacaoUtil<ConcursoEnvioAssRetorno>> listaAEnviosAguardandoAss(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
-        if (user.getUser(concursoEnvioAssinaturaRepository.getRequest()).getCargo().getValor() != 4) {
+        if (redisConnect.getUser(concursoEnvioAssinaturaRepository.getRequest()).getCargo().getValor() != 4) {
             List<ConcursoEnvioAssRetorno> listavazia = new ArrayList<>();
             PaginacaoUtil<ConcursoEnvioAssRetorno> paginacaoUtilvazia = new PaginacaoUtil<>(0, 1, 1, 0, listavazia);
             return ResponseEntity.ok().body(paginacaoUtilvazia);
@@ -105,8 +106,8 @@ public class AssinarConcursoController {
 
                 //gera assinatura do envio
                 ConcursoEnvioAssinatura novaAssinaturaConcurso = new ConcursoEnvioAssinatura();
-                novaAssinaturaConcurso.setIdCargo(user.getUser(concursoEnvioAssinaturaRepository.getRequest()).getCargo().getValor());
-                novaAssinaturaConcurso.setCpf(user.getUser(concursoEnvioAssinaturaRepository.getRequest()).getCpf());
+                novaAssinaturaConcurso.setIdCargo(redisConnect.getUser(concursoEnvioAssinaturaRepository.getRequest()).getCargo().getValor());
+                novaAssinaturaConcurso.setCpf(redisConnect.getUser(concursoEnvioAssinaturaRepository.getRequest()).getCpf());
                 novaAssinaturaConcurso.setIp(((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest().getRemoteAddr());
                 novaAssinaturaConcurso.setConcursoEnvio(envio);
                 novaAssinaturaConcurso.setData_Assinatura(LocalDateTime.now());
@@ -137,7 +138,7 @@ public class AssinarConcursoController {
     @PostMapping(path = "/iniciarAssinatura")
     public ResponseEntity<?> iniciarAssinatura(@RequestBody String certificado_mensagem_hash) {
         try {
-            User userlogado = user.getUser(concursoEnvioAssinaturaRepository.getRequest());
+            User userlogado = redisConnect.getUser(concursoEnvioAssinaturaRepository.getRequest());
             JsonNode respostaJson = new ObjectMapper().readTree(certificado_mensagem_hash);
             String certificado = respostaJson.get("certificado").asText();
             String Original = respostaJson.get("original").asText();
@@ -176,7 +177,7 @@ public class AssinarConcursoController {
 
     private void gerarProcesso(ConcursoEnvio envio) throws NoSuchAlgorithmException {
         //coleta dados do cadun sobre o id  do responsavel da ug e o id da pessoa juridica
-        String Cnpj = user.getUser(concursoEnvioAssinaturaRepository.getRequest()).getUnidadeGestora().getId();
+        String Cnpj = redisConnect.getUser(concursoEnvioAssinaturaRepository.getRequest()).getUnidadeGestora().getId();
         Integer origem = concursoEnvioAssinaturaRepository.getidCADUNPJ(Cnpj);
         Integer responsavel = concursoEnvioAssinaturaRepository.getidCADUNPF(Cnpj);
         Integer id_entidade_vinculada = null;
@@ -223,7 +224,7 @@ public class AssinarConcursoController {
     }
 
     private void validaUsuarioAssinante() {
-        User userlogado = user.getUser(concursoEnvioRepository.getRequest());
+        User userlogado = redisConnect.getUser(concursoEnvioRepository.getRequest());
         if (userlogado != null) {
             if (userlogado.getCargo().getValor() != 4)
                 throw new RuntimeException("Apenas o gestor da unidade gestora pode assinar envios!!");

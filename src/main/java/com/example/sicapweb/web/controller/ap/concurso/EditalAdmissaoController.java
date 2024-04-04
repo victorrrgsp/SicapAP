@@ -11,6 +11,7 @@ import com.example.sicapweb.repository.concurso.ConcursoEnvioRepository;
 import com.example.sicapweb.repository.concurso.EditalAprovadoRepository;
 import com.example.sicapweb.repository.concurso.EditalRepository;
 import com.example.sicapweb.repository.movimentacaoDePessoal.AdmissaoRepository;
+import com.example.sicapweb.security.RedisConnect;
 import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,7 @@ import java.util.Objects;
 @RequestMapping({"/ConcessaoAdmissao"})
 public class EditalAdmissaoController {
     @Autowired
-    protected User user;
+    protected RedisConnect redisConnect;
 
     @Autowired
     private EditalAprovadoRepository editalAprovadoRepository;
@@ -97,7 +98,7 @@ public class EditalAdmissaoController {
     @Transactional
     @PostMapping(path = "/processos")
     public ResponseEntity<AdmissaoEnvio> create(@RequestBody AdmissaoEnvio admissaoEnvio) {
-        admissaoEnvio.setCnpjUnidadeGestora(user.getUser(admissaoEnvioRepository.getRequest()).getUnidadeGestora().getId());
+        admissaoEnvio.setCnpjUnidadeGestora(redisConnect.getUser(admissaoEnvioRepository.getRequest()).getUnidadeGestora().getId());
         Integer numeroEnvio = admissaoEnvioRepository.getLastNumeroEnvioByEdital(admissaoEnvio.getEdital().getId());
         admissaoEnvio.setNumeroEnvio(numeroEnvio==null?1:numeroEnvio );
         List<AdmissaoEnvio> pa = admissaoEnvioRepository.GetEmAbertoByEdital(admissaoEnvio.getEdital().getId());

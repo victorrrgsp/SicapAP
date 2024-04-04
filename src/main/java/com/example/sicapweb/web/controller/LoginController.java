@@ -6,6 +6,7 @@ import com.example.sicapweb.repository.geral.AdmSistemaRepository;
 import com.example.sicapweb.repository.geral.UnidadeGestoraRepository;
 import com.example.sicapweb.repository.geral.UsuarioRepository;
 import com.example.sicapweb.security.Config;
+import com.example.sicapweb.security.RedisConnect;
 import com.example.sicapweb.security.Session;
 import com.example.sicapweb.security.User;
 import com.example.sicapweb.service.Login;
@@ -23,6 +24,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.exceptions.JedisConnectionException;
 
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
@@ -30,14 +34,13 @@ import java.io.IOException;
 import java.security.Key;
 import java.sql.Date;
 import java.text.ParseException;
+import java.time.Duration;
 import java.util.List;
 
 @RestController
 @RequestMapping("/tcetouser")
 public class LoginController extends DefaultController<Login> {
 
-    @Autowired
-    private Config config;
 
     @Autowired
     private UsuarioRepository usuarioRepository;
@@ -48,67 +51,43 @@ public class LoginController extends DefaultController<Login> {
     @Autowired
     private UnidadeGestoraRepository unidadeGestoraRepository;
 
+    @Autowired
+    private RedisConnect redisConnect;
+
     @CrossOrigin
     @Transactional
     @PostMapping(path = {"/session/"})
     public ResponseEntity<?> find(@org.springframework.web.bind.annotation.RequestBody String user) throws ValidationException {
+        JedisPool pool = new JedisPool("172.30.0.149", 6379);
 
-        if (user == null || user.trim().isEmpty() || config.getJedis().get(user.replace("=", "")) == null)
+        try (Jedis jedis = pool.getResource()) {
+            jedis.get(user.replace("=", ""));
+            User users = redisConnect.get(user.replace("=", ""), User.class);
+        } catch (JedisConnectionException e) {
+            e.printStackTrace();
+        } finally {
+            pool.close(); // Fechar o pool de conexões quando não for mais necessário
+        }
+
+        User userSession = redisConnect.get(user.replace("=", ""), User.class);
+        if (user == null || user.trim().isEmpty() || userSession == null)
             throw new ValidationException("Usuário não autenticado");
 
-        User userSession = Config.fromJson(config.getJedis().get(user.replace("=", "")), User.class);
         try {
             new br.gov.to.tce.util.Date(userSession.getDateEnd().toStringDateAndHourDatabaseFormat2());
         } catch (ParseException e) {
             throw new ValidationException(e.getMessage());
         }
         if (!userSession.isValid()) {
-            config.getJedis().del(user.replace("=", ""));
+            redisConnect.delete(user.replace("=", ""));
             throw new ValidationException("Sessão inválida");
         }
-        config.getJedis().expire(user.replace("=", ""), 480L);
+        //config.getJedis().expire(user.replace("=", ""), 480L);
+        redisConnect.expire(user.replace("=", ""), Duration.ofSeconds(480));
         Session.usuarioLogado = userSession;
         return ResponseEntity.ok().body(true);
     }
 
-    @CrossOrigin
-    @Transactional
-    @PostMapping(path = {"/logout/"})
-    public ResponseEntity<?> logout(@org.springframework.web.bind.annotation.RequestBody String user) {
-        config.getJedis().del(user.replace("=", ""));
-        Session.usuarioLogado = null;
-
-        return ResponseEntity.ok().body(true);
-    }
-
-    @CrossOrigin
-    @Transactional
-    @GetMapping(path = {"/getugs"})
-    public ResponseEntity<?> getUg() {
-        String usuario = user.getUser(usuarioRepository.getRequest()).getId();
-        usuario = usuario.replace("=", "");
-        User userLogado = Config.fromJson(config.getJedis().get(usuario.replace("=", "")), User.class);
-        return ResponseEntity.ok().body(userLogado.getUnidadeGestoraList());
-    }
-
-    @CrossOrigin
-    @Transactional
-    @PostMapping(path = {"/setug/"})
-    public ResponseEntity<?> setUg(@org.springframework.web.bind.annotation.RequestBody String idUnidadeGestora) {
-        String usuario = user.getUser(usuarioRepository.getRequest()).getId();
-        usuario = usuario.replace("=", "");
-        idUnidadeGestora = idUnidadeGestora.replace("=", "");
-
-        User userLogado = Config.fromJson(config.getJedis().get(usuario.replace("=", "")), User.class);
-        String finalIdUnidadeGestora = idUnidadeGestora;
-        userLogado.setUnidadeGestora(userLogado.getUnidadeGestoraList()
-                .stream().filter(o -> o.getId().equalsIgnoreCase(finalIdUnidadeGestora.trim()))
-                .findFirst().get());
-
-        config.getJedis().del(usuario.replace("=", ""));
-        config.getJedis().set(userLogado.getId(), Config.json(userLogado));
-        return ResponseEntity.ok().body(true);
-    }
 
 
     @CrossOrigin
@@ -178,7 +157,17 @@ public class LoginController extends DefaultController<Login> {
 
             Session.setUsuario(userLogado);
             getIp.getRequest().getSession().setAttribute(userLogado.getCpf(), userLogado);
-            config.getJedis().set(userLogado.getId(), Config.json(userLogado));
+
+            redisConnect.add(userLogado.getId(), userLogado);
+//            JedisPool pool = new JedisPool("172.30.0.149", 6379);
+//            try (Jedis jedis = pool.getResource()) {
+//                jedis.set(userLogado.getId(), Config.json(userLogado));
+//            } catch (JedisConnectionException e) {
+//                e.printStackTrace();
+//            } finally {
+//                pool.close(); // Fechar o pool de conexões quando não for mais necessário
+//            }
+            //config.getJedis().set(userLogado.getId(), Config.json(userLogado));
 
             return ResponseEntity.ok().body(userLogado.getId());
         } catch (Exception e) {
@@ -188,6 +177,45 @@ public class LoginController extends DefaultController<Login> {
 
         return ResponseEntity.ok().body("SemPermissao");
     }
+
+
+    @CrossOrigin
+    @Transactional
+    @PostMapping(path = {"/logout/"})
+    public ResponseEntity<?> logout(@org.springframework.web.bind.annotation.RequestBody String user) {
+        redisConnect.delete(user.replace("=", ""));
+        Session.usuarioLogado = null;
+
+        return ResponseEntity.ok().body(true);
+    }
+
+    @CrossOrigin
+    @Transactional
+    @GetMapping(path = {"/getugs"})
+    public ResponseEntity<?> getUg() {
+        User userLogado = redisConnect.getUser(usuarioRepository.getRequest());
+        return ResponseEntity.ok().body(userLogado.getUnidadeGestoraList());
+    }
+
+    @CrossOrigin
+    @Transactional
+    @PostMapping(path = {"/setug/"})
+    public ResponseEntity<?> setUg(@org.springframework.web.bind.annotation.RequestBody String idUnidadeGestora) {
+        String usuario = redisConnect.getUser(usuarioRepository.getRequest()).getId();
+        usuario = usuario.replace("=", "");
+        idUnidadeGestora = idUnidadeGestora.replace("=", "");
+
+        User userLogado = redisConnect.getUser(usuarioRepository.getRequest());
+        String finalIdUnidadeGestora = idUnidadeGestora;
+        userLogado.setUnidadeGestora(userLogado.getUnidadeGestoraList()
+                .stream().filter(o -> o.getId().equalsIgnoreCase(finalIdUnidadeGestora.trim()))
+                .findFirst().get());
+
+        redisConnect.delete(usuario.replace("=", ""));
+        redisConnect.add(userLogado.getId(), Config.json(userLogado));
+        return ResponseEntity.ok().body(true);
+    }
+
 
     @CrossOrigin
     @Transactional

@@ -54,7 +54,7 @@ public class FilaProcessamentosRepository extends DefaultRepository<String, Stri
                             "group by nome, cpf, CodigoCargo;");
             query.setParameter("tipo", tipoCargo);
             query.setParameter("date", new Date());
-            query.setParameter("unidade", user.getUser(super.request).getUnidadeGestora().getId());
+            query.setParameter("unidade", redisConnect.getUser(super.request).getUnidadeGestora().getId());
             query.setParameter("exercicio", infoRemessa.getExercicio());
             query.setParameter("remessa", infoRemessa.getRemessa());
             return query.getSingleResult();

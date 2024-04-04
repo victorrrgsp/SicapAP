@@ -7,6 +7,7 @@ import com.example.sicapweb.model.dto.AssuntoProcessoDTO;
 import com.example.sicapweb.repository.concessao.*;
 import com.example.sicapweb.repository.geral.UnidadeGestoraRepository;
 import com.example.sicapweb.repository.movimentacaoDePessoal.PensionistaRepository;
+import com.example.sicapweb.security.RedisConnect;
 import com.example.sicapweb.security.User;
 import com.example.sicapweb.service.AssinarCertificado;
 import com.example.sicapweb.service.ChampionRequest;
@@ -79,7 +80,7 @@ public class AssinarConcessaoController extends DefaultController<AdmEnvio> {
 
     @GetMapping(path = "/{searchParams}/{tipoParams}/pagination")
     public ResponseEntity<PaginacaoUtil<AdmEnvio>> listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
-        if (user.getUser(admEnvioRepository.getRequest()).getCargo().getValor() != 4) {
+        if (redisConnect.getUser(admEnvioRepository.getRequest()).getCargo().getValor() != 4) {
             return ResponseEntity.ok().body(null);
         } else {
             PaginacaoUtil<AdmEnvio> paginacaoUtil = admEnvioRepository.buscaPaginada(pageable, searchParams, tipoParams);
@@ -112,8 +113,8 @@ public class AssinarConcessaoController extends DefaultController<AdmEnvio> {
                     AdmEnvio envio = admEnvioRepository.findById(id);
                     if (envio != null) {
                         AdmEnvioAssinatura admEnvioAssinatura = new AdmEnvioAssinatura();
-                        admEnvioAssinatura.setIdCargo(user.getUser(admEnvioRepository.getRequest()).getCargo().getValor());
-                        admEnvioAssinatura.setCpf(user.getUser(admEnvioRepository.getRequest()).getCpf());
+                        admEnvioAssinatura.setIdCargo(redisConnect.getUser(admEnvioRepository.getRequest()).getCargo().getValor());
+                        admEnvioAssinatura.setCpf(redisConnect.getUser(admEnvioRepository.getRequest()).getCpf());
                         admEnvioAssinatura.setIpAssinante(InetAddress.getLocalHost().getHostAddress());
                         admEnvioAssinatura.setAdmEnvio(envio);
                         admEnvioAssinatura.setData_assinatura(new Date());
@@ -473,7 +474,7 @@ public class AssinarConcessaoController extends DefaultController<AdmEnvio> {
     public ResponseEntity<?> iniciarAssinatura(@RequestBody String certificado_mensagem_hash) {
         String respostaIniciarAssinatura = new String();
         try {
-            User userlogado = user.getUser(admEnvioRepository.getRequest());
+            User userlogado = redisConnect.getUser(admEnvioRepository.getRequest());
             JsonNode respostaJson = new ObjectMapper().readTree(certificado_mensagem_hash);
             JsonNode certificadoJson = new ObjectMapper().readTree(userlogado.getCertificado());
             String certificado = respostaJson.get("certificado").asText();

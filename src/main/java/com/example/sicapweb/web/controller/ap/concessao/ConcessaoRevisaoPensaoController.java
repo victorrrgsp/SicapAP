@@ -9,6 +9,7 @@ import com.example.sicapweb.model.dto.PensaoDTO;
 import com.example.sicapweb.repository.concessao.AdmEnvioRepository;
 import com.example.sicapweb.repository.concessao.DocumentoPensaoRepository;
 import com.example.sicapweb.repository.concessao.PensaoRepository;
+import com.example.sicapweb.security.RedisConnect;
 import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
 import com.example.sicapweb.web.controller.DefaultController;
@@ -31,6 +32,8 @@ import java.util.List;
 @RequestMapping("/documentoConcessaoRevisaoPensao")
 public class ConcessaoRevisaoPensaoController extends DefaultController<DocumentoPensao> {
 
+    @Autowired
+    protected RedisConnect redisConnect;
     @Autowired
     private PensaoRepository pensaoRepository;
 
@@ -95,8 +98,8 @@ public class ConcessaoRevisaoPensaoController extends DefaultController<Document
         documentoPensao.setStatus(DocumentoPensao.Status.Informado.getValor());
         documentoPensao.setRevisao("S");
         documentoPensao.setDescricao(descricao);
-        documentoPensao.setIdCargo(user.getUser(pensaoRepository.getRequest()).getCargo().getValor());
-        documentoPensao.setCpfUsuario(user.getUser(pensaoRepository.getRequest()).getCpf());
+        documentoPensao.setIdCargo(redisConnect.getUser(pensaoRepository.getRequest()).getCargo().getValor());
+        documentoPensao.setCpfUsuario(redisConnect.getUser(pensaoRepository.getRequest()).getCpf());
         documentoPensao.setIpUsuario(InetAddress.getLocalHost().getHostAddress());
         documentoPensao.setDataUpload(new Date());
         documentoPensaoRepository.save(documentoPensao);

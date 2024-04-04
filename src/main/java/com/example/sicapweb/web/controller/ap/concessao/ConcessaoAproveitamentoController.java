@@ -10,6 +10,7 @@ import com.example.sicapweb.model.dto.AproveitamentoDTO;
 import com.example.sicapweb.repository.concessao.AdmEnvioRepository;
 import com.example.sicapweb.repository.concessao.AproveitamentoRepository;
 import com.example.sicapweb.repository.concessao.DocumentoAproveitamentoRepository;
+import com.example.sicapweb.security.RedisConnect;
 import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
 import com.example.sicapweb.web.controller.DefaultController;
@@ -97,8 +98,8 @@ public class ConcessaoAproveitamentoController extends DefaultController<Documen
         documentoAproveitamento.setIdCastorFile(idCastor);
         documentoAproveitamento.setStatus(DocumentoAproveitamento.Status.Informado.getValor());
         documentoAproveitamento.setDescricao(descricao);
-        documentoAproveitamento.setIdCargo(user.getUser(aproveitamentoRepository.getRequest()).getCargo().getValor());
-        documentoAproveitamento.setCpfUsuario(user.getUser(aproveitamentoRepository.getRequest()).getCpf());
+        documentoAproveitamento.setIdCargo(redisConnect.getUser(aproveitamentoRepository.getRequest()).getCargo().getValor());
+        documentoAproveitamento.setCpfUsuario(redisConnect.getUser(aproveitamentoRepository.getRequest()).getCpf());
         documentoAproveitamento.setIpUsuario(InetAddress.getLocalHost().getHostAddress());
         documentoAproveitamento.setDataUpload(new Date());
         documentoAproveitamentoRepository.save(documentoAproveitamento);

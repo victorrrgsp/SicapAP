@@ -9,6 +9,7 @@ import com.example.sicapweb.model.dto.AposentadoriaDTO;
 import com.example.sicapweb.repository.concessao.AdmEnvioRepository;
 import com.example.sicapweb.repository.concessao.AposentadoriaRepository;
 import com.example.sicapweb.repository.concessao.DocumentoAposentadoriaRepository;
+import com.example.sicapweb.security.RedisConnect;
 import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
 import com.example.sicapweb.web.controller.DefaultController;
@@ -31,6 +32,8 @@ import java.util.List;
 @RequestMapping("/documentoConcessaoReversaoAposentadoriaReserva")
 public class ConcessaoReversaoAposentadoriaReservaController extends DefaultController<DocumentoAposentadoria> {
 
+    @Autowired
+    protected RedisConnect redisConnect;
     @Autowired
     private AposentadoriaRepository aposentadoriaRepository;
 
@@ -93,8 +96,8 @@ public class ConcessaoReversaoAposentadoriaReservaController extends DefaultCont
         documentoAposentadoria.setStatus(DocumentoAposentadoria.Status.Informado.getValor());
         documentoAposentadoria.setReversao("S");
         documentoAposentadoria.setDescricao(descricao);
-        documentoAposentadoria.setIdCargo(user.getUser(aposentadoriaRepository.getRequest()).getCargo().getValor());
-        documentoAposentadoria.setCpfUsuario(user.getUser(aposentadoriaRepository.getRequest()).getCpf());
+        documentoAposentadoria.setIdCargo(redisConnect.getUser(aposentadoriaRepository.getRequest()).getCargo().getValor());
+        documentoAposentadoria.setCpfUsuario(redisConnect.getUser(aposentadoriaRepository.getRequest()).getCpf());
         documentoAposentadoria.setIpUsuario(InetAddress.getLocalHost().getHostAddress());
         documentoAposentadoria.setDataUpload(new Date());
         documentoAposentadoriaRepository.save(documentoAposentadoria);

@@ -35,22 +35,22 @@ public class User implements Serializable {
     public List<String> systems = new ArrayList<>();
 
     @Autowired
-    private transient Config config;
+    private transient RedisConnect redisConnect;
 
     @JsonIgnore
     public List<UnidadeGestora> unidadeGestoraList = new ArrayList<>();
     public UnidadeGestora unidadeGestora = new UnidadeGestora("00299180000154", "PREFEITURA MUNICIPAL DE PARAÍSO DO TOCANTINS", 1);
 
-    public User getUser(String user) {
-        return Config.fromJson(config.getJedis().get(user.replace("=", "")), User.class);
-    }
+//    public User getUser(String user) {
+//        return redisConnect.get(user.replace("=", ""), User.class);
+//    }
     public void teste(String test) {
-        config.getJedis().set(test, "teste");
+        redisConnect.add(test, "teste");
     }
 
-    public User getUser(HttpServletRequest request) {
-        return getUser(request.getHeader("user"));
-    }
+//    public User getUser(HttpServletRequest request) {
+//        return getUser(request.getHeader("user"));
+//    }
 
     public String getId() {
         return id;

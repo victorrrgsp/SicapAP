@@ -9,6 +9,7 @@ import com.example.sicapweb.model.dto.ReadaptacaoDTO;
 import com.example.sicapweb.repository.concessao.AdmEnvioRepository;
 import com.example.sicapweb.repository.concessao.DocumentoReadaptacaoRepository;
 import com.example.sicapweb.repository.concessao.ReadaptacaoRepository;
+import com.example.sicapweb.security.RedisConnect;
 import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
 import com.example.sicapweb.web.controller.DefaultController;
@@ -31,6 +32,8 @@ import java.util.List;
 @RequestMapping("/documentoConcessaoReadaptacao")
 public class ConcessaoReadaptacaoController extends DefaultController<DocumentoReadaptacao> {
 
+    @Autowired
+    protected RedisConnect redisConnect;
     @Autowired
     private ReadaptacaoRepository readaptacaoRepository;
 
@@ -92,8 +95,8 @@ public class ConcessaoReadaptacaoController extends DefaultController<DocumentoR
         documentoReadaptacao.setIdCastorFile(idCastor);
         documentoReadaptacao.setStatus(DocumentoReadaptacao.Status.Informado.getValor());
         documentoReadaptacao.setDescricao(descricao);
-        documentoReadaptacao.setIdCargo(user.getUser(readaptacaoRepository.getRequest()).getCargo().getValor());
-        documentoReadaptacao.setCpfUsuario(user.getUser(readaptacaoRepository.getRequest()).getCpf());
+        documentoReadaptacao.setIdCargo(redisConnect.getUser(readaptacaoRepository.getRequest()).getCargo().getValor());
+        documentoReadaptacao.setCpfUsuario(redisConnect.getUser(readaptacaoRepository.getRequest()).getCpf());
         documentoReadaptacao.setIpUsuario(InetAddress.getLocalHost().getHostAddress());
         documentoReadaptacao.setDataUpload(new Date());
         documentoReadaptacaoRepository.save(documentoReadaptacao);

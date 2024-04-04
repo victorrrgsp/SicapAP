@@ -4,6 +4,7 @@ import br.gov.to.tce.model.InfoRemessa;
 import com.example.sicapweb.repository.remessa.GfipRepository;
 import com.example.sicapweb.repository.remessa.AcompanhamentoDeRemessasRepository;
 import com.example.sicapweb.repository.remessa.InfoRemessaRepository;
+import com.example.sicapweb.security.RedisConnect;
 import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
 import com.itextpdf.text.Document;
@@ -25,7 +26,7 @@ import java.util.Objects;
 public class AcompanhamentoDeRemessasController {
 
     @Autowired
-    protected User user;
+    protected RedisConnect redisConnect;
 
     @Autowired
     private AcompanhamentoDeRemessasRepository acompanhamentoDeRemessasRepository;
@@ -89,7 +90,7 @@ public class AcompanhamentoDeRemessasController {
     @CrossOrigin
     @GetMapping(path = {"/autenticacao"})
     public ResponseEntity<User> findeUserAutenticacao() {
-      User usuario = user.getUser(acompanhamentoDeRemessasRepository.getRequest());
+      User usuario = redisConnect.getUser(acompanhamentoDeRemessasRepository.getRequest());
       return ResponseEntity.ok().body(usuario);
     }
   @CrossOrigin

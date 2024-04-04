@@ -7,6 +7,7 @@ import com.example.sicapweb.exception.InvalitInsert;
 import com.example.sicapweb.repository.concurso.DocumentoAdmissaoRepository;
 import com.example.sicapweb.repository.concurso.EditalAprovadoRepository;
 import com.example.sicapweb.repository.concurso.EditalVagaRepository;
+import com.example.sicapweb.security.RedisConnect;
 import com.example.sicapweb.util.PaginacaoUtil;
 import com.example.sicapweb.web.controller.DefaultController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,8 @@ import java.util.List;
 @RequestMapping({"/documentoConcursoAdmissao"})
 public class DocumentoAdmissaoController extends DefaultController<DocumentoAdmissao> {
 
+    @Autowired
+    private RedisConnect redisConnect;
     @Autowired
     private DocumentoAdmissaoRepository documentoAdmissaoRepository;
     @Autowired
@@ -126,7 +129,7 @@ public class DocumentoAdmissaoController extends DefaultController<DocumentoAdmi
             documentoAdmissao.setData_cr(LocalDateTime.now());
             ServletRequestAttributes getIp = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
             documentoAdmissao.setIp_cr(getIp.getRequest().getRemoteAddr());
-            documentoAdmissao.setUsuario_cr(user.getUser(documentoAdmissaoRepository.getRequest()).getUserName());
+            documentoAdmissao.setUsuario_cr(redisConnect.getUser(documentoAdmissaoRepository.getRequest()).getUserName());
             documentoAdmissaoRepository.update(documentoAdmissao);
         }
         return ResponseEntity.ok().body(idCastor);
@@ -141,7 +144,7 @@ public class DocumentoAdmissaoController extends DefaultController<DocumentoAdmi
             documentoAdmissao.setStatus(DocumentoAdmissao.Status.EXCLUIDO_DOCUMENTO.getValor());
             ServletRequestAttributes getIp = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
             documentoAdmissao.setIp_altr(getIp.getRequest().getRemoteAddr());
-            documentoAdmissao.setUsuario_altr(user.getUser(documentoAdmissaoRepository.getRequest()).getUserName());
+            documentoAdmissao.setUsuario_altr(redisConnect.getUser(documentoAdmissaoRepository.getRequest()).getUserName());
             documentoAdmissao.setData_altr(LocalDateTime.now());
             documentoAdmissaoRepository.update(documentoAdmissao);
             DocumentoAdmissao novo = new DocumentoAdmissao();
@@ -167,7 +170,7 @@ public class DocumentoAdmissaoController extends DefaultController<DocumentoAdmi
             documentoAdmissao.setData_altr(LocalDateTime.now());
             ServletRequestAttributes getIp = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
             documentoAdmissao.setIp_altr(getIp.getRequest().getRemoteAddr());
-            documentoAdmissao.setUsuario_altr(user.getUser(documentoAdmissaoRepository.getRequest()).getUserName());
+            documentoAdmissao.setUsuario_altr(redisConnect.getUser(documentoAdmissaoRepository.getRequest()).getUserName());
             documentoAdmissaoRepository.update(documentoAdmissao);
         }
         return ResponseEntity.ok().body(documentoAdmissao);

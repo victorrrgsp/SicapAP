@@ -86,10 +86,13 @@
             <artifactId>spring-data-redis</artifactId>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/redis.clients/jedis -->
         <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
+            <version>5.1.2</version>
         </dependency>
+
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -180,12 +183,24 @@
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
             <version>4.1.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>redis.clients</groupId>
+                    <artifactId>jedis</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
             <version>4.1.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>redis.clients</groupId>
+                    <artifactId>jedis</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
     </dependencies>

@@ -10,6 +10,7 @@ import com.example.sicapweb.model.dto.ReintegracaoDTO;
 import com.example.sicapweb.repository.concessao.AdmEnvioRepository;
 import com.example.sicapweb.repository.concessao.DocumentoReintegracaoRepository;
 import com.example.sicapweb.repository.concessao.ReintegracaoRepository;
+import com.example.sicapweb.security.RedisConnect;
 import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
 import com.example.sicapweb.web.controller.DefaultController;
@@ -32,6 +33,8 @@ import java.util.List;
 @RequestMapping("/documentoConcessaoReintegracao")
 public class ConcessaoReintegracaoController extends DefaultController<DocumentoReintegracao> {
 
+    @Autowired
+    protected RedisConnect redisConnect;
     @Autowired
     private ReintegracaoRepository reintegracaoRepository;
 
@@ -94,8 +97,8 @@ public class ConcessaoReintegracaoController extends DefaultController<Documento
         documentoReintegracao.setIdCastorFile(idCastor);
         documentoReintegracao.setStatus(DocumentoReintegracao.Status.Informado.getValor());
         documentoReintegracao.setDescricao(descricao);
-        documentoReintegracao.setIdCargo(user.getUser(reintegracaoRepository.getRequest()).getCargo().getValor());
-        documentoReintegracao.setCpfUsuario(user.getUser(reintegracaoRepository.getRequest()).getCpf());
+        documentoReintegracao.setIdCargo(redisConnect.getUser(reintegracaoRepository.getRequest()).getCargo().getValor());
+        documentoReintegracao.setCpfUsuario(redisConnect.getUser(reintegracaoRepository.getRequest()).getCpf());
         documentoReintegracao.setIpUsuario(InetAddress.getLocalHost().getHostAddress());
         documentoReintegracao.setDataUpload(new Date());
         documentoReintegracaoRepository.save(documentoReintegracao);

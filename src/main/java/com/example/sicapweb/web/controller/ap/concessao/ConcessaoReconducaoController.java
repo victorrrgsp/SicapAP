@@ -9,6 +9,7 @@ import com.example.sicapweb.model.dto.ReconducaoDTO;
 import com.example.sicapweb.repository.concessao.AdmEnvioRepository;
 import com.example.sicapweb.repository.concessao.DocumentoReconducaoRepository;
 import com.example.sicapweb.repository.concessao.ReconducaoRepository;
+import com.example.sicapweb.security.RedisConnect;
 import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
 import com.example.sicapweb.web.controller.DefaultController;
@@ -91,8 +92,8 @@ public class ConcessaoReconducaoController extends DefaultController<DocumentoRe
         documentoReconducao.setIdCastorFile(idCastor);
         documentoReconducao.setStatus(DocumentoReconducao.Status.Informado.getValor());
         documentoReconducao.setDescricao(descricao);
-        documentoReconducao.setIdCargo(user.getUser(reconducaoRepository.getRequest()).getCargo().getValor());
-        documentoReconducao.setCpfUsuario(user.getUser(reconducaoRepository.getRequest()).getCpf());
+        documentoReconducao.setIdCargo(redisConnect.getUser(reconducaoRepository.getRequest()).getCargo().getValor());
+        documentoReconducao.setCpfUsuario(redisConnect.getUser(reconducaoRepository.getRequest()).getCpf());
         documentoReconducao.setIpUsuario(InetAddress.getLocalHost().getHostAddress());
         documentoReconducao.setDataUpload(new Date());
         documentoReconducaoRepository.save(documentoReconducao);

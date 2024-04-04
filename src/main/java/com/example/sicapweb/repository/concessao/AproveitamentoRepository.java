@@ -62,7 +62,7 @@ public class AproveitamentoRepository extends DefaultRepository<Aproveitamento, 
                                 "    join Ato ato on ato.id = a.idAto " +
                                 "    left join AdmEnvio ae on ae.idMovimentacao = a.id " +
                                 "    join InfoRemessa i on a.chave = i.chave "+
-                        " where i.idUnidadeGestora = '" + user.getUser(super.request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo)
+                        " where i.idUnidadeGestora = '" + redisConnect.getUser(super.request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();

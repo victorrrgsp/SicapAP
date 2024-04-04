@@ -5,6 +5,7 @@ import com.example.sicapweb.repository.geral.UnidadeGestoraRepository;
 import com.example.sicapweb.repository.remessa.AssinarRemessaRepository;
 import com.example.sicapweb.repository.remessa.GfipRepository;
 import com.example.sicapweb.repository.remessa.JustificativaGfipRepository;
+import com.example.sicapweb.security.RedisConnect;
 import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.ExcellExporter;
 import com.example.sicapweb.util.PaginacaoUtil;
@@ -35,7 +36,8 @@ import java.util.*;
 public class AssinarRemessaController {
 
     @Autowired
-    protected User user;
+    protected RedisConnect redisConnect;
+
     @Autowired
     private UnidadeGestoraRepository unidadeGestoraRepository;
 
@@ -98,7 +100,7 @@ public class AssinarRemessaController {
     @CrossOrigin
     @GetMapping(path = {"/autenticacao"})
     public ResponseEntity<User> findeUserAutenticacao(HttpSession session) {
-        return ResponseEntity.ok().body(user.getUser(assinarRemessaRepository.getRequest()));
+        return ResponseEntity.ok().body(redisConnect.getUser(assinarRemessaRepository.getRequest()));
     }
 
     @CrossOrigin

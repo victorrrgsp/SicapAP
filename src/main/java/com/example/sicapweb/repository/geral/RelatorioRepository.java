@@ -88,7 +88,7 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
                                 .setParameter("Ano", ano)
                                 .setParameter("Mes", mes)
                                 .setParameter("cargo", cargo)
-                                .setParameter("UnidadeGestora", user.getUser(super.request).getUnidadeGestora().getId());
+                                .setParameter("UnidadeGestora", redisConnect.getUser(super.request).getUnidadeGestora().getId());
                                 
         if(UnidadeAdministrativa != null){
             query.setParameter("UnidadeAdministrativa", UnidadeAdministrativa);
@@ -134,7 +134,7 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
                                 .setParameter("Ano", ano)
                                 .setParameter("Mes", mes)
                                 .setParameter("matriculaServidor", matriculaServidor)
-                                .setParameter("UnidadeGestora", user.getUser(super.request).getUnidadeGestora().getId());
+                                .setParameter("UnidadeGestora", redisConnect.getUser(super.request).getUnidadeGestora().getId());
                                 
         return StaticMethods.getHashmapFromQuery(query);
     }
@@ -152,7 +152,7 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
         }
         // retorna um array de string com o cpf [coluna 1] da lista de array de objetos de getQueryinfoServidor(PesoaParam).getResultList()
         
-        var query = getQueryServidoresFolha(Natureza, Vinculo, ano, mes, lotacao, UnidadeAdministrativa,user.getUser(super.request).getUnidadeGestora().getId(), folhaItem,
+        var query = getQueryServidoresFolha(Natureza, Vinculo, ano, mes, lotacao, UnidadeAdministrativa,redisConnect.getUser(super.request).getUnidadeGestora().getId(), folhaItem,
                 cargo, cpfsServidor);
 
         return StaticMethods.getHashmapFromQuery(query);
@@ -288,7 +288,7 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
                                             "join InfoRemessa on s.chave = InfoRemessa.chave\r\n"+
                                             "where s.cpfServidor+s.nome like '%'+:cpf+'%' and InfoRemessa.idUnidadeGestora = :UG")
                 .setParameter("cpf", cpf)
-                .setParameter("UG", user.getUser(super.request).getUnidadeGestora().getId());
+                .setParameter("UG", redisConnect.getUser(super.request).getUnidadeGestora().getId());
     }
 
     private Query getQueryHistoricoDeVinculo(String cpf) {
@@ -1018,7 +1018,7 @@ public class RelatorioRepository extends DefaultRepository<Lei, BigInteger> {
 
         var queryinfoServidor = getQueryinfoServidor(cpf);
         var queryHistoricoVinculo = getQueryHistoricoDeVinculo(cpf);
-        var queryHistoricoFolha = getQueryServidoresFolha(null, null,null, null, null, null, user.getUser(request).getUnidadeGestora().getId(), null, null, List.of(cpf));
+        var queryHistoricoFolha = getQueryServidoresFolha(null, null,null, null, null, null, redisConnect.getUser(request).getUnidadeGestora().getId(), null, null, List.of(cpf));
 
         hashMap.put("infoServidor", StaticMethods.getHashmapFromQuery(queryinfoServidor));
         hashMap.put("HistoricoVinculo", StaticMethods.getHashmapFromQuery(queryHistoricoVinculo));

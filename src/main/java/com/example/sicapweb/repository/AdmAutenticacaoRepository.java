@@ -69,7 +69,7 @@ public class AdmAutenticacaoRepository extends DefaultRepository<AdmAutenticacao
         List<AdmAutenticacao> list = null;
         list = getEntityManager()
                 .createNativeQuery("select * from AdmAutenticacao " +
-                        "WHERE " +search+" idUnidadeGestora= '"+ user.getUser(super.request).getUnidadeGestora().getId()+ "' " +
+                        "WHERE " +search+" idUnidadeGestora= '"+ redisConnect.getUser(super.request).getUnidadeGestora().getId()+ "' " +
                         "ORDER BY " + campo, AdmAutenticacao.class)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
@@ -83,7 +83,7 @@ public class AdmAutenticacaoRepository extends DefaultRepository<AdmAutenticacao
     }
 
     public long countChaves() {
-        return getEntityManager().createQuery("select count(*) from AdmAutenticacao WHERE idUnidadeGestora= '"+ user.getUser(super.request).getUnidadeGestora().getId()+ "'", Long.class).getSingleResult();
+        return getEntityManager().createQuery("select count(*) from AdmAutenticacao WHERE idUnidadeGestora= '"+ redisConnect.getUser(super.request).getUnidadeGestora().getId()+ "'", Long.class).getSingleResult();
     }
 
 

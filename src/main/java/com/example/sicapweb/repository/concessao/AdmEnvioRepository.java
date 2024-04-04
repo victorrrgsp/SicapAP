@@ -45,7 +45,7 @@ public class AdmEnvioRepository extends DefaultRepository<AdmEnvio, BigInteger> 
         List<AdmEnvio> list = getEntityManager().createNativeQuery("" +
                         "select * from AdmEnvio " +
                         "where status = 3 and unidadeGestora = '"
-                        + user.getUser(request).getUnidadeGestora().getId() + "' " + search + " ORDER BY "
+                        + redisConnect.getUser(request).getUnidadeGestora().getId() + "' " + search + " ORDER BY "
                         + campo, AdmEnvio.class)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
@@ -160,7 +160,7 @@ public class AdmEnvioRepository extends DefaultRepository<AdmEnvio, BigInteger> 
         Query query = getEntityManager().createNativeQuery("" +
                 "select count(*) from AdmEnvio " +
                 "where status = 3 and unidadeGestora = '"
-                + user.getUser(request).getUnidadeGestora().getId() + "' ");
+                + redisConnect.getUser(request).getUnidadeGestora().getId() + "' ");
         return (Integer) query.getSingleResult();
     }
 }

@@ -2,6 +2,7 @@ package com.example.sicapweb.web.controller;
 
 import br.gov.to.tce.model.adm.AdmAutenticacao;
 import com.example.sicapweb.repository.AdmAutenticacaoRepository;
+import com.example.sicapweb.security.RedisConnect;
 import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.exceptions.JedisConnectionException;
 
 import java.math.BigInteger;
 import java.net.URI;
@@ -74,15 +78,21 @@ public class ChavesController {
         Boolean status = admAutenticacaoRepository.getStatusChave(Cnpj, Exercicio, Remessa);
         return status;
     }
-@Autowired
-private User user;
+
+    @Autowired
+    protected RedisConnect redisConnect;
     @GetMapping(path = {"/teste"})
     public void findStatusChave() {
         System.out.println(new br.gov.to.tce.util.Date().toStringDateAndHourDatabaseFormat2());
-        for (Integer i = 0; i < 100000; i++) {
+        try {
+
+            for (Integer i = 0; i < 100000; i++) {
 //            Thread thread = new Thread();
 //            thread.start();
-            user.teste("user"+ i);
+                redisConnect.add("8403ad51-8f11-4068-a65e-f0091e0db19b"+i, "dfdfdf"+i);
+            }
+        }catch (Exception e ){
+            e.printStackTrace();
         }
 
         System.out.println(new br.gov.to.tce.util.Date().toStringDateAndHourDatabaseFormat2());

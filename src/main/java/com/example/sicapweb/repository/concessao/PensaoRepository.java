@@ -77,7 +77,7 @@ public class PensaoRepository extends DefaultRepository<Pensao, BigInteger> {
                         "left join AdmEnvio ae on ae.idMovimentacao = a.id " +
                         "join InfoRemessa i on a.chave = i.chave " +
                         "where a.revisao = 0 " +
-                        "and i.idUnidadeGestora = '" + user.getUser(super.request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo)
+                        "and i.idUnidadeGestora = '" + redisConnect.getUser(super.request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho);
 
@@ -93,7 +93,7 @@ public class PensaoRepository extends DefaultRepository<Pensao, BigInteger> {
     public Integer countPensao() {
         Query query = getEntityManager().createNativeQuery("select count(*) from Pensao a " +
                 "join InfoRemessa i on a.chave = i.chave " +
-                "where a.revisao = 0 and i.idUnidadeGestora= '"+ user.getUser(super.request).getUnidadeGestora().getId()+ "'");
+                "where a.revisao = 0 and i.idUnidadeGestora= '"+ redisConnect.getUser(super.request).getUnidadeGestora().getId()+ "'");
         return (Integer) query.getSingleResult();
     }
 
@@ -126,7 +126,7 @@ public class PensaoRepository extends DefaultRepository<Pensao, BigInteger> {
                         "left join AdmEnvio ae on ae.idMovimentacao = a.id " +
                         "join InfoRemessa i on a.chave = i.chave " +
                         "where a.revisao = 1 " +
-                        "and i.idUnidadeGestora = '" + user.getUser(super.request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo)
+                        "and i.idUnidadeGestora = '" + redisConnect.getUser(super.request).getUnidadeGestora().getId() + "' " + search + " ORDER BY " + campo)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho);
         List<Object> list = (List<Object>) query.getResultList();
@@ -141,7 +141,7 @@ public class PensaoRepository extends DefaultRepository<Pensao, BigInteger> {
     public Integer countPensaoRevisao() {
         Query query = getEntityManager().createNativeQuery("select count(*) from Pensao a " +
                 "join InfoRemessa i on a.chave = i.chave " +
-                "where a.revisao = 1 and i.idUnidadeGestora= '"+ user.getUser(super.request).getUnidadeGestora().getId()+ "'");
+                "where a.revisao = 1 and i.idUnidadeGestora= '"+ redisConnect.getUser(super.request).getUnidadeGestora().getId()+ "'");
         return (Integer) query.getSingleResult();
     }
 
