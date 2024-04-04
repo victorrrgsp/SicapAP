@@ -83,7 +83,7 @@ public class LoginController extends DefaultController<Login> {
             throw new ValidationException("Sessão inválida");
         }
         //config.getJedis().expire(user.replace("=", ""), 480L);
-        redisConnect.expire(user.replace("=", ""), Duration.ofSeconds(480));
+        redisConnect.expire(user.replace("=", ""), Duration.ofSeconds(900));
         Session.usuarioLogado = userSession;
         return ResponseEntity.ok().body(true);
     }
