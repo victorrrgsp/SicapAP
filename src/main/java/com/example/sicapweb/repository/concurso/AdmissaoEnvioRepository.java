@@ -18,7 +18,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
-public class AdmissaoEnvioRepository extends DefaultRepository<AdmissaoEnvio, BigInteger>  {
+public class AdmissaoEnvioRepository extends DefaultRepository<AdmissaoEnvio, BigInteger> {
 
     public AdmissaoEnvioRepository(EntityManager em) {
         super(em);
@@ -54,16 +54,16 @@ public class AdmissaoEnvioRepository extends DefaultRepository<AdmissaoEnvio, Bi
         String campo = String.valueOf(pageable.getSort()).replace(":", "");
 
         List<AdmissaoEnvio> list = getEntityManager()
-                .createNativeQuery("select a.* from AdmissaoEnvio a  where  a.cnpjUnidadeGestora='" + redisConnect.getUser(super.request).getUnidadeGestora().getId() +"' "+
+                .createNativeQuery("select a.* from AdmissaoEnvio a  where  a.cnpjUnidadeGestora='" + redisConnect.getUser(super.request).getUnidadeGestora().getId() + "' " +
                         " and   1=1 " + search + " ORDER BY " + campo, AdmissaoEnvio.class)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
                 .getResultList();
         long totalRegistros = countProcessos(search);
         long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
-        List<AdmissaoEnvioAssRetorno> listDtosAdmissaoRetorno= new ArrayList<AdmissaoEnvioAssRetorno>() ;
-        for(Integer i= 0; i < list.size(); i++){
-            AdmissaoEnvioAssRetorno dtoAssinaturaEnvio =new AdmissaoEnvioAssRetorno();
+        List<AdmissaoEnvioAssRetorno> listDtosAdmissaoRetorno = new ArrayList<AdmissaoEnvioAssRetorno>();
+        for (Integer i = 0; i < list.size(); i++) {
+            AdmissaoEnvioAssRetorno dtoAssinaturaEnvio = new AdmissaoEnvioAssRetorno();
             dtoAssinaturaEnvio.setNumeroEdital(list.get(i).getEdital().getNumeroEdital());
             dtoAssinaturaEnvio.setId(list.get(i).getId());
             dtoAssinaturaEnvio.setDtcriacao(list.get(i).getDataCriacao());
@@ -71,8 +71,8 @@ public class AdmissaoEnvioRepository extends DefaultRepository<AdmissaoEnvio, Bi
             dtoAssinaturaEnvio.setEdital(list.get(i).getEdital());
             dtoAssinaturaEnvio.setProcesso(list.get(i).getProcesso());
             dtoAssinaturaEnvio.setNumeroEnvio(list.get(i).getNumeroEnvio());
-            dtoAssinaturaEnvio.setQuantidade((Integer)  getEntityManager().createNativeQuery("select count(*) from DocumentoAdmissao a " +
-                    "where status > 0  and  a.idEnvio = "+ dtoAssinaturaEnvio.getId()+ "").getSingleResult());
+            dtoAssinaturaEnvio.setQuantidade((Integer) getEntityManager().createNativeQuery("select count(*) from DocumentoAdmissao a " +
+                    "where status > 0  and  a.idEnvio = " + dtoAssinaturaEnvio.getId() + "").getSingleResult());
             listDtosAdmissaoRetorno.add(dtoAssinaturaEnvio);
         }
 
@@ -80,8 +80,8 @@ public class AdmissaoEnvioRepository extends DefaultRepository<AdmissaoEnvio, Bi
     }
 
     public Integer countProcessos(String search) {
-        return  (Integer)getEntityManager().createNativeQuery("select count(*) from AdmissaoEnvio a  where a.cnpjUnidadeGestora='" + redisConnect.getUser(super.request).getUnidadeGestora().getId() +"' "+search
-                ).getSingleResult();
+        return (Integer) getEntityManager().createNativeQuery("select count(*) from AdmissaoEnvio a  where a.cnpjUnidadeGestora='" + redisConnect.getUser(super.request).getUnidadeGestora().getId() + "' " + search
+        ).getSingleResult();
     }
 
     public PaginacaoUtil<AdmissaoEnvioAssRetorno> buscarProcessosAguardandoAss(Pageable pageable, String searchParams, Integer tipoParams) {
@@ -92,7 +92,7 @@ public class AdmissaoEnvioRepository extends DefaultRepository<AdmissaoEnvio, Bi
         String campo = String.valueOf(pageable.getSort()).replace(":", "");
 
         List<AdmissaoEnvio> list = getEntityManager()
-                .createNativeQuery("select a.* from AdmissaoEnvio a where  a.cnpjUnidadeGestora='" + redisConnect.getUser(super.request).getUnidadeGestora().getId() +"' "+
+                .createNativeQuery("select a.* from AdmissaoEnvio a where  a.cnpjUnidadeGestora='" + redisConnect.getUser(super.request).getUnidadeGestora().getId() + "' " +
                         " and  status=2 and not exists(select 1 from AdmissaoEnvioAssinatura ass  where  ass.idEnvio=a.id)  and a.status=2 " + search + " ORDER BY " + campo, AdmissaoEnvio.class)
                 .setFirstResult(pagina)
                 .setMaxResults(tamanho)
@@ -102,17 +102,17 @@ public class AdmissaoEnvioRepository extends DefaultRepository<AdmissaoEnvio, Bi
         long totalRegistros = countProcessosAguardandoAss(search);
         long totalPaginas = (totalRegistros + (tamanho - 1)) / tamanho;
 
-        List<AdmissaoEnvioAssRetorno> listDtosAdmissaoRetorno= new ArrayList<AdmissaoEnvioAssRetorno>() ;
-        for(Integer i= 0; i < list.size(); i++){
-            AdmissaoEnvioAssRetorno dtoAssinaturaEnvio =new AdmissaoEnvioAssRetorno();
+        List<AdmissaoEnvioAssRetorno> listDtosAdmissaoRetorno = new ArrayList<AdmissaoEnvioAssRetorno>();
+        for (Integer i = 0; i < list.size(); i++) {
+            AdmissaoEnvioAssRetorno dtoAssinaturaEnvio = new AdmissaoEnvioAssRetorno();
             dtoAssinaturaEnvio.setNumeroEdital(list.get(i).getEdital().getNumeroEdital());
             dtoAssinaturaEnvio.setId(list.get(i).getId());
             dtoAssinaturaEnvio.setDtcriacao(list.get(i).getDataCriacao());
             dtoAssinaturaEnvio.setStatus(list.get(i).getStatus());
             dtoAssinaturaEnvio.setEdital(list.get(i).getEdital());
             dtoAssinaturaEnvio.setNumeroEnvio(list.get(i).getNumeroEnvio());
-            dtoAssinaturaEnvio.setQuantidade((Integer)  getEntityManager().createNativeQuery("select count(*) from DocumentoAdmissao a " +
-                    "where status > 0 and    a.idEnvio = "+ dtoAssinaturaEnvio.getId()+ "").getSingleResult());
+            dtoAssinaturaEnvio.setQuantidade((Integer) getEntityManager().createNativeQuery("select count(*) from DocumentoAdmissao a " +
+                    "where status > 0 and    a.idEnvio = " + dtoAssinaturaEnvio.getId() + "").getSingleResult());
             listDtosAdmissaoRetorno.add(dtoAssinaturaEnvio);
         }
 
@@ -120,27 +120,28 @@ public class AdmissaoEnvioRepository extends DefaultRepository<AdmissaoEnvio, Bi
     }
 
     public Integer countProcessosAguardandoAss(String search) {
-        return (Integer) getEntityManager().createNativeQuery("select count(*) from AdmissaoEnvio a where  a.cnpjUnidadeGestora='" + redisConnect.getUser(super.request).getUnidadeGestora().getId() +"' "+
-                " and  a.status=2 "+search).getSingleResult();
+        return (Integer) getEntityManager().createNativeQuery("select count(*) from AdmissaoEnvio a where  a.cnpjUnidadeGestora='" + redisConnect.getUser(super.request).getUnidadeGestora().getId() + "' " +
+                " and  a.status=2 " + search).getSingleResult();
     }
 
-    public List<AdmissaoEnvio> GetEmAbertoByEdital(BigInteger idedital){
-            return getEntityManager().createNativeQuery("select top 1 a.* from AdmissaoEnvio a where  a.cnpjUnidadeGestora='" + redisConnect.getUser(super.request).getUnidadeGestora().getId() + "' " +
-                    " and  a.processo is null and   a.idEdital =" + idedital, AdmissaoEnvio.class).getResultList();
+    public List<AdmissaoEnvio> GetEmAbertoByEdital(BigInteger idedital) {
+        return getEntityManager().createNativeQuery("select top 1 a.* from AdmissaoEnvio a where  a.cnpjUnidadeGestora='" + redisConnect.getUser(super.request).getUnidadeGestora().getId() + "' " +
+                " and  a.processo is null and   a.idEdital =" + idedital, AdmissaoEnvio.class).getResultList();
     }
 
-    public List<Map<String,Object>> getValidInfoEnvio(BigInteger idEdital) {
+    public List<Map<String, Object>> getValidInfoEnvio(BigInteger idEdital) {
 
         List<Map<String, Object>> validacoesVagaAprovado = new ArrayList<Map<String, Object>>();
 
         try {
 
             var query = entityManager.createNativeQuery(
-                            "select ev.id                                          idvaga,\n" +
+                    "select ev.id                                          idvaga,\n" +
                             "       ev.codigoVaga,\n" +
                             "       c.nomeCargo,\n" +
                             "       ev.especialidadeVaga,\n" +
                             "       ev.tipoConcorrencia,\n" +
+                            "       ev.quantidade                                     qtvagas, " +
                             "       count(EA.id)                                       qt_aprov,\n" +
                             "       min(cast(classificacao as INTEGER))            min_classif,\n" +
                             "       max(cast(classificacao as INTEGER))            max_classif,\n" +
@@ -153,9 +154,9 @@ public class AdmissaoEnvioRepository extends DefaultRepository<AdmissaoEnvio, Bi
                             "                ELSE NULL\n" +
                             "            END) AS qt_desistencia_prorogacao,\n" +
                             "       COUNT(CASE\n" +
-                            "                WHEN da.opcaoDesistencia = 3 THEN null\n" +
-                            "                WHEN da.opcaoDesistencia = 6 THEN null\n" +
-                            "                WHEN da.opcaoDesistencia is null THEN null\n" +
+                            "                WHEN da.opcaoDesistencia = 3 THEN 0\n" +
+                            "                WHEN da.opcaoDesistencia = 6 THEN 0\n" +
+                            "                WHEN da.opcaoDesistencia is null THEN 0\n" +
                             "                ELSE 1\n" +
                             "            END) AS qt_desistencia_desclasificado " +
                             "from dbo.AdmissaoEnvio pa\n" +
@@ -166,7 +167,7 @@ public class AdmissaoEnvioRepository extends DefaultRepository<AdmissaoEnvio, Bi
                             "         left join dbo.Admissao on da.idAdmissao = Admissao.id\n" +
                             "         left join dbo.Desligamento on Admissao.id = Desligamento.idAdmissao\n" +
                             "where pa.idEdital = :idEdital\n" +
-                            "group by ev.id, ev.codigoVaga, c.nomeCargo, ev.especialidadeVaga, ev.tipoConcorrencia, ev.quantidade").setParameter("idEdital",idEdital);
+                            "group by ev.id, ev.codigoVaga, c.nomeCargo, ev.especialidadeVaga, ev.tipoConcorrencia, ev.quantidade").setParameter("idEdital", idEdital);
             var list = StaticMethods.getHashmapFromQuery(query);
 
 //            for (Object[] obj : list) {
@@ -176,26 +177,24 @@ public class AdmissaoEnvioRepository extends DefaultRepository<AdmissaoEnvio, Bi
 
                 //quantidade= qtVagas +(qtDesistencias + qtDesligados)
                 {
-                    Integer aux = ((Integer) vagaAprovado.get("qtvagas")) + ((Integer) vagaAprovado.get("qt_desistencia_desclasificado")) + ((Integer) vagaAprovado.get("qtDesligados"));
+                    Integer aux = Integer.parseInt(vagaAprovado.get("qtvagas").toString()) + ((Integer) vagaAprovado.get("qt_desistencia_desclasificado"));
                     vagaAprovado.put("quantidade", aux);
                 }
 
-                String nomeTipoConcorrencia =  Arrays.stream(EditalVaga.TipoConcorrencia.values()).filter(tipoConcorrencia -> tipoConcorrencia.getValor()==vagaAprovado.get("tipoConcorrencia")).collect( Collectors.toList()).get(0).name();
+                String nomeTipoConcorrencia = Arrays.stream(EditalVaga.TipoConcorrencia.values()).filter(tipoConcorrencia -> tipoConcorrencia.getValor() == vagaAprovado.get("tipoConcorrencia")).collect(Collectors.toList()).get(0).name();
 
                 // if ( ((Integer)vagaAprovado.get("quantidade")) <  ((Integer)vagaAprovado.get("max_classif"))  ){
                 //     vagaAprovado.put("valido",  false);
                 //     vagaAprovado.put("ocorrencia",  " o numero de aprovados axcedeu o limite estipulado da vaga de codigo "+(vagaAprovado.get("codigoVaga"))+"-"+(vagaAprovado.get("nomeCargo"))+"-" +nomeTipoConcorrencia );
                 // } else 
-                if (((Integer)vagaAprovado.get("ct_nao_anexados")) > 0 ){
+                if (((Integer) vagaAprovado.get("ct_nao_anexados")) > 0) {
                     vagaAprovado.put("valido", false);
-                    vagaAprovado.put("ocorrencia",  "A vaga de código "+(vagaAprovado.get("codigoVaga"))+"-"+(vagaAprovado.get("nomeCargo"))+"-" +nomeTipoConcorrencia+" tem aprovados ao qual não foi anexado documentos!! " );
-                }
-                else if ( ((Integer)vagaAprovado.get("max_classif")) >   ((Integer)vagaAprovado.get("qt_aprov"))   ){
-                    vagaAprovado.put("valido",  false);
-                    vagaAprovado.put("ocorrencia",  "A vaga de código "+(vagaAprovado.get("codigoVaga"))+"-"+(vagaAprovado.get("nomeCargo"))+"-" +nomeTipoConcorrencia+" não tem os classificados na ordem de classificacão!! " );
-                }
-                else{
-                    vagaAprovado.put("valido",  true);
+                    vagaAprovado.put("ocorrencia", "A vaga de código " + (vagaAprovado.get("codigoVaga")) + "-" + (vagaAprovado.get("nomeCargo")) + "-" + nomeTipoConcorrencia + " tem aprovados ao qual não foi anexado documentos!! ");
+                } else if (((Integer) vagaAprovado.get("max_classif")) > ((Integer) vagaAprovado.get("qt_aprov"))) {
+                    vagaAprovado.put("valido", false);
+                    vagaAprovado.put("ocorrencia", "A vaga de código " + (vagaAprovado.get("codigoVaga")) + "-" + (vagaAprovado.get("nomeCargo")) + "-" + nomeTipoConcorrencia + " não tem os classificados na ordem de classificação!! ");
+                } else {
+                    vagaAprovado.put("valido", true);
                     vagaAprovado.put("ocorrencia", "");
                 }
                 validacoesVagaAprovado.add(vagaAprovado);
@@ -203,15 +202,15 @@ public class AdmissaoEnvioRepository extends DefaultRepository<AdmissaoEnvio, Bi
             return validacoesVagaAprovado;
 
         } catch (Exception e) {
-            throw  new RuntimeException("Problema ao validar aprovados e vagas!! Entre em contato com o administrador do Sicap AP!!");
+            throw new RuntimeException("Problema ao validar aprovados e vagas!! Entre em contato com o administrador do Sicap AP!!");
         }
     }
 
-    public Integer getLastNumeroEnvioByEdital(BigInteger idEdital){
+    public Integer getLastNumeroEnvioByEdital(BigInteger idEdital) {
         try {
             return (Integer) getEntityManager().createNativeQuery("select top 1 ( a.numeroEnvio+1) from AdmissaoEnvio a  " +
                     "where  a.idEdital =" + idEdital + " order by  numeroEnvio desc ").getSingleResult();
-        } catch (NoResultException e){
+        } catch (NoResultException e) {
             return 1;
         }
     }
