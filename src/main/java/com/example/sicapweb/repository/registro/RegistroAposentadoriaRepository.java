@@ -286,7 +286,8 @@ public class RegistroAposentadoriaRepository  extends DefaultRepository<Registro
                              "            (hdest_ldepto like '%DIRAP%' ) AND\r\n" + //
                              "            (proc_num_anexo IS NULL or proc_num_anexo =0) and\r\n" + //
                              "            (processo_numaps IS NULL or processo_numaps =0)\r\n" + //
-                             "        )  and trim(hists_dest_resp)= :Usuario\r\n" + //
+                             "        )  "+
+                             (userInfo != null ?"and trim(hists_dest_resp)= :Usuario\r\n":"" )+ //
                              "    ),\r\n"+ //
                              "registros as (\r\n" + //
                             "        select numeroAnoProcesso from RegistroPensao\r\n" + //
@@ -346,8 +347,11 @@ public class RegistroAposentadoriaRepository  extends DefaultRepository<Registro
                              "from envios env\r\n" + //
                              "    join processos pss on\r\n" + //
                              "        env.numeroProcesso = pss.numeroProcesso and\r\n" + //
-                             "        env.anoProcesso    = pss.anoProcesso")
-                    .setParameter("Usuario",userInfo.get("loginUsuario"));
+                             "        env.anoProcesso    = pss.anoProcesso");
+                    
+                    if (userInfo != null){
+                        sqlProcessos.setParameter("Usuario",userInfo.get("loginUsuario"));
+                    }
                     if (infoMovimentacao != null) {
                         sqlProcessos
                             .setParameter("cpf",infoMovimentacao.get("cpf"))
