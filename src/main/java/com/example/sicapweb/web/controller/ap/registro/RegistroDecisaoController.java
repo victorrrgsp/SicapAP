@@ -349,8 +349,14 @@ public class RegistroDecisaoController {
 
     public HashMap<String, Object> getInfoUserFromToken(String token) {
         BigInteger idUsuario = getIdUsuarioFromToken(token.substring(7));
-        HashMap<String, Object> infoUser = registroAposentadoriaRepository.getUserInfoFromIdUsuarioAutenticacao(idUsuario);
-        infoUser.put("setor", registroAposentadoriaRepository.getUserSetorFromLoginNoEcontas(infoUser.get("loginUsuario").toString()));
-        return infoUser;
+        try {
+            HashMap<String, Object> infoUser = registroAposentadoriaRepository.getUserInfoFromIdUsuarioAutenticacao(idUsuario);
+            infoUser.put("setor", registroAposentadoriaRepository.getUserSetorFromLoginNoEcontas(infoUser.get("loginUsuario").toString()));
+            return infoUser;    
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+            // TODO: handle exception
+        }
     }
 }
