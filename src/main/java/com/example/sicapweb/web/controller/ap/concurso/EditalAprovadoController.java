@@ -75,12 +75,13 @@ public class EditalAprovadoController extends DefaultController<EditalAprovado> 
     }
 
     private void associateVagaToEditalAprovado(EditalAprovado editalAprovado) {
-        String codigoVaga = editalAprovado.getCodigoVaga();
-        String numeroEdital = editalAprovado.getNumeroEdital();
-        EditalVaga vagaPorCodigoEEdital = editalVagaRepository.buscarVagasPorCodigoEEdital(codigoVaga,numeroEdital);
-        if (vagaPorCodigoEEdital == null)
-            throw  new InvalidParameterException("Não encontrou vaga com esse codigo");
-        editalAprovado.setEditalVaga(vagaPorCodigoEEdital);
+        //String codigoVaga = editalAprovado.getCodigoVaga();
+        //String numeroEdital = editalAprovado.getNumeroEdital();
+        //EditalVaga vagaPorCodigoEEdital = editalVagaRepository.buscarVagasPorCodigoEEdital(codigoVaga,numeroEdital);
+        EditalVaga vagaPorIdEditalVaga = editalVagaRepository.findById(editalAprovado.getEditalVaga().getId());
+        if (vagaPorIdEditalVaga == null)
+            throw  new InvalidParameterException("Não encontrou vaga especificada");
+        editalAprovado.setEditalVaga(vagaPorIdEditalVaga);
     }
 
     @CrossOrigin
