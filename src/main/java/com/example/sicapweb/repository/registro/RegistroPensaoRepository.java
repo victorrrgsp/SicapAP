@@ -130,7 +130,7 @@ public class RegistroPensaoRepository  extends DefaultRepository<RegistroPensao,
         Query queryRegistroMovimentos = getEntityManager().createNativeQuery("" +
                         " with registros as (select id, idPensao ,dataAtoDecisao,dataCadastro, numeroAnoProcesso, numeroAtoDecisao, tipoAtoDecisao, observacao" +
                         "                   from RegistroPensao " +
-                        "                   where idUnidadeGestora = :ug and  (:cpfServidor is null or    :cpfServidor = cpfServidor) and cpfUsuarioCadastro=:cpfUsuario and dataCadastro  between  cast(:dtini as date) and cast(:dtfim as date) \n" +
+                        "                   where idUnidadeGestora = :ug and  (:cpfServidor is null or    :cpfServidor = cpfServidor)  and dataCadastro  between  cast(:dtini as date) and cast(:dtfim as date) \n" +
                         "                    ) " +
                         "select a.id                as idRegistro," +
                         "       idPensao     as idMovimentacao,\n" +
@@ -155,7 +155,6 @@ public class RegistroPensaoRepository  extends DefaultRepository<RegistroPensao,
                         "         join Cargo c on ad.idCargo = c.id\n" +
                         "         join Servidor s on ad.idServidor = s.id   " )
                 .setParameter("ug", filtro.get("ug"))
-                .setParameter("cpfUsuario", filtro.get("cpfUsuario"))
                 .setParameter("dtini", filtro.get("dataInicio"))
                 .setParameter("dtfim", filtro.get("dataFim"))
                 .setParameter("cpfServidor", Objects.requireNonNullElse(filtro.get("cpf"),"").isEmpty() ? null:filtro.get("cpf"))
