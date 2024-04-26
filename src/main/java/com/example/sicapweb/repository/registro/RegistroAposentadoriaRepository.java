@@ -244,9 +244,12 @@ public class RegistroAposentadoriaRepository  extends DefaultRepository<Registro
             
             Query sqlAutenticacao=getEntityManager().createNativeQuery("  " +
                             "  select id as id,codigo as cpfUsuario,login as loginUsuario " +
-                            "from Autenticar.dbo.Usuario where id=:id ")
+                            "from Autenticar.dbo.vwUsuario where id_pessoa =:id ")
                     .setParameter("id",idIsuario).setMaxResults(1);
-            return  StaticMethods.getHashmapFromQuery(sqlAutenticacao).get(0);
+            var aux =StaticMethods.getHashmapFromQuery(sqlAutenticacao).get(0);
+            aux.put("login",aux.get("loginUsuario"));
+
+            return aux ;
         }catch (RuntimeException e){
             throw new RuntimeException("problema na autenticação:não encontrou a id do usuario informado!!");
         }
