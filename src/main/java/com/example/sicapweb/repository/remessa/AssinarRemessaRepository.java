@@ -2,6 +2,8 @@ package com.example.sicapweb.repository.remessa;
 
 import br.gov.to.tce.model.InfoRemessa;
 import br.gov.to.tce.util.JayReflection;
+
+import com.example.sicapweb.exception.InvalitInsert;
 import com.example.sicapweb.repository.DefaultRepository;
 import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
@@ -21,6 +23,9 @@ import java.util.stream.Collectors;
 public class AssinarRemessaRepository extends DefaultRepository<String, String> {
     @PersistenceContext
     private EntityManager entityManager;
+
+    BigDecimal idArquivo;
+    BigDecimal idAssinatura;
 
     public  enum Tabela {
         InfoRemessa(1,"InfoRemessa","br.gov.to.tce.repository"),
@@ -82,8 +87,6 @@ public class AssinarRemessaRepository extends DefaultRepository<String, String> 
     public AssinarRemessaRepository() {
 
     }
-
-
 
     public Object buscarResponsavelAssinatura(Integer tipoCargo, InfoRemessa infoRemessa) {
         try {
@@ -150,26 +153,36 @@ public class AssinarRemessaRepository extends DefaultRepository<String, String> 
     }
 
     public boolean remessaValida(InfoRemessa infoRemessa) {
-        Query query = getEntityManager().createNativeQuery("" +
-                "select 1 podeAssinar " +
+        Query query = getEntityManager().createNativeQuery(""+
+            "select " +
+                "   MIN(CASE " +
+                "     WHEN l.id IS NOT NULL AND l.idCastorFile IS NULL THEN 0 " +
+                "     ELSE 1 " +
+                "   END) AS podeAssinar, " +
+                "   string_agg(l.numeroLei, ',') as leis " +
                 "from SICAPAP21..InfoRemessa a " +
                 "         join SICAPAP21..AdmFilaRecebimento b on a.idFilaRecebimento = b.id " +
+                "         left join sicapap21..lei l on a.chave = l.chave and l.idCastorFile IS NULL " +
                 "where b.status = 2 " +
                 "  and a.idUnidadeGestora = '" + redisConnect.getUser(super.request).getUnidadeGestora().getId() + "'" +
                 "  and a.exercicio = " + infoRemessa.getExercicio() +
-                "  and a.remessa = " + infoRemessa.getRemessa());
+                "  and a.remessa = " + infoRemessa.getRemessa()+
+                "group by a.chave");
         try {
-            query.getSingleResult();
+            // se podeAssiner retorna 1 a funcao retrona true se nao lanca uma execao com as leis
+            Object[] result = (Object[]) query.getSingleResult();
+            if (result[0].equals(0)) {
+                throw new InvalitInsert("foram enviadas leis sem arquivo anexe os arquivos em https://www.tceto.tc.br/sicapap/Lei : \n" + ((String)result[1]).replace(",", "\n ,"));
+            }
             return true;
         } catch (NoResultException e) {
             return false;
+        } catch (InvalitInsert e) {
+            throw e;
         } catch (Exception e) {
             return false;
         }
     }
-
-    BigDecimal idArquivo;
-    BigDecimal idAssinatura;
 
     public void insertArquivo() {
         Query query = entityManager.createNativeQuery(
