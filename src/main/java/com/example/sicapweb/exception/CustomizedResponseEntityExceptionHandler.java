@@ -13,7 +13,7 @@ import org.springframework.http.HttpHeaders;
 @ControllerAdvice
 @RestController
 public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExceptionHandler{
-	
+
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
                                                                   HttpHeaders headers,
@@ -64,5 +64,15 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
 						//request.getDescription(true)
 						);
 		return new ResponseEntity<>(exceptionResponse, HttpStatus.UNAUTHORIZED);
+	}
+	@ExceptionHandler(LoginExpiradoException.class)
+	public final ResponseEntity<ExceptionResponse> LoginExpiradoExceptionExceptions(Exception ex, WebRequest request) {
+		ExceptionResponse exceptionResponse = 
+				new ExceptionResponse(
+						//new Date(),
+						ex.getMessage()
+						//request.getDescription(true)
+						);
+		return new ResponseEntity<>(exceptionResponse, HttpStatus.FORBIDDEN);
 	}
 }

@@ -1,6 +1,7 @@
 package com.example.sicapweb.security;
 
 
+import com.example.sicapweb.exception.LoginExpiradoException;
 import com.example.sicapweb.security.RedisConfig;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,11 @@ public class RedisConnect {
     }
 
     public User getUser(HttpServletRequest request) {
-        return get(request.getHeader("user"), User.class);
+        try {
+            return get(request.getHeader("user"), User.class);
+        } catch (Exception e) {
+            throw new LoginExpiradoException();
+        }
     }
 
 
