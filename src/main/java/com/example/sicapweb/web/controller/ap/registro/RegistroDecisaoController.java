@@ -120,7 +120,7 @@ public class RegistroDecisaoController {
             @PathVariable Integer tipoRegistro,
             @RequestBody HashMap<String, String> jsonFiltro) {
         HashMap<String, Object> UserInfo = getInfoUserFromToken(bearerToken);
-//        setInfoUsuarioEmFiltros(jsonFiltro, UserInfo);
+        setInfoUsuarioEmFiltros(jsonFiltro, UserInfo);
         return ResponseEntity.ok().body(
                 Objects.requireNonNullElse(this.getRegistrosPorTipo(pageable, tipoRegistro, jsonFiltro),
                         new PaginacaoUtil<>(0, 1, 1, 0, new ArrayList<>())));

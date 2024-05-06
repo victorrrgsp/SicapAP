@@ -128,7 +128,7 @@ public class RegistroAdmissaoRepository  extends DefaultRepository<RegistroAdmis
         Query queryRegistroMovimentos = getEntityManager().createNativeQuery("" +
                         " with   registros as (select id, idAdmissao ,dataCadastro,dataAtoDecisao, numeroAnoProcesso, numeroAtoDecisao, tipoAtoDecisao, observacao\n" +
                         "                   from RegistroAdmissao " +
-                        "                   where idUnidadeGestora = :ug and  (:cpfServidor is null or    :cpfServidor = cpfServidor) and dataCadastro  between  cast(:dtini as date) and cast(:dtfim as date)  " +
+                        "                   where idUnidadeGestora = :ug and  (:cpfServidor is null or    :cpfServidor = cpfServidor) and cpfUsuarioCadastro=:cpfUsuario and dataCadastro  between  cast(:dtini as date) and cast(:dtfim as date)  " +
                         "                     ) " +
                         "select a.id                as idRegistro,\n" +
                         "       idAdmissao     as idMovimentacao,\n" +
@@ -152,6 +152,7 @@ public class RegistroAdmissaoRepository  extends DefaultRepository<RegistroAdmis
                         "         join Cargo c on b.idCargo = c.id " +
                         "         join Servidor s on b.idServidor = s.id    " )
                 .setParameter("ug", filtro.get("ug"))
+                .setParameter("cpfUsuario", filtro.get("cpfUsuario"))
                 .setParameter("dtini", filtro.get("dataInicio"))
                 .setParameter("dtfim", filtro.get("dataFim"))
                 .setParameter("cpfServidor", Objects.requireNonNullElse(filtro.get("cpf"),"").isEmpty() ? null:filtro.get("cpf"))

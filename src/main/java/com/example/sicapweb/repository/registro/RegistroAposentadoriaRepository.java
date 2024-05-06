@@ -118,7 +118,7 @@ public class RegistroAposentadoriaRepository  extends DefaultRepository<Registro
         Query queryRegistroMovimentos = getEntityManager().createNativeQuery("" +
                         " with registros as (select id, idAposentadoria,dataAtoDecisao,dataCadastro, numeroAnoProcesso, numeroAtoDecisao, tipoAtoDecisao, observacao " +
                         "                   from RegistroAposentadoria " +
-                        "                   where idUnidadeGestora = :ug  and  (:cpfServidor is null or    :cpfServidor = cpfServidor) and dataCadastro  between  cast(:dtini as date) and cast(:dtfim as date)  \n" +
+                        "                   where idUnidadeGestora = :ug and cpfUsuarioCadastro=:cpfUsuario   and  (:cpfServidor is null or    :cpfServidor = cpfServidor) and dataCadastro  between  cast(:dtini as date) and cast(:dtfim as date)  \n" +
                         "                     ) " +
                         "select \r\n " + //
                         //tentar usar o setFirstResult(0) ou o setMaxResults() sem o setFirstResult() causa erro na consulta 
@@ -147,6 +147,7 @@ public class RegistroAposentadoriaRepository  extends DefaultRepository<Registro
                         "         join Cargo c on ad.idCargo = c.id \n" +
                         "         join Servidor s on ad.idServidor = s.id " )
                 .setParameter("ug", filtros.get("ug"))
+                .setParameter("cpfUsuario", filtros.get("cpfUsuario"))
                 .setParameter("dtini", filtros.get("dataInicio"))
                 .setParameter("dtfim", filtros.get("dataFim"))
                 .setParameter("cpfServidor", Objects.requireNonNullElse(filtros.get("cpf"),"").isEmpty() ? null:filtros.get("cpf"))
