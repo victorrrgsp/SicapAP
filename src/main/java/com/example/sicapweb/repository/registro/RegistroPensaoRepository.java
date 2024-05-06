@@ -68,7 +68,8 @@ public class RegistroPensaoRepository  extends DefaultRepository<RegistroPensao,
                         "     pens as (select i.idUnidadeGestora, a.*\n" +
                         "              from pensaoEnvios a\n" +
                         "                       join InfoRemessa i on a.chave = i.chave and i.idUnidadeGestora = :ug\n" +
-                        "              where not exists(select 1 from RegistroPensao where idPensao = a.id))\n" +
+                        //"              where not exists(select 1 from RegistroPensao where idPensao = a.id)" +
+                        ")\n" +
                         "select distinct\n" +
                         "        a.id               as idMovimentacao,\n" +
                         "       s.cpfServidor      as cpfServidor,\n" +
