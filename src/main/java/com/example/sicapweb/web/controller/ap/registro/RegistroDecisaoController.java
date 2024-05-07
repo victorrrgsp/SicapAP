@@ -285,7 +285,8 @@ public class RegistroDecisaoController {
             }
             throw new IllegalArgumentException("Tipo de movimentação não definido para alteração");
         }
-        var cargo = cargoRepository.buscarCargoUgPorcodigo((String)camposParaAlterar.get("cargo"),admissao.getChave().getIdUnidadeGestora());
+        //var cargo = cargoRepository.buscarCargoUgPorcodigo((String)camposParaAlterar.get("cargo"),admissao.getChave().getIdUnidadeGestora());
+        var cargo = cargoRepository.findById(BigInteger.valueOf(((Integer)camposParaAlterar.get("cargo")).intValue()));
         admissaoRepository.updateVinculo(admissao, cargo);
     }
 
