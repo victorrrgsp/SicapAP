@@ -72,7 +72,7 @@ public class RegistroAdmissaoRepository  extends DefaultRepository<RegistroAdmis
                         "        a.anoProcesso as anoProcesso, " +
                         "        c.nomeCargo         as nomeCargo, " +
                         "        c.codigoCargo      as codigoCargo,\n"+ 
-                        "        c.id      as idCargo,\n"+ 
+                        "        c.id      as idcargo,\n"+ 
                         "        o.numeroAto        as numeroAto, " +
                         "        o.tipoAto          as tipoAto, " +
                         "        a.idUnidadeGestora          as idUnidadeGestora, " +

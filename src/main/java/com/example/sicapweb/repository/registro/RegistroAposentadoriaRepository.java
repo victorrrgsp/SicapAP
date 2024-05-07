@@ -64,7 +64,7 @@ public class RegistroAposentadoriaRepository  extends DefaultRepository<Registro
                         "        a.dataAposentadoria as dataMovimentacao, " +
                         "        c.nomeCargo         as nomeCargo, " +
                         "        c.codigoCargo      as codigoCargo,\n"+
-                        "        c.id      as idCargo,\n"+
+                        "        c.id      as idcargo,\n"+
                         "        at.numeroAto        as numeroAto, " +
                         "        at.tipoAto          as tipoAto, " +
                         "        a.idUnidadeGestora  as idUnidadeGestora, " +
