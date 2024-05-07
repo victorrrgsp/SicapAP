@@ -80,6 +80,7 @@ public class RegistroPensaoRepository  extends DefaultRepository<RegistroPensao,
                         "       a.dataObito        as dataMovimentacao,\n" +
                         "       c.nomeCargo        as nomeCargo,\n" +
                         "       c.codigoCargo      as codigoCargo,\n" +
+                        "       c.id      as idcargo,\n" +
                         "       at.numeroAto       as numeroAto,\n" +
                         "       at.tipoAto         as tipoAto,\n" +
                         "       a.idUnidadeGestora as idUnidadeGestora,\n" +

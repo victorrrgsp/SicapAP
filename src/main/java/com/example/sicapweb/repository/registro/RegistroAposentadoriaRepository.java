@@ -63,7 +63,8 @@ public class RegistroAposentadoriaRepository  extends DefaultRepository<Registro
                         "        a.anoProcesso as anoProcesso, " +
                         "        a.dataAposentadoria as dataMovimentacao, " +
                         "        c.nomeCargo         as nomeCargo, " +
-                        "       c.codigoCargo      as codigoCargo,\n"+
+                        "        c.codigoCargo      as codigoCargo,\n"+
+                        "        c.id      as idCargo,\n"+
                         "        at.numeroAto        as numeroAto, " +
                         "        at.tipoAto          as tipoAto, " +
                         "        a.idUnidadeGestora  as idUnidadeGestora, " +
@@ -192,7 +193,9 @@ public class RegistroAposentadoriaRepository  extends DefaultRepository<Registro
 
    //Solucao para não fazer um metodo para cada subtipo de aposentadoria(TIPOS DE ACORDO COM O REGISTRO) visto que a variacao na consulta é pouca
     private  HashMap<String,HashMap<String, String>> getVariacoesNaQueryAposentadoria(){
-        HashMap<String, HashMap<String, String>> subtipos = new HashMap<>();
+        HashMap<String, HashMap<String, String>> subtipos = new HashMap<>(){
+
+        };
 
         HashMap<String,String> variacoesNaQueryAposentadoria =new HashMap<>();
         variacoesNaQueryAposentadoria.put("TipoMovimento"," a.tipoAposentadoria ");
@@ -235,7 +238,6 @@ public class RegistroAposentadoriaRepository  extends DefaultRepository<Registro
     public HashMap<String,Object> getUserInfoFromIdUsuarioAutenticacao(BigInteger idIsuario ){
         try{
                 //idIsuario = BigInteger.valueOf(17745);
-            
                 // var a = StaticMethods.getHashmapFromQuery(getEntityManager().createNativeQuery("  " +
                 //             "select *" +
                 //             "from Autenticar.dbo.Usuario"));
