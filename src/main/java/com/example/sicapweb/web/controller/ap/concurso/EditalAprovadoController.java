@@ -34,7 +34,6 @@ public class EditalAprovadoController extends DefaultController<EditalAprovado> 
     @Autowired
     private DocumentoAdmissaoRepository documentoAdmissaoRepository;
 
-
     @CrossOrigin
     @GetMapping(path="/{searchParams}/{tipoParams}/pagination")
     public ResponseEntity<PaginacaoUtil<EditalAprovado>> listChaves(Pageable pageable, @PathVariable String searchParams, @PathVariable Integer tipoParams) {
@@ -66,9 +65,9 @@ public class EditalAprovadoController extends DefaultController<EditalAprovado> 
             if (Integer.parseInt(numeroAto.substring(numeroAto.length()-4)) > 2016 ){
                 throw new InvalitInsert("Outro aprovado com o mesmo numero de inscrição!");
             }
-
         }
         else if (mesmaclassifmesmavaga!=null){throw new InvalitInsert("Outro aprovado ja se encontra na mesma classificação e tipo de concorrencia para mesma vaga!");}
+        editalAprovado.setCodigoVaga(editalAprovado.getEditalVaga().getCodigoVaga());
         editalAprovadoRepository.save(editalAprovado);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(editalAprovado.getId()).toUri();
         return ResponseEntity.created(uri).body(editalAprovado);
