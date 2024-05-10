@@ -162,7 +162,7 @@ public class AssinarRemessaRepository extends DefaultRepository<String, String> 
                 "   string_agg(l.numeroLei, ',') as leis " +
                 "from SICAPAP21..InfoRemessa a " +
                 "         join SICAPAP21..AdmFilaRecebimento b on a.idFilaRecebimento = b.id " +
-                "         left join sicapap21..lei l on a.chave = l.chave and l.idCastorFile IS NULL " +
+                "         left join sicapap21..lei l on a.chave = l.chave and l.idCastorFile IS NULL and l.numeroLei not like '9999992021'" +
                 "where b.status = 2 " +
                 "  and a.idUnidadeGestora = '" + redisConnect.getUser(super.request).getUnidadeGestora().getId() + "'" +
                 "  and a.exercicio = " + infoRemessa.getExercicio() +
@@ -172,7 +172,9 @@ public class AssinarRemessaRepository extends DefaultRepository<String, String> 
             // se podeAssiner retorna 1 a funcao retrona true se nao lanca uma execao com as leis
             Object[] result = (Object[]) query.getSingleResult();
             if (result[0].equals(0)) {
-                throw new InvalitInsert("foram enviadas leis sem arquivo anexe os arquivos em https://www.tceto.tc.br/sicapap/Lei : \n" + ((String)result[1]).replace(",", "\n ,"));
+                //throw new InvalitInsert("foram enviadas leis sem arquivo anexe os arquivos em https://www.tceto.tc.br/sicapap/Lei : \n" + ((String)result[1]).replace(",", "\n ,"));
+                throw new InvalitInsert("foram enviadas leis sem arquivo anexe os arquivos em https://www.tceto.tc.br/sicapap/Lei \n" + //
+                                        ".numero das leis inconsistente:\n" + ((String)result[1]).replace(",", "\n ,"));
             }
             return true;
         } catch (NoResultException e) {
