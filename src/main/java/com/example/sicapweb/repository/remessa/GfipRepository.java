@@ -31,7 +31,7 @@ public class GfipRepository extends DefaultRepository<Gfip, BigInteger> {
     public List<Object[]> buscarDocumentoAnteriorGfip(String chave, String tipo) {
         return getEntityManager().createNativeQuery(
                 "select l.id, l.idInfoRemessa, l.data, l.idCastorFile, l.tipo from (select doc.*, ROW_NUMBER() OVER (PARTITION BY idInfoRemessa\n" +
-                        "                              ORDER BY data desc) as linha from SICAPAP21W.dbo.DocumentoGfip doc where doc.idInfoRemessa = '" + chave + "' and doc.tipo = '" + tipo + "') l where l.linha = 1 and " +
+                        "                              ORDER BY data desc) as linha from SICAPAP21.dbo.DocumentoGfip doc where doc.idInfoRemessa = '" + chave + "' and doc.tipo = '" + tipo + "') l where l.linha = 1 and " +
                         "l.idInfoRemessa = '" + chave + "' and l.tipo = '" + tipo + "'")
                 .getResultList();
     }
@@ -74,10 +74,10 @@ public class GfipRepository extends DefaultRepository<Gfip, BigInteger> {
                         "       info.status " +
 
                         "from (select doc.*, ROW_NUMBER() OVER (PARTITION BY idInfoRemessa,tipo  ORDER BY data desc) as linha\n" +
-                        "                            from SICAPAP21W.dbo.DocumentoGfip doc\n" +
+                        "                            from SICAPAP21.dbo.DocumentoGfip doc\n" +
                         "                            ) l\n" +
-                        "join SICAPAP21W.dbo.InfoRemessa info on l.idInfoRemessa = info.chave\n" +
-                        "join SICAPAP21W.dbo.UnidadeGestora UG on UG.id = info.idUnidadeGestora\n" +
+                        "join SICAPAP21.dbo.InfoRemessa info on l.idInfoRemessa = info.chave\n" +
+                        "join SICAPAP21.dbo.UnidadeGestora UG on UG.id = info.idUnidadeGestora\n" +
                         "where l.linha = 1 and\n" +
                         "      Ug.id = :UG");
 
