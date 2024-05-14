@@ -16,11 +16,20 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import java.math.BigInteger;
 import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
+
 
 @RestController
 @RequestMapping("/lei")
@@ -125,6 +134,40 @@ public class LeiController extends DefaultController<Lei> {
         lei.setCastorFile(castorFile);
         leiRepository.update(lei);
         return ResponseEntity.ok().body(castorFile.getId());
+    }
+
+
+    @CrossOrigin
+    @Transactional
+    @PostMapping(value = "/upload2/{id}", consumes = "application/pdf")
+    public ResponseEntity<?> addFile2(@RequestBody byte[] fileContent, 
+                                        @PathVariable BigInteger id,
+                                        @RequestParam("name") String fileName
+                                        ) throws IOException {
+        File file = saveBytesToFile(fileContent, fileName);
+        // Verificar o tipo de arquivo
+        //getFileType(file);
+
+        Lei lei = new Lei();
+        lei = leiRepository.findById(id);
+        CastorFile castorFile = super.getCastorFile(file, "Lei");
+        lei.setCastorFile(castorFile);
+        leiRepository.update(lei);
+        return ResponseEntity.ok().body(castorFile.getId());
+    }
+    private File saveBytesToFile(byte[] content, String filename) throws IOException {
+        // Determinar um diretório para salvar o arquivo
+        Path path = Paths.get("uploads/" + filename);
+        // Garantir que os diretórios existam
+        Files.createDirectories(path.getParent());
+
+        // Criar um objeto File com base no path
+        File file = path.toFile();
+        // Usar FileOutputStream para escrever os bytes no arquivo
+        try (FileOutputStream fos = new FileOutputStream(file)) {
+            fos.write(content);
+        }
+        return file;
     }
 
     @CrossOrigin

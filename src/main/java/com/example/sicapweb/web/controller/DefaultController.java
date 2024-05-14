@@ -38,6 +38,8 @@ import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.math.BigInteger;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -270,6 +272,42 @@ public abstract class DefaultController<T> {
             e.printStackTrace();
             castorFile = null;
             fileTemp.delete();
+            try {
+                castor.deletar(objeto);
+            } catch (ApplicationException ex) {
+                ex.printStackTrace();
+            } catch (FileNotFoundException ex) {
+                ex.printStackTrace();
+            }
+        }
+        return castorFile;
+    }
+    public CastorFile getCastorFile(File file, String origem) {
+        new File(path).mkdirs();
+        File fileTemp = new File(path + file.hashCode() + "." +
+                FilenameUtils.getExtension(file.getName()));
+
+        CastorController castor = new CastorController();
+        ObjetoCastor objeto = new ObjetoCastor();
+
+        CastorFile castorFile = null;
+        try {
+            
+            Files.copy(file.toPath(), fileTemp.toPath(), StandardCopyOption.REPLACE_EXISTING);
+
+            objeto = castor.ArquivoParaObjetoCastor(fileTemp);
+            objeto.setNomeArquivo(file.getName());
+            objeto = castor.gravarArquivo(objeto);
+
+            castorFile = new CastorFile(objeto.getUUID(), origem);
+            new CastorFileRepository(repository.getEntityManager()).save(castorFile);
+            fileTemp.delete();
+            file.delete();
+        } catch (Exception e) {
+            e.printStackTrace();
+            castorFile = null;
+            fileTemp.delete();
+            file.delete();
             try {
                 castor.deletar(objeto);
             } catch (ApplicationException ex) {
