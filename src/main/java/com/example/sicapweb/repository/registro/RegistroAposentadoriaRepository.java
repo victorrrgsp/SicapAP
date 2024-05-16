@@ -288,11 +288,11 @@ public class RegistroAposentadoriaRepository  extends DefaultRepository<Registro
                              "               id_entidade_origem\r\n" + //
                              "        from SCP.dbo.VW_PROC_RECEBIDOS\r\n" + //
                              "        where (\r\n" + //
-                             "            (hdest_ldepto like '%DIRAP%' ) AND\r\n" + //
+                             //"            (hdest_ldepto like '%DIRAP%' ) AND\r\n" + //
                              "            (proc_num_anexo IS NULL or proc_num_anexo =0) and\r\n" + //
                              "            (processo_numaps IS NULL or processo_numaps =0)\r\n" + //
                              "        )  "+
-                             (userInfo != null ?"and trim(hists_dest_resp)= :Usuario\r\n":"" )+ //
+                            (userInfo != null ?"and (trim(hists_dest_resp)= :Usuario or trim(hdest_llogin)= :Usuario )\r\n":"" )+ //
                              "    ),\r\n"+ //
                              "registros as (\r\n" + //
                             "        select numeroAnoProcesso from RegistroPensao\r\n" + //
