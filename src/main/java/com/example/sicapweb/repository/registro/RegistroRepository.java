@@ -58,15 +58,18 @@ public class RegistroRepository  extends DefaultRepository<Registro, BigInteger>
             "    select cast(substring(processo, 1, len(processo) - 5) as int) numeroProcesso, " +
             "           cast(substring(processo, len(processo) - 3, len(processo)) as int) anoProcesso, " +
             "           processo," +
-            "           status, idMovimentacao " +
+            "           a.status, "+
+            "           ${idMovimentacao} idMovimentacao " +
             "    from ${tableEnvio}Envio a " +
-            "    where status = :status" +
+            "           left join DocumentoAdmissao b on a.id = b.idEnvio" +
+            "    where a.status = :status" +
             "), " +
             "movimentosEnvios as (" +
             "    select b.numeroProcesso, b.anoProcesso, b.processo ,a.*, pen.cpfPensionista " +
             "    from ${tableName} a " +
             "    join envios b on a.id = b.idMovimentacao " +
-            "    left join Pensionista pen on pen.cpfServidor = a.cpfServidor" +
+            "    left join pensao pe on pe.id = a.id" +
+            "    left join Pensionista pen on pen.cpfServidor = pe.cpfServidor" +
             "), " +
             "mov as (" +
             "    select i.idUnidadeGestora, a.* " +
@@ -114,6 +117,7 @@ public class RegistroRepository  extends DefaultRepository<Registro, BigInteger>
         String queryStr = "";
 
         queryStr = queryTemplate
+                        .replace("${idMovimentacao}", tipoMovimentacao.equals(Registro.Tipo.Efetivos) ? "idAdmissao as " : "")
                         .replace("${tableEnvio}", tipoMovimentacao.equals(Registro.Tipo.Efetivos) ? "admissao" : "adm")
                         .replace("${tipoMovimentacao}", tipoMovimentacaoQueryCampo)
                         .replace("${tableName}", tableName)
