@@ -11,5 +11,8 @@ public class MovimentacaoNotFaud extends RuntimeException{
 	public MovimentacaoNotFaud(String tipoRegistro,String CpfServido) {
 		super("A movimentação de " + tipoRegistro + " do CPF " + CpfServido + " não tem processo no e-Contas com decisão julgada para o usuário atual!");
 	}
+	public MovimentacaoNotFaud(String mensagem) {
+		super(mensagem);
+	}
 
 }

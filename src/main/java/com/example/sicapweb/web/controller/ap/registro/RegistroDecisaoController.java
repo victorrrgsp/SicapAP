@@ -19,6 +19,7 @@ import com.example.sicapweb.repository.movimentacaoDePessoal.AdmissaoRepository;
 import com.example.sicapweb.repository.registro.RegistroAdmissaoRepository;
 import com.example.sicapweb.repository.registro.RegistroAposentadoriaRepository;
 import com.example.sicapweb.repository.registro.RegistroPensaoRepository;
+import com.example.sicapweb.repository.registro.RegistroRepository;
 import com.example.sicapweb.util.PaginacaoUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -43,6 +44,9 @@ public class RegistroDecisaoController {
 
     @Autowired
     private RegistroAposentadoriaRepository registroAposentadoriaRepository;
+    
+    @Autowired
+    private RegistroRepository registroRepository;
 
     @Autowired
     private RegistroPensaoRepository registroPensaoRepository;
@@ -184,14 +188,11 @@ public class RegistroDecisaoController {
 
     private PaginacaoUtil<HashMap<String, Object>> getMovimentosPorTipo(Pageable pageable, Integer tipoRegistro, HashMap<String, String> filtro) {
         Registro.Tipo tipoRegistroEnum = Arrays.stream(Registro.Tipo.values()).filter(tipo -> tipo.getValor() == tipoRegistro).findFirst().get();
-        if (this.tiposRegistrosNaTabelaAposentadoria.contains(tipoRegistroEnum))
-            return registroAposentadoriaRepository.getMovimentosParaRegistrar(pageable, filtro, tipoRegistroEnum);
-        else if (this.tiposRegistrosNaTabelaPensao.contains(tipoRegistroEnum))
-            return registroPensaoRepository.getMovimentosPensaoParaRegistrar(pageable, filtro);
-        else if (this.tiposRegistrosNaTabelaAdmissao.contains(tipoRegistroEnum))
-            return registroAdmissaoRepository.getMovimentosAdmissaoParaRegistrar(pageable, filtro);
-        else
+        if (tipoRegistroEnum.equals(null)){
             throw new RuntimeException("não encontrou tipo de registro definido na busca!!");
+        }
+        return registroRepository.getMovimentosParaRegistrar(pageable, filtro,tipoRegistroEnum);
+                    
     }
 
     private void gravarRegistro(Registro registro, Integer tipoRegistro) {
