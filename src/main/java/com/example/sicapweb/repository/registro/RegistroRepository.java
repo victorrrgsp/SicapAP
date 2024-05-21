@@ -65,7 +65,7 @@ public class RegistroRepository  extends DefaultRepository<Registro, BigInteger>
             "    where a.status = :status" +
             "), " +
             "movimentosEnvios as (" +
-            "    select b.numeroProcesso, b.anoProcesso, b.processo ,a.*, pen.cpfPensionista " +
+            "    select distinct b.numeroProcesso, b.anoProcesso, b.processo ,a.*, pen.cpfPensionista " +
             "    from ${tableName} a " +
             "    join envios b on a.id = b.idMovimentacao " +
             "    left join pensao pe on pe.id = a.id" +
@@ -124,7 +124,6 @@ public class RegistroRepository  extends DefaultRepository<Registro, BigInteger>
                         .replace("${dataMovimentacao}", dataMovimentaca);
         Query queryMovimentos = getEntityManager()
                                             .createNativeQuery(queryStr)
-                                            .setParameter("ug", filtros.get("ug"))
                                             .setParameter("ug", filtros.get("ug"))
                                             .setParameter("status", tipoMovimentacao.getStatusEnvio());
         var movimentosTotatais = StaticMethods.getHashmapFromQuery(queryMovimentos);
