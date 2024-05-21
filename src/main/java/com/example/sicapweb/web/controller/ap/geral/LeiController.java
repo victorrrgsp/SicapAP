@@ -116,7 +116,7 @@ public class LeiController extends DefaultController<Lei> {
     @Transactional
     @DeleteMapping(value = {"/{id}"})
     public void delete(@PathVariable BigInteger id) {
-        leiRepository.delete(id); 
+        leiRepository.deletDuplicatedLeiById(id);
     }
 
 
