@@ -61,7 +61,7 @@ public class RegistroRepository  extends DefaultRepository<Registro, BigInteger>
             "           a.status, "+
             "           ${idMovimentacao} idMovimentacao " +
             "    from ${tableEnvio}Envio a " +
-            "           left join DocumentoAdmissao b on a.id = b.idEnvio" +
+            "           left join DocumentoAdmissao b on a.id = b.idEnvio and b.status > 0 " +
             "    where a.status = :status" +
             "), " +
             "movimentosEnvios as (" +
@@ -99,8 +99,8 @@ public class RegistroRepository  extends DefaultRepository<Registro, BigInteger>
             "join Servidor s on ad.idServidor = s.id " + 
             whereStatemente;
         String tableName = tipoMovimentacao.isTipoAposentadoria() ? "Aposentadoria" : tipoMovimentacao.getLabel();
-        String dataMovimentaca; 
-        String tipoMovimentacaoQueryCampo; 
+        String dataMovimentaca;
+        String tipoMovimentacaoQueryCampo;
         if (tipoMovimentacao.isTipoAposentadoria()) {
             dataMovimentaca = "dataAposentadoria";
         } else if (tipoMovimentacao.equals(Registro.Tipo.Efetivos)) {
