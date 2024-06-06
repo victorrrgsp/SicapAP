@@ -3,21 +3,20 @@ package com.example.sicapweb.web.controller;
 import br.gov.to.tce.model.adm.AdmAutenticacao;
 import com.example.sicapweb.repository.AdmAutenticacaoRepository;
 import com.example.sicapweb.security.RedisConnect;
-import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
+import com.example.sicapweb.web.validation.ChavesValidate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.exceptions.JedisConnectionException;
 
+import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.URI;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -28,6 +27,9 @@ public class ChavesController {
 
     @Autowired
     private AdmAutenticacaoRepository admAutenticacaoRepository;
+
+    @Autowired
+    ChavesValidate valida;
 
     @CrossOrigin
      @GetMapping(path="/{searchParams}/{tipoParams}/pagination")
@@ -50,10 +52,10 @@ public class ChavesController {
         String value = ""+autenticacao.getExercicio()+"-"+autenticacao.getRemessa()+"-"+autenticacao.getUnidadeGestora().getId()+"-"+dataString+"WRF";
         String sha1 = "";
 
+        //cria a chave hash SHA-1
         try {
-            //cria a chave hash SHA-1
-            MessageDigest digest = MessageDigest.getInstance("SHA-1");
-
+            MessageDigest digest = null;
+            digest = MessageDigest.getInstance("SHA-1");
             digest.reset();
             digest.update(value.getBytes("utf8"));
             sha1 = String.format("%040x", new BigInteger(1, digest.digest()));
@@ -61,11 +63,12 @@ public class ChavesController {
             autenticacao.setData(strToDate);
             autenticacao.setChave(sha1);
             autenticacao.setStatus(true);
-            admAutenticacaoRepository.save(autenticacao);
-
-        } catch (Exception e) {
+        } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
             e.printStackTrace();
         }
+
+        valida.criar(autenticacao);
+        admAutenticacaoRepository.save(autenticacao);
 
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(autenticacao.getId()).toUri();
         return ResponseEntity.created(uri).body(autenticacao);

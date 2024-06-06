@@ -118,4 +118,10 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
 						);
 		return new ResponseEntity<>(exceptionResponse, HttpStatus.FORBIDDEN);
 	}
+
+	@ExceptionHandler(ChaveValidationException.class)
+	public final ResponseEntity<ExceptionResponse> RemessaChaveExisteException(Exception ex, WebRequest request) {
+		ExceptionResponse exceptionResponse = new ExceptionResponse(ex.getMessage());
+		return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
+	}
 }
