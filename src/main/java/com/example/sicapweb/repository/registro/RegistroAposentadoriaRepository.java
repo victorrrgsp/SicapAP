@@ -301,11 +301,7 @@ public class RegistroAposentadoriaRepository  extends DefaultRepository<Registro
                             "        union all\r\n" + //
                             "        select numeroAnoProcesso from RegistroAdmissao\r\n" + //
                             "        union all\r\n" + //
-                            "        select rp.RegNrAnoProc from SICAPAP..REGISTRO r\r\n" + //
-                            "             left join SICAPAP..REGISTRO_PROCESSO rp on\r\n" + //
-                            "                r.RegNrAnoProc = rp.RegNrAnoProc and\r\n" + //
-                            "                r.RegUnidGestora = rp.RegUnidGestora and\r\n" + //
-                            "                r.RegFuncCpf = rp.RegFuncCpf\r\n" + //
+                            "        select RegNrAnoProc from SICAPAP..REGISTRO r\r\n" + //
                             "\r\n" + //
                             "    )," + //
                              "    processos as (\r\n" + //

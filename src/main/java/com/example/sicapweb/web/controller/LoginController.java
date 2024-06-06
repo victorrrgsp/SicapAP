@@ -217,7 +217,7 @@ public class LoginController extends DefaultController<Login> {
 
 
     @CrossOrigin
-    @Transactional
+    //@Transactional
     @PostMapping(path = {"/desafio/"})
     public ResponseEntity<?> getDesafio(@org.springframework.web.bind.annotation.RequestBody String user) {
 
