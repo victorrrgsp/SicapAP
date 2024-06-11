@@ -27,13 +27,13 @@ public class RegistroRepository  extends DefaultRepository<Registro, BigInteger>
         
         String nome= filtros.get("nome");
         String cpf= filtros.get("cpf");
-        String numeroProcesso= filtros.get("numeroProcesso");
+//        String numeroProcesso= filtros.get("numeroProcesso");
         
-        if (numeroProcesso !=null && !numeroProcesso.isEmpty()) {
-            search=" where a.processo = '"+numeroProcesso.trim()+"'";
-        } else {
-            throw new MovimentacaoNotFaud("Número do processo não informado");
-        }
+//        if (numeroProcesso !=null && !numeroProcesso.isEmpty()) {
+//            search=" where a.processo = '"+numeroProcesso.trim()+"'";
+//        } else {
+//            throw new MovimentacaoNotFaud("Número do processo não informado");
+//        }
 
         if (nome !=null && !nome.isEmpty()){
             search+=" and s.nome like '%"+nome.trim()+"%'";
@@ -79,7 +79,7 @@ public class RegistroRepository  extends DefaultRepository<Registro, BigInteger>
             "    where not exists(select 1 from Registro${tableName} where id${tableName} = a.id)" +
             ") " +
             "select a.id as idMovimentacao, " +
-            "       s.nome as nome, " +
+            "       CAST( REPLACE(s.nome, '''', '') AS VARCHAR(255)) AS nome," +
             "       s.cpfServidor as cpfServidor, " +
             "       ${tipoMovimentacao} as tipoMovimentacao, " +
             "       a.${dataMovimentacao} as dataMovimentacao, " +
