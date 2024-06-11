@@ -27,13 +27,13 @@ public class RegistroRepository  extends DefaultRepository<Registro, BigInteger>
         
         String nome= filtros.get("nome");
         String cpf= filtros.get("cpf");
-//        String numeroProcesso= filtros.get("numeroProcesso");
+        String numeroProcesso= filtros.get("numeroProcesso");
         
-//        if (numeroProcesso !=null && !numeroProcesso.isEmpty()) {
-//            search=" where a.processo = '"+numeroProcesso.trim()+"'";
-//        } else {
-//            throw new MovimentacaoNotFaud("Número do processo não informado");
-//        }
+        if (numeroProcesso !=null && !numeroProcesso.isEmpty()) {
+            search=" where a.processo = '"+numeroProcesso.trim()+"'";
+        } else {
+            throw new MovimentacaoNotFaud("Número do processo não informado");
+        }
 
         if (nome !=null && !nome.isEmpty()){
             search+=" and s.nome like '%"+nome.trim()+"%'";
