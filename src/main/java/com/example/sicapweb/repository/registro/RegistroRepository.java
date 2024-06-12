@@ -35,11 +35,19 @@ public class RegistroRepository  extends DefaultRepository<Registro, BigInteger>
             throw new MovimentacaoNotFaud("Número do processo não informado");
         }
 
-        if (nome !=null && !nome.isEmpty()){
-            search+=" and s.nome like '%"+nome.trim()+"%'";
-        } else if (cpf !=null && !cpf.isEmpty()) {
+        //foi acrescentado
+        if (cpf !=null && !cpf.isEmpty()) {
             search+=" and s.cpfServidor  = '"+cpf.trim()+"'";
         }
+
+        //foi retirado
+        //        if (nome !=null && !nome.isEmpty()){
+        //            search+=" and s.nome like '%"+nome.trim()+"%'";
+        //
+        //        } else if (cpf !=null && !cpf.isEmpty()) {
+        //
+        //            search+=" and s.cpfServidor  = '"+cpf.trim()+"'";
+        //        }
 
         return search;
     }
