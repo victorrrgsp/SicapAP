@@ -1,5 +1,7 @@
 package com.example.sicapweb.web.controller.ap.registro;
 
+import br.gov.to.tce.model.ProcessoCancelado;
+import br.gov.to.tce.model.adm.AdmEnvio;
 import br.gov.to.tce.model.ap.pessoal.Admissao;
 import br.gov.to.tce.model.ap.pessoal.Aposentadoria;
 import br.gov.to.tce.model.ap.pessoal.Pensao;
@@ -11,28 +13,32 @@ import br.gov.to.tce.model.ap.relacional.Ato;
 
 import com.example.sicapweb.exception.InvalitInsert;
 import com.example.sicapweb.exception.MovimentacaoNotFaud;
+import com.example.sicapweb.model.dto.ProcessoCanceladoDTO;
+import com.example.sicapweb.repository.concessao.AdmEnvioRepository;
 import com.example.sicapweb.repository.concessao.AposentadoriaRepository;
 import com.example.sicapweb.repository.concessao.PensaoRepository;
 import com.example.sicapweb.repository.geral.AtoRepository;
 import com.example.sicapweb.repository.geral.CargoRepository;
 import com.example.sicapweb.repository.movimentacaoDePessoal.AdmissaoRepository;
-import com.example.sicapweb.repository.registro.RegistroAdmissaoRepository;
-import com.example.sicapweb.repository.registro.RegistroAposentadoriaRepository;
-import com.example.sicapweb.repository.registro.RegistroPensaoRepository;
-import com.example.sicapweb.repository.registro.RegistroRepository;
+import com.example.sicapweb.repository.registro.*;
 import com.example.sicapweb.util.PaginacaoUtil;
+import com.example.sicapweb.web.validation.ProcessoCanceladoValidate;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.transaction.Transactional;
+import javax.validation.Valid;
 import java.math.BigInteger;
+import java.net.URI;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -69,6 +75,20 @@ public class RegistroDecisaoController {
     @Autowired
     private AtoRepository atoRepository;
 
+
+    @Autowired
+    private ProcessoCanceladoRepository processoCanceladoRepository;
+
+    @Autowired
+    ProcessoCanceladoValidate valida;
+
+    @Autowired
+    private AdmEnvioRepository admEnvioRepository;
+
+
+
+
+
     public static final List<Registro.Tipo> tiposRegistrosNaTabelaAposentadoria = Arrays.asList(
             Registro.Tipo.Aposentadoria,Registro.Tipo.Reserva,Registro.Tipo.Reforma,Registro.Tipo.Reversao,Registro.Tipo.RevisaoReforma,Registro.Tipo.RevisaoAposentadoria,Registro.Tipo.RevisaoReserva
     );
@@ -85,9 +105,7 @@ public class RegistroDecisaoController {
                                                                                   @PathVariable Integer tipoRegistro) {
         HashMap<String, Object> UserInfo = getInfoUserFromToken(bearerToken);
         return ResponseEntity.ok().body(
-                Objects.requireNonNullElse(
-                        this.getMovimentosPorTipo(pageable, tipoRegistro, jsonFiltro),
-                        new PaginacaoUtil<>(0, 1, 1, 0, new ArrayList<>())
+                Objects.requireNonNullElse( this.getMovimentosPorTipo(pageable, tipoRegistro, jsonFiltro),  new PaginacaoUtil<>(0, 1, 1, 0, new ArrayList<>())
                 )
         );
     }
@@ -141,6 +159,37 @@ public class RegistroDecisaoController {
         validarMovimentacao(UserInfo, BigInteger.valueOf(((Integer) infoAlteraracao.get("idMovimentacao")).longValue()), tipoRegistro);
         alterarMovimentacao(infoAlteraracao, tipoRegistro);
     }
+
+
+
+
+    @CrossOrigin
+    @Transactional
+    @PostMapping("/cancelarProcesso")
+    public ResponseEntity<?> salvarCancelamentoRegistro(@RequestBody @Valid ProcessoCanceladoDTO dtoProcessoCanelado) {
+
+       AdmEnvio adm = valida.buscaProcesso(dtoProcessoCanelado.getProcesso(),dtoProcessoCanelado.getAnoProcesso());
+
+      //  dtoProcessoCanelado = new ProcessoCanceladoDTO(dtoProcessoCanelado.getId(),dtoProcessoCanelado.getProcesso(),dtoProcessoCanelado.getAnoProcesso(),dtoProcessoCanelado.getMotivo(),adm.getAdmissao().getId().toString());
+        ProcessoCancelado processoCancelado = new ProcessoCancelado();
+        processoCancelado.setProcesso(dtoProcessoCanelado.getProcesso());
+        processoCancelado.setAnoProcesso(dtoProcessoCanelado.getAnoProcesso());
+        processoCancelado.setIdAdmissao(adm.getAdmissao().getId().intValue());
+        processoCancelado.setMotivo(dtoProcessoCanelado.getMotivo());
+
+        processoCanceladoRepository.save(processoCancelado);
+        // System.out.println(processoCancelado);
+        adm.setIdCancelamentoEnvio(processoCancelado.getId());
+        admEnvioRepository.update(adm);
+
+        return ResponseEntity.ok().body("Ok");
+
+    }
+
+
+
+
+
 
     @GetMapping(path = "/processos")
     public ResponseEntity<List<HashMap<String, Object>>> listaProcessos(@RequestHeader("Authorization") String bearerToken) {

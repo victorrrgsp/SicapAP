@@ -1,6 +1,8 @@
 package com.example.sicapweb.repository.concessao;
 
+
 import br.gov.to.tce.model.adm.AdmEnvio;
+import br.gov.to.tce.model.adm.AdmSistema;
 import com.example.sicapweb.repository.DefaultRepository;
 import com.example.sicapweb.security.User;
 import com.example.sicapweb.util.PaginacaoUtil;
@@ -163,4 +165,24 @@ public class AdmEnvioRepository extends DefaultRepository<AdmEnvio, BigInteger> 
                 + redisConnect.getUser(request).getUnidadeGestora().getId() + "' ");
         return (Integer) query.getSingleResult();
     }
+
+
+    public  AdmEnvio getProcessoAdmEnvio(String processo, String anoProcesso){
+        try {
+
+        Query query = getEntityManager().createNativeQuery("select * from SICAPAP21.dbo.AdmEnvio  " +
+                "where processo= '"+processo+"/"+anoProcesso+"' AND"+
+                " idCancelamentoEnvio IS NULL ", AdmEnvio.class);
+
+        return (AdmEnvio) query.getSingleResult();
+
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+
+
+
+
 }

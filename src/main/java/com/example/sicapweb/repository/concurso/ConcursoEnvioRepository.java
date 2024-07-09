@@ -58,6 +58,7 @@ public class ConcursoEnvioRepository extends DefaultRepository<ConcursoEnvio, Bi
         }
         return null;
     }
+
     public String getSearch(String searchParams, Integer tipoParams) {
         String search = "";
         //monta pesquisa search

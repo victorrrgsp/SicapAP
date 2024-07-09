@@ -337,7 +337,7 @@ public class RegistroAposentadoriaRepository  extends DefaultRepository<Registro
                              "                select cast(substring(processo, 1, len(processo) - 5) as int)             numeroProcesso,\r\n" + //
                              "                       cast(substring(processo, len(processo) - 3, len(processo)) as int) anoProcesso\r\n" + //
                              "                from AdmEnvio a\r\n" + //
-                             "                where processo is not  null\r\n" + //
+                             "                where processo is not  null and idCancelamentoEnvio is null and idCancelamentoEnvio is null \r\n" + //
                              "                union\r\n" + //
                              "                select cast(substring(processo, 1, len(processo) - 5) as int)             numeroProcesso,\r\n" + //
                              "                       cast(substring(processo, len(processo) - 3, len(processo)) as int) anoProcesso\r\n" + //
