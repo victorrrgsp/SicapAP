@@ -1,23 +1,23 @@
 <template>
   <div class="overflow-auto">
-    <b-card no-body class="mb-5 mt-5">
+    <b-card no-body class="mb-2 mt-0" >
       <b-card-header header-tag="nav">
         <b-nav card-header tabs>
           <b-nav-item active>Fila de Processamento - Em andamento</b-nav-item>
         </b-nav>
       </b-card-header>
-      <b-card-body v-if="this.fila === []">
+      <b-card-body v-if="this.fila === 0">
         {{ "Sem processos" }}
       </b-card-body>
       <b-card-body v-else>
         <b-table striped hover responsive sticky-header="450px" id="table" :items="fila" :fields="items2"
           :per-page="perPage" :current-page="currentPage" aria-controls="table" small>
-          <template #table-busy>
+          <!-- <template #table-busy>
             <div class="text-center text-danger my-2">
               <b-spinner class="align-middle"></b-spinner>
               <strong>Loading...</strong>
             </div>
-          </template>
+          </template> -->
         </b-table>
         <p v-if="fila.length == 0" class="text-danger">Sem processos!</p>
       </b-card-body>
@@ -31,9 +31,9 @@
       <b-row>
         &nbsp;&nbsp;&nbsp;
         <b-col>
-          <p align="left">
-            <b-form-group label="Unidade Gestora*	">
-              <b-form-input list="unidadeGestora" required v-model="filterform" name="unidadeGestora"
+          <p align="left" class="label-spacing">
+            <b-form-group label="Unidade Gestora:	">
+              <b-form-input style="height: auto;" list="unidadeGestora" required v-model="filterform" name="unidadeGestora"
                 placeholder="Pesquise aqui...">
               </b-form-input>
 
@@ -45,38 +45,40 @@
             </b-form-group>
           </p>
         </b-col>
-
-        <b-col>
-          <p align="right" class="pesquisa_select">
-            <b>Exercicio:</b> &nbsp;
-            <b-form-select class="select-selected" v-model="formdata.exercicio" :options="formdata.exercicios"
-              @change="pesquisarRemessas">
-            </b-form-select>
-            &nbsp;
-            <b>Remessa:</b> &nbsp;
-            <b-form-select class="select-selected" v-model="formdata.remessa" :options="formdata.remessas">
-            </b-form-select>
-            &nbsp;
+        <b-col  cols="auto">
+          <p align="left" >
+            <b-row>
+              <b-col cols="auto">
+                <b-form-group style="height: auto; margin-left: 10px;" class="label-spacing" label="Exercício:">
+                  <!-- @charge="filtraStatus"-->
+                  <b-form-select class="select-selected " v-model="formdata.exercicio" :options="formdata.exercicios">
+                  </b-form-select>
+                </b-form-group>
+              </b-col>
+              &nbsp;
+              <b-col cols="auto">
+                <b-form-group style="height: auto;  margin-left: 10px;" class="label-spacing" label="Remessa:">
+                  <!-- @charge="filtraStatus"-->
+                  <b-form-select class="select-selected spacing" v-model="formdata.remessa" :options="formdata.remessas">
+                  </b-form-select>
+                </b-form-group>
+              </b-col>
+            </b-row>
+          </p>
+          <p align="right" class="label-spacing">
+            <b-button pill variant="warning spacing" @click="resetFilter" size="sm">
+              Limpar
+            </b-button>
             <b-button @click="pesquisarRemesssa(formdata.exercicio, formdata.remessa)" pill variant="success" size="sm">
               Pesquisar
-            </b-button>
-            &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+              </b-button>
+             &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
           </p>
         </b-col>
       </b-row>
 
       <b-card-body>
-
-        <div class=" text-center font-weight-bold" style="font-size: 1.3em;">
-
-          <strong>
-            {{ FilterSize }} registros
-
-          </strong>
-
-        </div>
-
-        <b-table :busy="isBusy" striped hover responsive sticky-header="450px" id="my-table" :filter="filter"
+        <b-table striped hover responsive sticky-header="450px" :busy="isBusy" id="my-table" :filter="filter"
           :items="processos" :filter-included-fields="['nome']" :fields="items" :per-page="perPage"
           :current-page="currentPage" aria-controls="my-table" :tbody-tr-class="rowClass" small>
           <template #table-busy>
@@ -96,15 +98,28 @@
             </b-icon>
           </template>
         </b-table>
-        <div v-show="FilterSize < 1" class=" text-center font-weight-bold" style="font-size: 1.3em;">
+        <div v-show="FilterSize < 1 && isBusy==false" class=" text-center font-weight-bold" style="font-size: 1.3em;">
           <strong>
-            nao contem registros
+            não contém registros
           </strong>
         </div>
-        <b-icon class="h6 mb-1" icon="check-square" variant="success"> </b-icon>
-        &nbsp; &nbsp;Enviado &nbsp; &nbsp; &nbsp;
-        <b-icon class="h6 mb-1" icon="x-circle" variant="danger"> </b-icon>
-        &nbsp; &nbsp;Cancelado
+        <b-row>
+          <b-col cols="auto">
+            <b-icon class="h6 mb-1" style="display: inline-block;" icon="check-square" variant="success"> </b-icon>
+            &nbsp; &nbsp;Enviado &nbsp; &nbsp; 
+          </b-col>
+          <b-col cols="auto">
+            <b-icon class="h6 mb-1" style="display: inline-block;" icon="x-circle" variant="danger"> </b-icon>
+            &nbsp; &nbsp;Cancelado
+          </b-col>
+          <b-col>
+            <div class="align-right  font-weight-bold spacing" style="font-size: 1.3em;">
+              <strong>
+                {{ FilterSize }} Registro(s)
+              </strong>
+            </div>
+          </b-col>
+        </b-row>
       </b-card-body>
     </b-card>
     <!-- <b-pagination
@@ -123,7 +138,7 @@ import { api } from "@/plugins/axios";
 export default {
   data() {
     return {
-      FilterSize: 0,
+      FilterSize: '',
       unidades: [],
       aprovado: "aprovado",
       isBusy: true,
@@ -133,49 +148,38 @@ export default {
       filterform: "",
       processos: [],
       formdata: {
-        exercicio: 2021,
-        exercicios: [{ value: "2021", text: "2021" }],
-        remessa: 10,
-        remessas: [
-          { value: "10", text: "10" },
-          { value: "9", text: "9" },
-          { value: "8", text: "8" },
-          { value: "7", text: "7" },
-          { value: "6", text: "6" },
-          { value: "5", text: "5" },
-          { value: "4", text: "4" },
-          { value: "3", text: "3" },
-          { value: "2", text: "2" },
-          { value: "1", text: "1" },
-        ],
+        exercicio: '',
+        exercicios: [],
+        remessa: '',
+        remessas: [],
       },
       fila: [],
       items: [
         {
           key: "nome",
           label: "Unidade Gestora",
-          sortable: true,
+          sortable: false,
           tdClass: "fonteLinhaLeft",
-          // formatter: 'todasMaiusculas'
         },
-
         {
           key: "exercicio",
-          label: "Exercicio",
+          label: "Exercício",
+          thStyle: { textAlign: "center"},
           sortable: true,
           tdClass: "fonteLinha",
         },
         {
           key: "remessa",
           label: "Remessa",
+          thStyle: { textAlign: "center"},
           sortable: true,
           tdClass: "fonteLinha",
         },
-
         {
           key: "dataEnvio",
           label: "Data Envio",
           formatter: "formatarData",
+          thStyle: { textAlign: "center"},
           sortable: false,
           tdClass: "fonteLinha",
         },
@@ -183,12 +187,14 @@ export default {
           key: "dataProcessamento",
           label: "Data Procesamento",
           formatter: "formatarData",
+          thStyle: { textAlign: "center"},
           sortable: true,
           tdClass: "fonteLinha",
         },
         {
           key: "status",
           label: "Status",
+          thStyle: { textAlign: "center"},
           sortable: false,
           tdClass: "fonteLinha",
         },
@@ -197,27 +203,27 @@ export default {
         {
           key: "nome",
           label: "Unidade Gestora",
-          sortable: true,
+          sortable: false,
           tdClass: "fonteLinhaLeft",
-          // formatter: 'todasMaiusculas'
         },
-
         {
           key: "exercicio",
-          label: "Exercicio",
-          sortable: true,
+          label: "Exercício",
+          thStyle: { textAlign: "center"},
+          sortable: false,
           tdClass: "fonteLinha",
         },
         {
           key: "remessa",
           label: "Remessa",
-          sortable: true,
+          thStyle: { textAlign: "center"},
+          sortable: false,
           tdClass: "fonteLinha",
         },
-
         {
           key: "dataEnvio",
           label: "Data Envio",
+          thStyle: { textAlign: "center"},
           sortable: false,
           formatter: "formatarData",
           tdClass: "fonteLinha",
@@ -225,41 +231,70 @@ export default {
         {
           key: "posicao",
           label: "Posição",
-          sortable: true,
+          thStyle: { textAlign: "center"},
+          sortable: false,
           tdClass: "fonteLinha",
         },
         {
           key: "status",
           label: "Status",
+          thStyle: { textAlign: "center"},
           sortable: false,
           tdClass: "fonteLinha",
-          //formatter: "rowClass"
         },
       ],
     };
   },
   mounted() {
-    this.isBusy = true;
-    this.FindAll();
+    this.isBusy = false;
     this.pesquisarExercicios();
-    this.pesquisarRemessas();
+    this.pesquisarExercicioVigente();
+    this.readForms();
     this.findAllUnidadeGestora().then((resp) => {
       this.unidades = resp;
     });
     //  setTimeout(() =>{// aguarda com spinner antes da pesquisa aparecer na pesquisa inicial
     //               this.isBusy = false
     //               }, 1.0*1000)
-
-    // this.isBusy = false
-
-    //this.pesquisar()
-
-    setInterval(this.readForms, 1000);
+    // // this.isBusy = false
+    // // this.pesquisar()
+    // setInterval(this.readForms, 1000);
   },
   methods: {
+
+    filtroInicial(){
+      // this.filterSize();
+      this.processos = [];
+      this.formdata.exercicio = this.pesquisarExercicioVigente();
+      this.formdata.exercicios = this.pesquisarExercicios();
+      this.filterform = "";
+      this.filter = "";
+    },
+
+    resetFilter(){
+      this.formdata = { ...this.filtroInicial()}
+    },
+
+    async pesquisarExercicioVigente() { // vai buscar o exercicio de está em vigencia
+      //this.isBusy = !this.isBusy; //loading
+      await api.get("/exercicio/exercicioVigente").then((resp) => {
+        //commit('getUnidades', resp.data)
+        this.formdata.exercicio = resp.data[0];
+        this.pesquisarRemessaVigente(resp.data);
+        this.pesquisarRemessas(resp.data);
+      })
+    },
+
+    pesquisarRemessaVigente(exercicio) { // vai buscar o remessa de está em vigencia
+      api.get("/remessa/remessaVigente/" + exercicio).then((resp) => {
+        // commit('getUnidades', resp.data)
+        this.formdata.remessa = resp.data[0];
+        this.pesquisarRemesssa(exercicio, resp.data);
+      })
+    },
+
     pesquisarExercicios() {
       api.get("/exercicio").then((resp) => {
-        console.log("resp.data", resp.data);
         this.formdata.exercicios = resp.data
           .filter(p => p > 2020)
           .map((p) => {
@@ -273,7 +308,6 @@ export default {
 
     pesquisarRemessas() {
       api.get("/remessa/" + this.formdata.exercicio).then((resp) => {
-        console.log("resp.data remessa", resp.data);
         this.formdata.remessas = resp.data.map((p) => {
           return {
             value: p,
@@ -289,20 +323,20 @@ export default {
         return resp.data;
       }),
 
-    pesquisarRemesssa(exercicio, remessa) {
-      api
-        .get("filaProcessamento/processos/" + exercicio + "/" + remessa)
-        .then((resp) => {
+      pesquisarRemesssa(exercicio, remessa) {
+        this.isBusy = !this.isBusy;
+        api.get("filaProcessamento/processos/" + exercicio + "/" + remessa).then((resp) => {
           this.processos = resp.data;
+          this.filterSize();
+          this.isBusy = !this.isBusy;
         });
-
       this.filter = this.filterform;
-      this.filterSize();
     },
     FindAll() {
       api.get("filaProcessamento/processos").then((resp) => {
         this.processos = resp.data;
         this.isBusy = false;
+        this.filterSize();
       });
     },
     filterSize() {
@@ -324,7 +358,9 @@ export default {
 
     readForms() {
       api.get("filaProcessamento/fila").then((resp) => {
+        // this.isBusy = false;
         this.fila = resp.data;
+        // console.log(resp.data);
       });
     },
     formatarData: function (value) {
@@ -359,7 +395,7 @@ export default {
 
   computed: {
     rows() {
-      return this.processos.length;
+      return this.processos;
     },
   },
 };
@@ -367,7 +403,7 @@ export default {
 <style >
 .fonteLinha {
   font-size: 14px;
-  text-align: left;
+  text-align: center;
 }
 
 .fonteLinhaLeft {
@@ -382,6 +418,22 @@ export default {
 .select-selected.select-arrow-active:after {
   border-color: black;
   top: 7px;
+}
+
+.label-spacing{
+  margin-top: 10px;
+}
+
+.align-right{
+  text-align: right;
+}
+
+.spacing {
+  margin-right: 20px;
+}
+
+.width-unidade {
+  width: 1000px; /* Ajuste para o tamanho desejado */
 }
 
 .select-items div,

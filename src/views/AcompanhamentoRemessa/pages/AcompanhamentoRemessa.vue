@@ -10,8 +10,8 @@
         &nbsp;&nbsp;&nbsp;
         <b-col>
           <p align="left">
-            <b-form-group label="Unidade Gestora*	">
-              <b-form-input list="unidadeGestora" required v-model="filterform" name="unidadeGestora"
+            <b-form-group class="label-spacing" label="Unidade Gestora:">
+              <b-form-input style="height: auto; margin-right: 10x;" list="unidadeGestora" required v-model="filterform" name="unidadeGestora"
                 placeholder="Pesquise aqui...">
               </b-form-input>
 
@@ -23,44 +23,50 @@
             </b-form-group>
           </p>
         </b-col>
-
-        <b-col>
-          <p align="right" class="pesquisa_select">
-            <b>Status:</b> &nbsp;
-            <!-- @charge="filtraStatus"-->
-            <b-form-select class="select-selected" v-model="formdata.statu" :options="formdata.status" >
-            </b-form-select>
-            &nbsp;
-            <b>Exercicio:</b> &nbsp;
-            <b-form-select class="select-selected" v-model="formdata.exercicio" :options="formdata.exercicios"
-              @change="pesquisarRemessas">
-            </b-form-select>
-            &nbsp;
-            <b>Remessa:</b> &nbsp;
-            <b-form-select class="select-selected" v-model="formdata.remessa" :options="formdata.remessas">
-            </b-form-select>
-            &nbsp;
-            <b-button @click="pesquisarRemesssa" pill variant="success" size="sm">
+        <b-col cols="auto">
+          <p align="left">
+            <b-row>
+              <b-col cols="auto">
+                <b-form-group class="label-spacing" style="margin-left: 10px;" label="Status:">
+                  <!-- @charge="filtraStatus"-->
+                  <b-form-select style="height: auto;" class="select-selected" v-model="formdata.statu" :options="formdata.status">
+                  </b-form-select>
+                </b-form-group>
+              </b-col>
+              <b-col cols="auto">
+                <b-form-group class="label-spacing" style="margin-left: 10px;" label="Exercício:">
+                  <!-- @charge="filtraStatus"-->
+                  <b-form-select style="height: auto;" class="select-selected " v-model="formdata.exercicio" :options="formdata.exercicios">
+                  </b-form-select>
+                </b-form-group>
+              </b-col>
+              <b-col cols="auto" >
+                <b-form-group style="height: auto; margin-left: 10px;" class="label-spacing"  label="Remessa:">
+                  <!-- @charge="filtraStatus"-->
+                  <b-form-select class="select-selected spacing" v-model="formdata.remessa" :options="formdata.remessas">
+                  </b-form-select>
+                </b-form-group>
+              </b-col>
+               &nbsp;
+            </b-row>
+          </p>
+          <p align="right" class="label-spacing">
+            <b-button pill variant="warning spacing" @click="resetFilter" size="sm">
+              Limpar
+            </b-button>
+            <b-button @click="consultarRemessa" pill variant="success" size="sm" >
               Pesquisar
             </b-button>
             &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
           </p>
         </b-col>
       </b-row>
-      <div class=" text-center font-weight-bold" style="font-size: 1.3em;">
-
-        <strong>
-          {{ FilterSize }} registros
-
-        </strong>
-
-      </div>
-
+      
       <b-table striped hover responsive sticky-header="450px" id="my-table" :busy="isBusy" :items="tableData2"
         :filter="filter" :fields="columns" :filter-included-fields="['nomeEntidade']" :current-page="currentPage"
         aria-controls="my-table" small>
         <template #table-busy>
-          <div class="text-center text-danger my-2">
+          <div class="text-center text-danger my-2" >
             <b-spinner class="align-middle"></b-spinner>
             <strong>Loading...</strong>
           </div>
@@ -77,54 +83,54 @@
           </b-icon>
         </template>
         <template #cell(status)="data">
-          <b-icon :icon="iconStatus(data.item)" cursor="pointer" :title="iconStatusTitle(data.item)"
+          <b-icon class="icons" :icon="iconStatus(data.item)" cursor="pointer" :title="iconStatusTitle(data.item)"
             :variant="iconStatusVariant(data.item)" size="sm">
           </b-icon>
         </template>
       </b-table>
-      <div v-show="FilterSize < 1" class=" text-center font-weight-bold" style="font-size: 1.3em;">
-        <strong>
-          nao contem registros
-        </strong>
-      </div>
+      <b-row>
+        <b-col>
+          <div v-show="FilterSize < 1 && isBusy==false" class=" text-center font-weight-bold" style="font-size: 1.3em;"> 
+            <strong>
+              não contém registros
+            </strong>
+          </div>
+        </b-col>
+        <b-col cols="auto">
+          <div class="align-right font-weight-bold spacing" style="font-size: 1.3em;">
+            <strong>
+              {{ FilterSize }} Registro(s)
+            </strong>
+          </div>
+        </b-col>
+      </b-row>
     </b-card>
-
-              <!--
-                      if(item.contAssinaturas > 2){
-                              return 'Assinado'
-                        }
-                        if((item.contAssinaturas >= 1)&& (item.contAssinaturas <= 2)){
-                              return 'Pendente de Assinatura'
-                        }else if( item.qntDocumentoGFIP < 3 ) {
-                                return 'Pendente GFIP '
-                        }else{
-                          return 'Aguardando Envio'
-                        }
-
-                  },
-                      if(item.contAssinaturas > 2){
-                                return 'check-square'
-                          }
-                          if((item.contAssinaturas >= 1) && (item.contAssinaturas <= 2)){
-                                return 'exclamation-triangle-fill'
-                          }else if( item.qntDocumentoGFIP < 3 ) {
-                                return 'dash-circle'
-                          } else  {
-                           return 'x-circle'
-                          }
-
-                  },
-            -->
-
-    <b-icon class="h6 mb-2" icon="check-square" variant="success"> </b-icon>
-    &nbsp; &nbsp;Assinado &nbsp; &nbsp; &nbsp;
-    <b-icon class="h6 mb-2" icon="exclamation-triangle-fill" variant="warning">
-    </b-icon>
-    &nbsp; &nbsp;Pendente de Assinatura &nbsp; &nbsp; &nbsp;
-    <b-icon class="h6 mb-1" icon="dash-circle" variant="warning"> </b-icon>
-    &nbsp; &nbsp;GFIP Pendente &nbsp; &nbsp;
-    <b-icon class="h6 mb-1" icon="x-circle" variant="danger"> </b-icon> &nbsp;
-    &nbsp;Aguardando Envio &nbsp; &nbsp;
+    <b-row>
+      <b-col cols="auto">
+        <div>
+          <b-icon class="h6 mb-0 icons" icon="check-square" variant="success"></b-icon>
+          &nbsp; &nbsp;Assinado &nbsp; &nbsp; &nbsp;
+        </div>
+      </b-col>
+      <b-col cols="auto">
+        <div>
+          <b-icon class="h6 mb-0 icons" icon="check-circle-fill" variant="warning"></b-icon>
+          &nbsp; &nbsp;Assinado Intempestivamente &nbsp; &nbsp; &nbsp;
+        </div>
+      </b-col>
+      <b-col cols="auto">
+        <div>
+          <b-icon class="h6 mb-0 icons" icon="key-fill" variant="danger"></b-icon>
+          &nbsp; &nbsp;Pendente de Assinatura &nbsp; &nbsp; &nbsp;
+        </div>
+      </b-col>
+      <b-col cols="auto">
+        <div>
+          <b-icon class="h6 mb-0 icons" icon="question-circle-fill" variant="danger"></b-icon> 
+          &nbsp; &nbsp;Aguardando Envio &nbsp; &nbsp;
+        </div>
+      </b-col>
+    </b-row>
 
     <!-- Info modal -->
     <b-modal :id="infoModal.id" :title="infoModal.title" ok-only @hide="resetInfoModal" size="xl">
@@ -134,40 +140,37 @@
           <b-col><b>Responsável R.H.</b></b-col>
           <b-col><b>Controle Interno</b></b-col>
         </b-row>
-
         <b-row class="fonteLinhas">
           <b-col>{{ gestor }}</b-col>
           <b-col>{{ rh }}</b-col>
           <b-col>{{ controleInterno }}</b-col>
         </b-row>
-
         <b-row class="fonteLinhas">
           <b-col>Data Assinatura:
             {{
                 dataAssinaturaGestor == ""
                   ? "---"
                   : formatarData(dataAssinaturaGestor)
-            }}</b-col>
+              }}</b-col>
           <b-col>Data Assinatura:
             {{
-                dataAssinaturaRh === "" ? "---" : formatarData(dataAssinaturaRh)
-            }}</b-col>
+                  dataAssinaturaRh === "" ? "---" : formatarData(dataAssinaturaRh)
+                }}</b-col>
           <b-col>Data Assinatura:
             {{
-                dataAssinaturaCI === "" ? "---" : formatarData(dataAssinaturaCI)
-            }}</b-col>
+                  dataAssinaturaCI === "" ? "---" : formatarData(dataAssinaturaCI)
+                }}</b-col>
         </b-row>
       </b-container>
     </b-modal>
   </div>
 </template>
 
-
 <script>
 import { api } from "@/plugins/axios";
 import jsPDF from "jspdf";
 
-import { mapActions, mapState } from "vuex";
+import { mapActions } from "vuex";
 import maskMixins from "@/helpers/mixins/mask";
 export default {
   mixins: [maskMixins],
@@ -175,12 +178,16 @@ export default {
   data() {
     return {
       unidades: [],
-      tableData2:[],
+      tableData:'',
+      statu:'',
+      status:'',
+      once: false,
+      tableData2: [],
       isBusy: true,
       perPage: 325,
       currentPage: 1,
       filter: "",
-      FilterSize: 0,
+      FilterSize: '',
       filterform: "",
       items: [],
       gestor: "",
@@ -198,124 +205,126 @@ export default {
         {
           key: "nomeEntidade",
           label: "Unidade Gestora",
-          sortable: true,
-          thStyle: { width: "30%" },
+          sortable: false,
+          thStyle: { width: "38%" },
           tdClass: "fonteLinhasLeft",
+          // class: "borderGrid"
         },
         {
           key: "cnpj",
-          label: "Cnpj",
-          sortable: false,
+          label: "CNPJ",
+          sortable: true,
           thStyle: { width: "10%" },
           formatter: "mascaraCnpj",
           tdClass: "fonteLinhasLeft",
         },
         {
           key: "exercicio",
-          label: "Exercicio",
-          sortable: true,
+          label: "Exercício",
+          sortable: false,
+          thStyle: { width: "1%", textAlign: "center"},
           tdClass: "fonteLinhas",
         },
         {
           key: "remessa",
           label: "Remessa",
-          sortable: true,
-
+          thStyle: { width: "1%", textAlign: "center"},
+          sortable: false,
           tdClass: "fonteLinhas",
         },
         {
           key: "relatoria",
           label: "Relatoria",
+          thStyle: { width: "1%", textAlign: "center"},
           sortable: false,
           tdClass: "fonteLinhas",
         },
         {
           key: "dataEntrega",
           label: "Data Entrega",
-          sortable: false,
+          sortable: true,
           formatter: "formatarData",
-          thStyle: { width: "10%" },
-          tdClass: "fonteLinhasLeft",
+          thStyle: { width: "10%" , textAlign: "center"},
+          tdClass: "fonteLinhas",
         },
         {
           key: "dataAssinatura",
           label: "Data Assinatura",
           sortable: true,
           formatter: "formatarData",
-          thStyle: { width: "10%" },
-          tdClass: "fonteLinhasLeft",
+          thStyle: { width: "10%" , textAlign: "center"},
+          tdClass: "fonteLinhas",
         },
         {
           key: "contAssinaturas",
-          label: "Qtd. Assinaturas",
-          thStyle: { width: "10%" },
+          label: "Quant. Assinaturas",
+          thStyle: { width: "8%" , textAlign: "center"},
           tdClass: "fonteLinhas",
           sortable: true,
+        },
+        {
+          key: "situacaoGFIP",
+          label: "Situção GFIP",
+          thStyle: { width: "6%", textAlign: "center"},
+          tdClass: "fonteLinhas",
+          sortable: false,
         },
         {
           key: "assinaturas",
           label: "Assinaturas",
           tdClass: "fonteLinhas",
-          sortable: true,
+          thStyle: { width: "1%", textAlign: "center"},
+          sortable: false,
         },
         {
           key: "status",
           label: "Status",
+          thStyle: { width: "1%", textAlign: "center"},
           tdClass: "fonteLinhas",
-          sortable: true,
+          sortable: false,
         },
       ],
       formdata: {
-        exercicio: 2024,
-        status:[
-              "Todos",
-              "Todos Enviados",
-              "Assinado",
-              "Pendente de assinatura", 
-              "Aguardando Envio"
+        status: [
+          "Todos",
+          "Todos Enviados",
+          "Todos Assinados",
+          "Assinado Intempestivamente",
+          "Pendente de assinatura",
+          "Aguardando Envio"
         ],
-        statu:"Todos",
-        exercicios: [
-          { value: "0", text: "Todos" },
-          { value: "2021", text: "2021" },
-        ],
-        remessa: 1,
-        remessas: [
-          { value: "0", text: "Todos" },
-          { value: "10", text: "10" },
-          { value: "9", text: "9" },
-          { value: "8", text: "8" },
-          { value: "7", text: "7" },
-          { value: "6", text: "6" },
-          { value: "5", text: "5" },
-          { value: "4", text: "4" },
-          { value: "3", text: "3" },
-          { value: "2", text: "2" },
-          { value: "1", text: "1" },
-        ],
+        statu: "Todos",
+        exercicio: '',
+        exercicios: [],
+        remessa: '',
+        remessas: [],
       },
     };
   },
 
   mounted() {
     this.isBusy = false;
-    this.ActionFindExercicio().then();
-    // this.pesquisar();
     this.pesquisarExercicios();
-    this.pesquisarRemessas();
-    this.pesquisarRemesssa();
-    
+    this.pesquisarExercicioVigente();
+    // this.consultarRemessa();
     this.findAllUnidadeGestora().then(resp => {
       this.unidades = resp;
     });
-    this.filterSize();
+    this.status = this.formdata.status;
+    this.statu = this.formdata.statu;
   },
-    
   computed: {
     rows() {
       return this.tableData2.length;
     },
-    ...mapState("remessas", ["tableData"]),
+
+    filteredUnidades() {
+      const normalizedFilter = this.normalizeText(this.filterform);
+
+      return this.unidades.filter(item =>
+        this.normalizeText(item.nome).includes(normalizedFilter)
+      );
+    },
   },
   methods: {
 
@@ -323,9 +332,53 @@ export default {
     ...mapActions("remessas", ["ActionFindByRemessa"]),
     ...mapActions("remessas", ["ActionFindByExercicio"]),
     ...mapActions("remessas", ["ActionFindExercicio"]),
+    ...mapActions("remessas", ["ActionFindByExercicioVigente"]),
+    ...mapActions("remessas", ["ActionFindByRemessaVigente"]),
+    ...mapActions("remessas", ["ActionSituacaoGFIP"]),
 
+    filtroInicial(){
+      // this.filterSize();
+      this.tableData2 = [];
+      this.formdata.exercicio = this.pesquisarExercicioVigente();
+      this.formdata.exercicios = this.pesquisarExercicios();
+      this.filterform = "";
+      this.filter = "";
+    },
+
+    resetFilter(){
+      this.formdata = { ...this.filtroInicial()}
+    },
+
+    statusteste(){
+      this.formdata.status = this.status;
+      return this.formdata.status;
+    },
+    statuteste(){ 
+      this.formdata.statu = this.statu;
+      return this.formdata.statu;
+    },
+
+    normalizeText(text) {
+      return text
+        ? text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+        : '';
+    }, 
+    pesquisarExercicioVigente() { // vai buscar o exercicio de está em vigencia
+      api.get("/exercicio/exercicioVigente").then((resp) => {
+        this.formdata.exercicio = resp.data[0];
+        this.pesquisarRemessas(resp.data[0]);
+        this.pesquisarRemessaVigente(resp.data[0]);
+        this.statusteste();
+        this.statuteste();
+      });
+    },
+    pesquisarRemessaVigente(exercicio) { // vai buscar o remessa de está em vigencia
+        api.get("/remessa/remessaVigente/" + exercicio).then((resp) => {
+        this.formdata.remessa = resp.data[0];
+        this.consultarRemessa();
+      });
+    },
     pesquisarExercicios() {
-
       api.get("/exercicio").then((resp) => {
         this.formdata.exercicios = resp.data
           .filter(p => p > 2020)
@@ -335,16 +388,10 @@ export default {
               text: "" + p,
             };
           });
-        this.formdata.exercicios[this.formdata.exercicios.length] = {
-          value: 0,
-          text: "Todos",
-        };
-        this.formdata.exercicio = this.formdata.exercicios[0].value;
       });
     },
-    pesquisarRemessas() {
-      api.get("/remessa/" + this.formdata.exercicio).then((resp) => {
-
+    pesquisarRemessas(exercicio) {
+      api.get("/remessa/" + exercicio).then((resp) => {
         this.formdata.remessas = resp.data.map((p) => {
           return {
             value: p,
@@ -355,29 +402,31 @@ export default {
           value: 0,
           text: "Todos",
         };
-        this.formdata.remessa = this.formdata.remessas[this.formdata.remessas.length-1].value;
       });
-      this.filterSize();
     },
-    filtraStatus(){
-      let status = this.formdata.statu;
-      this.tableData2 = this.tableData.filter(function (x) {
+    filtraStatus(status) {
+      status = this.formdata.statu;
+      this.tableData2 = this.tableData2.filter(function (x) {
         let retorno = false
-        switch (status){
+        switch (status) {  
           case "Todos":
-
             retorno = true
             break
-          case "Assinado":
+          case "Todos Assinados":
             if (x.contAssinaturas > 2) {
               retorno = true
             }
             break;
-          case "Pendente de assinatura":
-          if (x.contAssinaturas >= 1 && x.contAssinaturas <= 2) {
+          case "Assinado Intempestivamente":
+            if (x.dataAssinatura > x.dataFinalEnvio) {
               retorno = true
             }
             break;
+          case "Pendente de assinatura":
+            if (x.contAssinaturas >= 0 && x.contAssinaturas <= 2 && x.dataEntrega != null) {
+              retorno = true
+            }
+            break; 
           case "Aguardando Envio":
             if (x.dataEntrega === null) {
               retorno = true
@@ -392,19 +441,21 @@ export default {
             retorno = false
             break;
         }
-        return retorno 
-      })
+        return retorno
+      });
     },
     iconStatusTitle(item) {
-      if (item.contAssinaturas > 2) {
-        return "Assinado";
+      if (item.dataAssinatura > item.dataFinalEnvio) {
+        return "Assinado Intempestivamente";
       }
-      if (item.dataEntrega !== null && item.contAssinaturas <= 2) {
-        return "Pendente de Assinatura";
-      } else if (item.qntDocumentoGFIP < 3) {
-        return "Pendente GFIP ";
-      } else {
+      if (item.contAssinaturas > 2 && item.dataAssinatura < item.dataFinalEnvio) {
+        return "Todos Assinados";
+      }
+      if (item.dataEntrega == null ) {
         return "Aguardando Envio";
+      }
+      if (item.contAssinaturas >= 0 && item.contAssinaturas <= 2) {
+        return "Pendente de Assinatura";
       }
     },
     filterSize() {
@@ -413,38 +464,39 @@ export default {
         if (x.nomeEntidade.toUpperCase().includes(this.filter.trim().toUpperCase())) {
           sum++;
         }
-      })
+      });
       this.FilterSize = sum;
       return sum;
     },
     iconStatus(item) {
-      switch (this.iconStatusTitle(item)){
-        case "Assinado":
+      switch (this.iconStatusTitle(item)) {
+        case "Todos Assinados":
           return "check-square";
+        case "Assinado Intempestivamente":
+          return "check-circle-fill";
         case "Pendente de Assinatura":
-          return "exclamation-triangle-fill";
-        case "Pendente GFIP ":
-          return "dash-circle";
+          return "key-fill";
         case "Aguardando Envio":
-          return "x-circle";
+          return "question-circle-fill";
       }
-      
     },
     iconStatusVariant(item) {
+      if (item.dataAssinatura > item.dataFinalEnvio) {
+        return "warning";
+      }
       if (item.contAssinaturas > 2) {
         return "success";
       }
-
+      
       if (
         (item.contAssinaturas >= 1 && item.contAssinaturas <= 2) |
         (item.qntDocumentoGFIP < 3)
       ) {
-        return "warning";
+        return "danger";
       } else {
         return "danger";
       }
     },
-
     verIconAssinatura(item) {
       if (item.contAssinaturas >= 1) {
         return false;
@@ -452,7 +504,6 @@ export default {
         return true;
       }
     },
-
     verIconRecibo(item) {
       if (item.contAssinaturas > 2) {
         return false;
@@ -460,14 +511,19 @@ export default {
         return true;
       }
     },
-    async pesquisarRemesssa() {
-      this.isBusy = !this.isBusy; //loading
-      await this.ActionFindByExercicio(this.formdata).then({});
-      //this.tableData = this.$store.remessas.tableData
-      this.isBusy = false;
+    consultarRemessa(){
+      this.isBusy = !this.isBusy;
+      let exercicio = this.formdata.exercicio;
+      let remessa = this.formdata.remessa;
+      // console.log('passou aki')
+      api.get("/externo/acompanhamentoRemessa/getExercicio/" + exercicio + "/" + remessa ).then((resp) => {
+        
+        this.tableData2 = resp.data;
+        this.filtraStatus();
+        this.filterSize();
+        this.isBusy = false;
+      });
       this.filter = this.filterform;
-      this.filterSize();
-      this.filtraStatus();
     },
     async pesquisar() {
       this.isBusy = !this.isBusy; //loading
@@ -475,7 +531,6 @@ export default {
       this.isBusy = false;
       this.filterSize();
     },
-
     mascaraCnpj(value) {
       var mascara = `${value}`.replace(
         /^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/,
@@ -483,7 +538,6 @@ export default {
       );
       return mascara;
     },
-
     formatarData: function (value) {
       if (value === null) {
         return null;
@@ -497,13 +551,11 @@ export default {
         second: "2-digit",
       });
     },
-
     info(item, index, button) {
       this.$root.$emit("bv::show::modal", this.infoModal.id, button);
       this.infoModal.title = `Unidade Gestora: ${item.nomeEntidade}`;
       this.buscarDadoRemessa(item.chave);
     },
-
     resetInfoModal() {
       this.infoModal.title = "";
       this.infoModal.content = "";
@@ -514,7 +566,6 @@ export default {
         (this.dataAssinaturaRh = ""),
         (this.dataAssinaturaCI = "");
     },
-
     abrirRecibo(item) {
       //let pdfName = 'Recibo Sicap AP '+item.cnpj+'_'+item.exercicio+'_'+item.remessa;
       var doc = new jsPDF();
@@ -543,7 +594,7 @@ export default {
       doc.text("CNPJ: ", 10, 70);
 
       doc.setFont(undefined, "normal");
-      doc.text("" + item.cnpj, 25, 70);
+      doc.text("" + this.mascaraCnpj(item.cnpj), 25, 70);
 
       doc.setFont(undefined, "bold");
       doc.text("Código de Entrega: ", 10, 80);
@@ -579,7 +630,7 @@ export default {
       api.get("/unidadeGestora/todos").then((resp) => {
         //commit('getUnidades', resp.data)
         return resp.data;
-    }),
+      }),
 
     buscarDadoRemessa(chave) {
       this.findGestor(chave);
@@ -598,7 +649,6 @@ export default {
         this.statusGestor = "Sem Permissão";
       }
     },
-
     async findRh(chave) {
       const data = await this.getResponsavel("Responsável R.H.", chave);
       if (data !== "semPermissao") {
@@ -632,7 +682,7 @@ export default {
   },
 };
 </script>
-<style >
+<style>
 .fonteLinhas {
   font-size: 14px;
   text-align: center;
@@ -640,6 +690,27 @@ export default {
 
 .fonteLinhasLeft {
   font-size: 14px;
+}
+
+.icons {
+  font-size: 18px;
+}
+
+.label-spacing{
+  margin-top: 10px;
+}
+
+.align-right{
+  text-align: right;
+}
+
+.spacing {
+  margin-right: 20px;
+}
+
+.width-unidade {
+  width: 810px; 
+  overflow: hidden; 
 }
 
 .select-selected {

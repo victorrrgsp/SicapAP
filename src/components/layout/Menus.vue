@@ -1,25 +1,19 @@
-<template>
-  <div> 
-      <template >
-        <div class="p-3">
-             <nav class="mb-3">
-                <b-nav horizontal>
-                        <router-link
-                            exact
-                            :key="i"
-                            class="nav-link"
-                            exact-active-class="active"
-                            :to="{ name: router.name }"
-                            v-for="(router, i) in routes">
-                            <b-icon :icon="router.meta.icon"></b-icon>
-                            {{ router.meta.title }} 
-                        </router-link>
-                </b-nav>
-           </nav>
-           <br/>
-           <br/>
-        </div>
-      </template>
+<template >
+  <div class="padding">
+    <nav class="mb-1">
+      <b-nav horizontal>
+        <router-link
+          exact
+          :key="i"
+          class="nav-link"
+          exact-active-class="active"
+          :to="{ name: router.name }"
+          v-for="(router, i) in routes">
+          <b-icon :icon="router.meta.icon"></b-icon>
+          {{ router.meta.title }} 
+        </router-link>
+      </b-nav>
+    </nav>
   </div>
 </template>
 <script>
@@ -58,7 +52,7 @@ export default {
 .nav {
     font-family: 'Montserrat', sans-serif;
     font-weight: 800;
-    font-size: 1.25rem/17.50px;
+    font-size: 14.50px;
     margin-left: -15px;
     width: calc(100% + 30px);
   .nav-link {

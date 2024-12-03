@@ -1,51 +1,36 @@
 <template>
-<div>
-  <b-navbar class="navbar-tce"  type="dark" >
-          <div class="container-fluid" >
-            <div class="row">
-                <div class="col-2">
-                    <b-collapse class="header1" id="collapse-1"  is-nav>
-                          <b-navbar-brand class="col-s-4">
-                             
-                              <img src="@/assets/imgs/logo_TCE.jpg" class="img-logo">
-                          </b-navbar-brand>
-                          <b-navbar-nav class="col-s-8">
-                                <div class="col-s-10">
-                                  <div class="row fonte_titulo_logo"> Tribunal de Contas</div>
-                                  <div class="row fonte_subtitulo_logo"> do Estado do Tocantins</div>
-                                </div>
-                          </b-navbar-nav>
-                    </b-collapse>
+  <div>
+    <b-navbar class="navbar-tce"  type="dark" >
+      <div class="container-fluid">
+        <div class="row ">
+          <div class="col-2">
+            <b-collapse class="header1" id="collapse-1"  is-nav>
+              <b-navbar-brand class="col-s-4">               
+                <img src="@/assets/imgs/logo_TCE.jpg" class="img-logo">
+                  </b-navbar-brand>
+                    <b-navbar-nav class="col-s-8">
+                      <div class="col-s-10">
+                        <div class="fonte_titulo_logo"> Tribunal de Contas</div>
+                        <div class="fonte_subtitulo_logo"> do Estado do Tocantins</div>
+                      </div>
+                    </b-navbar-nav>
+                  </b-collapse>
               </div>
-           <div class="col3-head">
-              <b-collapse id="nav-collapse" is-nav>
-                  <b-navbar-nav class="ms-left">
-                  <div class="row" style="margin-left: 2rem;">
-                    <b-nav >
-                        <b-nav-text style="margin-top: 5px; margin-left: 5px;"><span class="text-white h4">Sicap Atos de Pessoal Público</span></b-nav-text>
-                    </b-nav>
-                  </div>
-                </b-navbar-nav>
-              </b-collapse>
-          </div>
-
-          <div class="col">
-                <b-collapse id="nav-collapse"  is-nav >
-                  <b-navbar-nav class="ms-auto ">
-                      <b-nav class="teste" >
-                        <b-nav-item href="#"></b-nav-item >
-                        <b-nav-text style="margin-top: 7px"></b-nav-text>
-                      </b-nav>
-                    <b-nav-form @submit.prevent="submit()">
-                       
-                    </b-nav-form>
-                  </b-navbar-nav>
-                </b-collapse>
+          <div class="col-3">
+            <b-collapse id="nav-collapse" is-nav>
+              <b-navbar-nav class="ms-left">
+                <div class="row align" >
+                  <b-nav >
+                    <b-nav-text style="margin-top: 5px; margin-left: 0px; text-align: left;"><span class="text-white ">Sicap Atos de Pessoal Público</span></b-nav-text>
+                  </b-nav>
+                </div>
+              </b-navbar-nav>
+            </b-collapse>
           </div>
        </div>
-    </div>
-  </b-navbar>
-</div>
+      </div>
+    </b-navbar>
+  </div>
 </template>
 
 <script>
@@ -85,7 +70,8 @@ export default {
     .header1{
       background-color: var(--azul-escuro-tce);
       width: 100%;
-
+      display: flex;
+      // height: 5px;
     }
 
     .botao-menu{
@@ -139,6 +125,8 @@ export default {
         display: flex !important;
         padding: 0 0 0 0 !important;
         width: 100%;
+        // height: auto;
+        
         }
 
     .row{
@@ -147,11 +135,21 @@ export default {
        width: 100%;
        border-right: 0%;
         
-        }
+    }
+
+    .align{
+      margin-left: 1rem;
+    }
+
+      .col-3{
+        display: flex !important;
+        width: auto;
+      }
 
      .col-2{
-        width: 342px;
- }
+        width: 460px;
+    }
+
  html{
    border-right: 0%;
  }
@@ -203,6 +201,19 @@ export default {
   
 }
 
+@media (max-width: 716px) { 
+  .header1{
+    display: block;
+  }
+  .col-2{
+        width: 100%;
+  }
+  .col-3{  
+    width: 100%;
+    align-items: center;  
+  }
+}
+
 @media (max-width: 480px) { 
  
  
@@ -232,7 +243,7 @@ export default {
   .col-s-11 {width: 91.66%;}
   .col-s-12 {width: 100%;}
 
-
+   
   
  }
 

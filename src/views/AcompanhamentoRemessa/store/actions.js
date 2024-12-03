@@ -20,10 +20,25 @@ export const ActionFindByRemessa = ( {commit}, payload) => (
 )
 
 export const ActionFindByExercicio = ( {commit}, payload) => (
-    api.get('/externo/acompanhamentoRemessa/getExercicio/'+payload.exercicio+'/'+payload.remessa).then(resp => {
+    api.get('/externo/acompanhamentoRemessa/getExercicio/'+ payload.exercicio +'/'+ payload.remessa ).then(resp => {
         commit(types.SET_DADOS, resp.data)
     })
 )
 
+export const ActionFindByExercicioVigente = ( {commit} ) => (
+    api.get('/exercicio/exercicioVigente').then(resp => {
+        commit(types.SET_DADOS, resp.data)
+    })
+)
 
+export const ActionFindByRemessaVigente = ( {commit}, payloud) => (
+    api.get('/remessa/remessaVigente/'+payloud.exercicio).then(resp => {
+        commit(types.SET_DADOS, resp.data)
+    })
+)
 
+export const ActionSituacaoGFIP = ( {commit}, payloud) => (
+    api.get('cadastrarGfip/situacao/gfip/' + payloud.exercicio + '/' + payloud.remessa + '/' + payloud.cnpj).then(resp => {
+        commit(types.SET_DADOS, resp.data)
+    })
+)

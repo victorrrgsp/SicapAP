@@ -57,17 +57,40 @@ import BaseSpinner from './components/global/BaseSpinner'
 
   .body{
       position: absolute;
-      margin-top: 80px;
+      margin-top: 40px;
       left: 20px;
       right: 20px;
     }
 
   .menu{
       position: absolute;
-      margin-top: 2px;
+      margin-top: 6px;
       left: 20px;
       right: 20px;
     }
 
+    @media (max-width: 918px) { 
+      .body{
+        margin-top: 80px;
+      }
+    }
+
+    @media (max-width: 555px) { 
+      .body{
+        margin-top: 120px;
+      }
+    }
+
+    @media (max-width: 373px) { 
+      .body{
+        margin-top: 135px;
+      }
+    }
+    
+    @media (max-width: 318px) { 
+      .body{
+        margin-top: 150px;
+      }
+    }
 }
 </style>
