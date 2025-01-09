@@ -34,7 +34,7 @@ public class UnidadeGestoraRepository extends DefaultRepository<UnidadeGestora, 
     }
 
     public List<UnidadeGestora> buscaTodasUnidadeGestora() {
-        List<UnidadeGestora> list = entityManager.createNativeQuery("select * from UnidadeGestora ORDER BY nome ASC"
+        List<UnidadeGestora> list = entityManager.createNativeQuery("select * from UnidadeGestora where id <> '00000000000000' ORDER BY nome ASC"
                 , UnidadeGestora.class).getResultList();
         return list;
     }

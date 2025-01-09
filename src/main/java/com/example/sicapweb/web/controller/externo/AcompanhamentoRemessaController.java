@@ -31,7 +31,6 @@ public class AcompanhamentoRemessaController {
     @Autowired
     private InfoRemessaRepository infoRemessaRepository;
 
-
     @CrossOrigin
     @GetMapping(path = {"/all"})
     public ResponseEntity<?> findTodos() {
@@ -42,11 +41,16 @@ public class AcompanhamentoRemessaController {
     @CrossOrigin
     @GetMapping(path = {"/getExercicio/{exercicio}/{remessa}"})
     public ResponseEntity<?> findByExercicio(@PathVariable Integer exercicio, @PathVariable Integer remessa) {
-        List<Map<String, Object>> infoRemessa = acompanhamentoRemessaRepository.buscarExercicioAcompanhamentoRemessa(exercicio, remessa);
+        var infoRemessa = acompanhamentoRemessaRepository.buscarExercicioAcompanhamentoRemessa(exercicio, remessa);
         return ResponseEntity.ok().body(Objects.requireNonNullElse(infoRemessa, "semRemessa"));
     }
 
-
+//    @CrossOrigin
+//    @GetMapping(path = {"/buscarQuantidadeRegistros/{exercicio}/{remessa}"})
+//    public ResponseEntity<?> quantidadeRegistros(@PathVariable Integer exercicio , @PathVariable Integer remessa) {
+//        Object resposta = acompanhamentoRemessaRepository.quantidadeRegistros(exercicio, remessa);
+//        return ResponseEntity.ok().body(Objects.requireNonNullElse(resposta, "semRemessa"));
+//    }
 
     @CrossOrigin
     @GetMapping(path = {"/{cargo}/{chave}"})

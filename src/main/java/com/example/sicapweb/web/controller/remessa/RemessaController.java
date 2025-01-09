@@ -21,6 +21,11 @@ public class RemessaController {
         return ResponseEntity.ok().body(list);
     }
 
-
+    @CrossOrigin
+    @GetMapping(path = {"/remessaVigente/{exercicio}"})
+    public ResponseEntity<?> findRemessaVigente(@PathVariable Integer exercicio) {
+        List<Integer> infoRemessa = remessaRepository.buscarRemessaVigente(exercicio);
+        return ResponseEntity.ok().body(infoRemessa);
+    }
 
 }

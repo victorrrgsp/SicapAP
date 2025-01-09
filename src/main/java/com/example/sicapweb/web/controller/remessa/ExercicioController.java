@@ -16,6 +16,7 @@ public class ExercicioController {
 
     @Autowired
     private ExercicioRepository exercicioRepository;
+
     @CrossOrigin
     @GetMapping
     public ResponseEntity<List<Integer>> findAll(){
@@ -30,5 +31,10 @@ public class ExercicioController {
         return ResponseEntity.ok().body(list);
     }
 
-
+    @CrossOrigin
+    @GetMapping(path = {"/exercicioVigente"})
+    public ResponseEntity<?> findRemessaVigente() {
+        List<Integer> list = exercicioRepository.buscarExercicioVigente();
+        return ResponseEntity.ok().body(list);
+    }
 }

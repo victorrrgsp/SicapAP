@@ -22,4 +22,7 @@ public class RemessaRepository extends DefaultRepository<Integer, Integer> {
         return entityManager.createNativeQuery("select distinct numeroRemessa as remessa from Cadun..PeriodoRemessa  "+" where idSistema=29 AND exercicio="+exercicio+" ").getResultList();
     }
 
+    public List<Integer> buscarRemessaVigente(Integer exercicio) {
+        return entityManager.createNativeQuery("select top 1 numeroRemessa as remessa from Cadun..PeriodoRemessa pr where idSistema = 29 and ( " + exercicio + " is null or exercicio = " + exercicio + ") ORDER BY id DESC").getResultList();
+    }
 }
